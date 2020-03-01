@@ -1,0 +1,28 @@
+(defproject firn "0.1.0-SNAPSHOT"
+  :description "FIXME: write description"
+  :url "http://example.com/FIXME"
+  :license {:name "EPL-2.0 OR GPL-2.0-or-later WITH Classpath-exception-2.0"
+            :url "https://www.eclipse.org/legal/epl-2.0/"}
+  :dependencies [[borkdude/sci "0.0.13-alpha.14"]
+                 [cheshire "5.10.0"]
+                 [cli-matic "0.3.11"]
+                 [hiccup "1.0.5"]
+                 [http-kit "2.3.0"]
+                 ;; [juxt/dirwatch "0.2.5"] ;; vendored
+                 [me.raynes/fs "1.4.6"]
+                 [ring "1.8.0"]
+                 [mount "0.1.16"]
+                 [org.clojure/clojure "1.9.0"]
+                 [ring/ring-defaults "0.3.2"]]
+
+  :jvm-opts ["-Djava.library.path=./resources"]
+  :java-source-paths ["src-java"]
+  :plugins [[lein-cljfmt "0.6.7"]
+            [lein-cloverage "1.1.2"]]
+  :resources-paths ["resources"]
+  :main firn.core
+  :profiles {:uberjar {:aot :all
+                       :main firn.core
+                       :jvm-opts ["-Dclojure.compiler.direct-linking=true"
+                                  "-Dclojure.spec.skip-macros=true"]}}
+  :repl-options {:init-ns firn.core})

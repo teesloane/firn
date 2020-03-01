@@ -1,0 +1,4 @@
+#+TITLE: File Layout
+#+FIRN_LAYOUT: project
+
+A test file for asserting that FIRN_LAYOUT returns the layout function for project.

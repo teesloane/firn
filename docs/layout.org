@@ -1,0 +1,167 @@
+#+TITLE: Layout
+#+DATE_CREATED: <2020-03-24 Tue>
+#+DATE_UPDATED: <2020-04-20 20:21>
+#+FILE_UNDER: docs
+#+FIRN_LAYOUT: docs
+
+* Overview
+
+When you create a new Firn site for the first time, it will create a folder in
+=_firn/layouts=.
+
+When an org-mode file is processed by Firn it looks at the file's =keywords= to
+see if it uses a Layout. If none are specified, the _default template_ is used.
+
+The act of "applying" a template means to pass the content of the org-file
+through a specific clojure hiccup template that organizes how the content is displayed.
+
+* Usage
+
+Let's walk through an example.
+
+#+BEGIN_SRC  sh
+mkdir firn_example
+cd firn_example; touch foo.org
+#+END_SRC
+
+Navigate to =foo.org= and open the file. Edit it to include the following:
+
+*NOTE*: Because the snippet below is org-mode code, you will need to remove the =\=  preceding the =*= Headings.
+
+#+BEGIN_SRC org
+
+#+TITLE: Layout
+#+DATE_CREATED: <2020-03-24 Tue>
+#+DATE_UPDATED: <2020-03-24 14:20>
+#+FILE_UNDER: docs
+#+FIRN_LAYOUT: docs
+
+\* My project
+
+ This is my project
+
+\* Tasks
+
+ - [ ] Figure out how layouts work.
+#+END_SRC
+
+Now we have a file that is going to look for a layout called "docs" in the
+layouts folder. Return to the terminal
+
+#+BEGIN_SRC sh
+cd layouts
+touch docs.clj
+#+END_SRC
+
+Inside docs.clj place the following clojure code.
+
+#+BEGIN_SRC clojure
+(defn project
+  [{:keys [render title partials]}]
+  (let [{:keys [head nav]} partials]
+    (head
+     [:body
+      (nav)
+      [:main
+       [:article
+        [:div (render "Notes")]]]]))) ;; Renders The notes section.
+#+END_SRC
+
+* Do I have to use layouts?
+
+Not really. If you don't have any .clj files in the =_firn/layouts/= directory,
+Firn will default to using the internal default template. This provides a very
+basic out of the box formatting and will render the entirety of your org mode file.
+
+* How do I customize the styling of my layouts?
+
+As with normal HTML, you'll need to add a =head= tag with a =link= and linking
+to a css file. It'll probably be most likely to create a partial for your =<head></head>=
+content that can then be shared across layouts:
+
+#+BEGIN_SRC clojure
+(defn head
+  [body]
+  [:html
+   [:head
+    [:link {:rel "stylesheet" :href "/static/css/main.css"}]]
+   body])
+#+END_SRC
+
+* How do I drill down into the content of a heading?
+
+First, a =heading= refers to a bullet heading in org-mode (the kind that are
+toggleable with the =tab=) key. A =heading= can have =sub-headings=, =drawers=
+(properties, logbooks, etc) and general text content (tables, lists, prose, etc.)
+
+Because a heading can contain so much data, the =render= function, made
+available to your layouts, aims to make getting content out of a heading easier.
+
+View the code block below to see the multiple ways of using the =render= function
+
+#+BEGIN_SRC clojure
+;; In it's simplest form you can render a heading in it's entirety.
+;; This will search through the headings for a headline with that name specifically
+;; and then render it to HTML.
+[:div (render "My Heading")]]
+
+;; Next, you can ask to just render the headline's title:
+[:div (render "My Heading" :title)]] ; => "My Heading"
+
+;; You can also ask to get the "raw" text, which will just return the
+;; plain-text of the title -- you're just getting <string> rather than
+;; a hiccup data structure; so you won't be getting an H1/H2/H3 etc.
+[:div (render "My Tasks" :title-raw)]] ; => "My Tasks".
+
+;; Render the contents of the headline - ie, everything but the title "My Tasks".
+[:div (render "My Tasks" :content)]]
+#+END_SRC
+
+* How can I access data in my layouts?
+
+Currently, you can also access some site-wide meta-data in your layouts, as well as
+file-specific meta-data. Example meta-data:
+
+- All logbooks across all files.
+- All links across all files (which might be ideal for say... setting up a link graph.)
+
+The =prepare= [[file:../src/firn/layout.clj::69][function]] in the =layout= namespace sets up layouts to have access
+to functions and data:
+
+| Function/Data | Intent                                       | Data-type |
+|---------------+----------------------------------------------+-----------|
+| render        | Enables rendering parts of an org file.      | function  |
+| title         | The org mode file.                           | string    |
+| site-map      | A list of all files on the wiki              | list      |
+| site-links    | A list of all links across all documents     | list      |
+| site-logs     | A list of ALL logbook entries.               | list      |
+| file-logs     | A list of logbooks entries per file.         | list      |
+| file-links    | A list of links per file                     | list      |
+| partials      | a list of partials in your =partials= folder | list      |
+| yield         | Your entire org file, rendered to html       | html      |
+| config        | The site wide config.                        | map       |
+
+* Styling Layouts
+
+You can write css as you normally would by placing css files in the =_firn/static/css=
+folder and then having =firn=  move them into your =_site= folder when run.
+Styling is applied through [[https://github.com/weavejester/hiccup#syntax][hiccup]].
+
+There are some internal styles that are applied when org-mode text is
+transformed into data. These styles are all prefaced with the keyword =firn_=,
+(ie =firn_title-prirority= or =firn_title-keyword=).
+
+The following are the css classes and their rerspective org-mode structure they
+augment, as they come hard-coded into firn:
+
+| Css class                 | Element                                  |
+|---------------------------+------------------------------------------|
+| .firn_title-priority      | Title Priority (ex: [#A] / [#B] etc)     |
+| .firn_title-priority__A   | Targets =[#A]=                           |
+| .firn_title-priority__B   | Etc.                                     |
+| .firn_title-priority__C   | Etc.                                     |
+| .firn_title-keyword       | Targets all keywords =TODO/DONE= etc.    |
+| .firn_title-keyword__TODO | Targets =TODO=                           |
+| .firn_title-keyword__DONE | Targets =DONE=                           |
+| .firn_heading-timestamp   | Heading Timestamps*                      |
+| .firn_heading-cookie      | Targets heading todo-count (ex =[7/10]=) |

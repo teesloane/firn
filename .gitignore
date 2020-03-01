@@ -1,0 +1,36 @@
+/target
+/classes
+/checkouts
+profiles.clj
+pom.xml
+pom.xml.asc
+*.jar
+*.class
+/.lein-*
+/.nrepl-port
+.hgignore
+.hg/
+
+out.txt
+src/parser/target
+
+tmp/
+
+.DS_Store
+**/*/.DS_Store
+
+test/firn/demo_org/_firn
+# personal layouts.
+# resources/_firn_starter/layouts/project.clj
+
+rust/target
+clojure/target
+clojure/_firn
+clojure/clojure-rust
+clojure/.nrepl-port
+clojure/test/firn/demo_org/_firn
+clojure/resources/firn/libmylib.dylib
+clojure/firn
+clojure/resources/libmylib.dylib
+rust/target
+target

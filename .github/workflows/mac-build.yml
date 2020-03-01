@@ -1,0 +1,34 @@
+name: Mac Build
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: macOS-latest
+
+    env:
+      GRAALVM_HOME: /tmp/graalvm/Contents/Home
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup lein
+      run: |
+        brew install leiningen
+    - name: get graal.
+      run: |
+        bin/setup-graal-osx
+    - name: setup-native-image
+      run: |
+        $GRAALVM_HOME/bin/gu install native-image
+    - name: run compile script
+      run: |
+        echo "graal vm home is:"
+        echo $GRAALVM_HOME
+        bin/compile
+    - uses: actions/upload-artifact@v1
+      with:
+        name: firn-mac
+        path: target/
