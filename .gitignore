@@ -10,3 +10,6 @@ pom.xml.asc
 /.nrepl-port
 .hgignore
 .hg/
+
+out.txt
+src/parser/target

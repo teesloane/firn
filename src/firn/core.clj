@@ -7,9 +7,10 @@
 (defn get-files
   "Returns a list of files as Java objects.
   Filters out all non `.org` files.
-  TODO: handle empty folder; handle custom folder, handle none found.
+  FIXME: handle empty folder; handle custom folder, handle none found.
   "
   []
+  (println "Getting org files...")
   (->> "/Users/tees/Dropbox/wiki/"
        clojure.java.io/file
        file-seq
@@ -17,32 +18,34 @@
        (filter (fn [file] (-> file .getName (.endsWith ".org"))))))
 
 
-(defn read-files
+(defn read-file
   "Takes a list of files and reads them, eventually parsing them."
-  [f]
-  (slurp f))
+  [file]
+  (println "Reading File..." (.getName file))
+  (slurp file))
 
 
-(defn write-files
+(defn write-file
   "Takes read and parsed content files and writes them to output."
   [f]
+  (println "Writing files...")
   (spit "out.txt" f))
 
 
 (defn compile
   []
-  (-> (get-files)
-      (first)
-      (read-files)
-      (write-files)))
+  (let [files (get-files)
+        files [(first files)]] ;; remove this when ready.
+    (doseq [f files]
+      (-> f
+          (read-file)
+          (write-file)))))
 
-(compile)
+;; (compile)
 
 ;; File Writing
 
 (defn -main
   "I don't do a whole lot ... yet."
   [& args]
-  (println "Reading Files...")
-  (compile)
-  (println "Created Files."))
+  (compile))
