@@ -1,8 +1,10 @@
 (ns firn.core
   (:require [clojure.java.io :as io]
             [clojure.java.shell :as sh]
-            [cheshire.core :as json])
+            [cheshire.core :as json]
+            [firn.extracter :as ex])
   (:gen-class))
+
 
 ;; Files Reading
 ;; talk to rust binary!
@@ -32,7 +34,15 @@
   (let [f (-> file slurp parse!)]
     (if-not (= (:exit f) 0)
       (prn "It failed -- handle this.")
-      (json/parse-string (get f :out) true))))
+      (-> f
+          (:out)
+          (json/parse-string true)
+          (ex/get-meta)
+          #_(ex/trxer)))))
+
+         
+
+
 
 
 
@@ -40,24 +50,23 @@
   "Takes read and parsed content files and writes them to output."
   [f]
   (println "Writing files...")
-  (spit "out.txt" f))
+  (spit "out.edn" (pr-str f))
+  f)
 
 
-(defn compile
-  []
-  (let [files (get-files)
-        files [(first files)]] ;; remove this when ready.
-    (doseq [f files]
-      (-> f
-          (read-file)
-          (write-file)))))
- 
-(compile)
+(-> (get-files)
+    (first)
+    (read-file))
+
 
 ;; File Writing
 
 (defn -main
   [& args]
-  (compile))
+  (-> (get-files)
+      (first)
+      (read-file)
+      (write-file)))
 
 
+(-main)
