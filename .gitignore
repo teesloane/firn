@@ -13,3 +13,5 @@ pom.xml.asc
 
 out.txt
 src/parser/target
+
+tmp/
