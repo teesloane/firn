@@ -1,7 +1,7 @@
 (ns firn.extracter
   (:require [hiccup.core :as h]
             [firn.example :as ex]
-            [clojure.string :refer [trim-newline trim]]))
+            [clojure.string :as s :refer [trim-newline trim]]))
 
 
 ;; -- Get pieces out of the Org Map
@@ -46,6 +46,19 @@
 
 
 ;; General funcs for html.
+(s/includes? "file:research_org_mode_2020-02-28--20-56.org" "file")
+
+
+
+(defn a->html
+  "Parses links from the org-tree.
+  Checks if a link is an HTTP link or File link."
+  [v]
+  ()
+  (let [file-link? (s/includes? (v :path) "file:")]
+    (if file-link?
+        (h/html [:a {:href (get v :path "missing")} (get v :desc "missing")])
+        (h/html [:a {:href (get v :path "missing")} (get v :desc "missing")]))))
 
 (defn to-html
   "Should expect the first value to be of type `:section`
@@ -66,8 +79,9 @@
       (= "list"        t) (inner-html :ul)
       (= "list-item"   t) (inner-html :li)
       (= "quote-block" t) (inner-html :div) ;; TODO: fixme
+      (= "link" t)        (a->html v)
       (= "text"        t) (h/html [:p val])
-      :else             "<MISSING HTML VALUE FIXME>")))
+      :else               "<MISSING HTML VALUE FIXME>")))
 
 (to-html ex/ex5)
 
@@ -86,7 +100,7 @@
         notes     (get-1st-level-headline-by-name "Notes" org-tree)
         resources (get-1st-level-headline-by-name "Resources" org-tree)]
 
-    meta))
+    (-> notes first :children second to-html)))
     ;; {:in-buffer-settings {:data (get-in-buffer-settings org-tree)}
     ;;  :meta               {:data (get-meta org-tree)}}))
 
