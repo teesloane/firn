@@ -15,3 +15,6 @@ out.txt
 src/parser/target
 
 tmp/
+
+.DS_Store
+**/*/.DS_Store
