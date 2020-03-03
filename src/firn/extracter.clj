@@ -1,14 +1,7 @@
 (ns firn.extracter
   (:require [hiccup.core :as h]
             [firn.example :as ex]
-            [clojure.string :refer [trim-newline]]))
-
-
-
-(defn- get-headline-by-name
-  [v]
-  (when (= (:raw v) "Meta")
-    v))
+            [clojure.string :refer [trim-newline trim]]))
 
 
 ;; -- Get pieces out of the Org Map
@@ -25,12 +18,34 @@
 (defn get-meta
   [org-tree]
   (->> org-tree
-       (map (fn [v] v
+       (map (fn [v]
               (when (= (:raw v) "Meta")
                 {:title      (:raw v)
                  :properties (:properties v)})))
        (remove nil?)))
 
+
+(defn get-1st-level-headline-by-name
+  "Takes org tree and filters down to a headline + it's contents
+  FIXME: Needs to handle cases where nothing is found."
+  [name org-tree]
+  (->> org-tree
+       (map (fn [v]
+              (when (= (:type v) "headline") v)))
+       (filter (fn [y] ;; get level 1 headings
+                 (= (get y :level nil) 1)))
+       (filter (fn [y]
+                 (= (-> y
+                        :children
+                        first
+                        :children
+                        first
+                        :value
+                        trim) name)))
+       (remove nil?)))
+
+
+;; General funcs for html.
 
 (defn to-html
   "Should expect the first value to be of type `:section`
@@ -57,27 +72,22 @@
 (to-html ex/ex5)
 
 
-
-
-
-
-(->> ex/ex
-     (tree-seq map? :children)
-     (map to-html))
-
-  
-
-
+;; --- General funcs for preparing the big'un
 
 
 
 
 (defn trxer
   "Takes the AST and parses the info for everything."
-  [org-file]
+  [#_org-file]
 
-  (let [org-tree (tree-seq map? :children org-file)]
-    {:in-buffer-settings {:data (get-in-buffer-settings org-tree)}
-     :meta               {:data (get-meta org-tree)}}))
+  (let [org-tree  (tree-seq map? :children ex/ex #_org-file)
+        meta      (get-1st-level-headline-by-name "Meta" org-tree)
+        notes     (get-1st-level-headline-by-name "Notes" org-tree)
+        resources (get-1st-level-headline-by-name "Resources" org-tree)]
 
+    meta))
+    ;; {:in-buffer-settings {:data (get-in-buffer-settings org-tree)}
+    ;;  :meta               {:data (get-meta org-tree)}}))
 
+(trxer)
