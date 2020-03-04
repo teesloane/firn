@@ -1,6 +1,7 @@
 (ns firn.markup
   (:require [hiccup.core :as h]
-            [clojure.string :as s]))
+            [clojure.string :as s]
+            [firn.example :as ex]))
 
 
 ;; Helpers
@@ -20,62 +21,69 @@
         file-link? (s/includes? link-href "file:")
         link-val   (get v :desc "missing!")
         parse-link (if file-link? (parse-file-link link-href) link-href)]
-      (h/html [:a {:href parse-link} link-val])))
+      [:a {:href parse-link} link-val]))
 
-(defn- heading->html
-  "Parses headings
-  Needs to be able to parse headings that don't have simple text:
-  <* TODO [2020-02-25 Tue] Setup <2020-03-03 Tue> emacs spell check in org mode>
-  For example, in which the heading has interleaved non-text values in the heading.
-  "
-  [{:keys [level raw children keyword] :as v}]
-  (let [text-content (->> children
-                          (filter #(= (% :type) "text"))
-                          (mapcat #(str (% :value))))]
-    (case level
-      1 (h/html [:h1 text-content])
-      2 (h/html [:h2 text-content])
-      3 (h/html [:h3 text-content])
-      4 (h/html [:h4 text-content])
-      5 (h/html [:h5 text-content])
-      (h/html [:h6 text-content]))))
+(defn- title-level->html
+  " "
+  [v]
+  (case (v :level)
+    1 :h1
+    2 :h2 
+    3 :h3 
+    4 :h4 
+    5 :h5 
+    :h6))
 
 
 (defn- src-block->html
   [{:keys [contents language arguments] :as src-block}]
-  (h/html [:pre contents]))
+  [:pre contents])
+
 
 
 (defn to-html
-  "Should expect the first value to be of type `:section`
-  Is generally responsible for parsing org content (no headlines, etc)
-  Should not be encountering `:type` of `:heading` etc.
-  Not destructuring because it could create uneven maps.
-  https://stackoverflow.com/a/47040814 "
+  "RECURSIVE.
+  Parses the org-tree tree-seq into html.
+  Don't destructure - it can create uneven maps from possible nil vals on `V`"
   [v]
   (let [type       (v :type)
         children   (v :children)
         value      (v :value)
-        val        (if value (s/trim-newline value) value) ;; tri
-        ;; TODO - if children is empty return nothing...
-        inner-html #(h/html [% (map to-html children)])
+        val        (if value (s/trim-newline value) value)
         inner-html #(if (empty? children)
-                     ""
-                     (h/html [% (map to-html children)]))]
-    (case type
+                      ""
+                      [% (vec (map to-html children))])]
+   (case type
       "document"     (map to-html children)
-      "headline"     (map to-html children)
-      "title"        (heading->html v)
+      "headline"     (inner-html :div)
+      "title"        (inner-html (title-level->html v))
       "section"      (inner-html :section)
       "paragraph"    (inner-html :div)
       "underline"    (inner-html :i)
+      "italic"       (inner-html :em)
       "bold"         (inner-html :strong)
       "list"         (inner-html :ul)
       "list-item"    (inner-html :li)
       "quote-block"  (inner-html :div.quote-block) ;; TODO: fixme
       "source-block" (src-block->html v)
       "link"         (a->html v)
-      "code"         (h/html [:code val])
-      "text"         (h/html [:span val])
+      "code"         [:code val]
+      "text"         [:span val]
       ;; default value.
-      (h/html [:span "missing type:" type " val is " value]))))
+      [:span (str "<missing type!>" type " val is " value)])))
+
+;; (to-html ex/ex)
+
+;; (h/html [:div
+;;           [:span
+;;            [:div "hi"]
+;;            [:span "hi"]]])
+
+
+(defn template
+  [org-tree]
+  ;; (h/html (first (to-html org-tree))))
+  (h/html [:html
+           [:head
+            [:link {:rel "stylesheet" :href "./assets/main.css"}]]
+           [:body {} (h/html (to-html org-tree))]]))
