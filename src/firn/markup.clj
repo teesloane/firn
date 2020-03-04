@@ -6,14 +6,7 @@
 
 ;; Helpers
 
-(defn flatten-one-level [coll]
-  (into [] (mapcat  #(if (sequential? %) % [%]) coll)))
 
-(flatten-one-level [1 [2 3] [4 [5]]])
-
-
-
-;;
 (defn- parse-file-link
   "FIXME move this to regex.
   AND FIXME: add a base_path into config? (with a partial?) "
@@ -30,26 +23,22 @@
         file-link? (s/includes? link-href "file:")
         link-val   (get v :desc "missing!")
         parse-link (if file-link? (parse-file-link link-href) link-href)]
-      [:a {:href parse-link} link-val]))
+    [:a {:href parse-link} link-val]))
 
 (defn- title-level->html
   " "
   [v]
   (case (v :level)
     1 :h1
-    2 :h2 
-    3 :h3 
-    4 :h4 
-    5 :h5 
+    2 :h2
+    3 :h3
+    4 :h4
+    5 :h5
     :h6))
-
 
 (defn- src-block->html
   [{:keys [contents language arguments] :as src-block}]
   [:pre contents])
-
-
-
 
 (defn to-html
   "RECURSIVE.
@@ -62,9 +51,9 @@
         val        (if value (s/trim-newline value) value)
         inner-html (fn [tag]
                      (if (empty? children)
-                        ""
-                        (into [tag] (map to-html children))))] ;; << ???
-   (case type
+                       ""
+                       (into [tag] (map to-html children))))] ;; << ???
+    (case type
       "document"     (inner-html :body)
       "headline"     (inner-html :div)
       "title"        (inner-html (title-level->html v))
@@ -83,13 +72,9 @@
       ;; default value.
       [:span (str "<missing type!>" type " val is " value)])))
 
-(h/html (to-html ex/simple))
-
-
 
 (defn template
   [org-tree]
-  ;; (h/html (first (to-html org-tree))))
   (h/html [:html
            [:head
             [:link {:rel "stylesheet" :href "./assets/styles/main.css"}]]

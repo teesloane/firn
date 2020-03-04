@@ -7,22 +7,25 @@
 
 
 
-(defn dataify-file
-  "Converts an org file into a bunch of data."
-  [{:keys [file-name file-json] :as config}]
-  (let [file-edn             (-> file-json (:out) (json/parse-string true))
-        file-keywords        (get-in file-edn [:children 0 :children])
-        file-edn-no-keywords (assoc-in file-edn [:children 0 :children] [])
-        org-tree             (->> file-edn-no-keywords (tree-seq map? :children) (first))
-        org->html            (m/template org-tree)]
-    (conj
-     config
-     {:file-edn      file-edn
-      :file-keywords file-keywords
-      :org-tree      org-tree
-      :out-html      org->html})))
+;; -- Prepare the org tree
 
-    
+(defn org-edn->org-tree
+  "Takes a read org-file in edn format and preps it to be worked with as a tree."
+  [{:keys [file-edn] :as config}]
+  (let [file-keywords           (get-in file-edn [:children 0 :children])
+        file-edn-props-stripped (assoc-in file-edn [:children 0 :children] [])
+        org-tree                (->> file-edn-props-stripped (tree-seq map? :children) (first))]
+    (assoc config
+           :org-tree org-tree
+           :file-keywords file-keywords)))
+
+
+(defn org-tree->html-out
+  "Takes the org tree and renders it to html
+  TODO: eventually render html conditional to file type."
+  [config]
+  (let [out-html (-> config :org-tree m/template)]
+    (assoc config :out-html out-html)))
 
 
 (defn get-1st-level-headline-by-name
@@ -37,9 +40,16 @@
        ;; get at the (non-raw) heading if it matches `name`
        (filter #(= (-> % :children first :children first :value s/trim) name))
        (remove nil?)
-       (first))
+       (first)))
 
 
+
+(defn trxer
+  "Takes the AST and parses the info for everything."
+  [{:keys [file-name file-edn] :as config}]
+  (-> config
+      (org-edn->org-tree)
+      (org-tree->html-out))
 
   #_(let [org-tree  (org-edn->org-tree config)]
         ;; meta      (get-1st-level-headline-by-name "Meta" org-tree)
