@@ -3,7 +3,6 @@
             [clojure.string :as s]))
 
 
-
 ;; Helpers
 
 
@@ -25,6 +24,12 @@
         parse-link (if file-link? (parse-file-link link-href) link-href)]
     [:a {:href parse-link} link-val]))
 
+
+(defn- table->html
+  [v]
+
+  )
+
 (defn- title-level->html
   " "
   [v]
@@ -41,36 +46,36 @@
   [:pre contents])
 
 (defn to-html
-  "RECURSIVE.
-  Parses the org-tree tree-seq into html.
-  Don't destructure - it can create uneven maps from possible nil vals on `V`"
+  "Recursively Parses the org-tree tree-seq into hiccup.
+  Don't destructure! - it can create uneven maps from possible nil vals on `V`"
   [v]
   (let [type       (v :type)
         children   (v :children)
         value      (v :value)
         val        (if value (s/trim-newline value) value)
-        inner-html (fn [tag]
-                     (if (empty? children)
-                       ""
-                       (into [tag] (map to-html children))))] ;; << ???
+        make-child #(into [%] (map to-html children))]
     (case type
-      "document"     (inner-html :body)
-      "headline"     (inner-html :div)
-      "title"        (inner-html (title-level->html v))
-      "section"      (inner-html :section)
-      "paragraph"    (inner-html :div)
-      "underline"    (inner-html :i)
-      "italic"       (inner-html :em)
-      "bold"         (inner-html :strong)
-      "list"         (inner-html :ul)
-      "list-item"    (inner-html :li)
-      "quote-block"  (inner-html :div.quote-block) ;; TODO: fixme
+      "document"     (make-child :body)
+      "headline"     (make-child :div)
+      "title"        (make-child (title-level->html v))
+      "section"      (make-child :section)
+      "paragraph"    (make-child :div)
+      "underline"    (make-child :i)
+      "italic"       (make-child :em)
+      "bold"         (make-child :strong)
+      "list"         (make-child :ul)
+      "list-item"    (make-child :li)
+      "quote-block"  (make-child :div.quote-block) ;; TODO: fixme
       "source-block" (src-block->html v)
+      "table"
       "link"         (a->html v)
       "code"         [:code val]
+      "verbatim"     [:code val]
+      "drawer"       "" ; values we don't parse just return empty strings?
+      "rule"         [:hr]
       "text"         [:span val]
       ;; default value.
-      [:span (str "<missing type!>" type " val is " value)])))
+      [:span (str "{missing type!}!!" type " val is " value)])))
 
 
 (defn template

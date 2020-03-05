@@ -49,7 +49,52 @@
            [{:type "paragraph",
              :children
              [{:type "text",
-               :value "list 2\r"}]}]}]}]}]}]})
+               :value "list 2\r"}]}]}]}]}]}
+    {:type "headline",
+     :level 1,
+     :children
+     [{:type "title",
+       :level 1,
+       :raw "Headline One!",
+       :properties {:shoes "yes!"},
+       :children
+       [{:type "text",
+         :value "Headline One!"}]}]}]})
+
+(def table-ex
+  {:type "document",
+   :children
+   [{:type "section",
+     :children
+     [{:type "table",
+       :table_type "org",
+       :tblfm nil,
+       :children
+       [{:type "table-row",
+         :table_row_type "standard",
+         :children
+         [{:type "table-cell",
+           :children
+           [{:type "text", :value "Expression"}]}
+          {:type "table-cell",
+           :children
+           [{:type "text", :value "Meaning"}]}]}
+        {:type "table-row",
+         :table_row_type "rule"}
+        {:type "table-row",
+         :table_row_type "standard",
+         :children
+         [{:type "table-cell",
+           :children
+           [{:type "text",
+             :value
+             "Je suis soud comme un pot"}]}
+          {:type "table-cell",
+           :children
+           [{:type "text",
+             :value
+             "I'm as deaf as a pot."}]}]}]}]}]})
+
 
 
 (defn default
