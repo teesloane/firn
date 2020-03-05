@@ -33,7 +33,7 @@
         org-files      (u/get-files-of-type site-dir-files ".org")]
     (cond
       (not (.isDirectory site-dir))
-      (u/exit-with-err "No folder found at site-directory")
+      (u/exit-with-err "No folder found at site-directory:" site-dir)
 
       (= (count org-files) 0)
       (u/exit-with-err "No .org files found in site-directory")

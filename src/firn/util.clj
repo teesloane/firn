@@ -12,6 +12,6 @@
 (defn exit-with-err
   "Exits with error.
   TODO: make this not exit the repl in dev-mode."
-  [msg]
-  (prn "Err: " msg)
+  [& msgs]
+  (prn "Err: " msgs)
   #_(System/exit 1))
