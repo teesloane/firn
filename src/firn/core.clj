@@ -45,6 +45,7 @@
 (defn read-file
   "Pulls :curr-file from config > parses > put into config with new vals"
   [config]
+  (prn "CONFIG IS" config)
   (let [file-orig   (-> config :curr-file :original)
         file-parsed (->> file-orig slurp parse!)
         file-name   (-> file-orig .getName (s/split #"\.") (first))]
