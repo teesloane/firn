@@ -5,7 +5,6 @@
 
 ;; Helpers
 
-
 (defn- parse-file-link
   "FIXME move this to regex.
   AND FIXME: add a base_path into config? (with a partial?) "
@@ -25,13 +24,8 @@
     [:a {:href parse-link} link-val]))
 
 
-(defn- table->html
-  [v]
-
-  )
-
 (defn- title-level->html
-  " "
+  "Takes a title element and returns html depending on title-level."
   [v]
   (case (v :level)
     1 :h1
@@ -47,6 +41,7 @@
 
 (defn to-html
   "Recursively Parses the org-tree tree-seq into hiccup.
+  Some values don't get parsed (drawers) - yet. They return empty strings.
   Don't destructure! - it can create uneven maps from possible nil vals on `V`"
   [v]
   (let [type       (v :type)
@@ -59,24 +54,27 @@
       "headline"     (make-child :div)
       "title"        (make-child (title-level->html v))
       "section"      (make-child :section)
-      "paragraph"    (make-child :div)
+      "paragraph"    (make-child :p)
       "underline"    (make-child :i)
       "italic"       (make-child :em)
       "bold"         (make-child :strong)
       "list"         (make-child :ul)
       "list-item"    (make-child :li)
       "quote-block"  (make-child :div.quote-block) ;; TODO: fixme
+      "table"        (make-child :table)
+      "table-row"    (make-child :tr)
+      "table-cell"   (make-child :td)
       "source-block" (src-block->html v)
-      "table"
       "link"         (a->html v)
       "code"         [:code val]
       "verbatim"     [:code val]
-      "drawer"       "" ; values we don't parse just return empty strings?
       "rule"         [:hr]
+      "cookie"       [:span.cookie val]
       "text"         [:span val]
+      "timestamp"    [:span val] ;; TODO
+      "drawer"       ""
       ;; default value.
       [:span (str "{missing type!}!!" type " val is " value)])))
-
 
 (defn template
   [org-tree]

@@ -43,36 +43,35 @@
       (conj config {:org-files org-files}))))
 
 (defn read-file
-  "file (java object) > slurps > parses (rust) > config"
-  [{:keys [curr-file] :as config}]
-  (let [file-parsed (->> curr-file slurp parse!)]
-    (merge
-     config
-     {:file-name (-> curr-file .getName (s/split #"\.") (first))
-      :file-orig curr-file
-      :file-json file-parsed})))
+  "Pulls :curr-file from config > parses > put into config with new vals"
+  [config]
+  (let [file-orig   (-> config :curr-file :original)
+        file-parsed (->> file-orig slurp parse!)
+        file-name   (-> file-orig .getName (s/split #"\.") (first))]
+    (config/update-curr-file config {:name file-name :as-json file-parsed})))
 
 (defn dataify-file
   "Converts an org file into a bunch of data."
-  [{:keys [file-name file-json] :as config}]
-  (let [file-edn             (-> file-json (json/parse-string true))
+  [config]
+  (let [file-json            (-> config :curr-file :as-json)
+        file-edn             (-> file-json (json/parse-string true))
         file-keywords        (get-in file-edn [:children 0 :children])
         file-edn-no-keywords (assoc-in file-edn [:children 0 :children] [])
         org-tree             (->> file-edn-no-keywords (tree-seq map? :children) (first))
         org->html            (m/template org-tree)]
-    (conj
-     config
-     {:file-edn      file-edn
-      :file-keywords file-keywords
-      :org-tree      org-tree
-      :out-html      org->html})))
+    (config/update-curr-file
+     config {:as-edn   file-edn-no-keywords
+             :as-html  org->html
+             :as-tree  org-tree
+             :keywords file-keywords})))
 
 (defn write-file
   "Takes (file-)config input and writes html to output."
-  [config]
-  (println "Writing files: " (config :file-name))
-  (let [out-file-name (str (:out-dir config) (:file-name config) ".html")
-        out-html      (:out-html config)]
+  [{:keys [out-dir curr-file]}]
+  (let [curr-file-name (curr-file :name)
+        out-file-name  (str out-dir curr-file-name ".html")
+        out-html       (curr-file :as-html)]
+    (println "Writing file: " curr-file-name)
     (spit out-file-name out-html)))
 
 (defn -main
@@ -82,10 +81,11 @@
 
     (setup config)
     (doseq [f (:org-files (get-files config))]
-      (-> (assoc config :curr-file f)
-          (read-file)
-          (dataify-file)
-          (write-file)))
+      (->> f
+           (config/set-curr-file config)
+           (read-file)
+           (dataify-file)
+           (write-file)))
     (System/exit 0)))
 
 ;; (-main) ; I recommend not running this in your repl.
