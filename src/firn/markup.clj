@@ -1,7 +1,7 @@
 (ns firn.markup
   (:require [hiccup.core :as h]
-            [clojure.string :as s]
-            [firn.example :as ex]))
+            [clojure.string :as s]))
+
 
 
 ;; Helpers

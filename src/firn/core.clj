@@ -4,6 +4,7 @@
             [cheshire.core :as json]
             [firn.markup :as m]
             [firn.util :as u]
+            [firn.config :as config]
             [clojure.string :as s]
             [hiccup.core :as h])
   (:gen-class))
@@ -77,10 +78,10 @@
 (defn -main
   [& args]
   (let [files-dir (first args)
-        config    {:out-dir   (str files-dir "_site/")
-                   :files-dir (first args)
-                   :org-files nil
-                   :curr-file nil}]
+        config    (config/default files-dir)  #_{:out-dir   (str files-dir "_site/")
+                                                 :files-dir (first args)
+                                                 :org-files nil
+                                                 :curr-file nil}]
 
     (setup config)
     (doseq [f (:org-files (get-files config))]
