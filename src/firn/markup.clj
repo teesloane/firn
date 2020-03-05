@@ -5,6 +5,7 @@
 
 ;; Helpers
 
+
 (defn- parse-file-link
   "FIXME move this to regex.
   AND FIXME: add a base_path into config? (with a partial?) "
@@ -23,21 +24,35 @@
         parse-link (if file-link? (parse-file-link link-href) link-href)]
     [:a {:href parse-link} link-val]))
 
-
-(defn- title-level->html
-  "Takes a title element and returns html depending on title-level."
+(defn- title->html
+  "Constructs titles - which can have additional values (keywords, priorities, etc)
+  That aren't found in the `children` values and so need special parsing."
   [v]
-  (case (v :level)
-    1 :h1
-    2 :h2
-    3 :h3
-    4 :h4
-    5 :h5
-    :h6))
-
-(defn- src-block->html
-  [{:keys [contents language arguments] :as src-block}]
-  [:pre contents])
+  (let [level      (v :level)
+        typ        (v :type)
+        children   (v :children)
+        raw        (v :raw)
+        keywrd     (v :keyword)
+        priority   (v :priority)
+        value      (v :value)
+        h-level    (case level 1 :h1 2 :h2 3 :h3 4 :h4 5 :h5 :h6)
+        make-child #(into [%] (map title->html children))]
+    (case typ
+      "headline"  (make-child :div)
+      "title"     [h-level
+                   [:span.heading-keyword (str keywrd " ")]
+                   [:span.heading-priority (str priority " ")]
+                   (make-child :span)]
+      "text"      [:span value]
+      "cookie"    [:span.heading-cookie value]
+      "timestamp" [:span.heading-teimstamp value]
+      "code"      [:code val]
+      "verbatim"  [:code val]
+      "link"      (a->html v)
+      "underline" (make-child :i)
+      "italic"    (make-child :em)
+      "bold"      (make-child :strong)
+      [:span " - ERR! Val Missing -"])))
 
 (defn to-html
   "Recursively Parses the org-tree tree-seq into hiccup.
@@ -52,7 +67,7 @@
     (case type
       "document"     (make-child :body)
       "headline"     (make-child :div)
-      "title"        (make-child (title-level->html v))
+      "title"        (title->html v)
       "section"      (make-child :section)
       "paragraph"    (make-child :p)
       "underline"    (make-child :i)
