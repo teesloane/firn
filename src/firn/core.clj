@@ -78,10 +78,7 @@
 (defn -main
   [& args]
   (let [files-dir (first args)
-        config    (config/default files-dir)  #_{:out-dir   (str files-dir "_site/")
-                                                 :files-dir (first args)
-                                                 :org-files nil
-                                                 :curr-file nil}]
+        config    (config/default files-dir)]
 
     (setup config)
     (doseq [f (:org-files (get-files config))]
