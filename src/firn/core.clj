@@ -56,10 +56,10 @@
   (let [file-json            (-> config :curr-file :as-json)
         file-edn             (-> file-json (json/parse-string true))
         file-keywords        (get-in file-edn [:children 0 :children])
-        file-edn-no-keywords (assoc-in file-edn [:children 0 :children] [])
-        org->html            (m/template file-edn-no-keywords)]
+        ;; file-edn-no-keywords (assoc-in file-edn [:children 0 :children] [])
+        org->html            (m/template file-edn)]
     (config/update-curr-file
-     config {:as-edn   file-edn-no-keywords
+     config {:as-edn   file-edn
              :as-html  org->html
              :keywords file-keywords})))
 
@@ -77,7 +77,7 @@
   (let [files-dir (first args)
         config    (config/default files-dir)]
 
-    (setup config)
+    (setup config) ;; side effectful
     (doseq [f (:org-files (get-files config))]
       (->> f
            (config/set-curr-file config)
