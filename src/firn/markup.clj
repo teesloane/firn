@@ -71,7 +71,7 @@
         val        (if value (s/trim-newline value) value)
         make-child #(into [%] (map to-html children))]
     (case type
-      "document"     (make-child :body)
+      "document"     (make-child :main)
       "headline"     (make-child :div)
       "title"        (title->html v)
       "section"      (make-child :section)
