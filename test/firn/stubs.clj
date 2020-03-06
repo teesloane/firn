@@ -39,6 +39,3 @@
        :children
        [{:type "text",
          :value "hithere"}]}]}]})
-
-(-> list-items
-    (firn.markup/to-html))

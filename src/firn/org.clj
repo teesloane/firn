@@ -9,8 +9,8 @@
   "Takes org tree and filters down to a headline + it's contents
   Example: `(get-1st-level-headline-by-name 'Meta' org-tree)`
   FIXME: Needs to handle cases where nothing is found."
-  [name org-tree]
-  (->> org-tree
+  [name org-edn]
+  (->> org-edn
        (map (fn [v]
               (when (= (:type v) "headline") v)))
        ;; get level 1 headings

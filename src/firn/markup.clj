@@ -71,29 +71,31 @@
         val        (if value (s/trim-newline value) value)
         make-child #(into [%] (map to-html children))]
     (case type
-      "document"     (make-child :main)
-      "headline"     (make-child :div)
-      "title"        (title->html v)
-      "section"      (make-child :section)
-      "paragraph"    (make-child :p)
-      "underline"    (make-child :i)
-      "italic"       (make-child :em)
-      "bold"         (make-child :strong)
-      "list"         (make-child (if ordered :ol :ul))
-      "list-item"    (make-child :li)
-      "quote-block"  (make-child :div.quote-block) ;; TODO: fixme
-      "table"        (make-child :table)
-      "table-row"    (make-child :tr)
-      "table-cell"   (make-child :td)
-      "source-block" (src-block->html v)
-      "link"         (a->html v)
-      "code"         [:code val]
-      "verbatim"     [:code val]
-      "rule"         [:hr]
-      "cookie"       [:span.cookie val]
-      "text"         [:span val]
-      "timestamp"    [:span val] ;; TODO
-      "drawer"       ""
+      "document"      (make-child :main)
+      "headline"      (make-child :div)
+      "title"         (title->html v)
+      "section"       (make-child :section)
+      "paragraph"     (make-child :p)
+      "underline"     (make-child :i)
+      "italic"        (make-child :em)
+      "bold"          (make-child :strong)
+      "list"          (make-child (if ordered :ol :ul))
+      "list-item"     (make-child :li)
+      "quote-block"   (make-child :div.quote-block)
+      "table"         (make-child :table)
+      "table-row"     (make-child :tr)
+      "table-cell"    (make-child :td)
+      "source-block"  (src-block->html v)
+      "link"          (a->html v)
+      "code"          [:code val]
+      "verbatim"      [:code val]
+      "rule"          [:hr]
+      "cookie"        [:span.cookie val]
+      "text"          [:span val]
+      "timestamp"     [:span val] ;; TODO html constructor.
+      "keyword"       ""          ;; Don't parse
+      "comment-block" ""          ;; Don't parse
+      "drawer"        ""          ;; Don't parse
       ;; default value.
       [:span (str "{missing type!}!!" type " val is " value)])))
 
