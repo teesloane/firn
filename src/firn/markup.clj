@@ -13,6 +13,11 @@
   (str "./" (-> s (s/split #":") (second) (s/split #"\.") (first))))
 
 ;; Renderers
+;;
+(defn- src-block->html
+  [{:keys [contents language arguments] :as src-block}]
+  [:pre contents])
+
 
 (defn- a->html
   "Parses links from the org-tree.
@@ -46,8 +51,8 @@
       "text"      [:span value]
       "cookie"    [:span.heading-cookie value]
       "timestamp" [:span.heading-teimstamp value]
-      "code"      [:code val]
-      "verbatim"  [:code val]
+      "code"      [:code value]
+      "verbatim"  [:code value]
       "link"      (a->html v)
       "underline" (make-child :i)
       "italic"    (make-child :em)
@@ -62,6 +67,7 @@
   (let [type       (v :type)
         children   (v :children)
         value      (v :value)
+        ordered    (v :ordered) ;; for lists
         val        (if value (s/trim-newline value) value)
         make-child #(into [%] (map to-html children))]
     (case type
@@ -73,7 +79,7 @@
       "underline"    (make-child :i)
       "italic"       (make-child :em)
       "bold"         (make-child :strong)
-      "list"         (make-child :ul)
+      "list"         (make-child (if ordered :ol :ul))
       "list-item"    (make-child :li)
       "quote-block"  (make-child :div.quote-block) ;; TODO: fixme
       "table"        (make-child :table)

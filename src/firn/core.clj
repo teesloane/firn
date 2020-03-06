@@ -57,12 +57,10 @@
         file-edn             (-> file-json (json/parse-string true))
         file-keywords        (get-in file-edn [:children 0 :children])
         file-edn-no-keywords (assoc-in file-edn [:children 0 :children] [])
-        org-tree             (->> file-edn-no-keywords (tree-seq map? :children) (first))
-        org->html            (m/template org-tree)]
+        org->html            (m/template file-edn-no-keywords)]
     (config/update-curr-file
      config {:as-edn   file-edn-no-keywords
              :as-html  org->html
-             :as-tree  org-tree
              :keywords file-keywords})))
 
 (defn write-file

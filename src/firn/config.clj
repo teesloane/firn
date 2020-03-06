@@ -102,7 +102,6 @@
    :keywords nil      ; list of keywords at top of org file: #+TITLE:, #+CATEGORY, etc.
    :as-json  nil      ; The org file, read as json and spat out by the rust binary.
    :as-edn   nil      ; JSON of org file -> converted to a map.
-   :as-tree  nil      ; The org edn tree-sequenced for traversal.
    :as-html  nil})    ; the html output
 
 (def starting-config
