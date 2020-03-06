@@ -7,7 +7,6 @@
 
 (def test-dir    "./tmp/")
 (def f-1         (io/file "./test/firn/sample_orgfile.org"))
-(def f-1-str     (slurp f-1))
 (def config-test (config/default test-dir))
 
 
@@ -23,14 +22,14 @@
 
 
 
-;; (deftest _read-file
-  ;; (testing "correct outputs"
-  ;;   (let [stub (-> (setup-files))
-  ;;         res (firn.core/read-file setup-res)]
-  ;;     (prn "RES IS " res)
-  ;;     (is (= 1 1)))))
-      ;; (let [res (firn.core/read-file setup-res)]
-      ;;   (is (=  1 1))))))
+(deftest _read-file ;; (testing "correct outputs"
+  (let [stub     (-> (firn.core/setup config-test)
+                     (config/set-curr-file))
+        res      (firn.core/read-file stub)
+        res-json (-> res :curr-file :as-json)]
+    (testing "Returns valid, updated sub map (:curr-file)"
+      (is (not= nil (-> res :curr-file :name)))
+      (is (not= nil res-json))
+      (is (> (count res-json) 0)))))
 
 
-;; "E2E"
