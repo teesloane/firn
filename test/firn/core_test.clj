@@ -41,12 +41,13 @@
 
 (defn- e2e
   []
-  (fs/delete-dir (config-sample :out-dir))
+  (fs/delete-dir (config-sample :out-dir)) ;; delete folder if it exists
   (sut/setup config-sample)
-  (->> f-1
-        (config/set-curr-file config-sample)
-        (sut/read-file)
-        (sut/dataify-file)
-        (sut/write-file)))
+  (doseq [f (:org-files (sut/get-files config-sample))]
+    (->> f
+         (config/set-curr-file config-sample)
+         (sut/read-file)
+         (sut/dataify-file)
+         (sut/write-file))))
 
 (e2e)

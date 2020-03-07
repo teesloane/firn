@@ -9,8 +9,6 @@ Foo.
 
 [[file:assets/images/test-img.png]]
 
-
-
 [[https://docs.cider.mx/cider/usage/misc_features.html][Miscellaneous Features :: CIDER Docs]]
 
 [[file:file2.org][File 2]]
