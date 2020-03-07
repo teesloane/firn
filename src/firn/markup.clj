@@ -26,9 +26,11 @@
   Checks if a link is an HTTP link or File link.
   TODO: add regex for image files that show up as `<./link/foo.png>`"
   [v]
-  (let [local-img-regex #"(file:)(.*)\.(jpg|JPG|gif|GIF|png)"
-        local-org-regex #"(file:)(.*)\.(org)"
-        http-img-regex  #"(http:\/\/|https:\/\/)(.*)\.(jpg|JPG|gif|GIF|png)"
+  (let [img-file-regex  #"(file:)(.*)\.(jpg|JPG|gif|GIF|png)"
+        img-http-regex  #"(http:\/\/|https:\/\/)(.*)\.(jpg|JPG|gif|GIF|png)"
+        img-rel-regex   #"(\.(.*))\.(jpg|JPG|gif|GIF|png)"
+
+        org-file-regex  #"(file:)(.*)\.(org)"
         http-link-regex #"https?:\/\/(?![^\" ]*(?:jpg|png|gif))[^\" ]+"
         ;; final src/href concat. This is a bit clunkly.
         local-img-path  #(str "./" (nth %  2) "." (nth % 3))
@@ -37,13 +39,16 @@
         link-val        (get v :desc "missing")
         link-href       (get v :path "missing href")]
     (cond
-      (re-matches local-img-regex link-href)
-      [:img {:src (local-img-path (re-matches local-img-regex link-href))}]
+      (re-matches img-file-regex link-href)
+      [:img {:src (local-img-path (re-matches img-file-regex link-href))}]
 
-      (re-matches local-org-regex link-href)
-      [:a {:href (file-path (re-matches local-org-regex link-href))} link-val]
+      (re-matches img-rel-regex link-href)
+      [:img {:src link-href}]
 
-      (re-matches http-img-regex link-href)
+      (re-matches org-file-regex link-href)
+      [:a {:href (file-path (re-matches org-file-regex link-href))} link-val]
+
+      (re-matches img-http-regex link-href)
       [:img {:src link-href}]
 
       (re-matches http-link-regex link-href)
@@ -128,5 +133,5 @@
   [org-tree]
   (h/html [:html
            [:head
-            [:link {:rel "stylesheet" :href "./assets/styles/main.css"}]]
+            [:link {:rel "stylesheet" :href "./assets/css/main.css"}]]
            [:body {} (h/html (to-html org-tree))]]))

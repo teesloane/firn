@@ -28,23 +28,25 @@
     ;; cleanup
     (fs/delete-dir out-dir)))
 
-(deftest _read-file ;; (testing "correct outputs"
-  (let [stub     (-> (sut/setup config-sample)
-                     (config/set-curr-file f-1))
-        res      (sut/read-file stub)
-        res-json (-> res :curr-file :as-json)]
-    (testing "Returns valid, updated sub map (:curr-file)"
-      (is (not= nil (-> res :curr-file :name)))
-      (is (not= nil res-json))
-      (is (> (count res-json) 0)))))
+(deftest _read-file
+  (testing "correct outputs"
+    (let [stub     (-> (sut/setup config-sample)
+                       (config/set-curr-file f-1))
+          res      (sut/read-file stub)
+          res-json (-> res :curr-file :as-json)]
+      (testing "Returns valid, updated sub map (:curr-file)"
+        (is (not= nil (-> res :curr-file :name)))
+        (is (not= nil res-json))
+        (is (> (count res-json) 0))))))
 
-(defn e2e
+(defn- e2e
   []
+  (fs/delete-dir (config-sample :out-dir))
   (sut/setup config-sample)
   (->> f-1
-       (config/set-curr-file config-sample)
-       (sut/read-file)
-       (sut/dataify-file)
-       (sut/write-file)))
+        (config/set-curr-file config-sample)
+        (sut/read-file)
+        (sut/dataify-file)
+        (sut/write-file)))
 
 (e2e)

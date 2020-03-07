@@ -4,7 +4,12 @@
 
 Foo.
 
-[[file:media/test-img.png]]
+
+[[./assets/images/test-img.png]]
+
+[[file:assets/images/test-img.png]]
+
+
 
 [[https://docs.cider.mx/cider/usage/misc_features.html][Miscellaneous Features :: CIDER Docs]]
 

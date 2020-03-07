@@ -105,10 +105,10 @@
    :as-html  nil})    ; the html output
 
 (def starting-config
-  {:out-dir   "_site" ; where files get published; likely to be overridden
-   :media-dir "media" ; org attachments to get copied into _site.
-   :files-dir nil     ; where org content lives.
-   :org-files nil     ; a list of org files, added to as files get converted.
+  {:out-dir   "_site"  ; where files get published; likely to be overridden
+   :media-dir "assets" ; org attachments to get copied into _site.
+   :files-dir nil      ; where org content lives.
+   :org-files nil      ; a list of org files, added to as files get converted.
    :curr-file curr-file})
 
 (defn set-curr-file
