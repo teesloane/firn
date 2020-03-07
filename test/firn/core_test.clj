@@ -1,7 +1,7 @@
-(ns firn.core-test
+(ns fc-test
   (:require [clojure.test :refer :all]
             [clojure.java.io :as io]
-            [firn.core]
+            [firn.core :as fc]
             [firn.config :as config]))
 
 
@@ -12,7 +12,7 @@
 
 (deftest _setup
   (let [out-dir (config-sample :out-dir)
-        setup-res (firn.core/setup config-sample)]
+        setup-res (fc/setup config-sample)]
 
     (testing "It creates a folder"
       (is (.isDirectory (io/file out-dir))))
@@ -23,9 +23,9 @@
 
 
 (deftest _read-file ;; (testing "correct outputs"
-  (let [stub     (-> (firn.core/setup config-sample)
+  (let [stub     (-> (fc/setup config-sample)
                      (config/set-curr-file f-1))
-        res      (firn.core/read-file stub)
+        res      (fc/read-file stub)
         res-json (-> res :curr-file :as-json)]
     (testing "Returns valid, updated sub map (:curr-file)"
       (is (not= nil (-> res :curr-file :name)))
@@ -36,11 +36,12 @@
 
 (defn e2e
   []
-  (firn.core/setup config-sample)
+  (fc/setup config-sample)
   (->> f-1
        (config/set-curr-file config-sample)
-       (read-file)
-       (dataify-file)
-       (write-file)))
+       (fc/read-file)
+       (fc/dataify-file)
+
+       #_(fc/write-file)))
 
 (e2e)
