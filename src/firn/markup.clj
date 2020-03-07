@@ -34,7 +34,7 @@
         http-link-regex #"https?:\/\/(?![^\" ]*(?:jpg|png|gif))[^\" ]+"
         ;; final src/href concat. This is a bit clunkly.
         local-img-path  #(str "./" (nth %  2) "." (nth % 3))
-        file-path       #(str "./" (nth %  2))
+        file-path       #(str "./" (nth %  2) ".html")
         ;; html values
         link-val        (get v :desc "missing")
         link-href       (get v :path "missing href")]
@@ -106,7 +106,7 @@
       "title"         (title->html v)
       "section"       (make-child :section)
       "paragraph"     (make-child :p)
-      "underline"     (make-child :i)
+      "underline"     (make-child :u)
       "italic"        (make-child :em)
       "bold"          (make-child :strong)
       "list"          (make-child (if ordered :ol :ul))

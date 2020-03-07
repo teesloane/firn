@@ -73,3 +73,10 @@ code {
     border-left: 4px solid lightgrey;
 }
 
+
+hr {
+  margin: 32px 0;
+  height: 2px;
+  background-color: #afafaf;
+  border: none;
+}
