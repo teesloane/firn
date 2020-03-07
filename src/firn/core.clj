@@ -4,6 +4,7 @@
             [cheshire.core :as json]
             [firn.markup :as m]
             [firn.util :as u]
+            [me.raynes.fs :as fs]
             [firn.config :as config]
             [clojure.string :as s]
             [hiccup.core :as h])
@@ -11,10 +12,15 @@
 
 (defn setup
   "Creates output directory for files and sets up starting
-  config file that gets passed through all functions"
-  [{:keys [files-dir out-dir] :as config}]
+  config file that gets passed through all functions
+  Also, moves your `media folder` into _site. TODO - make configurable..."
+  [{:keys [files-dir out-dir media-dir] :as config}]
   (prn "Making _site output.")
-  (.mkdir (java.io.File. out-dir))
+  (fs/mkdir out-dir)
+
+  (prn "Copying root media into out media")
+  (fs/copy-dir (config :media-dir) (config :out-media-dir))
+
   config)
 
 (defn parse!

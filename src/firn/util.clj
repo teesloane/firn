@@ -1,4 +1,5 @@
-(ns firn.util)
+(ns firn.util
+  (:refer-clojure :exclude [name parents]))
 
 (defn get-files-of-type
   "Takes an io/file sequence and gets all files of a specific extension."
@@ -8,6 +9,7 @@
              (.isFile f)
              (-> f .getName (.endsWith ext))))
           fileseq))
+
 
 (defn exit-with-err
   "Exits with error.

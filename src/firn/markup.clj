@@ -27,37 +27,31 @@
   TODO: add regex for image files that show up as `<./link/foo.png>`"
   [v]
   (let [local-img-regex #"(file:)(.*)\.(jpg|JPG|gif|GIF|png)"
-        local-img-path-regex #"(file:)(.*)\.(org)"
         local-org-regex #"(file:)(.*)\.(org)"
         http-img-regex  #"(http:\/\/|https:\/\/)(.*)\.(jpg|JPG|gif|GIF|png)"
         http-link-regex #"https?:\/\/(?![^\" ]*(?:jpg|png|gif))[^\" ]+"
-        img-path        #(str (nth %  2) "." (nth % 3))
+        ;; final src/href concat. This is a bit clunkly.
+        local-img-path  #(str "./" (nth %  2) "." (nth % 3))
         file-path       #(str "./" (nth %  2))
+        ;; html values
         link-val        (get v :desc "missing")
         link-href       (get v :path "missing href")]
     (cond
       (re-matches local-img-regex link-href)
-      [:img {:src (img-path (re-matches local-img-regex link-href))}]
+      [:img {:src (local-img-path (re-matches local-img-regex link-href))}]
 
       (re-matches local-org-regex link-href)
       [:a {:href (file-path (re-matches local-org-regex link-href))} link-val]
+
+      (re-matches http-img-regex link-href)
+      [:img {:src link-href}]
 
       (re-matches http-link-regex link-href)
       [:a {:href link-href} link-val]
 
       :default
-      [:a {:href link-href} link-val])))
+      [:a {:href link-href}])))
 
-;; (link->html {:type "link", :path "file:test-img.png"})
-;; [:img {:src "test-img.png"}]
-
-
-;; (link->html {:type "link", :path "./test-img.png"})
-;; [:a {:href "./test-img.png"} "missing"]
-
-;; (link->html {:type "link",
-;;              :path "https://docs.cider.mx/cider/usage/misc_features.html",
-;;              :desc "Miscellaneous Features :: CIDER Docs"})
 
 
 (defn- title->html
@@ -128,11 +122,11 @@
       "comment-block" ""          ;; Don't parse
       "drawer"        ""          ;; Don't parse
       ;; default value.
-      [:span (str "{missing type!}!!" type " val is " value)]))
+      [:span (str "{missing type!}!!" type " val is " value)])))
 
-  (defn template
-    [org-tree]
-    (h/html [:html
-             [:head
-              [:link {:rel "stylesheet" :href "./assets/styles/main.css"}]]
-             [:body {} (h/html (to-html org-tree))]])))
+(defn template
+  [org-tree]
+  (h/html [:html
+           [:head
+            [:link {:rel "stylesheet" :href "./assets/styles/main.css"}]]
+           [:body {} (h/html (to-html org-tree))]]))

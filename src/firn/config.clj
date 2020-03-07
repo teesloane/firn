@@ -106,6 +106,7 @@
 
 (def starting-config
   {:out-dir   "_site" ; where files get published; likely to be overridden
+   :media-dir "media" ; org attachments to get copied into _site.
    :files-dir nil     ; where org content lives.
    :org-files nil     ; a list of org files, added to as files get converted.
    :curr-file curr-file})
@@ -125,5 +126,7 @@
 (defn default
   [files-dir]
   (merge starting-config
-         {:out-dir   (str files-dir "_site/")
-          :files-dir files-dir}))
+         {:out-dir       (str files-dir "_site/")
+          :out-media-dir (str files-dir "_site/" (starting-config :media-dir))
+          :files-dir     files-dir
+          :media-dir     (str files-dir "/" (starting-config :media-dir))}))

@@ -3,24 +3,45 @@
             [clojure.test :as t]))
 
 
-(def sample-links {:file-img   {:type "link", :path "file:test-img.png"}
+;; Mocks
+
+
+(def sample-links {:file-img  {:type "link", :path "file:test-img.png"}
+                   :file-link {:type "link", :path "file:file2.org", :desc "File 2"}
                    ;; :string-img {:type "link", :path "./test-img.png"} ;; not supported yet.
-                   :http-link  {:type "link",
-                                :path "https://docs.cider.mx/cider/usage/misc_features.html",
-                                :desc "Miscellaneous Features :: CIDER Docs"}})
+                   :file-img2 {:type "link", :path "file:media/test-img.png"}
+                   :http-img  {:type "link",
+                               :path "https://www.fillmurray.com/g/200/300.jpg",
+                               :desc "Miscellaneous Features :: CIDER Docs"}
+                   :http-link {:type "link",
+                               :path "https://docs.cider.mx/cider/usage/misc_features.html",
+                               :desc "Miscellaneous Features :: CIDER Docs"}})
+
+;; Tests
 
 
 (t/deftest link->html
   (t/testing "http-link"
     (t/is (= (sut/link->html (sample-links :http-link))
-           [:a
-            {:href "https://docs.cider.mx/cider/usage/misc_features.html"}
-            "Miscellaneous Features :: CIDER Docs"])))
+             [:a
+              {:href "https://docs.cider.mx/cider/usage/misc_features.html"}
+              "Miscellaneous Features :: CIDER Docs"])))
+
+
+  (t/testing "http-image-link"
+    (t/is (= (sut/link->html (sample-links :http-img))
+             [:img
+              {:src "https://www.fillmurray.com/g/200/300.jpg"}])))
+
 
   (t/testing "img-link"
     (t/is (= (sut/link->html (sample-links :file-img))
-           [:img {:src "test-img.png"}])))
+             [:img {:src "./test-img.png"}])))
+
+  (t/testing "img-link at another path"
+    (t/is (= (sut/link->html (sample-links :file-img2))
+             [:img {:src "./media/test-img.png"}])))
 
   (t/testing "internal-link"
-    (t/is (= (sut/link->html (sample-links :file-img))
-           [:img {:src "test-img.png"}]))))
+    (t/is (= (sut/link->html (sample-links :file-link))
+             [:a {:href "./file2"} "File 2"]))))
