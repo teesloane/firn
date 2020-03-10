@@ -1,10 +1,9 @@
 
-Static wiki generator using. Under Development.
-
+Static wiki generator using org-mode. Under Development.
 
 * Assumptions
 
 - You are using a flat file wiki system (all content files in a single directory)
-- The wiki-dir has a =media= folder of some kind, also at the same leve.
+- The wiki-dir has a =media= folder of some kind, also at the same level.
 - You are using =file:= links in org to add images.
 - Many other things I am probably forgetting right now.
