@@ -48,6 +48,7 @@
          (config/set-curr-file config-sample)
          (sut/read-file)
          (sut/dataify-file)
+         (sut/htmlify-file)
          (sut/write-file))))
 
 (e2e)

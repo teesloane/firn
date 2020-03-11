@@ -4,6 +4,7 @@
             [cheshire.core :as json]
             [firn.markup :as m]
             [firn.util :as u]
+            [firn.layout :as layout]
             [me.raynes.fs :as fs]
             [firn.config :as config]
             [clojure.string :as s]
@@ -15,6 +16,7 @@
   config file that gets passed through all functions
   Also, moves your `media folder` into _site. TODO - make configurable..."
   [{:keys [files-dir out-dir media-dir] :as config}]
+
   (prn "Making _site output.")
   (fs/mkdir out-dir)
 
@@ -57,17 +59,19 @@
     (config/update-curr-file config {:name file-name :as-json file-parsed})))
 
 (defn dataify-file
-  "Converts an org file into a bunch of data."
+  "Converts an org file into a bunch of data.
+  TODO collect logbook, clock, for every file."
   [config]
   (let [file-json            (-> config :curr-file :as-json)
         file-edn             (-> file-json (json/parse-string true))
-        file-keywords        (get-in file-edn [:children 0 :children])
-        ;; file-edn-no-keywords (assoc-in file-edn [:children 0 :children] [])
-        org->html            (m/template file-edn)]
-    (config/update-curr-file
-     config {:as-edn   file-edn
-             :as-html  org->html
-             :keywords file-keywords})))
+        file-keywords        (get-in file-edn [:children 0 :children])]
+    (config/update-curr-file config {:as-edn file-edn :keywords file-keywords})))
+
+(defn htmlify-file
+  "Renders files according to their `layout` keyword."
+  [config]
+  (let [as-html   (layout/default-template config)]
+    (config/update-curr-file config {:as-html as-html})))
 
 (defn write-file
   "Takes (file-)config input and writes html to output."
@@ -89,6 +93,7 @@
            (config/set-curr-file config)
            (read-file)
            (dataify-file)
+           (htmlify-file)
            (write-file)))
     (System/exit 0)))
 

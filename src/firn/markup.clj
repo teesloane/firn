@@ -1,30 +1,18 @@
 (ns firn.markup
+  "Namespace responsible for converted org-edn into html."
   (:require [hiccup.core :as h]
             [clojure.string :as s]))
 
 
-;; Helpers
-
-
-(defn- parse-file-link
-  "FIXME move this to regex.
-  AND FIXME: add a base_path into config? (with a partial?) "
-  [s]
-  (str "./" (-> s (s/split #":") (second) (s/split #"\.") (first))))
-
-
 ;; Renderers
-;;
+
 (defn- src-block->html
   [{:keys [contents language arguments] :as src-block}]
   [:pre contents])
 
-
-
 (defn link->html
   "Parses links from the org-tree.
-  Checks if a link is an HTTP link or File link.
-  TODO: add regex for image files that show up as `<./link/foo.png>`"
+  Checks if a link is an HTTP link or File link."
   [v]
   (let [img-file-regex  #"(file:)(.*)\.(jpg|JPG|gif|GIF|png)"
         img-http-regex  #"(http:\/\/|https:\/\/)(.*)\.(jpg|JPG|gif|GIF|png)"
@@ -58,7 +46,6 @@
       [:a {:href link-href}])))
 
 
-
 (defn- title->html
   "Constructs titles - which can have additional values (keywords, priorities, etc)
   That aren't found in the `children` values and so need special parsing."
@@ -80,7 +67,7 @@
                    (make-child :span)]
       "text"      [:span value]
       "cookie"    [:span.heading-cookie value]
-      "timestamp" [:span.heading-teimstamp value]
+      "timestamp" [:span.heading-timestamp value]
       "code"      [:code value]
       "verbatim"  [:code value]
       "link"      (link->html v)
@@ -129,9 +116,4 @@
       ;; default value.
       [:span (str "{missing type!}!!" type " val is " value)])))
 
-(defn template
-  [org-tree]
-  (h/html [:html
-           [:head
-            [:link {:rel "stylesheet" :href "./assets/css/main.css"}]]
-           [:body {} (h/html (to-html org-tree))]]))
+
