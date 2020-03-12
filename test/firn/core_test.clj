@@ -39,4 +39,11 @@
         (is (not= nil res-json))
         (is (> (count res-json) 0))))))
 
-(sut/-main test-dir)
+
+
+(defn main-runner
+  []
+  (fs/delete-dir (config-sample :out-dir)) ;; clear it out!
+  (sut/-main test-dir)) ;; delete folder if it exists
+
+(main-runner)
