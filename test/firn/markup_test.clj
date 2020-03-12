@@ -5,6 +5,7 @@
 
 ;; Mocks
 
+
 (def sample-links {:img-file     {:type "link", :path "file:test-img.png"}
                    :img-rel-file {:type "link", :path "./assets/images/test-img.png"}
                    :file-link    {:type "link", :path "file:file2.org", :desc "File 2"}

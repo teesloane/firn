@@ -1,5 +1,6 @@
 (defproject firn "0.1.0-SNAPSHOT"
   :description "Wiki Generator"
+  :plugins [[lein-cljfmt "0.6.7"]]
   :url "http://example.com/FIXME"
   :dependencies [[cheshire "5.10.0"]
                  [hiccup "1.0.5"]

@@ -20,7 +20,6 @@
          [{:type "text",
            :value "Hi there"}]}]}]}]})
 
-
 (def list-items
   {:type "list",
    :indent 0,
@@ -39,3 +38,5 @@
        :children
        [{:type "text",
          :value "hithere"}]}]}]})
+
+

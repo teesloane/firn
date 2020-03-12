@@ -39,16 +39,4 @@
         (is (not= nil res-json))
         (is (> (count res-json) 0))))))
 
-(defn- e2e
-  []
-  (fs/delete-dir (config-sample :out-dir)) ;; delete folder if it exists
-  (sut/setup config-sample)
-  (doseq [f (:org-files (sut/get-files config-sample))]
-    (->> f
-         (config/set-curr-file config-sample)
-         (sut/read-file)
-         (sut/dataify-file)
-         (sut/htmlify-file)
-         (sut/write-file))))
-
-(e2e)
+(sut/-main test-dir)

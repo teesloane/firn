@@ -10,7 +10,6 @@
              (-> f .getName (.endsWith ext))))
           fileseq))
 
-
 (defn exit-with-err
   "Exits with error.
   TODO: make this not exit the repl in dev-mode."

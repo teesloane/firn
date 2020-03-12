@@ -1,5 +1,7 @@
 (ns firn.config)
 
+(def dev? true)
+
 (def curr-file
   {:name     nil
    :original nil      ; the file as as javaFile object.
@@ -26,6 +28,21 @@
   [config new-m]
   (let [new-curr-file (merge (config :curr-file) new-m)]
     (assoc config :curr-file new-curr-file)))
+
+(defn get-curr-file-name
+  [config]
+  (-> config :curr-file :name))
+
+(defn get-layout
+  "Pulls the `layout` value out of a current file.
+  Returns nil if it doesn't exist."
+  [config]
+  (->> config
+       (:curr-file)
+       (:keywords)
+       (filter #(= (:key %) "LAYOUT"))
+       (first)
+       (:value)))
 
 (defn default
   [files-dir]

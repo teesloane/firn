@@ -1,14 +1,14 @@
 (ns firn.core
-  (:require [clojure.java.io :as io]
+  (:require [cheshire.core :as json]
+            [clojure.java.io :as io]
             [clojure.java.shell :as sh]
-            [cheshire.core :as json]
+            [clojure.string :as s]
+            [firn.config :as config]
+            [firn.layout :as layout]
             [firn.markup :as m]
             [firn.util :as u]
-            [firn.layout :as layout]
-            [me.raynes.fs :as fs]
-            [firn.config :as config]
-            [clojure.string :as s]
-            [hiccup.core :as h])
+            [hiccup.core :as h]
+            [me.raynes.fs :as fs])
   (:gen-class))
 
 (defn setup
@@ -17,10 +17,11 @@
   Also, moves your `media folder` into _site. TODO - make configurable..."
   [{:keys [files-dir out-dir media-dir] :as config}]
 
-  (prn "Making _site output.")
+  (println "Running setup...")
+  (println "Setup: Making _site output.")
   (fs/mkdir out-dir)
 
-  (prn "Copying root media into out media")
+  (println "Copying root media into out media")
   (fs/copy-dir (config :media-dir) (config :out-media-dir))
 
   config)
@@ -70,7 +71,9 @@
 (defn htmlify-file
   "Renders files according to their `layout` keyword."
   [config]
-  (let [as-html   (layout/default-template config)]
+  (let [layout   (config/get-layout config)
+        as-html  (layout/apply-template config layout)]
+
     (config/update-curr-file config {:as-html as-html})))
 
 (defn write-file
@@ -84,17 +87,19 @@
 
 (defn -main
   [& args]
-  (let [files-dir (first args)
-        config    (config/default files-dir)]
+  (let [files-dir  (first args)
+        config     (config/default files-dir)
+        org-files  (-> config get-files :org-files)]
 
     (setup config) ;; side effectful
-    (doseq [f (:org-files (get-files config))]
+    (doseq [f org-files]
       (->> f
            (config/set-curr-file config)
            (read-file)
            (dataify-file)
            (htmlify-file)
            (write-file)))
-    (System/exit 0)))
+    (if config/dev?
+      (System/exit 0))))
 
-;; (-main) ; I recommend not running this in your repl.
+;; (-main) ; I recommend not running this in your repl with many files. See test suite instead.

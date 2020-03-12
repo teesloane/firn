@@ -6,6 +6,7 @@
 
 ;; Renderers
 
+
 (defn- src-block->html
   [{:keys [contents language arguments] :as src-block}]
   [:pre contents])
@@ -44,7 +45,6 @@
 
       :default
       [:a {:href link-href}])))
-
 
 (defn- title->html
   "Constructs titles - which can have additional values (keywords, priorities, etc)
