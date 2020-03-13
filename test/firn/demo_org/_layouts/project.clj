@@ -1,14 +1,17 @@
-;; (defn project
-;;   "Renders a templates as if a project."
-;;   [config wrapper]
-;;   (wrapper
-;;    [:main.debug.m7
-;;     [:aside.fl.w-25.pa2
-;;      [:div.pa2.pr4 "Sidebar stuff"]]
-;;     [:div.fl.w-10.pa2]
-;;     [:article.fl.w-60.pa2
-;;      [:div.pa2 "Content"]]]))
+;; (defn sidebar
+;;   [config]
+;;   [:aside.fl.w-25.pa2
+;;    [:div.pa2.pr4 "Sidebar stuff"]])
+
+(defn template
+  "Renders a templates as if a project."
+  [config wrapper]
+  (wrapper
+   [:main.debug.m7
+    [:div.fl.w-10.pa2]
+    [:article.fl.w-30.pa2
+     [:div.pa2 "content"]]]))
 
 
-
-{:export (fn [] (println "hi there"))}
+(fn [config wrapper]
+  (template config wrapper))

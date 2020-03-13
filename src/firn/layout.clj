@@ -30,22 +30,12 @@
   (templ-wrapper
    [:main (markup/to-html (:as-edn curr-file))]))
 
-;; (defn apply-template
-;;   "Depending on the layout of an org file, renders a template."
-;;   [config template]
-;;   (h/html
-;;    (case template
-;;      "project" (templ-project config)
-;;      (do
-;;        (println "Template: <" template "> not found for file:" (config/get-curr-file-name config))
-;;        (default-template config)))))
-
 (defn apply-template
   "Depending on the layout of an org file, renders a template."
   [config layout]
   (prn "layout is" layout (type layout))
   (if layout
     (let [layout-file-path (-> config :layouts layout .getPath)
-          load-layout      (load-file layout-file-path)]
-      (h/html [:div "This should be the project file eventually"]))
+          loaded-layout    (-> layout-file-path (slurp) (read-string) (eval))]
+      (h/html (loaded-layout config templ-wrapper)))
     (h/html (default-template config))))

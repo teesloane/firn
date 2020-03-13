@@ -70,11 +70,9 @@
       (.getPath)
       (slurp)
       (read-string)
-      (:export)
       (eval)))
 
-(x)
-
+(x config-sample layout/templ-wrapper)
 
 
 ;; (load-file (str test-dir "_layouts/project.clj"))
