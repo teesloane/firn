@@ -4,17 +4,18 @@
 
 (def curr-file
   {:name     nil
-   :original nil      ; the file as as javaFile object.
-   :keywords nil      ; list of keywords at top of org file: #+TITLE:, #+CATEGORY, etc.
-   :as-json  nil      ; The org file, read as json and spat out by the rust binary.
-   :as-edn   nil      ; JSON of org file -> converted to a map.
-   :as-html  nil})    ; the html output
+   :original nil         ; the file as as javaFile object.
+   :keywords nil         ; list of keywords at top of org file: #+TITLE:, #+CATEGORY, etc.
+   :as-json  nil         ; The org file, read as json and spat out by the rust binary.
+   :as-edn   nil         ; JSON of org file -> converted to a map.
+   :as-html  nil})       ; the html output
 
 (def starting-config
   {:out-dir     "_site"  ; where files get published; likely to be overridden
    :media-dir   "assets" ; org attachments to get copied into _site.
    :layouts     {}       ; layouts loaded into memory
    :layouts-dir ""       ; where layouts are stored.
+   :partials-dir ""      ; where partials are stored.
    :files-dir   nil      ; where org content lives.
    :org-files   nil      ; a list of org files, added to as files get converted.
    :curr-file   curr-file})
@@ -52,7 +53,8 @@
   [files-dir]
   (merge starting-config
          {:out-dir       (str files-dir "_site/")
-          :layouts-dir (str files-dir "_layouts/")
+          :layouts-dir   (str files-dir "_layouts/")
+          :partials-dir  (str files-dir "_partials/")
           :out-media-dir (str files-dir "_site/" (starting-config :media-dir))
           :files-dir     files-dir
           :media-dir     (str files-dir "/" (starting-config :media-dir))}))

@@ -42,7 +42,6 @@
         (is (not= nil res-json))
         (is (> (count res-json) 0))))))
 
-
 (defn single-file-runner
   []
   (fs/delete-dir (config-sample :out-dir)) ;; clear it out!
@@ -62,17 +61,3 @@
 
 (main-runner)
 
-
-(def x
-  (-> (layout/get-templates config-sample)
-      (:layouts)
-      (:project)
-      (.getPath)
-      (slurp)
-      (read-string)
-      (eval)))
-
-(x config-sample layout/templ-wrapper)
-
-
-;; (load-file (str test-dir "_layouts/project.clj"))

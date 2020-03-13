@@ -3,7 +3,6 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as s]))
 
-
 (defn get-files-of-type
   "Takes an io/file sequence and gets all files of a specific extension."
   [fileseq ext]

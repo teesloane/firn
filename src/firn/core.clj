@@ -23,8 +23,7 @@
   (println "Setup: Copying root media into out media")
   (fs/copy-dir (config :media-dir) (config :out-media-dir))
 
-  (-> config
-      layout/get-templates))
+  (-> config layout/get-layouts-and-partials))
 
 (defn parse!
   "Shells out to the rust binary to parse the org-mode file."
@@ -33,7 +32,6 @@
     (if-not (= (res :exit) 0)
       (prn "Failed to parse file.")
       (res :out))))
-
 
 (defn get-files
 
