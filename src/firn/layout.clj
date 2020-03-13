@@ -2,13 +2,16 @@
   (:require [hiccup.core :as h]
             [hiccup.def :refer :all]
             [firn.markup :as markup]
-            [firn.config :as config]))
+            [firn.util :as u]
+            [firn.config :as config]
+            [me.raynes.fs :as fs]))
 
 (defn get-templates
-  "Reads in an external file of hiccup templates."
-  []
-  nil)
-
+  "Reads in a _layouts dir of clj/hiccup templates."
+  [config]
+  (let [layout-files  (fs/find-files (config :layouts-dir) #"^.*\.(clj)$")
+        layouts-map   (into {} (map #(hash-map (u/io-file->keyword %) %) layout-files))]
+    (assoc config :layouts layouts-map)))
 
 (defn templ-wrapper
   "Default shared wrapper around ALL files."
@@ -20,29 +23,29 @@
    [:body body]])
 
 
-(defn templ-project
-  "Renders a templates as if a project."
-  [config]
-  (templ-wrapper
-   [:main.debug.m7
-    [:aside.fl.w-25.pa2
-     [:div.pa2.pr4 "Sidebar stuff"]]
-    [:div.fl.w-10.pa2]
-    [:article.fl.w-60.pa2
-     [:div.pa2 "Content"]]]))
-
+;; TODO - this would be replaced by "_layouts/default.clj"
 (defn default-template
   "The default template if no `layout` key is specified."
   [{:keys [curr-file] :as config}]
   (templ-wrapper
    [:main (markup/to-html (:as-edn curr-file))]))
 
+;; (defn apply-template
+;;   "Depending on the layout of an org file, renders a template."
+;;   [config template]
+;;   (h/html
+;;    (case template
+;;      "project" (templ-project config)
+;;      (do
+;;        (println "Template: <" template "> not found for file:" (config/get-curr-file-name config))
+;;        (default-template config)))))
+
 (defn apply-template
   "Depending on the layout of an org file, renders a template."
-  [config template]
-  (h/html
-   (case template
-     "project" (templ-project config)
-     (do
-       (println "Template: <" template "> not found for file:" (config/get-curr-file-name config))
-       (default-template config)))))
+  [config layout]
+  (prn "layout is" layout (type layout))
+  (if layout
+    (let [layout-file-path (-> config :layouts layout .getPath)
+          load-layout      (load-file layout-file-path)]
+      (h/html [:div "This should be the project file eventually"]))
+    (h/html (default-template config))))

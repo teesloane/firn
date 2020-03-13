@@ -3,8 +3,10 @@
             [clojure.java.io :as io]
             [firn.core :as sut]
             [firn.config :as config]
+            [firn.util :as u]
             [me.raynes.fs :as fs]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [firn.layout :as layout]))
 
 (def test-dir      "./test/firn/demo_org/")
 (def f-1           (io/file (str test-dir "file1.org")))
@@ -12,6 +14,7 @@
 (def config-sample (config/default test-dir))
 
 (deftest _setup
+  ;; TODO - test reading of layouts into memory.
   (let [out-dir       (config-sample :out-dir)
         out-media-dir (config-sample :out-media-dir)
         setup-res     (sut/setup config-sample)]
@@ -40,6 +43,17 @@
         (is (> (count res-json) 0))))))
 
 
+(defn single-file-runner
+  []
+  (fs/delete-dir (config-sample :out-dir)) ;; clear it out!
+  (let [config (sut/setup config-sample)]
+    (->> f-2
+         (config/set-curr-file config)
+         (sut/read-file)
+         (sut/dataify-file)
+         (sut/htmlify-file))))
+
+(single-file-runner)
 
 (defn main-runner
   []
@@ -47,3 +61,20 @@
   (sut/-main test-dir)) ;; delete folder if it exists
 
 (main-runner)
+
+
+(def x
+  (-> (layout/get-templates config-sample)
+      (:layouts)
+      (:project)
+      (.getPath)
+      (slurp)
+      (read-string)
+      (:export)
+      (eval)))
+
+(x)
+
+
+
+;; (load-file (str test-dir "_layouts/project.clj"))

@@ -17,14 +17,14 @@
   Also, moves your `media folder` into _site. TODO - make configurable..."
   [{:keys [files-dir out-dir media-dir] :as config}]
 
-  (println "Running setup...")
   (println "Setup: Making _site output.")
   (fs/mkdir out-dir)
 
-  (println "Copying root media into out media")
+  (println "Setup: Copying root media into out media")
   (fs/copy-dir (config :media-dir) (config :out-media-dir))
 
-  config)
+  (-> config
+      layout/get-templates))
 
 (defn parse!
   "Shells out to the rust binary to parse the org-mode file."
@@ -34,22 +34,14 @@
       (prn "Failed to parse file.")
       (res :out))))
 
+
 (defn get-files
+
+  ;; TODO -  maybe better belongs in setup function?
   "Returns a list of files as Java objects. Filters out all non `.org` files."
   [{:keys [files-dir] :as config}]
   (println "Getting org files...")
-  (let [site-dir       (io/file files-dir)
-        site-dir-files (file-seq site-dir)
-        org-files      (u/get-files-of-type site-dir-files ".org")]
-    (cond
-      (not (.isDirectory site-dir))
-      (u/exit-with-err "No folder found at site-directory:" site-dir)
-
-      (= (count org-files) 0)
-      (u/exit-with-err "No .org files found in site-directory")
-
-      :else
-      (conj config {:org-files org-files}))))
+  (conj config {:org-files (fs/find-files files-dir #"^.*\.(org)$")}))
 
 (defn read-file
   "Pulls :curr-file from config > parses > put into config with new vals"
@@ -86,20 +78,21 @@
     (spit out-file-name out-html)))
 
 (defn -main
+  "TODO:  Messy. move the `let` block into the `setup` fn"
   [& args]
-  (let [files-dir  (first args)
-        config     (config/default files-dir)
-        org-files  (-> config get-files :org-files)]
+  (let [files-dir          (first args)
+        config             (config/default files-dir)
+        config-with-layout (setup config) ;; side effectful
+        org-files          (-> config get-files :org-files)]
 
-    (setup config) ;; side effectful
     (doseq [f org-files]
       (->> f
-           (config/set-curr-file config)
+           (config/set-curr-file config-with-layout)
            (read-file)
            (dataify-file)
            (htmlify-file)
            (write-file)))
-    (if config/dev?
-      (System/exit 0))))
+    #_(if config/dev?
+        (System/exit 0))))
 
 ;; (-main) ; I recommend not running this in your repl with many files. See test suite instead.
