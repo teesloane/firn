@@ -13,7 +13,7 @@
     (head
      [:main.wiki
       (nav)
-      [:article.fl.w-30.pa2.sidebar
+      [:article.fl.w-30.pv2.pr4.sidebar
        [:div.pa2 (render tasks)]]
       [:article.fl.w-70.pa2
        [:div.pa2 (render notes)]]])))

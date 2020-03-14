@@ -3,10 +3,8 @@
             [clojure.java.io :as io]
             [firn.core :as sut]
             [firn.config :as config]
-            [firn.util :as u]
-            [me.raynes.fs :as fs]
-            [clojure.string :as str]
-            [firn.layout :as layout]))
+            [me.raynes.fs :as fs]))
+            
 
 (def test-dir      "./test/firn/demo_org/")
 (def f-1           (io/file (str test-dir "file1.org")))

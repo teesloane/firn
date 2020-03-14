@@ -1,13 +1,9 @@
 (ns firn.core
   (:require [cheshire.core :as json]
-            [clojure.java.io :as io]
             [clojure.java.shell :as sh]
             [clojure.string :as s]
             [firn.config :as config]
             [firn.layout :as layout]
-            [firn.markup :as m]
-            [firn.util :as u]
-            [hiccup.core :as h]
             [me.raynes.fs :as fs])
   (:gen-class))
 

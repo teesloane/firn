@@ -43,7 +43,7 @@
       (re-matches http-link-regex link-href)
       [:a {:href link-href} link-val]
 
-      :default
+      :else
       [:a {:href link-href}])))
 
 (defn- title->html
@@ -57,8 +57,8 @@
         keywrd           (v :keyword)
         priority         (v :priority)
         value            (v :value)
-        heading-priority (keyword (str "span.heading-priority." priority))
-        heading-keyword  (keyword (str "span.heading-keyword." keywrd))
+        heading-priority (keyword (str "span.heading-priority.heading-priority__" priority))
+        heading-keyword  (keyword (str "span.heading-keyword.heading-keyword__" keywrd))
         h-level          (case level 1 :h1 2 :h2 3 :h3 4 :h4 5 :h5 :h6)
         make-child       #(into [%] (map title->html children))]
     (case typ

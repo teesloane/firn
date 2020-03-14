@@ -1,9 +1,8 @@
-/* Box sizing rules */ *, *::before, *::after {box-sizing: border-box;} /* Remove default padding */ ul[class], ol[class] {padding: 0;} /* Remove default margin */ body, h1, h2, h3, h4, p, ul[class], ol[class], li, figure, figcaption, blockquote, dl, dd {margin: 0;} /* Set core body defaults */ body {min-height: 100vh; scroll-behavior: smooth; text-rendering: optimizeSpeed; line-height: 1.5;} /* Remove list styles on ul, ol elements with a class attribute */ ul[class], ol[class] {list-style: none;} /* A elements that don't have a class get default styles */ a:not([class]) {text-decoration-skip-ink: auto;} /* Make images easier to work with */ img {max-width: 100%; display: block;} /* Natural flow and rhythm in articles by default */ article > * + * {margin-top: 1em;} /* Inherit fonts for inputs and buttons */ input, button, textarea, select {font: inherit;} /* Remove all animations and transitions for people that prefer not to see them */ @media (prefers-reduced-motion: reduce) {* {animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important;}}
-
 .wiki {
   max-width: 1260px;
   margin: 0 auto !important;
   font-family: sans-serif;
+  line-height: 1.5;
   width: 100%;
 }
 
@@ -16,7 +15,26 @@ p {
   margin-top: 16px;
 }
 
-h1,h2,h3,h4,h5,h6 {
+ul {
+  padding-left: 16px;
+  list-style-type: none;
+  list-style-type: '– ';
+}
+
+li > p {
+  margin: 8px 0;
+}
+
+code {
+  font-size: 0.9em !important;
+}
+
+h1 {
+  margin: 32px 0 64px 0 !important;
+}
+
+
+h2,h3,h4,h5,h6 {
   margin: 32px 0;
 }
 
@@ -82,29 +100,55 @@ hr {
 }
 
 
-.sidebar h2,
-.sidebar h3,
-.sidebar h4,
-.sidebar h5 {
-  font-size: 15px;
-  margin: 0px;
-}
 
+
+/* Heading Keywords and Priority */
 
 .heading-priority {
-  margin: 0 4px;
-  border: 1px solid black;
-  border-radius: 50%;
-  min-width: 24px;
-  min-height: 24px;
+  margin: -22px 0 0 -6px;
+  font-size: 8px;
+  min-width: 12px;
+  min-height: 12px;
   display: inline-flex;
   justify-content: center;
+  align-items: center;
 }
 
-.heading-keyword {
-  color: grey;
+
+.heading-priority__A {
+  color: salmon;
 }
 
-.heading-keyword .DONE {
-  color: #9EEBCF;
+.heading-priority__B {
+  color: mediumseagreen;
+}
+
+.heading-priority__C {
+  color: lightblue;
+}
+
+.heading-keyword > div {
+  font-size: 12px;
+}
+
+.heading-keyword__DONE {
+  font-size: 12px;
+  margin-right: 4px;
+  color: lightgrey;
+}
+
+
+/* Sidebar */
+
+.sidebar section {
+  font-size: 13px;
+}
+
+.sidebar h3,
+.sidebar h4,
+.sidebar h5,
+.sidebar h2 {
+  font-size: 14px;
+  margin: 24px 0px;
+  border-bottom: 1px dashed #efefef;
 }
