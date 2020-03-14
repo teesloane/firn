@@ -77,7 +77,7 @@
       [:span " - ERR! Val Missing -"])))
 
 (defn to-html
-  "Recursively Parses the org-tree tree-seq into hiccup.
+  "Recursively Parses the org-edn into hiccup.
   Some values don't get parsed (drawers) - yet. They return empty strings.
   Don't destructure! - it can create uneven maps from possible nil vals on `V`"
   [v]

@@ -9,6 +9,7 @@
   ; b) eval is not a good idea, probably."
   (:require [firn.config :as config]
             [firn.markup :as markup]
+            [firn.org :as org]
             [firn.util :as u]
             [hiccup.core :as h]
             [hiccup.def :refer :all]
@@ -63,13 +64,19 @@
   "The default template if no `layout` key is specified.
   TODO - this would be replaced by `_layouts/default.clj`"
   [{:keys [curr-file] :as config}]
-  (layout-wrapper
-   [:main (markup/to-html (:as-edn curr-file))]))
+  [:main (markup/to-html (:as-edn curr-file))])
+
+(defn with-fns-config
+  "Pass functions needed for rendering to configs."
+  [config]
+  (assoc config
+         :render markup/to-html
+         :get-headline org/get-headline))
 
 
 (defn apply-template
   "If a file has a template, render the file with it, or use the default layout"
   [config layout]
   (if-let [layout (layout-exists? config layout)]
-    (h/html (layout config))
+    (h/html (layout (with-fns-config config)))
     (h/html (default-template config))))

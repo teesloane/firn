@@ -54,6 +54,11 @@
 
 (single-file-runner)
 
+
+(-> (single-file-runner)
+    :curr-file
+    :as-edn)
+
 (defn main-runner
   []
   (fs/delete-dir (config-sample :out-dir)) ;; clear it out!
