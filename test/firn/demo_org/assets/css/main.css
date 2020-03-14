@@ -137,6 +137,12 @@ hr {
   color: lightgrey;
 }
 
+.heading-keyword__TODO {
+  font-size: 12px;
+  margin-right: 4px;
+  color: seagreen;
+}
+
 
 /* Sidebar */
 
