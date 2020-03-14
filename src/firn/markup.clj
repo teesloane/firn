@@ -50,20 +50,22 @@
   "Constructs titles - which can have additional values (keywords, priorities, etc)
   That aren't found in the `children` values and so need special parsing."
   [v]
-  (let [level      (v :level)
-        typ        (v :type)
-        children   (v :children)
-        raw        (v :raw)
-        keywrd     (v :keyword)
-        priority   (v :priority)
-        value      (v :value)
-        h-level    (case level 1 :h1 2 :h2 3 :h3 4 :h4 5 :h5 :h6)
-        make-child #(into [%] (map title->html children))]
+  (let [level            (v :level)
+        typ              (v :type)
+        children         (v :children)
+        raw              (v :raw)
+        keywrd           (v :keyword)
+        priority         (v :priority)
+        value            (v :value)
+        heading-priority (keyword (str "span.heading-priority." priority))
+        heading-keyword  (keyword (str "span.heading-keyword." keywrd))
+        h-level          (case level 1 :h1 2 :h2 3 :h3 4 :h4 5 :h5 :h6)
+        make-child       #(into [%] (map title->html children))]
     (case typ
       "headline"  (make-child :div)
       "title"     [h-level
-                   [:span.heading-keyword (str keywrd " ")]
-                   [:span.heading-priority (str priority " ")]
+                   (when keywrd [heading-keyword (str keywrd " ")])
+                   (when priority [heading-priority (str priority " ")])
                    (make-child :span)]
       "text"      [:span value]
       "cookie"    [:span.heading-cookie value]
@@ -75,6 +77,8 @@
       "italic"    (make-child :em)
       "bold"      (make-child :strong)
       [:span " - ERR! Val Missing -"])))
+
+(keyword (str "span.heading-keyword"))
 
 (defn to-html
   "Recursively Parses the org-edn into hiccup.

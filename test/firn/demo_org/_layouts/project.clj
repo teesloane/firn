@@ -1,18 +1,19 @@
 (defn template
-  "Renders a templates as if a project."
+  "Renders a templates as if a project.
+  Someday this will become a macro. Maybe."
   [config]
   (let [{:keys [ head nav ] } (config :partials)
         render                (config :render)
         content               (-> config :curr-file :as-edn)
-        ;; _ (prn "RENDER IS " content)
         get-headline          (-> config :get-headline)
-        meta                  (get-headline content "Notes")
-        _                     (prn "META IS " meta)]
+        notes                 (get-headline content "Notes")
+        meta                  (get-headline content "Meta")
+        tasks                 (get-headline content "Tasks")]
 
     (head
-     [:main.m7
+     [:main.wiki
       (nav)
-      [:article.fl.w-30.pa2
-       [:div.pa2 "yo"]]
+      [:article.fl.w-30.pa2.sidebar
+       [:div.pa2 (render tasks)]]
       [:article.fl.w-70.pa2
-       [:div.pa2 (render meta)]]])))
+       [:div.pa2 (render notes)]]])))
