@@ -2,6 +2,7 @@
   (:require [clojure.test :refer :all]
             [clojure.java.io :as io]
             [firn.core :as sut]
+            [firn.org :as org]
             [firn.config :as config]
             [me.raynes.fs :as fs]))
            

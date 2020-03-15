@@ -3,6 +3,7 @@
             [clojure.java.shell :as sh]
             [clojure.string :as s]
             [firn.config :as config]
+            [firn.org :as org]
             [firn.layout :as layout]
             [me.raynes.fs :as fs])
   (:gen-class))
@@ -49,10 +50,19 @@
   "Converts an org file into a bunch of data.
   TODO collect logbook, clock, for every file."
   [config]
-  (let [file-json            (-> config :curr-file :as-json)
-        file-edn             (-> file-json (json/parse-string true))
-        file-keywords        (get-in file-edn [:children 0 :children])]
-    (config/update-curr-file config {:as-edn file-edn :keywords file-keywords})))
+  (let [file-json     (-> config :curr-file :as-json)
+        file-edn      (-> file-json (json/parse-string true))
+        file-keywords (get-in file-edn [:children 0 :children])
+        org-title     (->> file-keywords
+                           (filter #(= "TITLE" (:key %)))
+                           (first) :value)]
+
+
+    (config/update-curr-file
+     config
+     {:as-edn    file-edn
+      :keywords  file-keywords
+      :org-title org-title})))
 
 (defn htmlify-file
   "Renders files according to their `layout` keyword."

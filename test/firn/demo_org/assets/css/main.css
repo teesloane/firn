@@ -1,17 +1,24 @@
 body {
   display: flex;
   flex-direction: column;
+  max-width: 1260px;
+  padding: 24px;
+  margin: 0 auto;
+  font-family: sans-serif;
 }
 
 main {
-  max-width: 1260px;
   margin: 64px auto 0 !important;
-  padding: 24px;
   font-family: sans-serif;
   line-height: 1.5;
   width: 100%;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
+}
+
+article {
+  max-width: 650px;
+  padding-right: 24px;
 }
 
 .debug * {
@@ -33,12 +40,6 @@ pre {
   overflow-x: scroll;
   padding: 16px 8px;
   background: #dfdfdf;
-}
-
-article {
-  max-width: 650px;
-  padding: 0 24px;
-  flex: 1;
 }
 
 p {

@@ -50,18 +50,11 @@
 
 (defn layout-exists?
   "Checks if a layout for a project exists in the config map
-  If it does, return the function value of the layout, otherwise nil/false
-  FIXME: turn this into a cond."
+  If it does, return the function value of the layout, otherwise the default template "
   [config layout]
-  ;; if layout exists, use it.
-  (if (contains? (config :layouts) layout)
-    (get-in config [:layouts layout])
-    ;; If it doesn't, use defualt if it exists.
-    (if (contains? (config :layouts) :default)
-      (get-in config [:layouts :default])
-      ;; else, use the default template
-      default-template)))
-
+  (get-in config [:layouts layout]
+          (get-in config [:layouts :default]
+                  default-template)))
 
 (defn with-fns-config
   "Pass functions needed for rendering to configs."
@@ -70,13 +63,9 @@
          :render markup/to-html
          :get-headline org/get-headline))
 
-
 (defn apply-template
   "If a file has a template, render the file with it, or use the default layout"
   [config layout]
   (let [selected-layout (layout-exists? config layout)]
+    (prn " THE SELECTED LAYOUT IS " selected-layout)
     (h/html (selected-layout (with-fns-config config)))))
-  ;; (if-let [layout (layout-exists? config layout)]
-  ;;   (h/html (layout (with-fns-config config)))
-  ;;   (h/html (layout (with-fns-config config)))
-  ;; #_(h/html (default-template config)))])

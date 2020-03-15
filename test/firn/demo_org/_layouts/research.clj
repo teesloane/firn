@@ -1,4 +1,4 @@
-(defn project
+(defn layout-project
   "Renders a templates as if a project.
   Someday this will become a macro. Maybe."
   [config]
@@ -6,19 +6,16 @@
         render                (config :render)
         content               (-> config :curr-file :as-edn)
         get-headline          (-> config :get-headline)
-        file-title            (-> config :curr-file :org-title)
         notes                 (-> (get-headline content "Notes") :children second)
         meta                  (get-headline content "Meta")
-        resources             (get-headline content "Resources")
-        tasks                 (get-headline content "Tasks")]
+        resources             (get-headline content "Resources")]
+
 
     (head
      [:body
       (nav)
       [:main
        [:article
-        [:h1 file-title]
         [:div (render notes)]]
        [:aside
-        [:div (render resources)]
-        [:div (render tasks)]]]])))
+        [:div (render resources)]]]])))

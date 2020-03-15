@@ -30,65 +30,14 @@ CLOCK: [2020-03-01 Sun 17:34]--[2020-03-01 Sun 18:09] =>  0:35
 * Resources
 - [[https://www.britannica.com/science/firn][Namesake]]
 - [[file:org-mode.org][Org Modeº]]
-  - [[file:emacs.org][Emacsº]]
+- [[file:emacs.org][Emacsº]]
 * Tasks
-** TODO [#A] =(get-files)= fetches recursively.                                :bug:
+** TODO - Do thing
 - Only root files should be fetched
-- sub folders of wiki are being translated to html.
-** TODO [#B] Build "View" templating [33%]                                     :feature:
-Depending on file's "#+VIEW:" keyword, could render it differently, ex:
-- [X] _Project_ - Renders meta, resources, tasks, in a specific, styled way.
-- [ ] _General_ - Spits out a standard html render of entire file contents.
-- [ ] _Private_ - Don't render a file
-** TODO [#C] innerfile-linking with anchors                                    :convenience:
-** TODO [#C] Collect LOGBOOK into currentfile.                                 :wiki:
-** TODO [#C] Vendor Rust binary [%]                                            :reliability:
-- [ ] or at least make it's installation part of the README.
-** TODO [#C] Build table of contents
-** TODO [#C] enable per-header rendering                                       :someday:
-- Some headers might not need to be rendered; using :PROPERTIES:, could enable a
-  flag on conditional rendering.
-** TODO [#C] Build front end heading folding.                                  :someday:
-** TODO [#C] Orgize - fix parser for list items with brackets.                 :refactor:someday:
-** TODO Make nested headings
-** TODO [#B] Abstract html "primitives" into macro?                            :refactor:
-- code, verbatim, rule, etc are common case items that don't have children... I guess?
-** DONE Build embedding images
-CLOSED: [2020-03-07 Sat 16:00]
-** DONE [#C] Build media library                                               :wiki:
-CLOSED: [2020-03-07 Sat 16:00]
-- [X] start with org-files (image tags)
-** DONE Fix =1) 2) 3)= list item rendering ( see assimil doc. )
-CLOSED: [2020-03-06 Fri 05:37]
-** DONE Setup tests.
-CLOSED: [2020-03-05 Thu 21:32]
-** DONE Handle all org -> html types.
-CLOSED: [2020-03-05 Thu 14:37]
-- [X] table
-- [X] drawers (hide them)
-- [X] rule (hrs)
-** DONE Cleanup how ~:curr-file~ works.
-CLOSED: [2020-03-05 Thu 14:36]
-- Make into a sub-map of :config
-- Write funcs for setting / getting values out of it.
-** DONE More file work [100%]
-CLOSED: [2020-03-04 Wed 21:26]
-*** DONE Strip Keywords from file and move into config map
-** DONE create /tmp folder if not exist.
-CLOSED: [2020-03-04 Wed 21:03]
-** DONE Make passing directory of files easier.
-CLOSED: [2020-03-04 Wed 21:03]
-** DONE MVP [100%]
-*** DONE Setup Parser [100%]
-- [X] Find a good org-parser.
-- [X] Slurp single file
-- [X] Parse file
-- [X] Display one basic element (propertees?) with hiccup.
-*** DONE Render a single org file to html [100%]
-CLOSED: [2020-03-01 Sun 17:36]
-- [X] Slurp File
-- [X] render it to file as is.
+- sub folders of wiki are being translated to html.ODO
+*** TODO Sub todo.
 * Notes
+
 #+BEGIN_QUOTE
 Firn is found under the snow that accumulates at the head of a glacier. It is formed under the pressure of overlying snow by the processes of compaction, recrystallization, localized melting, and the crushing of individual snowflakes.
 

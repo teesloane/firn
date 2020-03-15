@@ -5,6 +5,7 @@
 (def curr-file
   {:name     nil
    :original nil         ; the file as as javaFile object.
+   :org-title nil        ; the #+TITLE value.
    :keywords nil         ; list of keywords at top of org file: #+TITLE:, #+CATEGORY, etc.
    :as-json  nil         ; The org file, read as json and spat out by the rust binary.
    :as-edn   nil         ; JSON of org file -> converted to a map.
