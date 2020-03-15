@@ -2,5 +2,5 @@
   [:html
    [:head
     [:link {:rel "stylesheet" :href "./assets/css/main.css"}]
-    [:link {:rel "stylesheet" :href "./assets/css/tachyons.css"}]]
-   [:body body]])
+    #_[:link {:rel "stylesheet" :href "./assets/css/tachyons.css"}]]
+   body])

@@ -1,13 +1,37 @@
-.wiki {
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+main {
   max-width: 1260px;
-  margin: 0 auto !important;
+  margin: 64px auto 0 !important;
   font-family: sans-serif;
   line-height: 1.5;
   width: 100%;
+  display: flex;
+  justify-content: space-around;
 }
 
-div {
-  margin: 8px 0;
+.debug * {
+  outline: 1px solid lavender;
+}
+
+a {
+  text-decoration: none;
+  color: ;
+}
+
+pre {
+  max-width: 100%;
+  overflow-x: scroll;
+  padding: 16px 8px;
+  background: #dfdfdf;
+}
+
+article {
+  max-width: 650px;
+  flex: 1;
 }
 
 p {
@@ -30,12 +54,15 @@ code {
 }
 
 h1 {
-  margin: 32px 0 64px 0 !important;
+  font-size: 1.25em;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }
 
+h2 {font-size: 1.12em;}
 
-h2,h3,h4,h5,h6 {
-  margin: 32px 0;
+h1, h2, h3, h4, h5, h6, div, p, section {
+  margin: 0 0 32px 0;
 }
 
 
@@ -99,9 +126,6 @@ hr {
   border: none;
 }
 
-
-
-
 /* Heading Keywords and Priority */
 
 .heading-priority {
@@ -144,17 +168,35 @@ hr {
 }
 
 
-/* Sidebar */
+/* Sidebar ---  */
 
-.sidebar section {
+/* Displays tasks, resources, and media */
+
+aside section {
   font-size: 13px;
+  padding: 4px 0;
 }
 
-.sidebar h3,
-.sidebar h4,
-.sidebar h5,
-.sidebar h2 {
+aside {
+  max-width: 320px;
+  max-height: 90vh;
+  overflow: scroll;
+  padding: 0 24px;
+}
+
+aside h1 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  border-bottom: 1px solid lightgrey;
+  margin-bottom: 8px !important;
+}
+
+aside h3,
+aside h4,
+aside h5,
+aside h2 {
   font-size: 14px;
-  margin: 24px 0px;
   border-bottom: 1px dashed #efefef;
+  margin: 24px 0px !important;
 }

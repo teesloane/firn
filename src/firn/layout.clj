@@ -19,7 +19,6 @@
   "Takes a list of files and returns a map of filenames as :keywords -> file"
   [file-list]
   (let [eval-file (fn [file]
-                    (prn "file thing is " (-> file .getPath))
                     (-> file .getPath slurp read-string eval))]
 
     (into {} (map #(hash-map (u/io-file->keyword %) (eval-file %)) file-list))))

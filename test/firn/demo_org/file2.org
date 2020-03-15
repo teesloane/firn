@@ -37,9 +37,9 @@ CLOCK: [2020-03-01 Sun 17:34]--[2020-03-01 Sun 18:09] =>  0:35
 - sub folders of wiki are being translated to html.
 ** TODO [#B] Build "View" templating [33%]                                     :feature:
 Depending on file's "#+VIEW:" keyword, could render it differently, ex:
-- [X] Project - Renders meta, resources, tasks, in a specific, styled way.
-- [ ] General - Spits out a standard html render of entire file contents.
-- [ ] Private - Don't render a file
+- [X] Project_ - Renders meta, resources, tasks, in a specific, styled way.
+- [ ] General_ - Spits out a standard html render of entire file contents.
+- [ ] Private_ - Don't render a file
 ** TODO [#C] innerfile-linking with anchors                                    :convenience:
 ** TODO [#C] Collect LOGBOOK into currentfile.                                 :wiki:
 ** TODO [#C] Vendor Rust binary [%]                                            :reliability:

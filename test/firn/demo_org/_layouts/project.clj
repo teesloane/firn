@@ -8,12 +8,14 @@
         get-headline          (-> config :get-headline)
         notes                 (get-headline content "Notes")
         meta                  (get-headline content "Meta")
+        resources             (get-headline content "Resources")
         tasks                 (get-headline content "Tasks")]
 
     (head
-     [:main.wiki
-      (nav)
-      [:article.fl.w-30.pv2.pr4.sidebar
-       [:div.pa2 (render tasks)]]
-      [:article.fl.w-70.pa2
-       [:div.pa2 (render notes)]]])))
+     [:body
+      [:main
+       [:article
+        [:div (render notes)]]
+       [:aside.fl.w-30.sidebar.pa4.bl.b--light-gray
+        [:div (render resources)]
+        [:div (render tasks)]]]])))

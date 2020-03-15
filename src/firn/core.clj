@@ -11,10 +11,10 @@
   "Creates output directory for files and sets up starting
   config file that gets passed through all functions
   Also, moves your `media folder` into _site. TODO - make configurable..."
-  [{:keys [files-dir out-dir media-dir] :as config}]
+  [config]
 
   (println "Setup: Making _site output.")
-  (fs/mkdir out-dir)
+  (fs/mkdir (config :out-dir))
 
   (println "Setup: Copying root media into out media")
   (fs/copy-dir (config :media-dir) (config :out-media-dir))
@@ -26,7 +26,7 @@
   [file-str]
   (let [res (sh/sh "./src/parser/target/debug/parser" file-str)]
     (if-not (= (res :exit) 0)
-      (prn "Failed to parse file.")
+      (prn "Orgize failed to parse file." file-str res)
       (res :out))))
 
 (defn get-files

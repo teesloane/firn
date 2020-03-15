@@ -4,7 +4,7 @@
             [firn.core :as sut]
             [firn.config :as config]
             [me.raynes.fs :as fs]))
-            
+           
 
 (def test-dir      "./test/firn/demo_org/")
 (def f-1           (io/file (str test-dir "file1.org")))
@@ -48,7 +48,9 @@
          (config/set-curr-file config)
          (sut/read-file)
          (sut/dataify-file)
-         (sut/htmlify-file))))
+         (:curr-file)
+         :as-edn
+         #_(sut/htmlify-file))))
 
 (single-file-runner)
 
