@@ -32,16 +32,9 @@
            :layouts layouts-map
            :partials partials-map)))
 
-(defn get-partials
-  "Reads in a _layouts dir (from the config map) of clj/hiccup templates."
-  [config]
-  (let [layout-files  (fs/find-files (config :layouts-dir) #"^.*\.(clj)$")
-        layouts-map   (into {} (map #(hash-map (u/io-file->keyword %) %) layout-files))]
-    (assoc config :layouts layouts-map)))
-
 (defn default-template
   "The default template if no `layout` key is specified.
-  TODO - this would be replaced by `_layouts/default.clj`"
+  This lets users know they need to build a `_layouts/default.clj`"
   [{:keys [curr-file]}]
   [:main
    [:h1 "Note! You don't have a default template."]
