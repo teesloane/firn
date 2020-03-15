@@ -7,12 +7,10 @@
   NOTE: will change (apply-templates, especially) in the future:
   ; a) probably can't compile down with GRAAL and
   ; b) eval is not a good idea, probably."
-  (:require [firn.config :as config]
-            [firn.markup :as markup]
+  (:require [firn.markup :as markup]
             [firn.org :as org]
             [firn.util :as u]
             [hiccup.core :as h]
-            [hiccup.def :refer :all]
             [me.raynes.fs :as fs]))
 
 (defn file-name->keyword
@@ -41,29 +39,29 @@
         layouts-map   (into {} (map #(hash-map (u/io-file->keyword %) %) layout-files))]
     (assoc config :layouts layouts-map)))
 
-(defn layout-exists?
-  "Checks if a layout for a project exists in the config map
-  If it does, return the function value of the layout, otherwise nil/false"
-  [config layout]
-  (if (contains? (config :layouts) layout)
-    (get-in config [:layouts layout])
-    false))
-
-
-(defn layout-wrapper
-  "Default shared wrapper around ALL files."
-  [body]
-  [:html
-   [:head
-    [:link {:rel "stylesheet" :href "https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css"}]
-    [:link {:rel "stylesheet" :href "./assets/css/main.css"}]]
-   [:body body]])
-
 (defn default-template
   "The default template if no `layout` key is specified.
   TODO - this would be replaced by `_layouts/default.clj`"
-  [{:keys [curr-file] :as config}]
-  [:main (markup/to-html (:as-edn curr-file))])
+  [{:keys [curr-file]}]
+  [:main
+   [:h1 "Note! You don't have a default template."]
+   [:div "Please make a _layouts/default.clj file and put it in your org note directory."]
+   [:div (markup/to-html (:as-edn curr-file))]])
+
+(defn layout-exists?
+  "Checks if a layout for a project exists in the config map
+  If it does, return the function value of the layout, otherwise nil/false
+  FIXME: turn this into a cond."
+  [config layout]
+  ;; if layout exists, use it.
+  (if (contains? (config :layouts) layout)
+    (get-in config [:layouts layout])
+    ;; If it doesn't, use defualt if it exists.
+    (if (contains? (config :layouts) :default)
+      (get-in config [:layouts :default])
+      ;; else, use the default template
+      default-template)))
+
 
 (defn with-fns-config
   "Pass functions needed for rendering to configs."
@@ -76,6 +74,9 @@
 (defn apply-template
   "If a file has a template, render the file with it, or use the default layout"
   [config layout]
-  (if-let [layout (layout-exists? config layout)]
-    (h/html (layout (with-fns-config config)))
-    (h/html (default-template config))))
+  (let [selected-layout (layout-exists? config layout)]
+    (h/html (selected-layout (with-fns-config config)))))
+  ;; (if-let [layout (layout-exists? config layout)]
+  ;;   (h/html (layout (with-fns-config config)))
+  ;;   (h/html (layout (with-fns-config config)))
+  ;; #_(h/html (default-template config)))])

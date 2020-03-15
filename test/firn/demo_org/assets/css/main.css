@@ -6,6 +6,7 @@ body {
 main {
   max-width: 1260px;
   margin: 64px auto 0 !important;
+  padding: 24px;
   font-family: sans-serif;
   line-height: 1.5;
   width: 100%;
@@ -19,7 +20,12 @@ main {
 
 a {
   text-decoration: none;
-  color: ;
+  color: #357EDD;
+}
+
+a:visited {
+  color: #00449E;
+
 }
 
 pre {
@@ -31,6 +37,7 @@ pre {
 
 article {
   max-width: 650px;
+  padding: 0 24px;
   flex: 1;
 }
 
@@ -114,7 +121,7 @@ code {
 .quote-block {
   margin: 32px 0;
   background: #fafafa;
-  padding: 8px 24px 16px;
+  padding: 24px 24px 4px;
   border-left: 4px solid lightgrey;
 }
 
@@ -124,6 +131,10 @@ hr {
   height: 2px;
   background-color: #afafaf;
   border: none;
+}
+
+img {
+  width: 100%;
 }
 
 /* Heading Keywords and Priority */
@@ -172,16 +183,24 @@ hr {
 
 /* Displays tasks, resources, and media */
 
-aside section {
-  font-size: 13px;
-  padding: 4px 0;
-}
+
 
 aside {
   max-width: 320px;
+  min-width: 320px;
   max-height: 90vh;
   overflow: scroll;
   padding: 0 24px;
+  border-left: 1px solid #efefef;
+}
+
+aside section, aside p {
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+li > p {
+  margin-bottom: 0px;
 }
 
 aside h1 {
@@ -198,5 +217,5 @@ aside h5,
 aside h2 {
   font-size: 14px;
   border-bottom: 1px dashed #efefef;
-  margin: 24px 0px !important;
+  margin: 24px 0px 12px !important;
 }

@@ -37,9 +37,9 @@ CLOCK: [2020-03-01 Sun 17:34]--[2020-03-01 Sun 18:09] =>  0:35
 - sub folders of wiki are being translated to html.
 ** TODO [#B] Build "View" templating [33%]                                     :feature:
 Depending on file's "#+VIEW:" keyword, could render it differently, ex:
-- [X] Project_ - Renders meta, resources, tasks, in a specific, styled way.
-- [ ] General_ - Spits out a standard html render of entire file contents.
-- [ ] Private_ - Don't render a file
+- [X] _Project_ - Renders meta, resources, tasks, in a specific, styled way.
+- [ ] _General_ - Spits out a standard html render of entire file contents.
+- [ ] _Private_ - Don't render a file
 ** TODO [#C] innerfile-linking with anchors                                    :convenience:
 ** TODO [#C] Collect LOGBOOK into currentfile.                                 :wiki:
 ** TODO [#C] Vendor Rust binary [%]                                            :reliability:
@@ -58,7 +58,7 @@ CLOSED: [2020-03-07 Sat 16:00]
 ** DONE [#C] Build media library                                               :wiki:
 CLOSED: [2020-03-07 Sat 16:00]
 - [X] start with org-files (image tags)
-** DONE Fix ~1) 2) 3)~ list item rendering ( see assimil doc. )
+** DONE Fix =1) 2) 3)= list item rendering ( see assimil doc. )
 CLOSED: [2020-03-06 Fri 05:37]
 ** DONE Setup tests.
 CLOSED: [2020-03-05 Thu 21:32]
@@ -69,7 +69,7 @@ CLOSED: [2020-03-05 Thu 14:37]
 - [X] rule (hrs)
 ** DONE Cleanup how ~:curr-file~ works.
 CLOSED: [2020-03-05 Thu 14:36]
-- Make into a =sub-map= of :config
+- Make into a sub-map of :config
 - Write funcs for setting / getting values out of it.
 ** DONE More file work [100%]
 CLOSED: [2020-03-04 Wed 21:26]

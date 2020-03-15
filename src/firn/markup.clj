@@ -85,14 +85,18 @@
   Some values don't get parsed (drawers) - yet. They return empty strings.
   Don't destructure! - it can create uneven maps from possible nil vals on `V`"
   [v]
+  ;; (prn "V Is ----- " v)
   (if (nil? v)
-    (throw (AssertionError. "INVALID INPUT -- org-tree is nil."))
-    (let [type       (get v :type)
-          children   (get v :children)
-          value      (get v :value)
-          ordered    (get v :ordered) ;; for lists
-          val        (if value (s/trim-newline value) value)
-          make-child #(into [%] (map to-html children))]
+    [:em "Missing value supplied to layout. Ensure that your org files are properly
+         setup to be parsed by your _layout files."]
+    #_(throw (AssertionError. "INVALID INPUT -- org-tree is nil."))
+    (let [type              (get v :type)
+          children          (get v :children)
+          ;; children-w-parent (map #(assoc % :parent v ) children)
+          value             (get v :value)
+          ordered           (get v :ordered) ;; for lists
+          val               (if value (s/trim-newline value) value)
+          make-child        #(into [%] (map to-html children))]
       (case type
         "document"      (make-child :div)
         "headline"      (make-child :div)

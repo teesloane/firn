@@ -48,9 +48,7 @@
          (config/set-curr-file config)
          (sut/read-file)
          (sut/dataify-file)
-         (:curr-file)
-         :as-edn
-         #_(sut/htmlify-file))))
+         (sut/htmlify-file))))
 
 (single-file-runner)
 
