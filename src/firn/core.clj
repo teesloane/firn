@@ -1,6 +1,7 @@
 (ns firn.core
   (:require [cheshire.core :as json]
             [clojure.java.shell :as sh]
+            [clojure.java.io :as io]
             [clojure.string :as s]
             [firn.config :as config]
             [firn.layout :as layout]
@@ -31,7 +32,6 @@
 
 
 
-(re-pattern "foo")
 
 ;; Le grandiose --------------------------------
 
@@ -109,7 +109,9 @@
         out-html           (curr-file :as-html)]
     (println "original files dir is " (config :files-dirname))
     (println "Writing file: " curr-file-name "to " out-file-name)
+    (io/make-parents out-file-name)
     (spit out-file-name out-html)))
+
 
 (defn -main
   "TODO:  Messy. move the `let` block into the `setup` fn"

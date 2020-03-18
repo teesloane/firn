@@ -1,9 +1,45 @@
 
 Static wiki generator using org-mode. Under Development.
 
-* Assumptions
+* Assumptions / Limitations
 
-- You are using a flat file wiki system (all content files in a single directory)
-- The wiki-dir has a =media= folder of some kind, also at the same level.
-- You are using =file:= links in org to add images.
-- Many other things I am probably forgetting right now.
+- the content directory name (ex: "my_wiki") should not exist anywhere else in
+  the path to a file in the wiki.
+  - for example, this is bad: =~/development/my_wiki/some_more_dirs/my_wiki/file_1.org=
+  - Unlikely that user's will have this, but it's currently a limitation nonetheless.
+
+
+* Templating
+
+There is a very basic templating system in place. When running =firn=, it looks
+for a =_layouts= directory. Currently, layouts are built with hiccup and are
+explicity passed the entire =config= object (the base of which can be see in
+[[file:src/firn/config.clj][config.clj]]).
+
+From there, you have acccess to the values that accumulate in the ~config~ map
+as the program runs over time.
+
+Firn currently requires you to have a =_layouts/default.clj= file. In its
+simplest form, it might look something like this.
+
+#+BEGIN_SRC  clojure
+(defn layout-default ;; < the name of this function is irrelevant.
+  "Renders a templates as if a project.
+  Someday this will become a macro. Maybe."
+  [config]
+  (let [{:keys [ head ]} (config :partials)
+        render                (config :render)
+        content               (-> config :curr-file :as-edn)]
+
+    (head
+     [:body
+      [:main
+       [:article
+        [:div (render content)]]
+       [:aside
+        [:div ""]
+        [:div ""]]]])))
+#+END_SRC
+
+
+Eventually, this might be replaced with some kind of macro (?)
