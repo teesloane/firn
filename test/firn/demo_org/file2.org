@@ -32,7 +32,7 @@ CLOCK: [2020-03-01 Sun 17:34]--[2020-03-01 Sun 18:09] =>  0:35
 - [[file:org-mode.org][Org Modeº]]
 - [[file:emacs.org][Emacsº]]
 * Tasks
-** TODO - Do thing
+** TODO [#B] - Do [[http:google.com][thing]]
 - Only root files should be fetched
 - sub folders of wiki are being translated to html.ODO
 *** TODO Sub todo.

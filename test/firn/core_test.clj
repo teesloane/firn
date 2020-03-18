@@ -1,11 +1,11 @@
 (ns firn.core-test
-  (:require [clojure.test :refer :all]
-            [clojure.java.io :as io]
-            [firn.core :as sut]
+  (:require [clojure.java.io :as io]
+            [clojure.test :refer :all]
             [firn.config :as config]
+            [firn.core :as sut]
             [me.raynes.fs :as fs]))
            
-
+           
 (def test-dir      "test/firn/demo_org/")
 (def f-1           (io/file (str test-dir "file1.org")))
 (def f-2           (io/file (str test-dir "file2.org")))
@@ -60,3 +60,4 @@
   (sut/-main test-dir)) ;; delete folder if it exists
 
 (main-runner)
+

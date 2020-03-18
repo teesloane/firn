@@ -4,17 +4,23 @@
   Which are created by the rust binary."
   (:require [clojure.string :as s]))
 
-(defn get-headline
-  "Fetches a headline from an org-mode tree.
-  FIXME: Cannot handle headlines that have links in them."
-  [tree name]
-  (let [pred (fn [i]
-               ;; the node if a headline.
-               (and (= "headline" (:type i))
-                    ;; the headlines first child (the `title`) has a `some` val of the children equalling the name
-                    (some #(= (s/trim (% :value)) name) (-> i :children first :children))))]
-                   
-    (->> (tree-seq map? :children tree)
-         (filter pred)
-         (first))))
+(defn- get-headline-helper
+  "Sanitizes a heading of links and just returns text.
+  Necessary because org leafs of :type `link` have a `:desc` and not a `:value` "
+  [headline]
+  (let [title-children (-> headline :children first :children)]
+    (s/join
+     (for [child title-children]
+       (case (:type child)
+         "text" (get child :value)
+         "link" (get child :desc)
+         "")))))
 
+
+(defn get-headline
+  "Fetches a headline from an org-mode tree."
+  [tree name]
+  (->> (tree-seq map? :children tree)
+       (filter #(and (= "headline" (:type %))
+                     (= name (get-headline-helper %))))
+       (first)))
