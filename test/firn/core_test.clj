@@ -6,7 +6,7 @@
             [me.raynes.fs :as fs]))
            
 
-(def test-dir      "./test/firn/demo_org/")
+(def test-dir      "test/firn/demo_org/")
 (def f-1           (io/file (str test-dir "file1.org")))
 (def f-2           (io/file (str test-dir "file2.org")))
 (def config-sample (config/default test-dir))
@@ -48,7 +48,9 @@
          (config/set-curr-file config)
          (sut/read-file)
          (sut/dataify-file)
-         (sut/htmlify-file))))
+         (sut/htmlify-file)
+         (sut/write-file))))
+
 
 (single-file-runner)
 

@@ -1,4 +1,5 @@
-(ns firn.config)
+(ns firn.config
+  (:require [clojure.string :as s]))
 
 (def dev? true)
 
@@ -12,14 +13,16 @@
    :as-html  nil})       ; the html output
 
 (def starting-config
-  {:out-dir     "_site"  ; where files get published; likely to be overridden
-   :media-dir   "assets" ; org attachments to get copied into _site.
-   :layouts     {}       ; layouts loaded into memory
-   :layouts-dir ""       ; where layouts are stored.
-   :partials-dir ""      ; where partials are stored.
-   :files-dir   nil      ; where org content lives.
-   :org-files   nil      ; a list of org files, added to as files get converted.
-   :curr-file   curr-file})
+  {:out-dir       nil      ; where files get published. TODO - change this to "out-dirpath"
+   :out-dirname   "_site"
+   :media-dir     "assets" ; org attachments to get copied into _site.
+   :layouts       {}       ; layouts loaded into memory
+   :layouts-dir   ""       ; where layouts are stored.
+   :partials-dir  ""       ; where partials are stored.
+   :files-dir     nil      ; where org content lives.
+   :files-dirname nil
+   :org-files     nil      ; a list of org files, added to as files get converted.
+   :curr-file     curr-file})
 
 (defn set-curr-file
   "Takes app-wide config and sets the current file being read on :curr-file"
@@ -53,9 +56,11 @@
 (defn default
   [files-dir]
   (merge starting-config
-         {:out-dir       (str files-dir "_site/")
+         {:out-dir       (str files-dir (starting-config :out-dirname) "/")
           :layouts-dir   (str files-dir "_layouts/")
           :partials-dir  (str files-dir "_partials/")
           :out-media-dir (str files-dir "_site/" (starting-config :media-dir))
           :files-dir     files-dir
-          :media-dir     (str files-dir "/" (starting-config :media-dir))}))
+          :files-dirname (-> files-dir (s/split #"/") last)
+
+          :media-dir (str files-dir "/" (starting-config :media-dir))}))

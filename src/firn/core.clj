@@ -3,10 +3,37 @@
             [clojure.java.shell :as sh]
             [clojure.string :as s]
             [firn.config :as config]
-            [firn.org :as org]
             [firn.layout :as layout]
             [me.raynes.fs :as fs])
   (:gen-class))
+
+
+;; -------------------------- helpers
+;; (defn- build-file-outpath
+;;   "For the current file, get the path for everything after the files-dirname"
+;;   [{:keys [curr-file files-dirname out-dir] :as config}]
+;;   (let [curr-file-path           (-> curr-file :original .getPath)
+;;         file-path-split          (s/split curr-file-path #"/")
+;;         files-dir-to-end-of-file (drop-while #(not= files-dirname %) file-path-split)]))
+
+
+(defn- build-file-outpath
+  "For the current file, build it's output filename
+  based on out-dir, the path of the file (it could be several layers deep)
+  Returns the file name as a string."
+  [{:keys [out-dirname files-dirname curr-file] :as config}]
+  (let [curr-file-path (-> curr-file :original .getPath)
+        out-comb (str files-dirname "/" out-dirname)]
+    (-> curr-file-path
+        (s/replace #"\.org" ".html")
+        (s/replace (re-pattern files-dirname) out-comb))))
+
+
+
+
+(re-pattern "foo")
+
+;; Le grandiose --------------------------------
 
 (defn setup
   "Creates output directory for files and sets up starting
@@ -74,11 +101,14 @@
 
 (defn write-file
   "Takes (file-)config input and writes html to output."
-  [{:keys [out-dir curr-file]}]
-  (let [curr-file-name (curr-file :name)
-        out-file-name  (str out-dir curr-file-name ".html")
-        out-html       (curr-file :as-html)]
-    (println "Writing file: " curr-file-name)
+  [{:keys [out-dir curr-file] :as config}]
+  (let [curr-file-name     (curr-file :name)
+        curr-file-orig     (curr-file :original)
+        ;; out-file-name      (str out-dir curr-file-name ".html")
+        out-file-name      (build-file-outpath config)
+        out-html           (curr-file :as-html)]
+    (println "original files dir is " (config :files-dirname))
+    (println "Writing file: " curr-file-name "to " out-file-name)
     (spit out-file-name out-html)))
 
 (defn -main
@@ -100,3 +130,17 @@
         (System/exit 0))))
 
 ;; (-main) ; I recommend not running this in your repl with many files. See test suite instead.
+
+(def f "test/firn/demo_org/")
+
+(def x "/Users/tees/Projects/firn/firn/test/firn/demo_org/file2.org")
+
+(s/split "hi " #"i")
+
+(s/split x #"/")
+
+
+
+(s/replace x  #"demo_org" (str "demo_org" "/_site"))
+
+(s/split f #"/")

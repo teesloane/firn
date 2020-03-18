@@ -60,5 +60,4 @@
   "If a file has a template, render the file with it, or use the default layout"
   [config layout]
   (let [selected-layout (layout-exists? config layout)]
-    (prn " THE SELECTED LAYOUT IS " selected-layout)
     (h/html (selected-layout (with-fns-config config)))))
