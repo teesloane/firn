@@ -27,6 +27,11 @@ an <img> tag, but end in a file image type (.png | .jpg | etc)
 A =file:= link
 
 [[file:file2.org][File 2]]
+
+And now, a sub folder link
+
+[[file:nested/file3.org][nested file 3]]
+
 * Headings (lvl 1)
 ** TODO Heading (2) with keyword
 ** TODO [#B] Heading 2 with priority
@@ -40,7 +45,6 @@ A =file:= link
 |   1 |     2 |        3 | 4 |      5 |
 |-----+-------+----------+---+--------|
 | foo | =foo= | /italic/ |   | *bold* |
-
 * Text markup
 - *bold*
 - /italic/

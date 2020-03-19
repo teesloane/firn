@@ -8,13 +8,25 @@
 :PROPERTIES:
 :date_completed: ?
 :date_started: <2020-03-01 Sun>
-:file_under: project
+:file_under: shit
 :intent: Wiki
 :links: ?
 :slug: firn
 :state: active
 :END:
 :LOGBOOK:
+CLOCK: [2020-03-18 Wed 13:20]--[2020-03-18 Wed 15:14] =>  1:54
+CLOCK: [2020-03-17 Tue 20:01]--[2020-03-17 Tue 20:31] =>  0:30
+CLOCK: [2020-03-16 Mon 10:37]--[2020-03-16 Mon 11:00] =>  0:23
+CLOCK: [2020-03-15 Sun 16:34]--[2020-03-15 Sun 17:01] =>  0:27
+CLOCK: [2020-03-15 Sun 13:36]--[2020-03-15 Sun 14:26] =>  0:50
+CLOCK: [2020-03-14 Sat 19:25]--[2020-03-14 Sat 21:16] =>  1:51
+CLOCK: [2020-03-14 Sat 07:55]--[2020-03-14 Sat 10:34] =>  2:39
+CLOCK: [2020-03-13 Fri 14:48]--[2020-03-13 Fri 16:01] =>  1:13
+CLOCK: [2020-03-12 Thu 16:44]--[2020-03-12 Thu 19:14] =>  2:30
+CLOCK: [2020-03-12 Thu 11:28]--[2020-03-12 Thu 11:44] =>  0:16
+CLOCK: [2020-03-11 Wed 20:05]--[2020-03-11 Wed 21:02] =>  0:57
+CLOCK: [2020-03-11 Wed 15:38]--[2020-03-11 Wed 16:05] =>  0:27
 CLOCK: [2020-03-11 Wed 09:53]--[2020-03-11 Wed 10:40] =>  0:47
 CLOCK: [2020-03-08 Sun 17:51]--[2020-03-08 Sun 18:00] =>  0:09
 CLOCK: [2020-03-07 Sat 08:26]--[2020-03-07 Sat 09:43] =>  1:17
@@ -31,13 +43,93 @@ CLOCK: [2020-03-01 Sun 17:34]--[2020-03-01 Sun 18:09] =>  0:35
 - [[https://www.britannica.com/science/firn][Namesake]]
 - [[file:org-mode.org][Org Modeº]]
 - [[file:emacs.org][Emacsº]]
-* Tasks
-** TODO [#B] - Do [[http:google.com][thing]]
-- Only root files should be fetched
-- sub folders of wiki are being translated to html.ODO
-*** TODO Sub todo.
+* Tasks [48%]
+** TODO Stop rendering of private files
+- and file under a /priv folder won't get published.
+- =#+PRIVATE: true= should prevent publishing as well.
+** DONE Make sure that top level files can link to sub files.
+CLOSED: [2020-03-18 Wed 16:07]
+** TODO Build development server                                               :feature:
+** TODO [#B] Improve setup fn.                                                 :refactor:
+*** TODO Create errors for missing =_layout= , =_partials=
+*** TODO Migrate =get-files= into =setup=.
+** TODO [#B] Collect "Sitemap" / Link grouping                                 :feature:
+- As files are processed, spit their name into a [links] vector.
+- Useful for a sidebar / related.
+- Group links by "file_under" - for building index pages.
+** TODO [#C] Collect LOGBOOK into currentfile.                                 :feature:
+** TODO [#C] Make it an executable                                             :cry:
+- Who knows if this will work. Possible blockers:
+  - =(read-string)=
+  - reflection problems from libraries (fs?).
+  - [[https://github.com/borkdude/clojure-rust-graalvm][combining a rust binary into the graal binary]]...
+  - see [[file:pod-dodger.org][Pod-Dodgerº]] for possible help.
+** TODO [#C] Document use of rust binary.                                      :reliability:
+- or at least make it's installation part of the README.
+** TODO Improve view templating                                                :usability:
+- make a macro that has auto-bound functions
+  - file name, render, content, context, etc.
+** TODO Someday [0/7]
+*** TODO [#C] Org table of contents / inner-file-linking
+*** TODO [#C] enable per-header rendering                                     :someday:
+- Some headers might not need to be rendered; using :PROPERTIES:, could enable a
+  flag on conditional rendering.
+*** TODO [#C] Markup/to-html should enable heading indenting.                 :feature:
+- ie, in the case of showing a todo list.
+*** TODO [#C] Build front-end heading folding.                                :someday:
+*** TODO [#C] Orgize - fix parser for list items with brackets.               :refactor:someday:
+*** TODO Figure out footnotes.
+*** [?] [#B] Abstract html "primitives" into macro?                           :refactor:
+- code, verbatim, rule, etc are common case items that don't have children... I guess?
+** DONE [#A] =org/get-headline= needs to match with links in it.
+CLOSED: [2020-03-18 Wed 14:35]
+6799386 * master make org/get-headline match when links are present
+** DONE [#A] File path should create url path                                  :bug:
+CLOSED: [2020-03-18 Wed 13:21]
+- If you're content folder has nested notes, it should create that structure in the _site output.
+- When reading the file, parse the path and store in memory.
+- When writing the html file, create the directories according to the path at readtime.
+** DONE [#B] Build basic "View" templating [100%]                              :feature:
+CLOSED: [2020-03-15 Sun 16:44]
+- [X] Depending on file's "#+VIEW:" keyword, could render it differently.
+- [X] _Project_ - Renders meta, resources, tasks, in a specific, styled way.
+- [X] _General_ - Spits out a standard html render of entire file contents.
+** DONE Build embedding images
+CLOSED: [2020-03-07 Sat 16:00]
+** DONE [#C] Build media library                                               :wiki:
+CLOSED: [2020-03-07 Sat 16:00]
+- [X] start with org-files (image tags)
+** DONE Fix 1) 2) 3) list item rendering ( see assimil doc. )
+CLOSED: [2020-03-06 Fri 05:37]
+** DONE Setup tests.
+CLOSED: [2020-03-05 Thu 21:32]
+** DONE Handle all org -> html types.
+CLOSED: [2020-03-05 Thu 14:37]
+- [X] table
+- [X] drawers (hide them)
+- [X] rule (hrs)
+** DONE Cleanup how ~:curr-file~ works.
+CLOSED: [2020-03-05 Thu 14:36]
+- Make into a sub-map of :config
+- Write funcs for setting / getting values out of it.
+** DONE More file work [100%]
+CLOSED: [2020-03-04 Wed 21:26]
+*** DONE Strip Keywords from file and move into config map
+** DONE create /tmp folder if not exist.
+CLOSED: [2020-03-04 Wed 21:03]
+** DONE Make passing directory of files easier.
+CLOSED: [2020-03-04 Wed 21:03]
+** DONE MVP [100%]
+*** DONE Setup Parser [100%]
+- [X] Find a good org-parser.
+- [X] Slurp single file
+- [X] Parse file
+- [X] Display one basic element (propertees?) with hiccup.
+*** DONE Render a single org file to html [100%]
+CLOSED: [2020-03-01 Sun 17:36]
+- [X] Slurp File
+- [X] render it to file as is.
 * Notes
-
 #+BEGIN_QUOTE
 Firn is found under the snow that accumulates at the head of a glacier. It is formed under the pressure of overlying snow by the processes of compaction, recrystallization, localized melting, and the crushing of individual snowflakes.
 
@@ -47,4 +139,5 @@ Firn is found under the snow that accumulates at the head of a glacier. It is fo
 Cumulative wiki engine built with[[file:org-mode.org][ Org Modeº]] and [[file:clojure.org][Clojureº]].
 
 Primarily catalogues [[file:projects.org][Projectsº]] and [[file:research.org][Researchº]] as well as other experiments,
-quotes, ideas &c.
+quotes, ideas &c. poo
+

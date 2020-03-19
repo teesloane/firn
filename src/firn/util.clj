@@ -27,3 +27,6 @@
   [& msgs]
   (prn "Err: " msgs)
   #_(System/exit 1))
+
+
+(def spy #(do (println "DEBUG:" %) %))

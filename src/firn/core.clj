@@ -22,15 +22,12 @@
   "For the current file, build it's output filename
   based on out-dir, the path of the file (it could be several layers deep)
   Returns the file name as a string."
-  [{:keys [out-dirname files-dirname curr-file] :as config}]
+  [{:keys [out-dirname files-dirname curr-file]}]
   (let [curr-file-path (-> curr-file :original .getPath)
-        out-comb (str files-dirname "/" out-dirname)]
+        out-comb       (str files-dirname "/" out-dirname)]
     (-> curr-file-path
         (s/replace #"\.org" ".html")
-        (s/replace (re-pattern files-dirname) out-comb))))
-
-
-
+        (s/replace (re-pattern files-dirname) (str out-comb))))) ;; < str to make linter happy.
 
 
 ;; Le grandiose --------------------------------
@@ -74,8 +71,7 @@
     (config/update-curr-file config {:name file-name :as-json file-parsed})))
 
 (defn dataify-file
-  "Converts an org file into a bunch of data.
-  TODO collect logbook, clock, for every file."
+  "Converts an org file into a bunch of data."
   [config]
   (let [file-json     (-> config :curr-file :as-json)
         file-edn      (-> file-json (json/parse-string true))
@@ -83,7 +79,6 @@
         org-title     (->> file-keywords
                            (filter #(= "TITLE" (:key %)))
                            (first) :value)]
-
 
     (config/update-curr-file
      config
@@ -101,13 +96,10 @@
 
 (defn write-file
   "Takes (file-)config input and writes html to output."
-  [{:keys [out-dir curr-file] :as config}]
+  [{:keys [ curr-file] :as config}]
   (let [curr-file-name     (curr-file :name)
-        curr-file-orig     (curr-file :original)
-        ;; out-file-name      (str out-dir curr-file-name ".html")
         out-file-name      (build-file-outpath config)
         out-html           (curr-file :as-html)]
-    (println "original files dir is " (config :files-dirname))
     (println "Writing file: " curr-file-name "to " out-file-name)
     (io/make-parents out-file-name)
     (spit out-file-name out-html)))
@@ -123,7 +115,7 @@
 
     (doseq [f org-files]
       (->> f
-           (config/set-curr-file config-with-layout)
+           (config/set-curr-file-original config-with-layout)
            (read-file)
            (dataify-file)
            (htmlify-file)
@@ -132,17 +124,3 @@
         (System/exit 0))))
 
 ;; (-main) ; I recommend not running this in your repl with many files. See test suite instead.
-
-(def f "test/firn/demo_org/")
-
-(def x "/Users/tees/Projects/firn/firn/test/firn/demo_org/file2.org")
-
-(s/split "hi " #"i")
-
-(s/split x #"/")
-
-
-
-(s/replace x  #"demo_org" (str "demo_org" "/_site"))
-
-(s/split f #"/")

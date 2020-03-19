@@ -53,8 +53,9 @@
   "Pass functions needed for rendering to configs."
   [config]
   (assoc config
-         :render markup/to-html
-         :get-headline org/get-headline))
+         :render               markup/to-html
+         :get-headline         org/get-headline
+         :get-headline-content org/get-headline-content))
 
 (defn apply-template
   "If a file has a template, render the file with it, or use the default layout"

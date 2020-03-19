@@ -76,7 +76,7 @@
       "underline" (make-child :i)
       "italic"    (make-child :em)
       "bold"      (make-child :strong)
-      [:span " - ERR! Val Missing -"])))
+      "")))
 
 (keyword (str "span.heading-keyword"))
 
@@ -85,43 +85,37 @@
   Some values don't get parsed (drawers) - yet. They return empty strings.
   Don't destructure! - it can create uneven maps from possible nil vals on `V`"
   [v]
-  ;; (prn "V Is ----- " v)
-  (if (nil? v)
-    [:em "Missing value supplied to layout. Ensure that your org files are properly
-         setup to be parsed by your _layout files."]
-    #_(throw (AssertionError. "INVALID INPUT -- org-tree is nil."))
-    (let [type              (get v :type)
-          children          (get v :children)
-          ;; children-w-parent (map #(assoc % :parent v ) children)
-          value             (get v :value)
-          ordered           (get v :ordered) ;; for lists
-          val               (if value (s/trim-newline value) value)
-          make-child        #(into [%] (map to-html children))]
-      (case type
-        "document"      (make-child :div)
-        "headline"      (make-child :div)
-        "title"         (title->html v)
-        "section"       (make-child :section)
-        "paragraph"     (make-child :p)
-        "underline"     (make-child :u)
-        "italic"        (make-child :em)
-        "bold"          (make-child :strong)
-        "list"          (make-child (if ordered :ol :ul))
-        "list-item"     (make-child :li)
-        "quote-block"   (make-child :div.quote-block)
-        "table"         (make-child :table)
-        "table-row"     (make-child :tr)
-        "table-cell"    (make-child :td)
-        "source-block"  (src-block->html v)
-        "link"          (link->html v)
-        "code"          [:code val]
-        "verbatim"      [:code val]
-        "rule"          [:hr]
-        "cookie"        [:span.cookie val]
-        "text"          [:span val]
-        "timestamp"     [:span val] ;; TODO html constructor.
-        "keyword"       ""          ;; Don't parse
-        "comment-block" ""          ;; Don't parse
-        "drawer"        ""          ;; Don't parse
-        ;; default value.
-        "ERR: MISSING VALUE"))))
+  (let [type              (get v :type)
+        children          (get v :children)
+        value             (get v :value)
+        ordered           (get v :ordered) ;; for lists
+        val               (if value (s/trim-newline value) value)
+        make-child        #(into [%] (map to-html children))]
+    (case type
+      "document"      (make-child :div)
+      "headline"      (make-child :div)
+      "title"         (title->html v)
+      "section"       (make-child :section)
+      "paragraph"     (make-child :p)
+      "underline"     (make-child :u)
+      "italic"        (make-child :em)
+      "bold"          (make-child :strong)
+      "list"          (make-child (if ordered :ol :ul))
+      "list-item"     (make-child :li)
+      "quote-block"   (make-child :div.quote-block)
+      "table"         (make-child :table)
+      "table-row"     (make-child :tr)
+      "table-cell"    (make-child :td)
+      "source-block"  (src-block->html v)
+      "link"          (link->html v)
+      "code"          [:code val]
+      "verbatim"      [:code val]
+      "rule"          [:hr]
+      "cookie"        [:span.cookie val]
+      "text"          [:span val]
+      "timestamp"     [:span val] ;; TODO html constructor.
+      "keyword"       ""          ;; Don't parse
+      "comment-block" ""          ;; Don't parse
+      "drawer"        ""          ;; Don't parse
+      ;; default value. FIXME: Should have a debug value for verbose mode.
+      "")))

@@ -24,17 +24,21 @@
    :org-files     nil      ; a list of org files, added to as files get converted.
    :curr-file     curr-file})
 
-(defn set-curr-file
-  "Takes app-wide config and sets the current file being read on :curr-file"
-  [config file]
-  (let [cf (assoc curr-file :original file)
-        config (assoc config :curr-file cf)]
-    config))
 
 (defn update-curr-file
+  "Merges new values into the :curr-file map"
   [config new-m]
   (let [new-curr-file (merge (config :curr-file) new-m)]
     (assoc config :curr-file new-curr-file)))
+
+
+(defn set-curr-file-original
+  "Takes app-wide config and sets the current file being read on :curr-file"
+  [config file]
+  (update-curr-file config {:original file}))
+
+
+;; -- "Getter" for pulling values out of the config -----------------------------
 
 (defn get-curr-file-name
   [config]
@@ -43,7 +47,7 @@
 (defn get-layout
   "Pulls the `#+LAYOUT` value out of a current file.
   Returns nil if it doesn't exist.
-  TODO - write test"
+  TODO - write test; TODO move this to org?"
   [config]
   (->> config
        (:curr-file)
@@ -52,6 +56,9 @@
        (first)
        (:value)
        (keyword)))
+
+
+;; -- Default Config -----------------------------------------------------------
 
 (defn default
   [files-dir]

@@ -6,11 +6,14 @@
         render                (config :render)
         content               (-> config :curr-file :as-edn)
         get-headline          (-> config :get-headline)
+        get-headline-content  (-> config :get-headline-content)
         file-title            (-> config :curr-file :org-title)
-        notes                 (-> (get-headline content "Notes") :children second)
+
+        notes                 (-> (get-headline-content content "Notes"))
         meta                  (get-headline content "Meta")
         resources             (get-headline content "Resources")
         tasks                 (get-headline content "Tasks")]
+       
 
     (head
      [:body
