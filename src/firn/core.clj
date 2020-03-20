@@ -5,7 +5,8 @@
             [clojure.string :as s]
             [firn.config :as config]
             [firn.layout :as layout]
-            [me.raynes.fs :as fs])
+            [me.raynes.fs :as fs]
+            [firn.util :as u])
   (:gen-class))
 
 (defn- build-file-outpath
@@ -23,18 +24,25 @@
 ;; Le grandiose --------------------------------
 
 (defn setup
-  "Creates output directory for files and sets up starting
-  config file that gets passed through all functions
-  Also, moves your `media folder` into _site. TODO - make configurable..."
-  [config]
+  "Creates folders for output, slurps in layouts and partials.
+  FIXME: should slurp/mkdir/copy-dir be wrapped in try-catches? if-err handling?"
+  [{:keys [layouts-dir partials-dir files-dir] :as config}]
+  (let [layout-files  (u/find-files-by-ext layouts-dir "clj")
+        partial-files (u/find-files-by-ext partials-dir "clj")
+        partials-map  (u/file-list->key-file-map partial-files)
+        layouts-map   (u/file-list->key-file-map layout-files)]
 
-  (println "Setup: Making _site output.")
-  (fs/mkdir (config :out-dir))
 
-  (println "Setup: Copying root media into out media")
-  (fs/copy-dir (config :media-dir) (config :out-media-dir))
+    (println "Setup: Making _site output.")
+    (fs/mkdir (config :out-dir))
 
-  (-> config layout/get-layouts-and-partials))
+    (println "Setup: Copying root media into out media")
+    (fs/copy-dir (config :media-dir) (config :out-media-dir))
+
+    (assoc config
+           :org-files (u/find-files-by-ext files-dir "org")
+           :layouts layouts-map
+           :partials partials-map)))
 
 (defn parse!
   "Shells out to the rust binary to parse the org-mode file."
@@ -43,14 +51,6 @@
     (if-not (= (res :exit) 0)
       (prn "Orgize failed to parse file." file-str res)
       (res :out))))
-
-(defn get-files
-
-  ;; TODO -  maybe better belongs in setup function?
-  "Returns a list of files as Java objects. Filters out all non `.org` files."
-  [{:keys [files-dir] :as config}]
-  (println "Getting org files...")
-  (conj config {:org-files (fs/find-files files-dir #"^.*\.(org)$")}))
 
 (defn read-file
   "Pulls :curr-file from config > parses > put into config with new vals"
@@ -96,21 +96,19 @@
       (spit out-file-name out-html))))
 
 (defn -main
-  "TODO:  Messy. move the `let` block into the `setup` fn"
+  "Takes a link to a directory and runs on the list of org files."
   [& args]
-  (let [files-dir          (first args)
-        config             (config/default files-dir)
-        config-with-layout (setup config) ;; side effectful
-        org-files          (-> config get-files :org-files)]
+  (let [files-dir          (first args) ;; TODO setup cli args.
+        config             (-> files-dir config/default setup)]
 
-    (doseq [f org-files]
+    (doseq [f (config :org-files)]
       (->> f
-           (config/set-curr-file-original config-with-layout)
-           (read-file)
-           (dataify-file)
-           (munge-file)
-           (htmlify-file)
-           (write-file)))
+         (config/set-curr-file-original config)
+         (read-file)
+         (dataify-file)
+         (munge-file)
+         (htmlify-file)
+         (write-file)))
     #_(if config/dev?
         (System/exit 0))))
 

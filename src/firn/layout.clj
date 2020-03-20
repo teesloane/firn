@@ -9,28 +9,10 @@
   ; b) eval is not a good idea, probably."
   (:require [firn.markup :as markup]
             [firn.org :as org]
-            [firn.util :as u]
-            [hiccup.core :as h]
-            [me.raynes.fs :as fs]))
+            [hiccup.core :as h]))
 
-(defn file-name->keyword
-  "Takes a list of files and returns a map of filenames as :keywords -> file"
-  [file-list]
-  (let [eval-file (fn [file]
-                    (-> file .getPath slurp read-string eval))]
 
-    (into {} (map #(hash-map (u/io-file->keyword %) (eval-file %)) file-list))))
 
-(defn get-layouts-and-partials
-  "Reads in a _layouts and _partials dir of clj/hiccup templates."
-  [config]
-  (let [layout-files  (fs/find-files (config :layouts-dir) #"^.*\.(clj)$")
-        partial-files (fs/find-files (config :partials-dir) #"^.*\.(clj)$")
-        partials-map  (file-name->keyword partial-files)
-        layouts-map   (file-name->keyword layout-files)]
-    (assoc config
-           :layouts layouts-map
-           :partials partials-map)))
 
 (defn default-template
   "The default template if no `layout` key is specified.

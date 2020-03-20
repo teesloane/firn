@@ -3,8 +3,8 @@
             [clojure.test :refer :all]
             [firn.config :as config]
             [firn.core :as sut]
-            [me.raynes.fs :as fs]
-            [firn.org :as org]))
+            [me.raynes.fs :as fs]))
+
 
 (def test-dir      "test/firn/demo_org/")
 (def f-1           (io/file (str test-dir "file1.org")))
