@@ -84,15 +84,16 @@
   (config/update-curr-file
    config
    {:keywords    (config/get-keywords config)
-    :org-title   (config/get-keyword config "TITLE")
-    :is-private? (config/get-keyword config "PRIVATE")}))
+    :org-title   (config/get-keyword config "TITLE")}))
+       
 
 
 (defn htmlify-file
   "Renders files according to their `layout` keyword."
   [config]
   (let [layout   (config/get-layout config)
-        as-html  (layout/apply-template config layout)]
+        as-html  (when-not (config/file-is-private? config)
+                   (layout/apply-template config layout))]
 
     (config/update-curr-file config {:as-html as-html})))
 

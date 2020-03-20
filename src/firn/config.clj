@@ -16,6 +16,7 @@
 (def starting-config
   {:out-dir       nil      ; where files get published. TODO - change this to "out-dirpath"
    :out-dirname   "_site"
+   :ignored-dirs  ["priv"]
    :media-dir     "assets" ; org attachments to get copied into _site.
    :layouts       {}       ; layouts loaded into memory
    :layouts-dir   ""       ; where layouts are stored.
@@ -58,8 +59,16 @@
      :value))
 
 (defn file-is-private?
+  "Returns true if a file meets the conditions of being 'private'
+  Assumes the files has been read into memory and parsed to edn."
   [config]
-  (nil? (-> config :curr-file :is-private?)))
+  (let [is-private?     (get-keyword config "PRIVATE")
+        file-path       (-> config :curr-file :original .getPath (s/split #"/"))
+        in-priv-folder? (some (set file-path) (config :ignored-dirs))]
+    (or
+     (some? in-priv-folder?)
+     (some? is-private?))))
+
 
 (defn get-layout
   "Pulls the `#+LAYOUT` value out of a current file.

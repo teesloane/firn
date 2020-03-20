@@ -50,11 +50,11 @@
        (sut/read-file)
        (sut/dataify-file)
        (sut/munge-file)
-       #_(sut/htmlify-file)
-       #_(sut/write-file))))
+       (sut/htmlify-file)
+       (sut/write-file))))
 
-(-> (single-file-runner)
-    (:curr-file))
+(-> (single-file-runner))
+
 
 
 (defn main-runner
@@ -63,3 +63,4 @@
   (sut/-main test-dir)) ; delete folder if it exists
 
 (main-runner)
+

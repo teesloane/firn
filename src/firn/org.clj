@@ -20,7 +20,7 @@
   search headlines that have percentages, or priorities, etc."
   [headline]
   (let [title-children  (-> headline :children first :children)
-        get-trimmed-val #(let [trimmed-val (s/trim (get %1 %2))]
+        get-trimmed-val #(let [trimmed-val (s/trim (get %1 %2 ""))] ;; NOTE: not sure if should default to ""
                            (if (empty? trimmed-val) "" trimmed-val))]
     (s/join " "
             (filter not-empty
