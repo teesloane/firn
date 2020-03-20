@@ -9,15 +9,6 @@
   (:gen-class))
 
 
-;; -------------------------- helpers
-;; (defn- build-file-outpath
-;;   "For the current file, get the path for everything after the files-dirname"
-;;   [{:keys [curr-file files-dirname out-dir] :as config}]
-;;   (let [curr-file-path           (-> curr-file :original .getPath)
-;;         file-path-split          (s/split curr-file-path #"/")
-;;         files-dir-to-end-of-file (drop-while #(not= files-dirname %) file-path-split)]))
-
-
 (defn- build-file-outpath
   "For the current file, build it's output filename
   based on out-dir, the path of the file (it could be several layers deep)
