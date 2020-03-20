@@ -14,7 +14,7 @@
    :as-html  nil})       ; the html output
 
 (def starting-config
-  {:out-dir       nil      ; where files get published. TODO - change this to "out-dirpath"
+  {:out-dir       nil      ; where files get published
    :out-dirname   "_site"
    :ignored-dirs  ["priv"]
    :media-dir     "assets" ; org attachments to get copied into _site.
@@ -69,28 +69,11 @@
      (some? in-priv-folder?)
      (some? is-private?))))
 
-
-(defn get-layout
-  "Pulls the `#+LAYOUT` value out of a current file.
-  Returns nil if it doesn't exist.
-  TODO - write test; TODO move this to org?"
-  [config]
-  (->> config
-       (:curr-file)
-       (:keywords)
-       (filter #(= (:key %) "LAYOUT"))
-       (first)
-       (:value)
-       (keyword)))
-
 (defn get-curr-file-keyword
   [config]
   (-> config
      :curr-file
      :keywords))
-
-
-
 
 ;; -- Default Config -----------------------------------------------------------
 

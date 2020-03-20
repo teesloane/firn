@@ -8,7 +8,6 @@
             [me.raynes.fs :as fs])
   (:gen-class))
 
-
 (defn- build-file-outpath
   "For the current file, build it's output filename
   based on out-dir, the path of the file (it could be several layers deep)
@@ -68,7 +67,6 @@
         file-edn  (-> file-json (json/parse-string true))]
     (config/update-curr-file config {:as-edn file-edn})))
 
-
 (defn munge-file
   "After dataify-file,  we extract information and store it in curr-file."
   [config]
@@ -76,13 +74,11 @@
    config
    {:keywords    (config/get-keywords config)
     :org-title   (config/get-keyword config "TITLE")}))
-       
-
 
 (defn htmlify-file
   "Renders files according to their `layout` keyword."
   [config]
-  (let [layout   (config/get-layout config)
+  (let [layout   (keyword (config/get-keyword config "LAYOUT"))
         as-html  (when-not (config/file-is-private? config)
                    (layout/apply-template config layout))]
 
@@ -90,7 +86,7 @@
 
 (defn write-file
   "Takes (file-)config input and writes html to output."
-  [{:keys [ curr-file] :as config}]
+  [{:keys [curr-file] :as config}]
   (let [curr-file-name (curr-file :name)
         out-file-name  (build-file-outpath config)
         out-html       (curr-file :as-html)]
@@ -98,7 +94,6 @@
     (when-not (config/file-is-private? config)
       (io/make-parents out-file-name)
       (spit out-file-name out-html))))
-
 
 (defn -main
   "TODO:  Messy. move the `let` block into the `setup` fn"
