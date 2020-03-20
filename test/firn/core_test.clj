@@ -49,13 +49,13 @@
        (config/set-curr-file-original config)
        (sut/read-file)
        (sut/dataify-file)
-       (sut/htmlify-file)
-       (sut/write-file))))
+       (sut/munge-file)
+       #_(sut/htmlify-file)
+       #_(sut/write-file))))
 
 (-> (single-file-runner)
-    (:curr-file)
-    (:as-edn)
-    (org/get-headline "Do Thing"))
+    (:curr-file))
+
 
 (defn main-runner
   []

@@ -1,5 +1,6 @@
 (ns firn.config
-  (:require [clojure.string :as s]))
+  (:require [clojure.string :as s]
+            [firn.util :as u]))
 
 (def dev? true)
 
@@ -44,6 +45,22 @@
   [config]
   (-> config :curr-file :name))
 
+(defn get-keywords
+  "Gets keywords (ex: #+TITLE:) for a file."
+  [config]
+  (get-in config [:curr-file :as-edn :children 0 :children]))
+
+(defn get-keyword
+  [config keywrd]
+  (->> config
+     get-keywords
+     (u/find-first #(= keywrd (:key %)))
+     :value))
+
+(defn file-is-private?
+  [config]
+  (nil? (-> config :curr-file :is-private?)))
+
 (defn get-layout
   "Pulls the `#+LAYOUT` value out of a current file.
   Returns nil if it doesn't exist.
@@ -56,6 +73,14 @@
        (first)
        (:value)
        (keyword)))
+
+(defn get-curr-file-keyword
+  [config]
+  (-> config
+     :curr-file
+     :keywords))
+
+
 
 
 ;; -- Default Config -----------------------------------------------------------

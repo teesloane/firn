@@ -29,4 +29,8 @@
   #_(System/exit 1))
 
 
+(defn find-first
+  [f coll]
+  (first (filter f coll)))
+
 (def spy #(do (println "DEBUG:" %) %))

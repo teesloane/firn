@@ -73,18 +73,20 @@
 (defn dataify-file
   "Converts an org file into a bunch of data."
   [config]
-  (let [file-json     (-> config :curr-file :as-json)
-        file-edn      (-> file-json (json/parse-string true))
-        file-keywords (get-in file-edn [:children 0 :children])
-        org-title     (->> file-keywords
-                           (filter #(= "TITLE" (:key %)))
-                           (first) :value)]
+  (let [file-json (-> config :curr-file :as-json)
+        file-edn  (-> file-json (json/parse-string true))]
+    (config/update-curr-file config {:as-edn file-edn})))
 
-    (config/update-curr-file
-     config
-     {:as-edn    file-edn
-      :keywords  file-keywords
-      :org-title org-title})))
+
+(defn munge-file
+  "After dataify-file,  we extract information and store it in curr-file."
+  [config]
+  (config/update-curr-file
+   config
+   {:keywords    (config/get-keywords config)
+    :org-title   (config/get-keyword config "TITLE")
+    :is-private? (config/get-keyword config "PRIVATE")}))
+
 
 (defn htmlify-file
   "Renders files according to their `layout` keyword."
@@ -97,12 +99,13 @@
 (defn write-file
   "Takes (file-)config input and writes html to output."
   [{:keys [ curr-file] :as config}]
-  (let [curr-file-name     (curr-file :name)
-        out-file-name      (build-file-outpath config)
-        out-html           (curr-file :as-html)]
+  (let [curr-file-name (curr-file :name)
+        out-file-name  (build-file-outpath config)
+        out-html       (curr-file :as-html)]
     (println "Writing file: " curr-file-name "to " out-file-name)
-    (io/make-parents out-file-name)
-    (spit out-file-name out-html)))
+    (when-not (config/file-is-private? config)
+      (io/make-parents out-file-name)
+      (spit out-file-name out-html))))
 
 
 (defn -main
@@ -118,6 +121,7 @@
            (config/set-curr-file-original config-with-layout)
            (read-file)
            (dataify-file)
+           (munge-file)
            (htmlify-file)
            (write-file)))
     #_(if config/dev?
