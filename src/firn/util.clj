@@ -28,7 +28,6 @@
   (prn "Err: " msgs)
   #_(System/exit 1))
 
-
 (defn find-first
   [f coll]
   (first (filter f coll)))

@@ -26,13 +26,11 @@
    :org-files     nil      ; a list of org files, added to as files get converted.
    :curr-file     curr-file})
 
-
 (defn update-curr-file
   "Merges new values into the :curr-file map"
   [config new-m]
   (let [new-curr-file (merge (config :curr-file) new-m)]
     (assoc config :curr-file new-curr-file)))
-
 
 (defn set-curr-file-original
   "Takes app-wide config and sets the current file being read on :curr-file"
@@ -41,6 +39,7 @@
 
 
 ;; -- "Getter" for pulling values out of the config -----------------------------
+
 
 (defn get-curr-file-name
   [config]
@@ -54,9 +53,9 @@
 (defn get-keyword
   [config keywrd]
   (->> config
-     get-keywords
-     (u/find-first #(= keywrd (:key %)))
-     :value))
+       get-keywords
+       (u/find-first #(= keywrd (:key %)))
+       :value))
 
 (defn file-is-private?
   "Returns true if a file meets the conditions of being 'private'
@@ -72,8 +71,8 @@
 (defn get-curr-file-keyword
   [config]
   (-> config
-     :curr-file
-     :keywords))
+      :curr-file
+      :keywords))
 
 ;; -- Default Config -----------------------------------------------------------
 

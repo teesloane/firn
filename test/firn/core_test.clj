@@ -5,8 +5,7 @@
             [firn.core :as sut]
             [me.raynes.fs :as fs]
             [firn.org :as org]))
-           
-           
+
 (def test-dir      "test/firn/demo_org/")
 (def f-1           (io/file (str test-dir "file1.org")))
 (def f-2           (io/file (str test-dir "file2.org")))
@@ -33,7 +32,7 @@
 (deftest _read-file
   (testing "correct outputs"
     (let [stub     (-> (sut/setup config-sample)
-                      (config/set-curr-file-original f-1))
+                       (config/set-curr-file-original f-1))
           res      (sut/read-file stub)
           res-json (-> res :curr-file :as-json)]
       (testing "Returns valid, updated sub map (:curr-file)"
@@ -46,16 +45,14 @@
   (fs/delete-dir (config-sample :out-dir)) ;; clear it out!
   (let [config (sut/setup config-sample)]
     (->> f-2
-       (config/set-curr-file-original config)
-       (sut/read-file)
-       (sut/dataify-file)
-       (sut/munge-file)
-       (sut/htmlify-file)
-       (sut/write-file))))
+         (config/set-curr-file-original config)
+         (sut/read-file)
+         (sut/dataify-file)
+         (sut/munge-file)
+         (sut/htmlify-file)
+         (sut/write-file))))
 
 (-> (single-file-runner))
-
-
 
 (defn main-runner
   []

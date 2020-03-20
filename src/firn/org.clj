@@ -3,7 +3,6 @@
   Most of these functions are for operating on EDN-fied org-file
   Which are created by the rust binary."
   (:require [clojure.string :as s]))
-           
 
 (defn- get-headline-helper
   "Sanitizes a heading of links and just returns text.
@@ -31,7 +30,6 @@
                          "link" (get-trimmed-val child :desc)
                          "")))))))
 
-
 (defn get-headline
   "Fetches a headline from an org-mode tree."
   [tree name]
@@ -39,7 +37,6 @@
        (filter #(and (= "headline" (:type %))
                      (= name (get-headline-helper %))))
        (first)))
-
 
 (defn get-headline-content
   "Same as get-headline, but removes the first child :title)."
