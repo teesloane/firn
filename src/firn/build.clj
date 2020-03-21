@@ -12,7 +12,6 @@
 
 (def PARSER-PATH "/Users/tees/projects/firn/firn/src/parser/target/debug/parser")
 
-
 (defn- build-file-outpath
   "For the current file, build it's output filename
   based on out-dir, the path of the file (it could be several layers deep)
