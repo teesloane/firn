@@ -80,9 +80,9 @@
   [files-dir]
   (merge starting-config
          {:out-dir       (str files-dir (starting-config :out-dirname) "/")
-          :layouts-dir   (str files-dir "_layouts/")
-          :partials-dir  (str files-dir "_partials/")
-          :out-media-dir (str files-dir "_site/" (starting-config :media-dir))
+          :layouts-dir   (str files-dir "/_layouts/")
+          :partials-dir  (str files-dir "/_partials/")
+          :out-media-dir (str files-dir "/_site/" (starting-config :media-dir))
           :files-dir     files-dir
           :files-dirname (-> files-dir (s/split #"/") last)
 
