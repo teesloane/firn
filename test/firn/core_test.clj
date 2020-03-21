@@ -2,7 +2,7 @@
   (:require [clojure.java.io :as io]
             [clojure.test :refer :all]
             [firn.config :as config]
-            [firn.build :as sut]
+            [firn.build :as build]
             [me.raynes.fs :as fs]))
 
 
@@ -15,7 +15,7 @@
 ;;   ;; TODO - test reading of layouts into memory.
 ;;   (let [out-dir       (config-sample :out-dir)
 ;;         out-media-dir (config-sample :out-media-dir)
-;;         setup-res     (sut/setup config-sample)]
+;;         setup-res     (build/setup config-sample)]
 
 ;;     (testing "It creates _site output dir."
 ;;       (is (.isDirectory (io/file out-dir))))
@@ -31,9 +31,9 @@
 
 ;; (deftest _read-file
 ;;   (testing "correct outputs"
-;;     (let [stub     (-> (sut/setup config-sample)
+;;     (let [stub     (-> (build/setup config-sample)
 ;;                        (config/set-curr-file-original f-1))
-;;           res      (sut/read-file stub)
+;;           res      (build/read-file stub)
 ;;           res-json (-> res :curr-file :as-json)]
 ;;       (testing "Returns valid, updated sub map (:curr-file)"
 ;;         (is (not= nil (-> res :curr-file :name)))
@@ -43,14 +43,14 @@
 (defn single-file-runner
   []
   (fs/delete-dir (config-sample :out-dir)) ;; clear it out!
-  (let [config (sut/setup config-sample)]
+  (let [config (build/setup config-sample)]
     (->> f-2
          (config/set-curr-file-original config)
-         (sut/read-file)
-         (sut/dataify-file)
-         (sut/munge-file)
-         (sut/htmlify-file)
-         (sut/write-file))))
+         (build/read-file)
+         (build/dataify-file)
+         (build/munge-file)
+         (build/htmlify-file)
+         (build/write-file))))
 
 
 
@@ -59,7 +59,7 @@
 (defn main-runner
   []
   (fs/delete-dir (config-sample :out-dir)) ; clear it out!
-  (sut/all-files test-dir)) ; delete folder if it exists
+  (build/all-files test-dir)) ; delete folder if it exists
 
 (main-runner)
 

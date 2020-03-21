@@ -1,6 +1,5 @@
 
-🚧 Static site generator using org-mode. Under Development. Not recommended for
-use.
+🚧 Static site generator using org-mode. Under Development. Not recommended for use.
 
 * What's this?
 
