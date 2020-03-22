@@ -23,11 +23,10 @@
         (s/replace #"\.org" ".html")
         (s/replace (re-pattern files-dirname) (str out-comb))))) ;; < str to make linter happy.
 
-
 (defn setup
   "Creates folders for output, slurps in layouts and partials.
   FIXME: should slurp/mkdir/copy-dir be wrapped in try-catches? if-err handling?"
-  [{:keys [layouts-dir partials-dir files-dir] :as config}]
+  [{:keys [layouts-dir partials-dir media-dir out-media-dir files-dir] :as config}]
   (let [layout-files  (u/find-files-by-ext layouts-dir "clj")
         partial-files (u/find-files-by-ext partials-dir "clj")
         partials-map  (u/file-list->key-file-map partial-files)
@@ -36,7 +35,7 @@
     (println "Setup: Making _site output.")
     (fs/mkdir (config :out-dirname))
 
-    (println "Setup: Copying root media into out media")
+    (println "Setup: Copying root media" media-dir "into out: " out-media-dir)
     (fs/copy-dir (config :media-dir) (config :out-media-dir))
 
     (assoc config
@@ -90,7 +89,7 @@
   (let [curr-file-name (curr-file :name)
         out-file-name  (build-file-outpath config)
         out-html       (curr-file :as-html)]
-    (println "Writing file: " curr-file-name "to " out-file-name)
+    ;; (println "Writing file: " curr-file-name "to " out-file-name)
     (when-not (config/file-is-private? config)
       (io/make-parents out-file-name)
       (spit out-file-name out-html))))

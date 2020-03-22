@@ -77,13 +77,13 @@
 ;; -- Default Config -----------------------------------------------------------
 
 (defn default
+  "Assume that files-dir does NOT end in a `/`
+   ex: /Users/tees/Dropbox/wiki"
   [files-dir]
   (merge starting-config
-         {:out-dirname   (str files-dir "_site/")    #_(str files-dir (starting-config :out-dirname) "/")
-          :layouts-dir   (str files-dir "/_layouts/")
+         {:layouts-dir   (str files-dir "/_layouts/")
           :partials-dir  (str files-dir "/_partials/")
+          :media-dir     (str files-dir "/" (starting-config :media-dir))
           :out-media-dir (str files-dir "/_site/" (starting-config :media-dir))
           :files-dir     files-dir
-          :files-dirname (-> files-dir (s/split #"/") last)
-
-          :media-dir (str files-dir "/" (starting-config :media-dir))}))
+          :files-dirname (-> files-dir (s/split #"/") last)}))
