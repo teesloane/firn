@@ -1,7 +1,6 @@
 (ns firn.core
   (:require [firn.build :as build]
             [cli-matic.core :refer [run-cmd]])
-
   (:gen-class))
 
 (def CONFIGURATION
@@ -13,18 +12,10 @@
                   :description "Builds a static site in a directory with org files."
                   :opts        [{:option "path" :short "p"  :as "Specify path to content" :type :string :default ""}]
                   :runs        build/all-files}
-
                  ]})
 
 
 (defn -main
-  "Takes a link to a directory and runs on the list of org files."
+  "Parsed command line arguments and runs corresponding functions."
   [& args]
   (run-cmd args CONFIGURATION))
-;; ;; (let [files-dir (first args)] ;; TODO setup cli args.
-;; ;;   (build/all-files files-dir)
-
-;; #_(If config/dev?
-;;       (System/exit 0))))
-
-;; (-main)
