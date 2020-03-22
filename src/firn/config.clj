@@ -14,7 +14,7 @@
    :as-html  nil})       ; the html output
 
 (def starting-config
-  {:out-dir       nil      ; where files get published
+  {
    :out-dirname   "_site"
    :ignored-dirs  ["priv"]
    :media-dir     "assets" ; org attachments to get copied into _site.
@@ -79,7 +79,7 @@
 (defn default
   [files-dir]
   (merge starting-config
-         {:out-dir       (str files-dir (starting-config :out-dirname) "/")
+         {:out-dirname   (str files-dir "_site/")    #_(str files-dir (starting-config :out-dirname) "/")
           :layouts-dir   (str files-dir "/_layouts/")
           :partials-dir  (str files-dir "/_partials/")
           :out-media-dir (str files-dir "/_site/" (starting-config :media-dir))

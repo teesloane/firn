@@ -34,7 +34,7 @@
         layouts-map   (u/file-list->key-file-map layout-files)]
 
     (println "Setup: Making _site output.")
-    (fs/mkdir (config :out-dir))
+    (fs/mkdir (config :out-dirname))
 
     (println "Setup: Copying root media into out media")
     (fs/copy-dir (config :media-dir) (config :out-media-dir))
