@@ -5,7 +5,6 @@
             [firn.build :as build]
             [me.raynes.fs :as fs]))
 
-
 (def test-dir      "test/firn/demo_org")
 (def f-1           (io/file (str test-dir "/file1.org")))
 (def f-2           (io/file (str test-dir "/file2.org")))
@@ -51,11 +50,11 @@
 (-> (single-file-runner))
 
 (defn main-runner
-  []
+  [dir-to-build]
   (fs/delete-dir (config-sample :out-dirpath)) ; clear it out!
-  (build/all-files {; :path test-dir
-                    :path "/Users/tees/Dropbox/wiki"}))
-                     ; delete folder if it exists
+  (build/all-files {:path dir-to-build}))
 
+;; ---
 
-(main-runner)
+(main-runner "/Users/tees/Dropbox/wiki")
+(main-runner test-dir)
