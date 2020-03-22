@@ -20,7 +20,7 @@
   [{:keys [curr-file]}]
   [:main
    [:h1 "Note! You don't have a default template."]
-   [:div "Please make a _layouts/default.clj file and put it in your org note directory."]
+   [:div "Please make a _firn/layouts/default.clj file and put it in your org note directory."]
    [:div (markup/to-html (:as-edn curr-file))]])
 
 (defn layout-exists?

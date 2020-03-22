@@ -23,6 +23,15 @@
         (s/replace #"\.org" ".html")
         (s/replace (re-pattern files-dirname) (str out-comb))))) ;; < str to make linter happy.
 
+(defn new-site
+  "Creates the folders needed for a new site in your wiki directory.
+  TODO: try/catch; TODO: get layouts-dir from config/default"
+  [_opts]
+  (println "Creating a _firn directory.")
+  (fs/mkdirs "_firn/layouts")
+  (fs/mkdirs "_firn/partials"))
+
+
 (defn setup
   "Creates folders for output, slurps in layouts and partials.
   FIXME: should slurp/mkdir/copy-dir be wrapped in try-catches? if-err handling?"
@@ -86,10 +95,8 @@
 (defn write-file
   "Takes (file-)config input and writes html to output."
   [{:keys [curr-file] :as config}]
-  (let [curr-file-name (curr-file :name)
-        out-file-name  (build-file-outpath config)
+  (let [out-file-name  (build-file-outpath config)
         out-html       (curr-file :as-html)]
-    ;; (println "Writing file: " curr-file-name "to " out-file-name)
     (when-not (config/file-is-private? config)
       (io/make-parents out-file-name)
       (spit out-file-name out-html))))

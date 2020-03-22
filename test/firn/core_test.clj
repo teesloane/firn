@@ -6,9 +6,9 @@
             [me.raynes.fs :as fs]))
 
 
-(def test-dir      "test/firn/demo_org/")
-(def f-1           (io/file (str test-dir "file1.org")))
-(def f-2           (io/file (str test-dir "file2.org")))
+(def test-dir      "test/firn/demo_org")
+(def f-1           (io/file (str test-dir "/file1.org")))
+(def f-2           (io/file (str test-dir "/file2.org")))
 (def config-sample (config/default test-dir))
 
 ;; (deftest _setup
@@ -52,8 +52,10 @@
 
 (defn main-runner
   []
-  (fs/delete-dir (config-sample :out-dirname)) ; clear it out!
-  (build/all-files {:path "/Users/tees/Dropbox/wiki"})) ; delete folder if it exists
+  (fs/delete-dir (config-sample :out-dirpath)) ; clear it out!
+  (build/all-files {; :path test-dir
+                    :path "/Users/tees/Dropbox/wiki"}))
+                     ; delete folder if it exists
 
 
 (main-runner)

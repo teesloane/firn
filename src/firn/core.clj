@@ -12,6 +12,10 @@
                   :description "Builds a static site in a directory with org files."
                   :opts        [{:option "path" :short "p"  :as "Specify path to content" :type :string :default ""}]
                   :runs        build/all-files}
+                 {:command     "new"
+                  :description "Scaffolds files and folders needed to start a new site."
+                  :opts        []
+                  :runs        build/new-site}
                  ]})
 
 
