@@ -2,8 +2,6 @@
   (:require [clojure.string :as s]
             [firn.util :as u]))
 
-(def dev? true)
-
 (def curr-file
   {:name     nil
    :original nil         ; the file as as javaFile object.
@@ -14,8 +12,9 @@
    :as-html  nil})       ; the html output
 
 (def starting-config
-  {:out-dir       nil      ; where files get published
-   :out-dirname   "_site"
+  {
+   :out-dirname   "_firn/_site"
+   :out-dirpath   ""       ; cstrcted when default-config is made
    :ignored-dirs  ["priv"]
    :media-dir     "assets" ; org attachments to get copied into _site.
    :layouts       {}       ; layouts loaded into memory
@@ -77,13 +76,14 @@
 ;; -- Default Config -----------------------------------------------------------
 
 (defn default
+  "Assume that files-dir does NOT end in a `/`
+   ex: /Users/tees/Dropbox/wiki"
   [files-dir]
   (merge starting-config
-         {:out-dir       (str files-dir (starting-config :out-dirname) "/")
-          :layouts-dir   (str files-dir "_layouts/")
-          :partials-dir  (str files-dir "_partials/")
-          :out-media-dir (str files-dir "_site/" (starting-config :media-dir))
+         {:layouts-dir   (str files-dir "/_firn/layouts/")
+          :partials-dir  (str files-dir "/_firn/partials/")
+          :media-dir     (str files-dir "/" (starting-config :media-dir))
+          :out-media-dir (str files-dir "/_firn/_site/" (starting-config :media-dir))
+          :out-dirpath   (str files-dir "/" (starting-config :out-dirname))
           :files-dir     files-dir
-          :files-dirname (-> files-dir (s/split #"/") last)
-
-          :media-dir (str files-dir "/" (starting-config :media-dir))}))
+          :files-dirname (-> files-dir (s/split #"/") last)}))
