@@ -12,6 +12,13 @@
 
 (def PARSER-PATH "/Users/tees/projects/firn/firn/src/parser/target/debug/parser")
 
+(defn- prepare-config
+  "Takes a path to files (or CWD) and makes a config with it."
+  [{:keys [path]}]
+  (let [path   (if (empty? path) (.getPath fs/*cwd*) path)
+        config (config/default path)]
+    config))
+
 (defn- build-file-outpath
   "For the current file, build it's output filename
   based on out-dir, the path of the file (it could be several layers deep)
@@ -26,11 +33,18 @@
 (defn new-site
   "Creates the folders needed for a new site in your wiki directory.
   TODO: try/catch; TODO: get layouts-dir from config/default"
-  [_opts]
-  (println "Creating a _firn directory.")
-  (fs/mkdirs "_firn/layouts")
-  (fs/mkdirs "_firn/partials"))
+  ([opts]
+   (println "Creating a _firn site in this directory.")
+   (let [config (-> opts prepare-config)]
+     (fs/mkdirs (config :layouts-dir))
+     (fs/mkdirs (config :partials-dir))))
+  ([_ config]
+   (fs/mkdirs (config :layouts-dir))
+   (fs/mkdirs (config :partials-dir))))
 
+
+
+;; Leaving off ^^^^^^^^^^ make this callble from setup.
 
 (defn setup
   "Creates folders for output, slurps in layouts and partials.
@@ -40,6 +54,8 @@
         partial-files (u/find-files-by-ext partials-dir "clj")
         partials-map  (u/file-list->key-file-map partial-files)
         layouts-map   (u/file-list->key-file-map layout-files)]
+
+    (new-site nil config)
 
     (println "Setup: Making _site output.")
     (fs/mkdir (config :out-dirname))
@@ -114,8 +130,7 @@
 
 (defn all-files
   "Processes all files in the org-directory"
-  [{:keys [path]}] ;; < passed from CLI-matic.
-  (let [path   (if (empty? path) (.getPath fs/*cwd*) path)
-        config (-> path config/default setup)]
+  [opts]
+  (let [config (-> opts prepare-config setup)]
     (doseq [f (config :org-files)]
       (single-file config f))))

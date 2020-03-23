@@ -8,6 +8,8 @@
   "Sanitizes a heading of links and just returns text.
   Necessary because org leafs of :type `link` have a `:desc` and not a `:value`
 
+  Turns: `* This is my [[Headline]] with a link!` -> `This is my Headline with a link!`
+
   UGH. this is a mess of a function, and should be refactored. Basically:
   - Loop through the children that represent a title.
   - get the values out and trim them incase there is whitespace
