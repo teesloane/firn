@@ -10,7 +10,7 @@
             [firn.util :as u])
   (:gen-class))
 
-(def PARSER-PATH "/Users/tees/projects/firn/firn/src/parser/target/debug/parser")
+(def PARSER-PATH "resources/parser")
 
 (defn- prepare-config
   "Takes a path to files (or CWD) and makes a config with it."
@@ -20,8 +20,10 @@
     config))
 
 (defn- build-file-outpath
-  "For the current file, build it's output filename
-  based on out-dir, the path of the file (it could be several layers deep)
+  "For the current file, build it's output filename.
+  Because the users's content might not be a flat-wiki, we must account
+  for cases where a file is `nested/several/layers/deep.org.`
+  Basically, swaps out the `.org` -> `.html` and orig-dir -> orig-dir+output-dir.
   Returns the file name as a string."
   [{:keys [out-dirname files-dirname curr-file]}]
   (let [curr-file-path (-> curr-file :original .getPath)
@@ -31,8 +33,7 @@
         (s/replace (re-pattern files-dirname) (str out-comb))))) ;; < str to make linter happy.
 
 (defn new-site
-  "Creates the folders needed for a new site in your wiki directory.
-  TODO: try/catch; TODO: get layouts-dir from config/default"
+  "Creates the folders needed for a new site in your wiki directory."
   ([opts]
    (println "Creating a _firn site in this directory.")
    (let [config (-> opts prepare-config)]
@@ -43,35 +44,26 @@
    (fs/mkdirs (config :partials-dir))))
 
 
-
-;; Leaving off ^^^^^^^^^^ make this callble from setup.
-
 (defn setup
   "Creates folders for output, slurps in layouts and partials.
-  FIXME: should slurp/mkdir/copy-dir be wrapped in try-catches? if-err handling?"
-  [{:keys [layouts-dir partials-dir media-dir out-media-dir files-dir] :as config}]
+  NOTE: should slurp/mkdir/copy-dir be wrapped in try-catches? if-err handling?"
+  [{:keys [layouts-dir partials-dir files-dir] :as config}]
   (let [layout-files  (u/find-files-by-ext layouts-dir "clj")
         partial-files (u/find-files-by-ext partials-dir "clj")
         partials-map  (u/file-list->key-file-map partial-files)
+        org-files     (u/find-files-by-ext files-dir "org") ;; could bail if this is empty...
         layouts-map   (u/file-list->key-file-map layout-files)]
 
     (new-site nil config)
-
-    (println "Setup: Making _site output.")
     (fs/mkdir (config :out-dirname))
-
-    (println "Setup: Copying root media" media-dir "into out: " out-media-dir)
     (fs/copy-dir (config :media-dir) (config :out-media-dir))
-
-    (assoc config
-           :org-files (u/find-files-by-ext files-dir "org")
-           :layouts layouts-map
-           :partials partials-map)))
+    (assoc
+     config :org-files org-files :layouts layouts-map :partials partials-map)))
 
 (defn parse!
   "Shells out to the rust binary to parse the org-mode file."
   [file-str]
-  (let [res (sh/sh PARSER-PATH file-str)] ;; FIXME: baked-in parser path.
+  (let [res (sh/sh PARSER-PATH file-str)]
     (if-not (= (res :exit) 0)
       (prn "Orgize failed to parse file." file-str res)
       (res :out))))

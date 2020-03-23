@@ -1,14 +1,16 @@
 (ns firn.markup
   "Namespace responsible for converted org-edn into html."
-  (:require [hiccup.core :as h]
-            [clojure.string :as s]))
+  (:require [clojure.string :as s]))
 
 
 ;; Renderers
 
 
 (defn- src-block->html
-  [{:keys [contents language arguments] :as src-block}]
+  "Formats a org-mode src block.
+  NOTE: Has additional :keys `language` and `arguments`
+  that could be used for syntax highlighting"
+  [{:keys [contents _language _arguments] :as _src-block}]
   [:pre contents])
 
 (defn link->html
@@ -53,7 +55,6 @@
   (let [level            (v :level)
         typ              (v :type)
         children         (v :children)
-        raw              (v :raw)
         keywrd           (v :keyword)
         priority         (v :priority)
         value            (v :value)
@@ -77,8 +78,6 @@
       "italic"    (make-child :em)
       "bold"      (make-child :strong)
       "")))
-
-(keyword (str "span.heading-keyword"))
 
 (defn to-html
   "Recursively Parses the org-edn into hiccup.

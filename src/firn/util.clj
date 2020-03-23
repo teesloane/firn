@@ -1,5 +1,4 @@
 (ns firn.util
-  ;; (:refer-clojure :exclude [name parents])
   (:require [clojure.string :as s]
             [me.raynes.fs :as fs]))
 
@@ -21,7 +20,6 @@
       (do (println "No" ext "files found at " dir) files)
       files)))
 
-
 (defn file-name-no-ext
   "Removes an extension from a filename"
   [io-file]
@@ -38,14 +36,8 @@
   (let [eval-file #(-> % .getPath slurp read-string eval)]
     (into {} (map #(hash-map (io-file->keyword %) (eval-file %)) file-list))))
 
-(defn exit-with-err
-  "Exits with error.
-  TODO: make this not exit the repl in dev-mode."
-  [& msgs]
-  (prn "Err: " msgs)
-  #_(System/exit 1))
-
 (defn find-first
+  "Find the first item in a collection."
   [f coll]
   (first (filter f coll)))
 
