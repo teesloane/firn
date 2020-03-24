@@ -37,13 +37,13 @@
       [:img {:src link-href}]
 
       (re-matches org-file-regex link-href)
-      [:a {:href (file-path (re-matches org-file-regex link-href))} link-val]
+      [:a.internal {:href (file-path (re-matches org-file-regex link-href))} link-val]
 
       (re-matches img-http-regex link-href)
       [:img {:src link-href}]
 
       (re-matches http-link-regex link-href)
-      [:a {:href link-href} link-val]
+      [:a.external {:href link-href} link-val]
 
       :else
       [:a {:href link-href}])))
