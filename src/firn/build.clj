@@ -10,8 +10,6 @@
             [firn.util :as u])
   (:gen-class))
 
-(def PARSER-PATH "resources/parser")
-
 (defn- prepare-config
   "Takes a path to files (or CWD) and makes a config with it."
   [{:keys [path]}]
@@ -33,16 +31,20 @@
         (s/replace (re-pattern files-dirname) (str out-comb))))) ;; < str to make linter happy.
 
 (defn new-site
-  "Creates the folders needed for a new site in your wiki directory."
-  ([opts]
-   (println "Creating a _firn site in this directory.")
-   (let [config (-> opts prepare-config)]
-     (fs/mkdirs (config :layouts-dir))
-     (fs/mkdirs (config :partials-dir))))
-  ([_ config]
-   (fs/mkdirs (config :layouts-dir))
-   (fs/mkdirs (config :partials-dir))))
+  "Creates the folders needed for a new site in your wiki directory.
+  Copies the parser bin into the _firn site At least until graal is avail."
+  [cmds & args]
+  (let [new-config      (-> cmds prepare-config)
+        existing-config (first args)
+        config          (if (nil? cmds) existing-config new-config)
+        parser-out-path (io/file (str (config :bin-dir) "/parser"))]
 
+     (fs/mkdirs (config :layouts-dir))
+     (fs/mkdirs (config :bin-dir))
+     (fs/mkdirs (config :partials-dir))
+     ;; copy parser from /resources into _firn/bin/ and make it executable.
+     (-> "parser/bin/parser" io/resource io/input-stream (io/copy parser-out-path))
+     (fs/chmod "+x" parser-out-path)))
 
 (defn setup
   "Creates folders for output, slurps in layouts and partials.
@@ -62,8 +64,9 @@
 
 (defn parse!
   "Shells out to the rust binary to parse the org-mode file."
-  [file-str]
-  (let [res (sh/sh PARSER-PATH file-str)]
+  [config file-str]
+  (let [parser (str (config :bin-dir) "/parser")
+        res    (sh/sh parser file-str)]
     (if-not (= (res :exit) 0)
       (prn "Orgize failed to parse file." file-str res)
       (res :out))))
@@ -72,7 +75,7 @@
   "Pulls :curr-file from config > parses > put into config with new vals"
   [config]
   (let [file-orig   (-> config :curr-file :original)
-        file-parsed (->> file-orig slurp parse!)
+        file-parsed (->> file-orig slurp (parse! config))
         file-name   (-> file-orig .getName (s/split #"\.") (first))]
     (config/update-curr-file config {:name file-name :as-json file-parsed})))
 

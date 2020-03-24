@@ -82,6 +82,7 @@
   (merge starting-config
          {:layouts-dir   (str files-dir "/_firn/layouts/")
           :partials-dir  (str files-dir "/_firn/partials/")
+          :bin-dir       (str files-dir "/_firn/bin/")
           :media-dir     (str files-dir "/" (starting-config :media-dir))
           :out-media-dir (str files-dir "/_firn/_site/" (starting-config :media-dir))
           :out-dirpath   (str files-dir "/" (starting-config :out-dirname))

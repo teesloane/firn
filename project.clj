@@ -10,7 +10,7 @@
                  [cli-matic "0.3.11"]
                  [org.clojure/clojure "1.9.0"]]
 
-
+  :resource-paths ["resources"]
 
   :native-image {:name      "firn" ;; name of output image, optional
                  :graal-bin "/Users/tees/Downloads/graalvm-ce-java11-20.0.0/Contents/Home/bin/native-image" ;; path to GraalVM home, optional

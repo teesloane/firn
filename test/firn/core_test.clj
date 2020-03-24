@@ -25,8 +25,8 @@
   (fs/delete-dir (config-sample :out-dirpath)) ; clear it out!
   (build/all-files {:path dir-to-build}))
 
-(main-runner wiki-dir)
-;; (main-runner test-dir)
+;; (main-runner wiki-dir)
+(main-runner test-dir)
 
 
-(build/new-site {:path wiki-dir})
+(build/new-site {:path test-dir})
