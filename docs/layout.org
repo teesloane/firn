@@ -1,0 +1,86 @@
+#+TITLE: Layout
+#+DATE_CREATED: <2020-03-24 Tue>
+#+DATE_UPDATED: <2020-03-24 14:20>
+#+FILE_UNDER: docs
+#+LAYOUT: docs
+
+* Overview
+
+When you create a new Firn site for the first time, it will create a folder in
+=_firn/layouts=.
+
+When an org-mode file is processed by Firn it looks at the file's =keywords= to
+see if it uses a Layout. If none are specified, the _default template_ is used.
+
+The act of "applying" a template means to pass the content of the org-file
+through a specific clojure hiccup template that organizes how the content is displayed.
+
+* Usage
+
+Let's walk through an example.
+
+#+BEGIN_SRC  sh
+mkdir firn_example
+cd firn_example; touch foo.org
+#+END_SRC
+
+Navigate to =foo.org= and open the file. Edit it to include the following:
+
+*NOTE*: Because the snippet below is org-mode code, you will need to remove the =\=  preceding the =*= Headings.
+
+#+BEGIN_SRC org
+
+#+TITLE: Layout
+#+DATE_CREATED: <2020-03-24 Tue>
+#+DATE_UPDATED: <2020-03-24 14:20>
+#+FILE_UNDER: docs
+#+LAYOUT: docs
+
+\* My project
+
+ This is my project
+
+\* Tasks
+
+ - [ ] Figure out how layouts work.
+#+END_SRC
+
+Now we have a file that is going to look for a layout called "docs" in the
+layouts folder. Return to the terminal
+
+#+BEGIN_SRC sh
+cd layouts
+touch docs.clj
+#+END_SRC
+
+**Note**: This content will change soon, as layout features become more usable.
+
+Inside docs.clj place the following clojure code.
+
+#+BEGIN_SRC clojure
+(defn docs
+  "Renders a docs layouts"
+  [config]
+  (let [{:keys [head nav]} (config :partials)
+        render                (config :render)
+        content               (-> config :curr-file :as-edn)
+        get-headline          (-> config :get-headline)
+        tasks                 (-> (get-headline-content content "Tasks"))]
+
+     [:body
+      [:div
+       [:div "The following are some tasks:"]
+       [:div (render tasks)]]]])))
+#+END_SRC
+
+* Do I have to use layouts?
+
+Not really. If you don't have any .clj files in the =_firn/layouts/= directory,
+Firn will default to using the internal default template. This provides a very
+basic out of the box formatting and will render the entirety of your org mode file.
+
+* TODO How do I customize the styling of my layouts?
+
+* TODO How do I drill down into the content of a heading?
+
+n/a until there is better support/refactoring of the =firn/org= ns.
