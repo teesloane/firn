@@ -23,7 +23,7 @@
    [:div "Please make a _firn/layouts/default.clj file and put it in your org note directory."]
    [:div (markup/to-html (:as-edn curr-file))]])
 
-(defn layout-exists?
+(defn get-layout
   "Checks if a layout for a project exists in the config map
   If it does, return the function value of the layout, otherwise the default template "
   [config layout]
@@ -42,5 +42,5 @@
 (defn apply-template
   "If a file has a template, render the file with it, or use the default layout"
   [config layout]
-  (let [selected-layout (layout-exists? config layout)]
+  (let [selected-layout (get-layout config layout)]
     (h/html (selected-layout (with-fns-config config)))))
