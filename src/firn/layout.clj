@@ -24,7 +24,7 @@
   If it does, return the function value of the layout, otherwise the default template "
   [config layout]
   (let [curr-file-name (-> config :curr-file :name)
-        file-layout    (-> config :layouts layout)
+        file-layout    (get-in config [:layouts layout])
         default-layout (-> config :layouts :default)]
     (cond
       (not (nil? file-layout))
@@ -35,8 +35,10 @@
 
       :else
       (do
-        (println "⚠ No default layout found in _firn/layouts." curr-file-name "Also does not have #+LAYOUT key.")
-        (println "☝ Resorting to internal template!")
+        (if layout
+          (println "\n⚠ File:" curr-file-name "says it uses a layout of" layout "but no corresponding layout file exists in _firn/layouts")
+          (println "\n⚠ File:" curr-file-name "does not have #+LAYOUT key and no default layout file was found."))
+        (println "☝ Resorting to internal template!\n")
         internal-default-layout))))
 
 (defn with-fns-config
