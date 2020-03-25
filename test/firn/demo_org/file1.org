@@ -1,4 +1,5 @@
 #+TITLE: sample_orgfile
+#+LAYOUT: project
 
 * Headings
 :PROPERTIES:

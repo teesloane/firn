@@ -12,24 +12,32 @@
             [hiccup.core :as h]))
 
 
-
-
-(defn default-template
+(defn internal-default-layout
   "The default template if no `layout` key is specified.
   This lets users know they need to build a `_layouts/default.clj`"
   [{:keys [curr-file]}]
   [:main
-   [:h1 "Note! You don't have a default template."]
-   [:div "Please make a _firn/layouts/default.clj file and put it in your org note directory."]
    [:div (markup/to-html (:as-edn curr-file))]])
 
 (defn get-layout
   "Checks if a layout for a project exists in the config map
   If it does, return the function value of the layout, otherwise the default template "
   [config layout]
-  (get-in config [:layouts layout]
-          (get-in config [:layouts :default]
-                  default-template)))
+  (let [curr-file-name (-> config :curr-file :name)
+        file-layout    (-> config :layouts layout)
+        default-layout (-> config :layouts :default)]
+    (cond
+      (not (nil? file-layout))
+      file-layout
+
+      (not (nil? default-layout))
+      default-layout
+
+      :else
+      (do
+        (println "⚠ No default layout found in _firn/layouts." curr-file-name "Also does not have #+LAYOUT key.")
+        (println "☝ Resorting to internal template!")
+        internal-default-layout))))
 
 (defn with-fns-config
   "Pass functions needed for rendering to configs."

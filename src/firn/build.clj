@@ -30,21 +30,26 @@
         (s/replace #"\.org" ".html")
         (s/replace (re-pattern files-dirname) (str out-comb))))) ;; < str to make linter happy.
 
+
 (defn new-site
   "Creates the folders needed for a new site in your wiki directory.
-  Copies the parser bin into the _firn site At least until graal is avail."
+  Copies the _firn_starter from resources, into where you are running the cmd.
+  FIXME: This does not work with JARs - it's complicated to copy entire directories from a jar.
+  possible solution: https://stackoverflow.com/a/28682910"
   [cmds & args]
   (let [new-config      (-> cmds prepare-config)
         existing-config (first args)
-        config          (if (nil? cmds) existing-config new-config)
-        parser-out-path (io/file (str (config :bin-dir) "/parser"))]
+        config          (if (nil? cmds) existing-config new-config)]
+     (if (fs/exists? (config :firn-dir))
+       (u/print-err! "A _firn directory already exists.")
+       (do
+         (fs/copy-dir (io/resource "_firn_starter") (config :firn-dir))
+         ;; used to be doing the following, when just copying the parser and
+         ;; manually mkdirs... might have to revert to this:
+         ;; b9259f7 * origin/feat/improve-templating Fix: vendor parser + move it to _firn/bin in setup
+         ;; (-> "parser/bin/parser" io/resource io/input-stream (io/copy parser-out-path))))
+         (fs/chmod "+x" (config :parser-path))))))
 
-     (fs/mkdirs (config :layouts-dir))
-     (fs/mkdirs (config :bin-dir))
-     (fs/mkdirs (config :partials-dir))
-     ;; copy parser from /resources into _firn/bin/ and make it executable.
-     (-> "parser/bin/parser" io/resource io/input-stream (io/copy parser-out-path))
-     (fs/chmod "+x" parser-out-path)))
 
 (defn setup
   "Creates folders for output, slurps in layouts and partials.
@@ -56,7 +61,7 @@
         org-files     (u/find-files-by-ext files-dir "org") ;; could bail if this is empty...
         layouts-map   (u/file-list->key-file-map layout-files)]
 
-    (new-site nil config)
+    (when-not (fs/exists? (config :firn-dir)) (new-site nil config))
     (fs/mkdir (config :out-dirname))
     (fs/copy-dir (config :media-dir) (config :out-media-dir))
     (assoc
@@ -65,7 +70,7 @@
 (defn parse!
   "Shells out to the rust binary to parse the org-mode file."
   [config file-str]
-  (let [parser (str (config :bin-dir) "/parser")
+  (let [parser (config :parser-path)
         res    (sh/sh parser file-str)]
     (if-not (= (res :exit) 0)
       (prn "Orgize failed to parse file." file-str res)
