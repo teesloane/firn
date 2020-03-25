@@ -1,45 +1,24 @@
 #+TITLE: sample_orgfile
-* Links
 
-A Relative image link: =./assets/images/test-img.png=
-
-[[./assets/images/test-img.png]]
-
------
-
-An http link:
-
-[[https://docs.cider.mx/cider/usage/misc_features.html][Miscellaneous Features :: CIDER Docs]]
-
-
------
-
-An http image link
-
-*Note* - There is a limitation in that all links to images, in order to generate
-an <img> tag, but end in a file image type (.png | .jpg | etc)
-
-[[https://cdn.orvis.com/images/DBS_ShibaInu_1280.jpg]]
-
-
------
-
-A =file:= link
-
-[[file:file2.org][File 2]]
-
-And now, a sub folder link
-
-[[file:nested/file3.org][nested file 3]]
-
-* Headings (lvl 1)
-** TODO Heading (2) with keyword
+* Headings
+:PROPERTIES:
+:foo: bar
+:END:
+** TODO Heading (2) with /keyword/
 ** TODO [#B] Heading 2 with priority
 *** Heading 3
 **** Heading 4
 ***** Heading 5
 ****** Heading 6
 ******* Heading 7
+* Some Links
+
+A =file:= link
+
+[[file:file2.org][File 2]]
+
+
+[[file:nested/file3.org][nested file 3]]
 * Tables
 
 |   1 |     2 |        3 | 4 |      5 |
