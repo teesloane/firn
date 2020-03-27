@@ -1,5 +1,5 @@
 #+TITLE: sample_orgfile
-#+LAYOUT: project
+#+LAYOUT: default
 
 * Headings
 :PROPERTIES:

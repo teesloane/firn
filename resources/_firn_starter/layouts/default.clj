@@ -1,16 +1,11 @@
-(defn layout-default
-  "Renders a templates as if a project.
-  Someday this will become a macro. Maybe."
-  [config]
-  (let [{:keys [head]} (config :partials)
-        render         (config :render)
-        content        (-> config :curr-file :as-edn)]
-
+(defn default
+  [{:keys [ yield partials]}]
+  (let [{:keys [head]} partials]
     (head
      [:body
       [:main
        [:article
-        [:div (render content)]]
+        [:div yield]]
        [:aside
         [:div ""]
         [:div ""]]]])))

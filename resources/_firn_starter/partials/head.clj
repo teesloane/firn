@@ -1,6 +1,6 @@
-(fn [body]
+(defn head
+  [body]
   [:html
    [:head
-    [:link {:rel "stylesheet" :href "/assets/css/main.css"}]
-    #_[:link {:rel "stylesheet" :href "./assets/css/tachyons.css"}]]
+    [:link {:rel "stylesheet" :href "/assets/css/main.css"}]]
    body])

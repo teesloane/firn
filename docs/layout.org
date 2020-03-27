@@ -53,24 +53,18 @@ cd layouts
 touch docs.clj
 #+END_SRC
 
-**Note**: This content will change soon, as layout features become more usable.
-
 Inside docs.clj place the following clojure code.
 
 #+BEGIN_SRC clojure
-(defn docs
-  "Renders a docs layouts"
-  [config]
-  (let [{:keys [head nav]} (config :partials)
-        render                (config :render)
-        content               (-> config :curr-file :as-edn)
-        get-headline          (-> config :get-headline)
-        tasks                 (-> (get-headline-content content "Tasks"))]
-
+(defn project
+  [{:keys [render title partials]}]
+  (let [{:keys [head nav]} partials]
+    (head
      [:body
-      [:div
-       [:div "The following are some tasks:"]
-       [:div (render tasks)]]]])))
+      (nav)
+      [:main
+       [:article
+        [:div (render "Notes")]]]]))) ;; Renders The notes section.
 #+END_SRC
 
 * Do I have to use layouts?
@@ -79,8 +73,46 @@ Not really. If you don't have any .clj files in the =_firn/layouts/= directory,
 Firn will default to using the internal default template. This provides a very
 basic out of the box formatting and will render the entirety of your org mode file.
 
-* TODO How do I customize the styling of my layouts?
+* How do I customize the styling of my layouts?
 
-* TODO How do I drill down into the content of a heading?
+As with normal HTML, you'll need to add a =head= tag with a =link= and linking
+to a css file. It'll probably be most likely to create a partial for your =<head></head>=
+content that can then be shared across layouts:
 
-n/a until there is better support/refactoring of the =firn/org= ns.
+#+BEGIN_SRC clojure
+(defn head
+  [body]
+  [:html
+   [:head
+    [:link {:rel "stylesheet" :href "/assets/css/main.css"}]]
+   body])
+#+END_SRC
+
+* How do I drill down into the content of a heading?
+
+First, a =heading= refers to a bullet heading in org-mode (the kind that are
+toggleable with the =tab=) key. A =heading= can have =sub-headings=, =drawers=
+(properties, logbooks, etc) and general text content (tables, lists, prose, etc.)
+
+Because a heading can contain so much data, the =render= function, made
+available to your layouts, aims to make getting content out of a heading easier.
+
+View the code block below to see the multiple ways of using the =render= function
+
+#+BEGIN_SRC clojure
+;; In it's simplest form you can render a heading in it's entirety.
+;; This will search through the headings for a headline with that name specifically
+;; and then render it to HTML.
+[:div (render "My Heading")]]
+
+;; Next, you can ask to just render the headline's title:
+[:div (render "My Heading" :title)]] ; => "My Heading"
+
+;; You can also ask to get the "raw" text, which will just return the
+;; plain-text of the title -- you're just getting <string> rather than
+;; a hiccup data structure; so you won't be getting an H1/H2/H3 etc.
+[:div (render "My Tasks" :title-raw)]] ; => "My Tasks".
+
+;; Render the contents of the headline - ie, everything but the title "My Tasks".
+[:div (render "My Tasks" :content)]]
+#+END_SRC

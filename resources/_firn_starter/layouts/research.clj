@@ -1,4 +1,4 @@
-(defn project
+(defn research
   [{:keys [render title partials]}]
   (let [{:keys [head nav]} partials]
     (head
@@ -11,7 +11,4 @@
        [:aside
         [:details {:open "true"}
          [:summary  "Resources"]
-         [:div (render "Resources" :content)]]
-        [:details
-         [:summary (render "Tasks" :title-raw)]
-         [:div (render "Tasks" :content)]]]]])))
+         [:div (render "Resources" :content)]]]]])))

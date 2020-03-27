@@ -55,13 +55,14 @@
   "Creates folders for output, slurps in layouts and partials.
   NOTE: should slurp/mkdir/copy-dir be wrapped in try-catches? if-err handling?"
   [{:keys [layouts-dir partials-dir files-dir] :as config}]
+  (when-not (fs/exists? (config :firn-dir)) (new-site nil config))
+
   (let [layout-files  (u/find-files-by-ext layouts-dir "clj")
         partial-files (u/find-files-by-ext partials-dir "clj")
         partials-map  (u/file-list->key-file-map partial-files)
         org-files     (u/find-files-by-ext files-dir "org") ;; could bail if this is empty...
         layouts-map   (u/file-list->key-file-map layout-files)]
 
-    (when-not (fs/exists? (config :firn-dir)) (new-site nil config))
     (fs/mkdir (config :out-dirname))
     (fs/copy-dir (config :media-dir) (config :out-media-dir))
     (assoc

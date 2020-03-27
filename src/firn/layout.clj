@@ -11,8 +11,7 @@
             [firn.org :as org]
             [hiccup.core :as h]))
 
-
-(defn internal-default-layout
+(defn- internal-default-layout
   "The default template if no `layout` key is specified.
   This lets users know they need to build a `_layouts/default.clj`"
   [{:keys [curr-file]}]
@@ -41,23 +40,43 @@
         (println "☝ Resorting to internal template!\n")
         internal-default-layout))))
 
-(defn with-fns-config
+(defn render
+  "Responsible for rendering org content in layouts."
+  ;; Render the whole file.
+  ([config]
+   (let [org-tree (-> config :curr-file :as-edn)
+         yield    (markup/to-html org-tree)] ;; this has lots of nil vals in it.
+     yield))
+
+  ([config headline-name]
+   (let [org-tree (-> config :curr-file :as-edn)
+         headline (org/get-headline org-tree headline-name)]
+     (markup/to-html headline)))
+
+  ;; pass in a keyword to retrieve some munged piece of the data
+  ([config headline-name piece]
+   (let [org-tree         (-> config :curr-file :as-edn)
+         headline         (org/get-headline org-tree headline-name)
+         headline-content (org/get-headline-content org-tree headline-name)]
+     (case piece
+       :title      (-> headline :children first  markup/to-html)
+       :title-raw  (-> headline :children first :raw)
+       :content    (markup/to-html headline-content)
+       :logbook    nil ;; TODO
+       :properties nil ;; TODO
+       headline))))
+
+(defn prepare-layout
   "Pass functions needed for rendering to configs."
   [config]
-  (assoc config
-         ;; be sure that these don't clobber names in config!
-         :render               (partial org/render config)
-         :yield                (org/render config)
-
-         ;; these will be removed
-         :get-headline         org/get-headline
-         :get-headline-content org/get-headline-content))
-
-
-
+  {:render   (partial render config)
+   :title    (-> config :curr-file :org-title)
+   :partials (config :partials)
+   :yield    (render config)
+   :config   config})
 
 (defn apply-template
   "If a file has a template, render the file with it, or use the default layout"
   [config layout]
   (let [selected-layout (get-layout config layout)]
-    (h/html (selected-layout (with-fns-config config)))))
+    (h/html (selected-layout (prepare-layout config)))))
