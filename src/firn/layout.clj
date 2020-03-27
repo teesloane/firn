@@ -45,9 +45,16 @@
   "Pass functions needed for rendering to configs."
   [config]
   (assoc config
-         :render               markup/to-html
+         ;; be sure that these don't clobber names in config!
+         :render               (partial org/render config)
+         :yield                (org/render config)
+
+         ;; these will be removed
          :get-headline         org/get-headline
          :get-headline-content org/get-headline-content))
+
+
+
 
 (defn apply-template
   "If a file has a template, render the file with it, or use the default layout"

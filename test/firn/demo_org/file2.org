@@ -1,7 +1,7 @@
 #+TITLE: Firn
 #+DATE_CREATED: 2020-03-01--09-53
 #+STATUS: active
-#+LAYOUT: projectlkdjf
+#+LAYOUT: project
 
 
 * Meta
@@ -139,5 +139,4 @@ Firn is found under the snow that accumulates at the head of a glacier. It is fo
 Cumulative wiki engine built with[[file:org-mode.org][ Org Modeº]] and [[file:clojure.org][Clojureº]].
 
 Primarily catalogues [[file:projects.org][Projectsº]] and [[file:research.org][Researchº]] as well as other experiments,
-quotes, ideas &c. poo
-
+quotes, ideas &c.

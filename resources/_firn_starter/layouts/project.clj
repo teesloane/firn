@@ -35,7 +35,7 @@
 (defn project
   "Renders a templates as if a project.
   Someday this will become a macro. Maybe."
-  [{:keys [render] :as config}]
+  [{:keys [render yield] :as config}]
   (let [{:keys [head nav]} (config :partials)
         ;; render                (config :render)
         content               (-> config :curr-file :as-edn)
@@ -51,4 +51,5 @@
 
 
     (head
-     [:body (render "Notes")])))
+     [:body
+      [:div (render "Notes" :headline)]])))

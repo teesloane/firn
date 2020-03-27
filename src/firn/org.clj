@@ -2,7 +2,8 @@
   "Functions for managing org-related things.
   Most of these functions are for operating on EDN-fied org-file
   Which are created by the rust binary."
-  (:require [clojure.string :as s]))
+  (:require [clojure.string :as s]
+            [firn.markup :as markup]))
 
 (defn- get-headline-helper
   "Sanitizes a heading of links and just returns text.
@@ -45,3 +46,39 @@
   [tree name]
   (let [headline (get-headline tree name)]
     (update headline :children (fn [d] (filter #(not= (:type %) "title") d)))))
+
+(defn render
+  "Responsible for rendering org content in layouts.
+  TODO - this should be moved to firn.layouts."
+  ;; Render the whole file.
+  ([config]
+   (let [org-tree (-> config :curr-file :as-edn)
+         yield    (markup/to-html org-tree)] ;; this has lots of nil vals in it.
+     yield))
+
+  ;; render just a headline name.
+  ([config headline-name]
+   (let [org-tree (-> config :curr-file :as-edn)
+         headline (get-headline org-tree headline-name)]
+     headline))
+
+  ;; pass in a keyword to retrieve some munged piece of the data
+  ;; could be a headline, or the logboog (TODO)
+  ([config headline-name piece]
+   (let [org-tree         (-> config :curr-file :as-edn)
+         headline         (get-headline org-tree headline-name)
+         headline-content (get-headline-content org-tree headline-name)]
+     (case piece
+       :headline
+       (-> headline :children first markup/to-html)
+
+       :content
+       (markup/to-html headline-content)
+
+       :logbook
+       nil ;; TODO
+
+       :properties
+       nil
+
+       headline))))

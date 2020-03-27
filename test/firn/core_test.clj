@@ -25,8 +25,20 @@
   (fs/delete-dir (config-sample :out-dirpath)) ; clear it out!
   (build/all-files {:path dir-to-build}))
 
-;; (main-runner wiki-dir)
+(main-runner wiki-dir)
 (main-runner test-dir)
 
 
 (build/new-site {:path test-dir})
+
+
+
+
+;; (def sample
+;;   (-> config-sample
+;;      (config/set-curr-file-original f-2)
+;;      (build/read-file)
+;;      (build/dataify-file)
+;;      (build/munge-file)
+;;      (build/htmlify-file))
+;;   )

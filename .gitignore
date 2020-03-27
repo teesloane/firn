@@ -21,4 +21,4 @@ tmp/
 
 test/firn/demo_org/_firn
 # personal layouts.
-resources/_firn_starter/layouts/project.clj
+# resources/_firn_starter/layouts/project.clj
