@@ -16,7 +16,7 @@ The parsing of Org content happens in =firn.build/dataify-file=, the content of
 the the org-tree, parsed from json, is stored in the config object: ={:curr-file
 {:as-edn ...}}=
 
-A [[file:~/Projects/firn/firn/test/firn/demo_org/file1.org][simple org file]] with a few headings, tasks, logbook, etc, looks like this
+A [[file:../test/firn/demo_org/file1.org][simple org file]] with a few headings, tasks, logbook, etc, looks like this
 after being parsed to json and converted to edn:
 
 #+BEGIN_SRC  clojure
