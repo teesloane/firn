@@ -13,20 +13,28 @@
 
 
 (defn single-file-runner
+  "Run the file conversion on a single file."
   []
-  (fs/delete-dir (config-sample :out-dirname)) ;; clear it out!
+  (fs/delete-dir (config-sample :out-dirname))
   (let [config (build/setup config-sample)]
     (build/single-file config f-2)))
 
-;; (-> (single-file-runner))
-
 (defn main-runner
   [dir-to-build]
-  (fs/delete-dir (config-sample :out-dirpath)) ; clear it out!
+  (fs/delete-dir (config-sample :firn-dir))
   (build/all-files {:path dir-to-build}))
 
 (main-runner wiki-dir)
-;; (main-runner test-dir)
+(main-runner test-dir)
+
+(build/new-site {:path test-dir})
 
 
-(build/new-site {:path wiki-dir})
+;; (def sample
+;;   (-> config-sample
+;;      (config/set-curr-file-original f-2)
+;;      (build/read-file)
+;;      (build/dataify-file)
+;;      (build/munge-file)
+;;      (build/htmlify-file))
+;;   )

@@ -11,6 +11,12 @@
              (-> f .getName (.endsWith ext))))
           fileseq))
 
+(defn print-err!
+  "A semantic error function."
+  [& args]
+  (apply println args))
+
+
 (defn find-files-by-ext
   "Traverses a directory for all files of a specific extension."
   [dir ext]

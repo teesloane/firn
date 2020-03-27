@@ -10,8 +10,6 @@
             [firn.util :as u])
   (:gen-class))
 
-(def PARSER-PATH "resources/parser")
-
 (defn- prepare-config
   "Takes a path to files (or CWD) and makes a config with it."
   [{:keys [path]}]
@@ -32,29 +30,39 @@
         (s/replace #"\.org" ".html")
         (s/replace (re-pattern files-dirname) (str out-comb))))) ;; < str to make linter happy.
 
+
 (defn new-site
-  "Creates the folders needed for a new site in your wiki directory."
-  ([opts]
-   (println "Creating a _firn site in this directory.")
-   (let [config (-> opts prepare-config)]
-     (fs/mkdirs (config :layouts-dir))
-     (fs/mkdirs (config :partials-dir))))
-  ([_ config]
-   (fs/mkdirs (config :layouts-dir))
-   (fs/mkdirs (config :partials-dir))))
+  "Creates the folders needed for a new site in your wiki directory.
+  Copies the _firn_starter from resources, into where you are running the cmd.
+  FIXME: This does not work with JARs - it's complicated to copy entire directories from a jar.
+  possible solution: https://stackoverflow.com/a/28682910"
+  [cmds & args]
+  (let [new-config      (-> cmds prepare-config)
+        existing-config (first args)
+        config          (if (nil? cmds) existing-config new-config)]
+     (if (fs/exists? (config :firn-dir))
+       (u/print-err! "A _firn directory already exists.")
+       (do
+         (fs/copy-dir (io/resource "_firn_starter") (config :firn-dir))
+         ;; used to be doing the following, when just copying the parser and
+         ;; manually mkdirs... might have to revert to this:
+         ;; b9259f7 * origin/feat/improve-templating Fix: vendor parser + move it to _firn/bin in setup
+         ;; (-> "parser/bin/parser" io/resource io/input-stream (io/copy parser-out-path))))
+         (fs/chmod "+x" (config :parser-path))))))
 
 
 (defn setup
   "Creates folders for output, slurps in layouts and partials.
   NOTE: should slurp/mkdir/copy-dir be wrapped in try-catches? if-err handling?"
   [{:keys [layouts-dir partials-dir files-dir] :as config}]
+  (when-not (fs/exists? (config :firn-dir)) (new-site nil config))
+
   (let [layout-files  (u/find-files-by-ext layouts-dir "clj")
         partial-files (u/find-files-by-ext partials-dir "clj")
         partials-map  (u/file-list->key-file-map partial-files)
         org-files     (u/find-files-by-ext files-dir "org") ;; could bail if this is empty...
         layouts-map   (u/file-list->key-file-map layout-files)]
 
-    (new-site nil config)
     (fs/mkdir (config :out-dirname))
     (fs/copy-dir (config :media-dir) (config :out-media-dir))
     (assoc
@@ -62,8 +70,9 @@
 
 (defn parse!
   "Shells out to the rust binary to parse the org-mode file."
-  [file-str]
-  (let [res (sh/sh PARSER-PATH file-str)]
+  [config file-str]
+  (let [parser (config :parser-path)
+        res    (sh/sh parser file-str)]
     (if-not (= (res :exit) 0)
       (prn "Orgize failed to parse file." file-str res)
       (res :out))))
@@ -72,7 +81,7 @@
   "Pulls :curr-file from config > parses > put into config with new vals"
   [config]
   (let [file-orig   (-> config :curr-file :original)
-        file-parsed (->> file-orig slurp parse!)
+        file-parsed (->> file-orig slurp (parse! config))
         file-name   (-> file-orig .getName (s/split #"\.") (first))]
     (config/update-curr-file config {:name file-name :as-json file-parsed})))
 

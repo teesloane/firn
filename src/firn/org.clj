@@ -45,3 +45,4 @@
   [tree name]
   (let [headline (get-headline tree name)]
     (update headline :children (fn [d] (filter #(not= (:type %) "title") d)))))
+
