@@ -1,0 +1,35 @@
+#+TITLE: Editor Setup
+#+DATE_CREATED: <2020-03-27 Fri>
+#+DATE_UPDATED: <2020-03-27 20:51>
+#+FILE_UNDER: docs
+#+LAYOUT: docs
+
+* TODO The Ideal Folder Structure.
+Flat format.
+* TODO Using Org-Roam
+* TODO Relative links
+* TODO Media & Attachments
+* TODO Setting up elisp locals.
+** How To get =DATE_UPDATED= on every file in emacs.
+
+- Ensure that you have a =#+DATE_UPDATED= keyword in your org-files:
+
+#+BEGIN_SRC org
+#+TITLE: Firn
+#+DATE_CREATED: 2020-03-01--09-53
+#+DATE_UPDATED: <2020-03-22 13:24>
+#+END_SRC
+
+- In your wiki directory, add a =.dir-locals= file with these contents
+
+#+BEGIN_SRC elisp
+((org-mode
+  (time-stamp-pattern . "8/DATE_UPDATED:[ 	]+\\\\?[\"<]+%:y-%02m-%02d %02H:%02M\\\\?[\">]")
+  (org-link-file-path-type . relative)))
+#+END_SRC
+
+- Somewhere in your config, add a hook to run emacs' time-stamp function on save:
+
+#+BEGIN_SRC elisp
+(add-hook 'write-file-hooks 'time-stamp) ; update timestamp, if it exists, when saving
+#+END_SRC
