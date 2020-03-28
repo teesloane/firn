@@ -36,7 +36,7 @@
       (do
         (if layout
           (println "\n⚠ File:" curr-file-name "says it uses a layout of" layout "but no corresponding layout file exists in _firn/layouts")
-          (println "\n⚠ File:" curr-file-name "does not have #+LAYOUT key and no default layout file was found."))
+          (println "\n⚠ File:" curr-file-name "does not have #+FIRN_LAYOUT key and no default layout file was found."))
         (println "☝ Resorting to internal template!\n")
         internal-default-layout))))
 

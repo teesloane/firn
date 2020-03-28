@@ -2,7 +2,7 @@
 #+DATE_CREATED: <2020-03-25 Wed>
 #+DATE_UPDATED: <2020-03-24 14:20>
 #+FILE_UNDER: docs
-#+LAYOUT: docs
+#+FIRN_LAYOUT: docs
 
 Org files are parsed using a parser library called [[https://github.com/PoiScript/orgize][Orgize]]. When you create a new
 site with Firn, you will find the parser binary in =_firn/bin/=.

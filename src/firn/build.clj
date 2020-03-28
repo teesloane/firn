@@ -106,7 +106,7 @@
 (defn htmlify-file
   "Renders files according to their `layout` keyword."
   [config]
-  (let [layout   (keyword (config/get-keyword config "LAYOUT"))
+  (let [layout   (keyword (config/get-keyword config "FIRN_LAYOUT"))
         as-html  (when-not (config/file-is-private? config)
                    (layout/apply-template config layout))]
 

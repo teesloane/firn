@@ -4,49 +4,24 @@
 * What's this?
 
 Firn generates a website from your .org mode files. It's original intention was
-to support the building of a flat file wiki, but it has moved beyond that (for now.)
+to support the building of a flat file wiki (but can handle nested folders.)
 
 Currently, running the program on a directory of org files performs the
 following:
 
 - Reads all .org files in the directory recursively
-- Pulls layouts and partials into memory (from specified folders), from .clj
-  files with hiccup.
+- Load up layouts and partials and read these templates from hiccup files.
 - Iterates over files and runs them through [[https://github.com/PoiScript/orgize][Orgize]], then turns the resulting
   data into html.
   
 * Usage
 
-No out-of-the-box usage yet. Head to [[Developing]] and build an uberjar. Then run:
+No out-of-the-box usage yet. You're going to need emacs and a repl.
 
 #+BEGIN_SRC sh
 java -jar <path_to_code>/firn/target/uberjar/firn-0.1.0-SNAPSHOT-standalone.jar <path_to_content>
 #+END_SRC
 
-** How To get =DATE_UPDATED= on every file in emacs.
-
-- Ensure that you have a =#+DATE_UPDATED= keyword in your org-files:
-
-#+BEGIN_SRC org
-#+TITLE: Firn
-#+DATE_CREATED: 2020-03-01--09-53
-#+DATE_UPDATED: <2020-03-22 13:24>
-#+END_SRC
-
-- In your wiki directory, add a =.dir-locals= file with these contents
-
-#+BEGIN_SRC elisp
-((org-mode
-  (time-stamp-pattern . "8/DATE_UPDATED:[ 	]+\\\\?[\"<]+%:y-%02m-%02d %02H:%02M\\\\?[\">]")
-  (org-link-file-path-type . relative)))
-#+END_SRC
-
-- Somewhere in your config, add a hook to run emacs' time-stamp function on save:
-
-#+BEGIN_SRC elisp
-
-(add-hook 'write-file-hooks 'time-stamp) ; update timestamp, if it exists, when saving
-#+END_SRC
 
 * Assumptions / Limitations
 - the content _directory name_ (ex: "my_wiki") should not exist anywhere else in
@@ -56,40 +31,6 @@ java -jar <path_to_code>/firn/target/uberjar/firn-0.1.0-SNAPSHOT-standalone.jar 
 - Org mode links should be set to relative. You can probably do this with
   dir-locals and setting [[https://emacs.stackexchange.com/questions/32601/how-can-i-get-with-org-store-link-relative-path-instead-of-absolute][org-link-file-path-type]] to =relative=.
 
-* Layouts
-
-There is a very basic templating/layout system in place. When running =firn=, it looks
-for a =_layouts= directory. Currently, layouts are built with hiccup and are
-explicity passed the entire =config= object (the base of which can be see in
-[[file:src/firn/config.clj][config.clj]]).
-
-From there, you have acccess to the values that accumulate in the ~config~ map
-as the program runs over time.
-
-Firn currently requires you to have a =_layouts/default.clj= file. In its
-simplest form, it might look something like this.
-
-#+BEGIN_SRC  clojure
-(defn layout-default ;; < the name of this function is irrelevant.
-  "Renders a templates as if a project.
-  Someday this will become a macro. Maybe."
-  [config]
-  (let [{:keys [ head ]} (config :partials)
-        render                (config :render)
-        content               (-> config :curr-file :as-edn)]
-
-    (head
-     [:body
-      [:main
-       [:article
-        [:div (render content)]]
-       [:aside
-        [:div ""]
-        [:div ""]]]])))
-#+END_SRC
-
-Eventually, this might be replaced with some kind of macro (?). Using
-=read-string= is not exactly smart/safe probably.
 
 * Developing
 
@@ -111,6 +52,3 @@ To build a jar:
 #+BEGIN_SRC sh
 lein uberjar
 #+END_SRC
-
-Example usage:
-

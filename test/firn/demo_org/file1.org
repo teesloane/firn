@@ -1,5 +1,5 @@
 #+TITLE: sample_orgfile
-#+LAYOUT: default
+#+FIRN_LAYOUT: default
 
 * Headings <2020-03-27 Fri>
 :PROPERTIES:
