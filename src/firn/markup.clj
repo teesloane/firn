@@ -5,6 +5,12 @@
 
 ;; Renderers
 
+(defn date->html
+  [v]
+  (let [{:keys [year month day hour minute]} (v :start)]
+    [:span (str year "/" month "/" day
+                (when (and hour minute) hour ":" minute))]))
+
 
 (defn- src-block->html
   "Formats a org-mode src block.
@@ -70,7 +76,7 @@
                    (make-child :span)]
       "text"      [:span value]
       "cookie"    [:span.heading-cookie value]
-      "timestamp" [:span.heading-timestamp value]
+      "timestamp" [:span.heading-timestamp (date->html v)]
       "code"      [:code value]
       "verbatim"  [:code value]
       "link"      (link->html v)
@@ -84,12 +90,12 @@
   Some values don't get parsed (drawers) - yet. They return empty strings.
   Don't destructure! - it can create uneven maps from possible nil vals on `V`"
   [v]
-  (let [type              (get v :type)
-        children          (get v :children)
-        value             (get v :value)
-        ordered           (get v :ordered) ;; for lists
-        val               (if value (s/trim-newline value) value)
-        make-child        #(into [%] (map to-html children))]
+  (let [type       (get v :type)
+        children   (get v :children)
+        value      (get v :value)
+        ordered    (get v :ordered) ;; for lists
+        val        (if value (s/trim-newline value) value)
+        make-child #(into [%] (map to-html children))]
     (case type
       "document"      (make-child :div)
       "headline"      (make-child :div)
@@ -112,9 +118,9 @@
       "rule"          [:hr]
       "cookie"        [:span.cookie val]
       "text"          [:span val]
-      "timestamp"     [:span val] ;; TODO html constructor.
-      "keyword"       ""          ;; Don't parse
-      "comment-block" ""          ;; Don't parse
-      "drawer"        ""          ;; Don't parse
+      "timestamp"     (date->html v) ;; #_[:span val] ;; TODO html constructor.
+      "keyword"       ""           ;; Don't parse
+      "comment-block" ""           ;; Don't parse
+      "drawer"        ""           ;; Don't parse
       ;; default value. FIXME: Should have a debug value for verbose mode.
       "")))

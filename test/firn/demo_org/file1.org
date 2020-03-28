@@ -1,10 +1,13 @@
 #+TITLE: sample_orgfile
 #+LAYOUT: default
 
-* Headings
+* Headings <2020-03-27 Fri>
 :PROPERTIES:
 :foo: bar
 :END:
+
+and some stuff with a date: <2020-03-27 Fri>
+
 ** TODO Heading (2) with /keyword/
 ** TODO [#B] Heading 2 with priority
 *** Heading 3
