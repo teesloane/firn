@@ -10,7 +10,7 @@
             [firn.util :as u])
   (:gen-class))
 
-(defn- prepare-config
+(defn prepare-config
   "Takes a path to files (or CWD) and makes a config with it."
   [{:keys [path]}]
   (let [path   (if (empty? path) (.getPath fs/*cwd*) path)
@@ -63,8 +63,11 @@
         org-files     (u/find-files-by-ext files-dir "org") ;; could bail if this is empty...
         layouts-map   (u/file-list->key-file-map layout-files)]
 
-    (fs/mkdir (config :out-dirname))
-    (fs/copy-dir (config :media-dir) (config :out-media-dir))
+    (fs/mkdir (config :out-dirname)) ;; make _site
+
+    (when-not (fs/exists? (config :out-media-dir))
+      (fs/copy-dir (config :media-dir) (config :out-media-dir)))
+
     (assoc
      config :org-files org-files :layouts layouts-map :partials partials-map)))
 

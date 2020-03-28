@@ -21,13 +21,14 @@
 
 (defn main-runner
   [dir-to-build]
-  (fs/delete-dir (config-sample :firn-dir))
-  (build/all-files {:path dir-to-build}))
+  (let [config (build/prepare-config {:path dir-to-build})]
+    (fs/delete-dir (config :firn-dir))
+    (build/all-files {:path dir-to-build})))
 
 (main-runner wiki-dir)
-(main-runner test-dir)
+;; (main-runner test-dir)
 
-(build/new-site {:path test-dir})
+;; (build/new-site {:path test-dir})
 
 
 ;; (def sample
