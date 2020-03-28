@@ -43,7 +43,7 @@
       [:img {:src link-href}]
 
       (re-matches http-link-regex link-href)
-      [:a.external {:href link-href} link-val]
+      [:a.external {:href link-href :target "_blank"} link-val]
 
       :else
       [:a {:href link-href}])))
