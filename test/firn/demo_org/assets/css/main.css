@@ -140,7 +140,7 @@ img {
 
 /* Heading Keywords and Priority */
 
-.heading-priority {
+.title-priority {
   margin: -22px 0 0 -6px;
   font-size: 8px;
   min-width: 12px;
@@ -151,29 +151,29 @@ img {
 }
 
 
-.heading-priority__A {
+.title-priority__A {
   color: salmon;
 }
 
-.heading-priority__B {
+.title-priority__B {
   color: mediumseagreen;
 }
 
-.heading-priority__C {
+.title-priority__C {
   color: lightblue;
 }
 
-.heading-keyword > div {
+.title-keyword > div {
   font-size: 12px;
 }
 
-.heading-keyword__DONE {
+.title-keyword__DONE {
   font-size: 12px;
   margin-right: 4px;
   color: lightgrey;
 }
 
-.heading-keyword__TODO {
+.title-keyword__TODO {
   font-size: 12px;
   margin-right: 4px;
   color: seagreen;

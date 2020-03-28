@@ -16,6 +16,10 @@
   [& args]
   (apply println args))
 
+(defn str->keywrd
+  [& args]
+  (keyword (apply str args)))
+
 
 (defn find-files-by-ext
   "Traverses a directory for all files of a specific extension."

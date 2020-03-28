@@ -1,6 +1,7 @@
 (ns firn.markup
   "Namespace responsible for converted org-edn into html."
-  (:require [clojure.string :as s]))
+  (:require [clojure.string :as s]
+            [firn.util :as u]))
 
 
 ;; Renderers
@@ -10,7 +11,6 @@
   (let [{:keys [year month day hour minute]} (v :start)]
     [:span (str year "/" month "/" day
                 (when (and hour minute) hour ":" minute))]))
-
 
 (defn- src-block->html
   "Formats a org-mode src block.
@@ -55,24 +55,25 @@
       [:a {:href link-href}])))
 
 (defn- title->html
-  "Constructs titles - which can have additional values (keywords, priorities, etc)
+  "Constructs a headline title - with possible additional values
+  (keywords, priorities, timestamps -> can all be found in a headline.)
   That aren't found in the `children` values and so need special parsing."
   [v]
-  (let [level            (v :level)
-        typ              (v :type)
-        children         (v :children)
-        keywrd           (v :keyword)
-        priority         (v :priority)
-        value            (v :value)
-        heading-priority (keyword (str "span.heading-priority.heading-priority__" priority))
-        heading-keyword  (keyword (str "span.heading-keyword.heading-keyword__" keywrd))
-        h-level          (case level 1 :h1 2 :h2 3 :h3 4 :h4 5 :h5 :h6)
-        make-child       #(into [%] (map title->html children))]
+  (let [level          (v :level)
+        typ            (v :type)
+        children       (v :children)
+        keywrd         (v :keyword)
+        priority       (v :priority)
+        value          (v :value)
+        title-priority (u/str->keywrd "span.title-priority.title-priority__" priority)
+        title-keyword  (u/str->keywrd "span.title-keyword.title-keyword__" keywrd)
+        h-level        (case level 1 :h1 2 :h2 3 :h3 4 :h4 5 :h5 :h6)
+        make-child     #(into [%] (map title->html children))]
     (case typ
       "headline"  (make-child :div)
       "title"     [h-level
-                   (when keywrd [heading-keyword (str keywrd " ")])
-                   (when priority [heading-priority (str priority " ")])
+                   (when keywrd [title-keyword (str keywrd " ")])
+                   (when priority [title-priority (str priority " ")])
                    (make-child :span)]
       "text"      [:span value]
       "cookie"    [:span.heading-cookie value]
@@ -90,15 +91,17 @@
   Some values don't get parsed (drawers) - yet. They return empty strings.
   Don't destructure! - it can create uneven maps from possible nil vals on `V`"
   [v]
-  (let [type       (get v :type)
-        children   (get v :children)
-        value      (get v :value)
-        ordered    (get v :ordered) ;; for lists
-        val        (if value (s/trim-newline value) value)
-        make-child #(into [%] (map to-html children))]
+  (let [type           (get v :type)
+        children       (get v :children)
+        value          (get v :value)
+        ordered        (get v :ordered)                               ;; for lists
+        val            (if value (s/trim-newline value) value)
+        headline-level (get v :level)
+        headline-el    (u/str->keywrd "div.headline-" headline-level) ;; => :div.headline-n
+        make-child     #(into [%] (map to-html children))]
     (case type
       "document"      (make-child :div)
-      "headline"      (make-child :div)
+      "headline"      (make-child headline-el)
       "title"         (title->html v)
       "section"       (make-child :section)
       "paragraph"     (make-child :p)
@@ -118,9 +121,9 @@
       "rule"          [:hr]
       "cookie"        [:span.cookie val]
       "text"          [:span val]
-      "timestamp"     (date->html v) ;; #_[:span val] ;; TODO html constructor.
-      "keyword"       ""           ;; Don't parse
-      "comment-block" ""           ;; Don't parse
-      "drawer"        ""           ;; Don't parse
+      "timestamp"     (date->html v)
+      "keyword"       "" ;; Don't parse
+      "comment-block" "" ;; Don't parse
+      "drawer"        "" ;; Don't parse
       ;; default value. FIXME: Should have a debug value for verbose mode.
       "")))
