@@ -65,8 +65,12 @@
 
     (fs/mkdir (config :out-dirname)) ;; make _site
 
-    (when-not (fs/exists? (config :out-media-dir))
-      (fs/copy-dir (config :media-dir) (config :out-media-dir)))
+    ;; FIXME: These are not good - copying the entire attachment directory and the static folder.
+    (when-not (fs/exists? (config :out-attach-dir))
+      (fs/copy-dir (config :attach-dir) (config :out-attach-dir)))
+
+    (when-not (fs/exists? (config :static-out-dir))
+      (fs/copy-dir (config :static-dir) (config :static-out-dir)))
 
     (assoc
      config :org-files org-files :layouts layouts-map :partials partials-map)))

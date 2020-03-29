@@ -17,12 +17,17 @@ and some stuff with a date: <2020-03-27 Fri>
 ******* Heading 7
 * Some Links
 
+An image:
+
+[[file:attach/test-img.png]]
+
+[[file:attach/test-img.png][test image]]
+
 A =file:= link
 
 [[file:file2.org][File 2]]
 
 
-[[file:nested/file3.org][nested file 3]]
 * Tables
 
 |   1 |     2 |        3 | 4 |      5 |

@@ -21,20 +21,23 @@
 
 (defn link->html
   "Parses links from the org-tree.
-  Checks if a link is an HTTP link or File link."
+  Checks if a link is an HTTP link or File link.
+  FIXME: This is ripe for a refactor. But not too clever a refactor. Maybe."
   [v]
-  (let [img-file-regex  #"(file:)(.*)\.(jpg|JPG|gif|GIF|png)"
-        img-http-regex  #"(http:\/\/|https:\/\/)(.*)\.(jpg|JPG|gif|GIF|png)"
-        img-rel-regex   #"(\.(.*))\.(jpg|JPG|gif|GIF|png)"
-
-        org-file-regex  #"(file:)(.*)\.(org)"
-        http-link-regex #"https?:\/\/(?![^\" ]*(?:jpg|png|gif))[^\" ]+"
+  (println "V is" v)
+  (let [img-file-regex        #"(file:)(.*)\.(jpg|JPG|gif|GIF|png)"
+        img-http-regex        #"(http:\/\/|https:\/\/)(.*)\.(jpg|JPG|gif|GIF|png)"
+        img-rel-regex         #"(\.(.*))\.(jpg|JPG|gif|GIF|png)"
+        img-attach-regex      #"(download:)(.*)\.(jpg|JPG|gif|GIF|png)"
+        org-file-regex        #"(file:)(.*)\.(org)"
+        http-link-regex       #"https?:\/\/(?![^\" ]*(?:jpg|png|gif))[^\" ]+"
         ;; final src/href concat. This is a bit clunkly.
-        local-img-path  #(str "./" (nth %  2) "." (nth % 3))
-        file-path       #(str "./" (nth %  2) ".html")
+        local-img-path        #(str "./" (nth %  2) "." (nth % 3))
+        local-img-attach-path #(str "/" (nth % 2) "." (nth % 3))
+        file-path             #(str "./" (nth %  2) ".html")
         ;; html values
-        link-val        (get v :desc "missing")
-        link-href       (get v :path "missing href")]
+        link-val              (get v :desc "Missing link value.")
+        link-href             (get v :path "Missing HREF attribute.")]
     (cond
       (re-matches img-file-regex link-href)
       [:img {:src (local-img-path (re-matches img-file-regex link-href))}]
@@ -48,11 +51,18 @@
       (re-matches img-http-regex link-href)
       [:img {:src link-href}]
 
+      (re-matches img-attach-regex link-href)
+      [:img {:src (local-img-attach-path (re-matches img-attach-regex link-href))}]
+
       (re-matches http-link-regex link-href)
       [:a.external {:href link-href :target "_blank"} link-val]
 
       :else
       [:a {:href link-href}])))
+
+(link->html {:type "link", :path "download:attach/92/7B7DB1-4B0B-4189-8398-0495CFED0257/_20200328_193912Screen Shot 2020-03-28 at 7.39.03 PM.png"})
+
+(clojure.string/replace "The color is red" #" " "%20")
 
 (defn- title->html
   "Constructs a headline title - with possible additional values

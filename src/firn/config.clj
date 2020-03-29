@@ -15,8 +15,8 @@
   {
    :out-dirname   "_firn/_site"
    :out-dirpath   ""       ; cstrcted when default-config is made
-   :ignored-dirs  ["priv"]
-   :media-dir     "assets" ; org attachments to get copied into _site.
+   :ignored-dirs  ["priv"] ; Directories to ignore org files in.
+   :attach-dir    "attach" ; org attachments to get copied into _site.
    :layouts       {}       ; layouts loaded into memory
    :layouts-dir   ""       ; where layouts are stored.
    :partials-dir  ""       ; where partials are stored.
@@ -24,6 +24,8 @@
    :files-dirname nil
    :org-files     nil      ; a list of org files, added to as files get converted.
    :curr-file     curr-file})
+
+;; -- "Setters" For setting vlaues into the config.
 
 (defn update-curr-file
   "Merges new values into the :curr-file map"
@@ -80,12 +82,15 @@
    ex: /Users/tees/Dropbox/wiki"
   [files-dir]
   (merge starting-config
-         {:firn-dir      (str files-dir "/_firn")
-          :layouts-dir   (str files-dir "/_firn/layouts/")
-          :partials-dir  (str files-dir "/_firn/partials/")
-          :media-dir     (str files-dir "/" (starting-config :media-dir))
-          :out-media-dir (str files-dir "/_firn/_site/" (starting-config :media-dir))
-          :out-dirpath   (str files-dir "/" (starting-config :out-dirname))
-          :files-dir     files-dir
-          :files-dirname (-> files-dir (s/split #"/") last)
-          :parser-path   (str files-dir "/_firn/bin/parser")}))
+         {:firn-dir       (str files-dir "/_firn")
+          ;; this *-dir thing doesn't feel ...great
+          :layouts-dir    (str files-dir "/_firn/layouts/")
+          :partials-dir   (str files-dir "/_firn/partials/")
+          :static-dir     (str files-dir "/_firn/static/")
+          :static-out-dir (str files-dir "/_firn/_site/static/")
+          :attach-dir     (str files-dir "/" (starting-config :attach-dir))
+          :out-attach-dir (str files-dir "/_firn/_site/" (starting-config :attach-dir))
+          :out-dirpath    (str files-dir "/" (starting-config :out-dirname))
+          :files-dir      files-dir
+          :files-dirname  (-> files-dir (s/split #"/") last)
+          :parser-path    (str files-dir "/_firn/bin/parser")}))

@@ -1,6 +1,6 @@
 #+TITLE: Layout
 #+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-03-28 13:12>
+#+DATE_UPDATED: <2020-03-28 17:31>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: docs
 
@@ -84,7 +84,7 @@ content that can then be shared across layouts:
   [body]
   [:html
    [:head
-    [:link {:rel "stylesheet" :href "/assets/css/main.css"}]]
+    [:link {:rel "stylesheet" :href "/static/css/main.css"}]]
    body])
 #+END_SRC
 
