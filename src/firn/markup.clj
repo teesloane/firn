@@ -60,10 +60,6 @@
       :else
       [:a {:href link-href}])))
 
-(link->html {:type "link", :path "download:attach/92/7B7DB1-4B0B-4189-8398-0495CFED0257/_20200328_193912Screen Shot 2020-03-28 at 7.39.03 PM.png"})
-
-(clojure.string/replace "The color is red" #" " "%20")
-
 (defn- title->html
   "Constructs a headline title - with possible additional values
   (keywords, priorities, timestamps -> can all be found in a headline.)
