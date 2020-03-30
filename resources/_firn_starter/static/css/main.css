@@ -21,6 +21,22 @@ article {
   padding-right: 24px;
 }
 
+figure {
+  margin: 0;
+}
+
+figcaption {
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  padding: 4px 0px;
+  margin: 8px 0 4px;
+  font-family: Arial, sans-serif;
+}
+
+figcaption::before {
+  content: "◊"
+}
+
 .debug * {
   outline: 1px solid lavender;
 }

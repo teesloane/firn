@@ -19,40 +19,51 @@
   [{:keys [contents _language _arguments] :as _src-block}]
   [:pre contents])
 
+(defn img-link->figure
+  "Renders an image with a figure if the link has a :desc, otherwise, :img"
+  [{:keys [desc path]}]
+  (if desc
+    [:figure
+     [:img {:src path}]
+     [:figcaption desc]]
+    [:img {:src path}]))
+
 (defn link->html
   "Parses links from the org-tree.
   Checks if a link is an HTTP link or File link.
-  FIXME: This is ripe for a refactor. But not too clever a refactor. Maybe."
+  TODO: Cleanup a bit more someday."
   [v]
-  (println "V is" v)
-  (let [img-file-regex        #"(file:)(.*)\.(jpg|JPG|gif|GIF|png)"
-        img-http-regex        #"(http:\/\/|https:\/\/)(.*)\.(jpg|JPG|gif|GIF|png)"
-        img-rel-regex         #"(\.(.*))\.(jpg|JPG|gif|GIF|png)"
-        img-attach-regex      #"(download:)(.*)\.(jpg|JPG|gif|GIF|png)"
-        org-file-regex        #"(file:)(.*)\.(org)"
-        http-link-regex       #"https?:\/\/(?![^\" ]*(?:jpg|png|gif))[^\" ]+"
-        ;; final src/href concat. This is a bit clunkly.
-        local-img-path        #(str "./" (nth %  2) "." (nth % 3))
-        local-img-attach-path #(str "/" (nth % 2) "." (nth % 3))
-        file-path             #(str "./" (nth %  2) ".html")
-        ;; html values
-        link-val              (get v :desc "Missing link value.")
-        link-href             (get v :path "Missing HREF attribute.")]
+  (let [link-val        (get v :desc)
+        link-href       (get v :path "Missing HREF attribute.")
+        ;; img regexs / ctor fns.
+        img-file-regex  #"((file:)|(download:))(.*)\.(jpg|JPG|gif|GIF|png)"
+        img-http-regex  #"(http:\/\/|https:\/\/)(.*)\.(jpg|JPG|gif|GIF|png)"
+        img-rel-regex   #"(\.(.*))\.(jpg|JPG|gif|GIF|png)"
+        img-make-url    #(->> (re-matches img-file-regex link-href)
+                              (take-last 2)
+                              (s/join "."))
+        ;; file regexs / ctor fns
+        org-file-regex  #"(file:)(.*)\.(org)"
+        http-link-regex #"https?:\/\/(?![^\" ]*(?:jpg|png|gif))[^\" ]+"
+        file-path       #(str "./" (nth %  2) ".html")]
+
     (cond
+      ;; Images ---
+      ;; img file or attach: `file:` | `download:`
       (re-matches img-file-regex link-href)
-      [:img {:src (local-img-path (re-matches img-file-regex link-href))}]
+      (img-link->figure {:desc link-val :path (img-make-url)})
 
+      ;; relative: `../../foo.jpg`
       (re-matches img-rel-regex link-href)
-      [:img {:src link-href}]
+      (img-link->figure {:desc link-val :path link-href})
 
+      ;; a normal http image.
+      (re-matches img-http-regex link-href)
+      (img-link->figure {:desc link-val :path link-href})
+
+      ;; org files
       (re-matches org-file-regex link-href)
       [:a.internal {:href (file-path (re-matches org-file-regex link-href))} link-val]
-
-      (re-matches img-http-regex link-href)
-      [:img {:src link-href}]
-
-      (re-matches img-attach-regex link-href)
-      [:img {:src (local-img-attach-path (re-matches img-attach-regex link-href))}]
 
       (re-matches http-link-regex link-href)
       [:a.external {:href link-href :target "_blank"} link-val]

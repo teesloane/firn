@@ -1,6 +1,32 @@
 #+TITLE: sample_orgfile
 #+FIRN_LAYOUT: default
 
+* Image Tests                                                                   :ATTACH:
+:PROPERTIES:
+:ID:       ADC88028-FD31-4D0D-AE89-4FA5BB7D13E7
+:END:
+
+An org attach image:
+
+[[download:attach/AD/C88028-FD31-4D0D-AE89-4FA5BB7D13E7/_20200329_200052foo.png][Woah!]]
+
+A file image attachment with description:
+
+[[file:attach/test-img.png][Test image description!]]
+
+A file image without a description
+
+[[file:attach/_20200328_190456bike_tees_jamis_small.jpg][The Bike.]]
+
+Just a relative image link.
+
+[[./attach/test-img.png]]
+
+
+http image link
+
+https://wiki.xxiivv.com/media/diary/582.jpg
+
 * Headings <2020-03-27 Fri>
 :PROPERTIES:
 :foo: bar
@@ -17,17 +43,9 @@ and some stuff with a date: <2020-03-27 Fri>
 ******* Heading 7
 * Some Links
 
-An image:
-
-[[file:attach/test-img.png]]
-
-[[file:attach/test-img.png][test image]]
-
 A =file:= link
 
 [[file:file2.org][File 2]]
-
-
 * Tables
 
 |   1 |     2 |        3 | 4 |      5 |
