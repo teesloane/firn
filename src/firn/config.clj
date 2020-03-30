@@ -62,7 +62,7 @@
   "Returns true if a file meets the conditions of being 'private'
   Assumes the files has been read into memory and parsed to edn."
   [config]
-  (let [is-private?     (get-keyword config "PRIVATE")
+  (let [is-private?     (get-keyword config "FIRN_PRIVATE")
         file-path       (-> config :curr-file :original .getPath (s/split #"/"))
         in-priv-folder? (some (set file-path) (config :ignored-dirs))]
     (or
