@@ -51,7 +51,7 @@ sure org links are relative:
 
 When it comes to attachments:
 
-- It's recommended to put all images/attachments in a single folder  (your =:attach-dir=)
+- It's recommended to put all images/attachments in a single folder  (your =:dir-attach=)
 - =File:= links (to images, etc) are the best way to go for now.
   - pro: you can view images inline in graphical versions of emacs.
 - Org-attach can work, but isn't officially supported. If you do use it:

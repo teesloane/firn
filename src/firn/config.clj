@@ -3,27 +3,27 @@
             [firn.util :as u]))
 
 (def curr-file
-  {:name     nil
-   :original nil         ; the file as as javaFile object.
-   :org-title nil        ; the #+TITLE value.
-   :keywords nil         ; list of keywords at top of org file: #+TITLE:, #+CATEGORY, etc.
-   :as-json  nil         ; The org file, read as json and spat out by the rust binary.
-   :as-edn   nil         ; JSON of org file -> converted to a map.
-   :as-html  nil})       ; the html output
+  {:as-edn    nil   ; JSON of org file -> converted to a map.
+   :as-html   nil   ; the html output
+   :as-json   nil   ; The org file, read as json and spat out by the rust binary.
+   :keywords  nil   ; list of keywords at top of org file: #+TITLE:, #+CATEGORY, etc.
+   :name      nil   ; the file name
+   :org-title nil   ; the #+TITLE value.
+   :original  nil}) ; the file as as javaFile object.
+
 
 (def starting-config
-  {
-   :out-dirname   "_firn/_site"
-   :out-dirpath   ""       ; cstrcted when default-config is made
-   :ignored-dirs  ["priv"] ; Directories to ignore org files in.
-   :attach-dir    "attach" ; org attachments to get copied into _site.
-   :layouts       {}       ; layouts loaded into memory
-   :layouts-dir   ""       ; where layouts are stored.
-   :partials-dir  ""       ; where partials are stored.
-   :files-dir     nil      ; where org content lives.
-   :files-dirname nil
-   :org-files     nil      ; a list of org files, added to as files get converted.
-   :curr-file     curr-file})
+  {:curr-file     curr-file     ; the current file we are processing.
+   :dir-attach    "attach"      ; org attachments to get copied into _site.
+   :dir-files     nil           ; where org content lives.
+   :dir-layouts   ""            ; where layouts are stored.
+   :dir-partials  ""            ; where partials are stored.
+   :dirname-files nil           ; the name of directory where firn is run.
+   :dirname-out   "_firn/_site" ; the root dir of the compiled firn site.
+   :ignored-dirs  ["priv"]      ; Directories to ignore org files in.
+   :layouts       {}            ; layouts loaded into memory
+   :org-files     nil})         ; a list of org files, fetched when running setup.
+
 
 ;; -- "Setters" For setting vlaues into the config.
 
@@ -72,25 +72,23 @@
 (defn get-curr-file-keyword
   [config]
   (-> config
-      :curr-file
-      :keywords))
+     :curr-file
+     :keywords))
 
 ;; -- Default Config -----------------------------------------------------------
 
 (defn default
   "Assume that files-dir does NOT end in a `/`
    ex: /Users/tees/Dropbox/wiki"
-  [files-dir]
+  [dir-files]
   (merge starting-config
-         {:firn-dir       (str files-dir "/_firn")
-          ;; this *-dir thing doesn't feel ...great
-          :layouts-dir    (str files-dir "/_firn/layouts/")
-          :partials-dir   (str files-dir "/_firn/partials/")
-          :static-dir     (str files-dir "/_firn/static/")
-          :static-out-dir (str files-dir "/_firn/_site/static/")
-          :attach-dir     (str files-dir "/" (starting-config :attach-dir))
-          :out-attach-dir (str files-dir "/_firn/_site/" (starting-config :attach-dir))
-          :out-dirpath    (str files-dir "/" (starting-config :out-dirname))
-          :files-dir      files-dir
-          :files-dirname  (-> files-dir (s/split #"/") last)
-          :parser-path    (str files-dir "/_firn/bin/parser")}))
+         {:dir-firn        (str dir-files "/_firn")
+          :dir-layouts     (str dir-files "/_firn/layouts/")
+          :dir-partials    (str dir-files "/_firn/partials/")
+          :dir-static      (str dir-files "/_firn/static/")
+          :dir-attach      (str dir-files "/" (starting-config :dir-attach))
+          :dir-site-static (str dir-files "/_firn/_site/static/")
+          :dir-site-attach (str dir-files "/_firn/_site/" (starting-config :dir-attach))
+          :dir-files       dir-files
+          :dirname-files   (-> dir-files (s/split #"/") last) ;; the name of the dir where files are.
+          :parser-path     (str dir-files "/_firn/bin/parser")}))

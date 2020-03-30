@@ -23,12 +23,12 @@
   for cases where a file is `nested/several/layers/deep.org.`
   Basically, swaps out the `.org` -> `.html` and orig-dir -> orig-dir+output-dir.
   Returns the file name as a string."
-  [{:keys [out-dirname files-dirname curr-file]}]
+  [{:keys [dirname-out dirname-files curr-file]}]
   (let [curr-file-path (-> curr-file :original .getPath)
-        out-comb       (str files-dirname "/" out-dirname)]
+        out-comb       (str dirname-files "/" dirname-out)]
     (-> curr-file-path
         (s/replace #"\.org" ".html")
-        (s/replace (re-pattern files-dirname) (str out-comb))))) ;; < str to make linter happy.
+        (s/replace (re-pattern dirname-files) (str out-comb))))) ;; < str to make linter happy.
 
 
 (defn new-site
@@ -40,10 +40,10 @@
   (let [new-config      (-> cmds prepare-config)
         existing-config (first args)
         config          (if (nil? cmds) existing-config new-config)]
-     (if (fs/exists? (config :firn-dir))
+     (if (fs/exists? (config :dir-firn))
        (u/print-err! "A _firn directory already exists.")
        (do
-         (fs/copy-dir (io/resource "_firn_starter") (config :firn-dir))
+         (fs/copy-dir (io/resource "_firn_starter") (config :dir-firn))
          ;; used to be doing the following, when just copying the parser and
          ;; manually mkdirs... might have to revert to this:
          ;; b9259f7 * origin/feat/improve-templating Fix: vendor parser + move it to _firn/bin in setup
@@ -54,23 +54,23 @@
 (defn setup
   "Creates folders for output, slurps in layouts and partials.
   NOTE: should slurp/mkdir/copy-dir be wrapped in try-catches? if-err handling?"
-  [{:keys [layouts-dir partials-dir files-dir] :as config}]
-  (when-not (fs/exists? (config :firn-dir)) (new-site nil config))
+  [{:keys [dir-layouts dir-partials dir-files] :as config}]
+  (when-not (fs/exists? (config :dir-firn)) (new-site nil config))
 
-  (let [layout-files  (u/find-files-by-ext layouts-dir "clj")
-        partial-files (u/find-files-by-ext partials-dir "clj")
+  (let [layout-files  (u/find-files-by-ext dir-layouts "clj")
+        partial-files (u/find-files-by-ext dir-partials "clj")
         partials-map  (u/file-list->key-file-map partial-files)
-        org-files     (u/find-files-by-ext files-dir "org") ;; could bail if this is empty...
+        org-files     (u/find-files-by-ext dir-files "org") ;; could bail if this is empty...
         layouts-map   (u/file-list->key-file-map layout-files)]
 
-    (fs/mkdir (config :out-dirname)) ;; make _site
+    (fs/mkdir (config :dirname-out)) ;; make _site
 
     ;; FIXME: These are not good - copying the entire attachment directory and the static folder.
-    (when-not (fs/exists? (config :out-attach-dir))
-      (fs/copy-dir (config :attach-dir) (config :out-attach-dir)))
+    (when-not (fs/exists? (config :dir-site-attach))
+      (fs/copy-dir (config :dir-attach) (config :dir-site-attach)))
 
-    (when-not (fs/exists? (config :static-out-dir))
-      (fs/copy-dir (config :static-dir) (config :static-out-dir)))
+    (when-not (fs/exists? (config :dir-site-static))
+      (fs/copy-dir (config :dir-static) (config :dir-site-static)))
 
     (assoc
      config :org-files org-files :layouts layouts-map :partials partials-map)))
