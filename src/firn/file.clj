@@ -68,7 +68,7 @@
   Assumes the files has been read into memory and parsed to edn."
   [config f]
   (let [is-private?     (get-keyword f "FIRN_PRIVATE")
-        file-path       (f :path)
+        file-path       (-> f :path (s/split #"/"))
         in-priv-folder? (some (set file-path) (config :ignored-dirs))]
     (or
      (some? in-priv-folder?)
