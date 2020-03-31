@@ -30,7 +30,6 @@
         (s/replace #"\.org" ".html")
         (s/replace (re-pattern dirname-files) (str out-comb))))) ;; < str to make linter happy.
 
-
 (defn new-site
   "Creates the folders needed for a new site in your wiki directory.
   Copies the _firn_starter from resources, into where you are running the cmd.
@@ -49,7 +48,6 @@
          ;; b9259f7 * origin/feat/improve-templating Fix: vendor parser + move it to _firn/bin in setup
          ;; (-> "parser/bin/parser" io/resource io/input-stream (io/copy parser-out-path))))
          (fs/chmod "+x" (config :parser-path))))))
-
 
 (defn setup
   "Creates folders for output, slurps in layouts and partials.
