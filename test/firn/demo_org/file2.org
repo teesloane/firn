@@ -3,7 +3,6 @@
 #+STATUS: active
 #+FIRN_LAYOUT: project
 
-
 * Meta
 :PROPERTIES:
 :date_completed: ?

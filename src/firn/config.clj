@@ -97,6 +97,7 @@
           :dir-partials    (str dir-files "/_firn/partials/")
           :dir-static      (str dir-files "/_firn/static/")
           :dir-attach      (str dir-files "/" (starting-config :dir-attach))
+          :dir-site        (str dir-files "/_firn/_site/")
           :dir-site-static (str dir-files "/_firn/_site/static/")
           :dir-site-attach (str dir-files "/_firn/_site/" (starting-config :dir-attach))
           :dir-files       dir-files

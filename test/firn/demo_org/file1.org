@@ -1,4 +1,4 @@
-#+TITLE: sample_orgfile
+#+TITLE: Sample File!
 #+FIRN_LAYOUT: default
 
 * Image Tests                                                                   :ATTACH:
@@ -46,6 +46,9 @@ and some stuff with a date: <2020-03-27 Fri>
 A =file:= link
 
 [[file:file2.org][File 2]]
+
+[[file:subdir/file3.org][foo3]]
+
 * Tables
 
 |   1 |     2 |        3 | 4 |      5 |

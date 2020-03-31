@@ -21,8 +21,8 @@
 (defn get-layout
   "Checks if a layout for a project exists in the config map
   If it does, return the function value of the layout, otherwise the default template "
-  [config layout]
-  (let [curr-file-name (-> config :curr-file :name)
+  [config file layout]
+  (let [curr-file-name (file :name)
         file-layout    (get-in config [:layouts layout])
         default-layout (-> config :layouts :default)]
     (cond
@@ -43,19 +43,19 @@
 (defn render
   "Responsible for rendering org content in layouts."
   ;; Render the whole file.
-  ([config]
-   (let [org-tree (-> config :curr-file :as-edn)
+  ([file]
+   (let [org-tree (file :as-edn)
          yield    (markup/to-html org-tree)] ;; this has lots of nil vals in it.
      yield))
 
-  ([config headline-name]
-   (let [org-tree (-> config :curr-file :as-edn)
+  ([file headline-name]
+   (let [org-tree (file :as-edn)
          headline (org/get-headline org-tree headline-name)]
      (markup/to-html headline)))
 
   ;; pass in a keyword to retrieve some munged piece of the data
-  ([config headline-name piece]
-   (let [org-tree         (-> config :curr-file :as-edn)
+  ([file headline-name piece]
+   (let [org-tree         (file :as-edn)
          headline         (org/get-headline org-tree headline-name)
          headline-content (org/get-headline-content org-tree headline-name)]
      (case piece
@@ -68,15 +68,16 @@
 
 (defn prepare-layout
   "Pass functions needed for rendering to configs."
-  [config]
-  {:render   (partial render config)
+  [config file]
+  {:render   (partial render file)
    :title    (-> config :curr-file :org-title)
+   :site-map (config :site-map)
    :partials (config :partials)
-   :yield    (render config)
+   :yield    (render file)
    :config   config})
 
 (defn apply-layout
   "If a file has a template, render the file with it, or use the default layout"
-  [config layout]
-  (let [selected-layout (get-layout config layout)]
-    (h/html (selected-layout (prepare-layout config)))))
+  [config file layout]
+  (let [selected-layout (get-layout config file layout)]
+    (h/html (selected-layout (prepare-layout config file)))))

@@ -1,5 +1,5 @@
 (defn project
-  [{:keys [render title partials]}]
+  [{:keys [site-map render title partials]}]
   (let [{:keys [head nav]} partials]
     (head
      [:body

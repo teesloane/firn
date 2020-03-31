@@ -84,13 +84,13 @@
       (res :out))))
 
 ;; FIXME: remove
-(defn read-file
-  "Pulls :curr-file from config > parses > put into config with new vals"
-  [config]
-  (let [file-orig   (-> config :curr-file :original)
-        file-parsed (->> file-orig slurp (parse! config))
-        file-name   (-> file-orig .getName (s/split #"\.") (first))]
-    (config/update-curr-file config {:name file-name :as-json file-parsed})))
+#_(defn read-file
+    "Pulls :curr-file from config > parses > put into config with new vals"
+    [config]
+    (let [file-orig   (-> config :curr-file :original)
+          file-parsed (->> file-orig slurp (parse! config))
+          file-name   (-> file-orig .getName (s/split #"\.") (first))]
+      (config/update-curr-file config {:name file-name :as-json file-parsed})))
 
 (defn process-file
   [config f]
@@ -100,58 +100,80 @@
         as-edn   (-> as-json (json/parse-string true))
         new-file (file/change new-file {:as-json as-json :as-edn as-edn})
         new-file (file/change new-file {:keywords  (file/get-keywords new-file)
-                                        :org-title (file/get-keyword new-file "TITLE")})
-        new-file (file/htmlify config new-file)]
+                                        :org-title (file/get-keyword new-file "TITLE")})]
     new-file))
+        ;; new-file (file/htmlify config new-file)]
+    ;; (prn "NEW FILE IS" new-)
 
 ;; FIXME: remove
-(defn dataify-file
-  "Converts an org file into a bunch of data."
-  [config]
-  (let [file-json (-> config :curr-file :as-json)
-        file-edn  (-> file-json (json/parse-string true))]
-    (config/update-curr-file config {:as-edn file-edn})))
+#_(defn dataify-file
+    "Converts an org file into a bunch of data."
+    [config]
+    (let [file-json (-> config :curr-file :as-json)
+          file-edn  (-> file-json (json/parse-string true))]
+      (config/update-curr-file config {:as-edn file-edn})))
 
 ;; FIXME: remove
-(defn munge-file
-  "After dataify-file,  we extract information and store it in curr-file."
-  [config]
-  (config/update-curr-file
-   config
-   {:keywords    (config/get-keywords config)
-    :org-title   (config/get-keyword config "TITLE")}))
+#_(defn munge-file
+    "After dataify-file,  we extract information and store it in curr-file."
+    [config]
+    (config/update-curr-file
+     config
+     {:keywords    (config/get-keywords config)
+      :org-title   (config/get-keyword config "TITLE")}))
 
 ;; FIXME: remove
-(defn htmlify-file
-  "Renders files according to their `layout` keyword."
-  [config]
-  (let [layout   (keyword (config/get-keyword config "FIRN_LAYOUT"))
-        as-html  (when-not (config/file-is-private? config)
-                   (layout/apply-layout config layout))]
+#_(defn htmlify-file
+    "Renders files according to their `layout` keyword."
+    [config]
+    (let [layout   (keyword (config/get-keyword config "FIRN_LAYOUT"))
+          as-html  (when-not (config/file-is-private? config)
+                     (layout/apply-layout config layout))]
 
-    (config/update-curr-file config {:as-html as-html})))
+      (config/update-curr-file config {:as-html as-html})))
 
 ;; FIXME: migrate to file namespace.
-(defn write-file
-  "Takes (file-)config input and writes html to output."
-  [{:keys [curr-file] :as config}]
-  (let [out-file-name  (build-file-outpath config)
-        out-html       (curr-file :as-html)]
-    (when-not (config/file-is-private? config)
-      (io/make-parents out-file-name)
-      (spit out-file-name out-html))))
+;; (defn write-file
+;;   "Takes (file-)config input and writes html to output."
+;;   [{:keys [curr-file] :as config}]
+;;   (let [out-file-name  (build-file-outpath config)
+;;         out-html       (curr-file :as-html)]
+;;     (when-not (config/file-is-private? config)
+;;       (io/make-parents out-file-name)
+;;       (spit out-file-name out-html))))
+
+;; (defn write-file-2
+;;   "Takes (file-)config input and writes html to output."
+;;   [config file]
+;;   (let [out-file-name  (str (config :dir-firn) (file :path-web) ".html" ) #_(build-file-outpath config)
+;;         out-html       (file :as-html)]
+;;     (when-not (file/is-private? config file)
+;;       (io/make-parents out-file-name)
+;;       (spit out-file-name out-html))))
+
+(defn write-files
+  "Takes a config, of which we can presume as :processed-files.
+  Iterates on these files, and writes them to html using layouts."
+  [config]
+  (doseq [f (config :processed-files)]
+    (let [out-file-name (str (config :dir-site) (f :path-web) ".html")
+          out-file      (file/htmlify config f)
+          out-html      (out-file :as-html)]
+      (when-not (file/is-private? config f)
+        (io/make-parents out-file-name)
+        (spit out-file-name out-html)))))
 
 ;; FIXME: remove
-(defn single-file
-  "Processes a single file, as stored in the config :org-files"
-  [config f]
-  (-> config
-     (config/set-curr-file-original f)
-     (read-file)
-     (dataify-file)
-     (munge-file)
-     (htmlify-file)
-     (write-file)))
+;; (defn single-file
+;;   "Processes a single file, as stored in the config :org-files"
+;;   [config f]
+;;   (-> config
+;;      (config/set-curr-file-original f)
+;;      (read-file)
+;;      (dataify-file)
+;;      (munge-file)
+;;      (htmlify-file)
+;;      (write-file)))
 
 
 (defn process-files
@@ -159,28 +181,31 @@
   logbooks, site-map, link-map, etc.
   This could be recursive, but am using atoms as it could
   be refactored in the future to be async and to use atoms."
-  [opts]
-  (let [config     (-> opts prepare-config setup)
-        site-links (atom [])
-        site-logs  (atom []) ;; TODO
-        site-files (atom [])] ;; TODO
+  [config]
+  (let [; config     (-> opts prepare-config setup)
+        ;; site-links (atom [])
+        site-logs (atom []) ;; TODO
+        site-map  (atom [])] ;; TODO
     (loop [org-files (config :org-files)
            output    []]
       (if (empty? org-files)
-        (assoc config :processed-files output :site-links @site-links)
+        (assoc config :processed-files output :site-map @site-map)
 
         (let [next-file      (first org-files)
               processed-file (process-file config next-file)
               org-files      (rest org-files)
               output         (conj output processed-file)]
-          (swap! site-links conj {:path  (processed-file :path-web)
-                                  :title (processed-file :org-title)})
+          (prn "site map is " @site-map)
+          (swap! site-map conj {:path  (processed-file :path-web)
+                                :title (processed-file :org-title)})
           (recur org-files output))))))
+
 
 
 (defn all-files
   "Processes all files in the org-directory"
   [opts]
-  (let [config (-> opts prepare-config setup)]
-    (doseq [f (config :org-files)]
-      (single-file config f))))
+  (let [config      (-> opts prepare-config setup)]
+    (->> config
+       process-files
+       write-files)))
