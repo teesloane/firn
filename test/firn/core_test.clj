@@ -11,12 +11,11 @@
 (def config-sample (config/default test-dir))
 
 
-(defn main-runner-2
+(defn build-test-files
   [dir-to-build]
   (let [config (build/prepare-config {:path dir-to-build})]
     (fs/delete-dir (config :dir-firn))
     (build/all-files {:path dir-to-build})))
 
-(main-runner-2 wiki-dir)
-(main-runner-2 test-dir)
-
+(build-test-files wiki-dir)
+(build-test-files test-dir)
