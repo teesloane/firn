@@ -83,6 +83,7 @@
       (prn "Orgize failed to parse file." file-str res)
       (res :out))))
 
+;; FIXME: remove
 (defn read-file
   "Pulls :curr-file from config > parses > put into config with new vals"
   [config]
@@ -103,6 +104,7 @@
         new-file (file/htmlify config new-file)]
     new-file))
 
+;; FIXME: remove
 (defn dataify-file
   "Converts an org file into a bunch of data."
   [config]
@@ -110,6 +112,7 @@
         file-edn  (-> file-json (json/parse-string true))]
     (config/update-curr-file config {:as-edn file-edn})))
 
+;; FIXME: remove
 (defn munge-file
   "After dataify-file,  we extract information and store it in curr-file."
   [config]
@@ -118,6 +121,7 @@
    {:keywords    (config/get-keywords config)
     :org-title   (config/get-keyword config "TITLE")}))
 
+;; FIXME: remove
 (defn htmlify-file
   "Renders files according to their `layout` keyword."
   [config]
@@ -127,6 +131,7 @@
 
     (config/update-curr-file config {:as-html as-html})))
 
+;; FIXME: migrate to file namespace.
 (defn write-file
   "Takes (file-)config input and writes html to output."
   [{:keys [curr-file] :as config}]
@@ -136,6 +141,7 @@
       (io/make-parents out-file-name)
       (spit out-file-name out-html))))
 
+;; FIXME: remove
 (defn single-file
   "Processes a single file, as stored in the config :org-files"
   [config f]
@@ -156,9 +162,8 @@
   [opts]
   (let [config     (-> opts prepare-config setup)
         site-links (atom [])
-        site-logs  (atom [])
-        site-files (atom [])]
-        ;; org-files  (config :org-files)]
+        site-logs  (atom []) ;; TODO
+        site-files (atom [])] ;; TODO
     (loop [org-files (config :org-files)
            output    []]
       (if (empty? org-files)
@@ -170,21 +175,12 @@
               output         (conj output processed-file)]
           (swap! site-links conj {:path  (processed-file :path-web)
                                   :title (processed-file :org-title)})
-          (recur org-files output))))
-
-    ;; (for [f org-files]
-    ;;   (let [processed-f (process-file config f)]))
-    ;; (assoc config :processed-files (map #(process-file config %) org-files))
-    #_(for [f org-files])))
-
-       
-
-  
+          (recur org-files output))))))
 
 
 (defn all-files
   "Processes all files in the org-directory"
   [opts]
-  (let []
+  (let [config (-> opts prepare-config setup)]
     (doseq [f (config :org-files)]
       (single-file config f))))
