@@ -4,7 +4,7 @@
   This occurs by slurping in some layout files -- which are just `.clj` files, for now
   And then applying them inline.
 
-  NOTE: will change (apply-templates, especially) in the future:
+  NOTE: will change (apply-layouts, especially) in the future:
   ; a) probably can't compile down with GRAAL and
   ; b) eval is not a good idea, probably."
   (:require [firn.markup :as markup]
@@ -75,8 +75,7 @@
    :yield    (render config)
    :config   config})
 
-;; FIXME rename this to `apply-layout`
-(defn apply-template
+(defn apply-layout
   "If a file has a template, render the file with it, or use the default layout"
   [config layout]
   (let [selected-layout (get-layout config layout)]

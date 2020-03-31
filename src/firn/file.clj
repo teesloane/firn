@@ -79,5 +79,5 @@
   [config f]
   (let [layout   (get-keyword f "FIRN_LAYOUT")
         as-html  (when-not (is-private? config f)
-                   (layout/apply-template config layout))]
+                   (layout/apply-layout config layout))]
     (change f {:as-html as-html})))
