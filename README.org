@@ -4,33 +4,28 @@
 * What's this?
 
 Firn generates a website from your .org mode files. It's original intention was
-to support the building of a flat file wiki (but can handle nested folders.)
+to support the building of a flat file wiki, but it can handle nested folders.
 
-Currently, running the program on a directory of org files performs the
-following:
+Currently, running the program on a directory of org files performs the following:
 
-- Reads all .org files in the directory recursively
+- Reads all .org files in the directory recursively.
 - Load up layouts and partials and read these templates from hiccup files.
 - Iterates over files and runs them through [[https://github.com/PoiScript/orgize][Orgize]], then turns the resulting
   data into html.
   
 * Usage
 
-No out-of-the-box usage yet. You're going to need emacs and a repl.
-
-#+BEGIN_SRC sh
-java -jar <path_to_code>/firn/target/uberjar/firn-0.1.0-SNAPSHOT-standalone.jar <path_to_content>
-#+END_SRC
-
+No out-of-the-box usage yet. You're going to need emacs, a repl and some coffee.
 
 * Assumptions / Limitations
+
 - the content _directory name_ (ex: "my_wiki") should not exist anywhere else in
   the path to a file in the wiki.
-  - for example, this is bad: /development/*my_wiki*/some_more_dirs/*my_wiki*/file_1.org
+  - for example, this is bad: =/development/my_wiki/some_more_dirs/my_wiki/file_1.org=
   - Unlikely that user's will have this, but it's currently a limitation nonetheless.
 - Org mode links should be set to relative. You can probably do this with
-  dir-locals and setting [[https://emacs.stackexchange.com/questions/32601/how-can-i-get-with-org-store-link-relative-path-instead-of-absolute][org-link-file-path-type]] to =relative=.
-
+  dir-locals and setting [[https://emacs.stackexchange.com/questions/32601/how-can-i-get-with-org-store-link-relative-path-instead-of-absolute][org-link-file-path-type]] to =relative=. Read [[file:docs/setup.org][setup]] for
+  more details.
 
 * Developing
 
@@ -39,7 +34,7 @@ Versions:
 - Clojure / Lein - 1.9.0
 - rustc 1.41.1
 
-Up and atom:
+Up and atom ⚛ :zap::
 
 #+BEGIN_SRC sh
 git clone git@github.com:theiceshelf/firn.git
@@ -48,7 +43,5 @@ lein deps
 cargo build
 #+END_SRC
 
-To build a jar:
-#+BEGIN_SRC sh
-lein uberjar
-#+END_SRC
+Then boot up your ol' trusty and run cider-jack-in on =firn.core-test= to tamper
+with the built in sample org wiki (=test/firn/demo_org/=)
