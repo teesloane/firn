@@ -75,6 +75,7 @@
    :yield    (render config)
    :config   config})
 
+;; FIXME rename this to `apply-layout`
 (defn apply-template
   "If a file has a template, render the file with it, or use the default layout"
   [config layout]

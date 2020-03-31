@@ -24,8 +24,14 @@
     (fs/delete-dir (config :dir-firn))
     (build/all-files {:path dir-to-build})))
 
+(defn main-runner-2
+  [dir-to-build]
+  (let [config (build/prepare-config {:path dir-to-build})]
+    (fs/delete-dir (config :dir-firn))
+    (build/process-files {:path dir-to-build})))
+
 ;; (main-runner wiki-dir)
-(main-runner test-dir)
+(main-runner-2 test-dir)
 
 
 

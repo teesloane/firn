@@ -51,6 +51,7 @@
   [config]
   (get-in config [:curr-file :as-edn :children 0 :children]))
 
+;; FIXME: remove in favour of file namespace
 (defn get-keyword
   [config keywrd]
   (->> config

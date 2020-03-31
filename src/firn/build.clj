@@ -6,6 +6,7 @@
             [clojure.string :as s]
             [firn.config :as config]
             [firn.layout :as layout]
+            [firn.file :as file]
             [me.raynes.fs :as fs]
             [firn.util :as u])
   (:gen-class))
@@ -90,6 +91,18 @@
         file-name   (-> file-orig .getName (s/split #"\.") (first))]
     (config/update-curr-file config {:name file-name :as-json file-parsed})))
 
+(defn process-file
+  [config f]
+  ;; munge the file: slowly filling it up, using let-shadowing, with data and metadata
+  (let [new-file (file/make config f)
+        as-json  (->> f slurp (parse! config))
+        as-edn   (-> as-json (json/parse-string true))
+        new-file (file/change new-file {:as-json as-json :as-edn as-edn})
+        new-file (file/change new-file {:keywords  (file/get-keywords new-file)
+                                        :org-title (file/get-keyword new-file "TITLE")})
+        new-file (file/htmlify config new-file)]
+    new-file))
+
 (defn dataify-file
   "Converts an org file into a bunch of data."
   [config]
@@ -134,9 +147,44 @@
      (htmlify-file)
      (write-file)))
 
+
+(defn process-files
+  "Receives config, processes all files and builds up site-data
+  logbooks, site-map, link-map, etc.
+  This could be recursive, but am using atoms as it could
+  be refactored in the future to be async and to use atoms."
+  [opts]
+  (let [config     (-> opts prepare-config setup)
+        site-links (atom [])
+        site-logs  (atom [])
+        site-files (atom [])]
+        ;; org-files  (config :org-files)]
+    (loop [org-files (config :org-files)
+           output    []]
+      (if (empty? org-files)
+        (assoc config :processed-files output :site-links @site-links)
+
+        (let [next-file      (first org-files)
+              processed-file (process-file config next-file)
+              org-files      (rest org-files)
+              output         (conj output processed-file)]
+          (swap! site-links conj {:path  (processed-file :path-web)
+                                  :title (processed-file :org-title)})
+          (recur org-files output))))
+
+    ;; (for [f org-files]
+    ;;   (let [processed-f (process-file config f)]))
+    ;; (assoc config :processed-files (map #(process-file config %) org-files))
+    #_(for [f org-files])))
+
+       
+
+  
+
+
 (defn all-files
   "Processes all files in the org-directory"
   [opts]
-  (let [config (-> opts prepare-config setup)]
+  (let []
     (doseq [f (config :org-files)]
       (single-file config f))))
