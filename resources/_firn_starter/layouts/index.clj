@@ -1,7 +1,6 @@
 (defn index
   [{:keys [site-map partials]}]
   (let [{:keys [head]} partials]
-    (println "site map is " site-map)
     (head
      [:body.page-index
       [:main

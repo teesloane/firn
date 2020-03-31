@@ -77,7 +77,6 @@
 (defn htmlify
   "Renders files according to their `layout` keyword."
   [config f]
-  (println "CONFIG SITEMAP IS " (config :site-map))
   (let [layout   (keyword (get-keyword f "FIRN_LAYOUT"))
         as-html  (when-not (is-private? config f)
                    (layout/apply-layout config f layout))]
