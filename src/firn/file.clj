@@ -63,6 +63,20 @@
   [f keywrd]
   (->> f get-keywords (u/find-first #(= keywrd (:key %))) :value))
 
+(defn keywords->map
+  "Converts an org-file's keywords into a map.
+   [{:type keyword, :key TITLE, :value Firn, :post_blank 0}
+    {:type keyword, :key DATE_CREATED, :value 2020-03-01--09-53, :post_blank 0}]
+                               Becomes 
+   {:title Firn, :date-created 2020-03-01--09-53, :status active, :firn-layout project}
+  "
+  [f]
+  (let [kw            (get-keywords f)
+        lower-case-it #(when % (s/lower-case %))
+        dash-it       #(when % (s/replace % #"_" "-"))
+        key->keyword  (fn [k] (-> k :key lower-case-it dash-it keyword))]
+    (into {} (map #(hash-map (key->keyword %) (% :value)) kw))))
+
 (defn is-private?
   "Returns true if a file meets the conditions of being 'private'
   Assumes the files has been read into memory and parsed to edn."

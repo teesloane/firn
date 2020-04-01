@@ -110,11 +110,12 @@
         (let [next-file      (first org-files)
               processed-file (process-file config next-file)
               org-files      (rest org-files)
-              output         (conj output processed-file)]
+              output         (conj output processed-file)
+              keyword-map    (file/keywords->map processed-file)
+              new-site-map   (merge keyword-map {:path (processed-file :path-web)})]
           ;; add to sitemap.
           (when-not (file/is-private? config processed-file)
-            (swap! site-map conj {:path  (processed-file :path-web)
-                                  :title (processed-file :org-title)}))
+            (swap! site-map conj new-site-map))
           (recur org-files output))))))
 
 
