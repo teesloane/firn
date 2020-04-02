@@ -1,6 +1,25 @@
 #+TITLE: Sample File!
 #+FIRN_LAYOUT: default
 
+
+* Meta
+:PROPERTIES:
+:date_completed: ?
+:date_started: <2020-03-01 Sun>
+:file_under: Projects
+:intent: Wiki
+:links: ?
+:slug: firn
+:state: active
+:END:
+:LOGBOOK:
+CLOCK: [2020-03-31 Tue 19:36]--[2020-03-31 Tue 19:46] =>  0:10
+CLOCK: [2020-03-31 Tue 13:15]--[2020-03-31 Tue 17:36] =>  4:21
+CLOCK: [2020-03-31 Tue 10:55]--[2020-03-31 Tue 12:17] =>  1:22
+CLOCK: [2020-03-30 Mon 14:14]--[2020-03-30 Mon 14:41] =>  0:27
+CLOCK: [2020-03-29 Sun 17:08]--[2020-03-29 Sun 20:31] =>  3:23
+CLOCK: [2020-03-28 Sat 15:45]--[2020-03-28 Sat 18:29] =>  2:44
+:END:
 * Image Tests                                                                   :ATTACH:
 :PROPERTIES:
 :ID:       ADC88028-FD31-4D0D-AE89-4FA5BB7D13E7
@@ -10,30 +29,18 @@ An org attach image:
 
 [[download:attach/AD/C88028-FD31-4D0D-AE89-4FA5BB7D13E7/_20200329_200052foo.png][Woah!]]
 
-A file image attachment with description:
+A file image attachment with description: [[file:attach/test-img.png][Test image description!]]
 
-[[file:attach/test-img.png][Test image description!]]
+A file image without a description [[file:attach/_20200328_190456bike_tees_jamis_small.jpg][The Bike.]]
 
-A file image without a description
+Just a relative image link [[./attach/test-img.png]]
 
-[[file:attach/_20200328_190456bike_tees_jamis_small.jpg][The Bike.]]
-
-Just a relative image link.
-
-[[./attach/test-img.png]]
-
-
-http image link
-
-https://wiki.xxiivv.com/media/diary/582.jpg
-
+http image link https://wiki.xxiivv.com/media/diary/582.jpg
 * Headings <2020-03-27 Fri>
 :PROPERTIES:
 :foo: bar
 :END:
-
 and some stuff with a date: <2020-03-27 Fri>
-
 ** TODO Heading (2) with /keyword/
 ** TODO [#B] Heading 2 with priority
 *** Heading 3
@@ -42,21 +49,11 @@ and some stuff with a date: <2020-03-27 Fri>
 ****** Heading 6
 ******* Heading 7
 * Some Links
-
-A =file:= link
-
-[[file:file2.org][File 2]]
-
-[[file:subdir/file3.org][foo3]]
-
+A =file:= link [[file:file2.org][File 2]]
 * Tables
+
+Some tables with texte markup in them
 
 |   1 |     2 |        3 | 4 |      5 |
 |-----+-------+----------+---+--------|
 | foo | =foo= | /italic/ |   | *bold* |
-* Text markup
-- *bold*
-- /italic/
-- _underline_
-- =code 1=
-- ~code 2~

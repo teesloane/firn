@@ -69,12 +69,14 @@
 (defn prepare-layout
   "Pass functions needed for rendering to configs."
   [config file]
-  {:render   (partial render file)
-   :title    (-> config :curr-file :org-title)
-   :site-map (config :site-map)
-   :partials (config :partials)
-   :yield    (render file)
-   :config   config})
+  {:render     (partial render file)
+   :title      (-> config :curr-file :org-title)
+   :site-map   (config :site-map)
+   :site-links (config :site-links)
+   :site-logs  (config :site-logs)
+   :partials   (config :partials)
+   :yield      (render file)
+   :config     config})
 
 (defn apply-layout
   "If a file has a template, render the file with it, or use the default layout"

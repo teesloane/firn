@@ -2,7 +2,8 @@
   "Functions for operating on an org file, read into memory."
   (:require [clojure.string :as s]
             [firn.util :as u]
-            [firn.layout :as layout]))
+            [firn.layout :as layout]
+            [firn.org :as org]))
 
 (defn strip-file-ext
   "Removes a file extension from a file path string.
@@ -87,6 +88,26 @@
     (or
      (some? in-priv-folder?)
      (some? is-private?))))
+
+
+(defn extract-metadata
+  "Iterates over a tree, and returns metadata for site-wide usage such as
+  links (for graphing between documents, tbd) and logbook entries.
+
+  TODO: could use the treeseq to, when looping over items, store `last-heading`,
+  and when encountering the next LOGBOOK, use the values from the headline to pull out
+  more metadata, such as the headline name, and associated tags, allowing to get tracking
+  on task type.
+  "
+  [file]
+  (let [org-tree    (file :as-edn)
+        tree-data   (tree-seq map? :children org-tree)
+        metadata    {:from-file (file :name) :from-file-path (file :path-web)}
+        logbook     (filter #(= "clock" (:type %)) tree-data)
+        links       (filter #(= "link"  (:type %)) tree-data)
+        logbook-aug (map #(merge % metadata) logbook)
+        links-aug   (map #(merge % metadata) links)]
+    {:links links-aug :logbook logbook-aug}))
 
 (defn htmlify
   "Renders files according to their `layout` keyword."

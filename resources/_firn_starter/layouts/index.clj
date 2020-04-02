@@ -1,5 +1,5 @@
 (defn index
-  [{:keys [site-map partials]}]
+  [{:keys [site-map partials site-logs]}]
   (let [{:keys [head]} partials
         projects       (filter #(= (% :firn-under) "project") site-map)
         research       (filter #(= (% :firn-under) "research") site-map)]
