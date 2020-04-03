@@ -2,20 +2,8 @@
   (:require [clojure.string :as s]
             [firn.util :as u]))
 
-;; FIXME: remove
-(def curr-file
-  {:as-edn    nil   ; JSON of org file -> converted to a map.
-   :as-html   nil   ; the html output
-   :as-json   nil   ; The org file, read as json and spat out by the rust binary.
-   :keywords  nil   ; list of keywords at top of org file: #+TITLE:, #+CATEGORY, etc.
-   :name      nil   ; the file name
-   :org-title nil   ; the #+TITLE value.
-   :original  nil}) ; the file as as javaFile object.
-
-
 (def starting-config
-  {:curr-file     curr-file     ; the current file we are processing. FIXME: remove
-   :dir-attach    "attach"      ; org attachments to get copied into _site.
+  {:dir-attach    "attach"      ; org attachments to get copied into _site.
    :dir-files     nil           ; where org content lives.
    :dir-layouts   ""            ; where layouts are stored.
    :dir-partials  ""            ; where partials are stored.
@@ -25,65 +13,6 @@
    :layouts       {}            ; layouts loaded into memory
    :org-files     nil})         ; a list of org files, fetched when running setup.
 
-
-;; -- "Setters" For setting vlaues into the config.
-
-;; FIXME: remove
-(defn update-curr-file
-  "Merges new values into the :curr-file map"
-  [config new-m]
-  (let [new-curr-file (merge (config :curr-file) new-m)]
-    (assoc config :curr-file new-curr-file)))
-
-;; FIXME: remove
-(defn set-curr-file-original
-  "Takes app-wide config and sets the current file being read on :curr-file"
-  [config file]
-  (update-curr-file config {:original file}))
-
-
-;; -- "Getter" for pulling values out of the config -----------------------------
-
-
-;; FIXME: remove
-(defn get-curr-file-name
-  [config]
-  (-> config :curr-file :name))
-
-;; FIXME: remove
-(defn get-keywords
-  "Gets keywords (ex: #+TITLE:) for a file."
-  [config]
-  (get-in config [:curr-file :as-edn :children 0 :children]))
-
-;; FIXME: remove in favour of file namespace
-(defn get-keyword
-  [config keywrd]
-  (->> config
-       get-keywords
-       (u/find-first #(= keywrd (:key %)))
-       :value))
-
-
-;; FIXME: remove in favour of file namespace
-(defn file-is-private?
-  "Returns true if a file meets the conditions of being 'private'
-  Assumes the files has been read into memory and parsed to edn."
-  [config]
-  (let [is-private?     (get-keyword config "FIRN_PRIVATE")
-        file-path       (-> config :curr-file :original .getPath (s/split #"/"))
-        in-priv-folder? (some (set file-path) (config :ignored-dirs))]
-    (or
-     (some? in-priv-folder?)
-     (some? is-private?))))
-
-
-;; FIXME: remove in favour of file namespace
-(defn get-curr-file-keyword
-  [config]
-  (-> config
-     :curr-file
-     :keywords))
 
 ;; -- Default Config -----------------------------------------------------------
 

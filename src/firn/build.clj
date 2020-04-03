@@ -98,8 +98,8 @@
   be refactored in the future to be async and to use atoms."
   [config]
   (let [
-        site-links (atom []) ; TODO
-        site-logs  (atom []) ; TODO
+        site-links (atom [])
+        site-logs  (atom [])
         site-map   (atom [])]
     (loop [org-files (config :org-files)
            output    []]
@@ -119,10 +119,9 @@
               file-metadata  (file/extract-metadata processed-file)]
           ;; add to sitemap.
           (when-not (file/is-private? config processed-file)
-            (swap! site-map conj new-site-map))
-
-          (swap! site-links concat @site-links (:links file-metadata))
-          (swap! site-logs concat @site-logs (:logbook file-metadata))
+            (swap! site-map conj new-site-map)
+            (swap! site-links concat @site-links (:links file-metadata))
+            (swap! site-logs concat @site-logs (:logbook file-metadata)))
           ;; add links and logs to site wide data.
           (recur org-files output))))))
 

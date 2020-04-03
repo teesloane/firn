@@ -89,7 +89,6 @@
      (some? in-priv-folder?)
      (some? is-private?))))
 
-
 (defn extract-metadata
   "Iterates over a tree, and returns metadata for site-wide usage such as
   links (for graphing between documents, tbd) and logbook entries.

@@ -62,7 +62,7 @@
        :title      (-> headline :children first  markup/to-html)
        :title-raw  (-> headline :children first :raw)
        :content    (markup/to-html headline-content)
-       :logbook    nil ;; TODO
+       :logbook    nil ;; TODO render logbook, possible with options, :logbook-heatmap, :logbook-graph.
        :properties nil ;; TODO
        headline))))
 
@@ -70,7 +70,7 @@
   "Pass functions needed for rendering to configs."
   [config file]
   {:render     (partial render file)
-   :title      (-> config :curr-file :org-title)
+   :title      (-> file :org-title)
    :site-map   (config :site-map)
    :site-links (config :site-links)
    :site-logs  (config :site-logs)
