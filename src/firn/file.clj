@@ -89,23 +89,41 @@
      (some? in-priv-folder?)
      (some? is-private?))))
 
+(defn extract-metadata-logbook-helper
+  "Extracts the logbook and associates the parent headline's metadata with it.
+  Because we are dealing with a flattened tree sequence we have to loop through items to
+  keep track of headline values that precede a logbook. This is easier and more performant
+  than searching an entire edn-tree of headings to see if they have a logbook to associate with.
+  ... I think. ┬──┬◡ﾉ(° -°ﾉ)"
+  [tree-seq]
+  (loop [tree-items    tree-seq
+         output        []
+         last-headline nil]
+    (if (empty? tree-items)
+      output
+      ;; if the item is a heading, store it for the next loop item to possibly access.
+      (let [curr-item          (first tree-items)
+            headline-val       (if (= (:type curr-item) "headline") curr-item last-headline)
+            remaining-items    (rest tree-items)
+            headline-meta-data {:from-headline (-> headline-val :children first :raw)} ;; raw headline for now.
+            logbook-aug        #(merge % headline-meta-data)
+            new-output         (if (= (:type curr-item) "clock")
+                                (conj output (logbook-aug curr-item))
+                                output)]
+        (recur remaining-items new-output headline-val)))))
+
+
 (defn extract-metadata
   "Iterates over a tree, and returns metadata for site-wide usage such as
-  links (for graphing between documents, tbd) and logbook entries.
-
-  TODO: could use the treeseq to, when looping over items, store `last-heading`,
-  and when encountering the next LOGBOOK, use the values from the headline to pull out
-  more metadata, such as the headline name, and associated tags, allowing to get tracking
-  on task type.
-  "
+  links (for graphing between documents, tbd) and logbook entries."
   [file]
-  (let [org-tree    (file :as-edn)
-        tree-data   (tree-seq map? :children org-tree)
-        metadata    {:from-file (file :name) :from-file-path (file :path-web)}
-        logbook     (filter #(= "clock" (:type %)) tree-data)
-        links       (filter #(= "link"  (:type %)) tree-data)
-        logbook-aug (map #(merge % metadata) logbook)
-        links-aug   (map #(merge % metadata) links)]
+  (let [org-tree      (file :as-edn)
+        tree-data     (tree-seq map? :children org-tree)
+        file-metadata {:from-file (file :name) :from-file-path (file :path-web)}
+        links         (filter #(= "link"  (:type %)) tree-data)
+        logbook       (extract-metadata-logbook-helper tree-data)
+        logbook-aug   (map #(merge % file-metadata) logbook)
+        links-aug     (map #(merge % file-metadata) links)]
     {:links links-aug :logbook logbook-aug}))
 
 (defn htmlify
