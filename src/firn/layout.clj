@@ -74,6 +74,8 @@
    :site-map   (config :site-map)
    :site-links (config :site-links)
    :site-logs  (config :site-logs)
+   :file-logs  (file :logbook)
+   :file-links (file :links)
    :partials   (config :partials)
    :yield      (render file)
    :config     config})

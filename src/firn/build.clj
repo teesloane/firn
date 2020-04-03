@@ -71,12 +71,15 @@
 (defn process-file
   [config f]
   ;; munge the file: slowly filling it up, using let-shadowing, with data and metadata
-  (let [new-file (file/make config f)
-        as-json  (->> f slurp (parse! config))
-        as-edn   (-> as-json (json/parse-string true))
-        new-file (file/change new-file {:as-json as-json :as-edn as-edn})
-        new-file (file/change new-file {:keywords  (file/get-keywords new-file)
-                                        :org-title (file/get-keyword new-file "TITLE")})]
+  (let [new-file      (file/make config f)
+        as-json       (->> f slurp (parse! config))
+        as-edn        (-> as-json (json/parse-string true))
+        new-file      (file/change new-file {:as-json as-json :as-edn as-edn})
+        file-metadata (file/extract-metadata new-file)
+        new-file      (file/change new-file {:keywords  (file/get-keywords new-file)
+                                             :org-title (file/get-keyword new-file "TITLE")
+                                             :links     (file-metadata :links)
+                                             :logbook   (file-metadata :logbook)})]
     new-file))
 
 (defn write-files
