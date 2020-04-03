@@ -66,8 +66,8 @@
        :properties nil ;; TODO
        headline))))
 
-(defn prepare-layout
-  "Pass functions needed for rendering to configs."
+(defn prepare
+  "Prepare functions and data to be available in layout functions."
   [config file]
   {:render     (partial render file)
    :title      (-> file :org-title)
@@ -84,4 +84,4 @@
   "If a file has a template, render the file with it, or use the default layout"
   [config file layout]
   (let [selected-layout (get-layout config file layout)]
-    (h/html (selected-layout (prepare-layout config file)))))
+    (h/html (selected-layout (prepare config file)))))

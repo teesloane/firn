@@ -1,6 +1,6 @@
 #+TITLE: Layout
 #+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-03-28 17:31>
+#+DATE_UPDATED: <2020-04-03 16:25>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: docs
 
@@ -116,3 +116,27 @@ View the code block below to see the multiple ways of using the =render= functio
 ;; Render the contents of the headline - ie, everything but the title "My Tasks".
 [:div (render "My Tasks" :content)]]
 #+END_SRC
+
+* How can I access data in my layouts?
+
+Currently, you can also access some site-wide meta-data in your layouts, as well as
+file-specific meta-data. Example meta-data:
+
+- All logbooks across all files.
+- All links across all files (which might be ideal for say... setting up a link graph.)
+
+The =prepare= [[file:../src/firn/layout.clj::69][function]] in the =layout= namespace sets up layouts to have access
+to functions and data:
+
+| Function/Data | Intent                                       | Data-type |
+|---------------+----------------------------------------------+-----------|
+| render        | Enables rendering parts of an org file.      | function  |
+| title         | The org mode file.                           | string    |
+| site-map      | A list of all files on the wiki              | list      |
+| site-links    | A list of all links across all documents     | list      |
+| site-logs     | A list of ALL logbook entries.               | list      |
+| file-logs     | A list of logbooks entries per file.         | list      |
+| file-links    | A list of links per file                     | list      |
+| partials      | a list of partials in your =partials= folder | list      |
+| yield         | Your entire org file, rendered to html       | html      |
+| config        | The site wide config.                        | map       |
