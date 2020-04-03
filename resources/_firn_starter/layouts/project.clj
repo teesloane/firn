@@ -1,15 +1,14 @@
 (defn project
   [{:keys [site-map render title partials file-logs]}]
-  (prn "file logs are " file-logs)
   (let [{:keys [head nav]} partials]
     (head
-     [:body
+     [:body.baskerville.lh-copy
       (nav)
-      [:main
-       [:article
+      [:main.flex.min-h-100
+       [:article.br.pa4.w-40
         [:h1 title]
         [:div (render "Notes" :content)]]
-       [:aside
+       [:aside.br.pa4.w-20
         [:details {:open "true"}
          [:summary  "Resources"]
          [:div (render "Resources" :content)]]

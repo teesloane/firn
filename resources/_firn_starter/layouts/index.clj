@@ -5,7 +5,7 @@
         research       (filter #(= (% :firn-under) "research") site-map)]
     (head
      [:body.page-index
-      [:main
+      [:main.flex.pa4.sans-serif
        [:section.flex.flex-column.center
         [:h3 "Projects and Experiments"]
         ;; Projects
