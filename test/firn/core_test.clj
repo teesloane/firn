@@ -11,28 +11,11 @@
 (def config-sample (config/default test-dir))
 
 
-(defn single-file-runner
-  "Run the file conversion on a single file."
-  []
-  (fs/delete-dir (config-sample :dirname-out))
-  (let [config (build/setup config-sample)]
-    (build/single-file config f-2)))
-
-(defn main-runner
+(defn build-test-files
   [dir-to-build]
   (let [config (build/prepare-config {:path dir-to-build})]
     (fs/delete-dir (config :dir-firn))
     (build/all-files {:path dir-to-build})))
 
-;; (main-runner wiki-dir)
-(main-runner test-dir)
-
-
-
-#_(def sample
-    (-> config-sample
-       (config/set-curr-file-original f-2)
-       (build/read-file)
-       (build/dataify-file)
-       (build/munge-file)
-       (build/htmlify-file)))
+(build-test-files wiki-dir)
+(build-test-files test-dir)

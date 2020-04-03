@@ -2,7 +2,7 @@
 #+DATE_CREATED: 2020-03-01--09-53
 #+STATUS: active
 #+FIRN_LAYOUT: project
-
+#+FIRN_UNDER: project
 
 * Meta
 :PROPERTIES:
@@ -44,6 +44,9 @@ CLOCK: [2020-03-01 Sun 17:34]--[2020-03-01 Sun 18:09] =>  0:35
 ** TODO A sample task
 ** DONE A finished task
 * Notes
+:LOGBOOK:
+CLOCK: [2020-04-03 Fri 13:52]--[2020-04-03 Fri 14:00] =>  0:08
+:END:
 #+BEGIN_QUOTE
 Firn is found under the snow that accumulates at the head of a glacier. It is formed under the pressure of overlying snow by the processes of compaction, recrystallization, localized melting, and the crushing of individual snowflakes.
 

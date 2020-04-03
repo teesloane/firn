@@ -3,9 +3,8 @@
   (:require [cheshire.core :as json]
             [clojure.java.shell :as sh]
             [clojure.java.io :as io]
-            [clojure.string :as s]
             [firn.config :as config]
-            [firn.layout :as layout]
+            [firn.file :as file]
             [me.raynes.fs :as fs]
             [firn.util :as u])
   (:gen-class))
@@ -16,20 +15,6 @@
   (let [path   (if (empty? path) (.getPath fs/*cwd*) path)
         config (config/default path)]
     config))
-
-(defn- build-file-outpath
-  "For the current file, build it's output filename.
-  Because the users's content might not be a flat-wiki, we must account
-  for cases where a file is `nested/several/layers/deep.org.`
-  Basically, swaps out the `.org` -> `.html` and orig-dir -> orig-dir+output-dir.
-  Returns the file name as a string."
-  [{:keys [dirname-out dirname-files curr-file]}]
-  (let [curr-file-path (-> curr-file :original .getPath)
-        out-comb       (str dirname-files "/" dirname-out)]
-    (-> curr-file-path
-        (s/replace #"\.org" ".html")
-        (s/replace (re-pattern dirname-files) (str out-comb))))) ;; < str to make linter happy.
-
 
 (defn new-site
   "Creates the folders needed for a new site in your wiki directory.
@@ -49,7 +34,6 @@
          ;; b9259f7 * origin/feat/improve-templating Fix: vendor parser + move it to _firn/bin in setup
          ;; (-> "parser/bin/parser" io/resource io/input-stream (io/copy parser-out-path))))
          (fs/chmod "+x" (config :parser-path))))))
-
 
 (defn setup
   "Creates folders for output, slurps in layouts and partials.
@@ -84,61 +68,72 @@
       (prn "Orgize failed to parse file." file-str res)
       (res :out))))
 
-(defn read-file
-  "Pulls :curr-file from config > parses > put into config with new vals"
-  [config]
-  (let [file-orig   (-> config :curr-file :original)
-        file-parsed (->> file-orig slurp (parse! config))
-        file-name   (-> file-orig .getName (s/split #"\.") (first))]
-    (config/update-curr-file config {:name file-name :as-json file-parsed})))
-
-(defn dataify-file
-  "Converts an org file into a bunch of data."
-  [config]
-  (let [file-json (-> config :curr-file :as-json)
-        file-edn  (-> file-json (json/parse-string true))]
-    (config/update-curr-file config {:as-edn file-edn})))
-
-(defn munge-file
-  "After dataify-file,  we extract information and store it in curr-file."
-  [config]
-  (config/update-curr-file
-   config
-   {:keywords    (config/get-keywords config)
-    :org-title   (config/get-keyword config "TITLE")}))
-
-(defn htmlify-file
-  "Renders files according to their `layout` keyword."
-  [config]
-  (let [layout   (keyword (config/get-keyword config "FIRN_LAYOUT"))
-        as-html  (when-not (config/file-is-private? config)
-                   (layout/apply-template config layout))]
-
-    (config/update-curr-file config {:as-html as-html})))
-
-(defn write-file
-  "Takes (file-)config input and writes html to output."
-  [{:keys [curr-file] :as config}]
-  (let [out-file-name  (build-file-outpath config)
-        out-html       (curr-file :as-html)]
-    (when-not (config/file-is-private? config)
-      (io/make-parents out-file-name)
-      (spit out-file-name out-html))))
-
-(defn single-file
-  "Processes a single file, as stored in the config :org-files"
+(defn process-file
   [config f]
-  (-> config
-     (config/set-curr-file-original f)
-     (read-file)
-     (dataify-file)
-     (munge-file)
-     (htmlify-file)
-     (write-file)))
+  ;; munge the file: slowly filling it up, using let-shadowing, with data and metadata
+  (let [new-file      (file/make config f)
+        as-json       (->> f slurp (parse! config))
+        as-edn        (-> as-json (json/parse-string true))
+        new-file      (file/change new-file {:as-json as-json :as-edn as-edn})
+        file-metadata (file/extract-metadata new-file)
+        new-file      (file/change new-file {:keywords  (file/get-keywords new-file)
+                                             :org-title (file/get-keyword new-file "TITLE")
+                                             :links     (file-metadata :links)
+                                             :logbook   (file-metadata :logbook)})]
+    new-file))
+
+(defn write-files
+  "Takes a config, of which we can presume as :processed-files.
+  Iterates on these files, and writes them to html using layouts."
+  [config]
+  (doseq [f (config :processed-files)]
+    (let [out-file-name (str (config :dir-site) (f :path-web) ".html")
+          out-file      (file/htmlify config f)
+          out-html      (out-file :as-html)]
+      (when-not (file/is-private? config f)
+        (io/make-parents out-file-name)
+        (spit out-file-name out-html)))))
+
+(defn process-files
+  "Receives config, processes all files and builds up site-data
+  logbooks, site-map, link-map, etc.
+  This could be recursive, but am using atoms as it could
+  be refactored in the future to be async and to use atoms."
+  [config]
+  (let [
+        site-links (atom [])
+        site-logs  (atom [])
+        site-map   (atom [])]
+    (loop [org-files (config :org-files)
+           output    []]
+      (if (empty? org-files)
+        (assoc config
+               :processed-files output
+               :site-map        @site-map
+               :site-links      @site-links
+               :site-logs       @site-logs)
+
+        (let [next-file      (first org-files)
+              processed-file (process-file config next-file)
+              org-files      (rest org-files)
+              output         (conj output processed-file)
+              keyword-map    (file/keywords->map processed-file)
+              new-site-map   (merge keyword-map {:path (processed-file :path-web)})
+              file-metadata  (file/extract-metadata processed-file)]
+          ;; add to sitemap.
+          (when-not (file/is-private? config processed-file)
+            (swap! site-map conj new-site-map)
+            (swap! site-links concat @site-links (:links file-metadata))
+            (swap! site-logs concat @site-logs (:logbook file-metadata)))
+          ;; add links and logs to site wide data.
+          (recur org-files output))))))
+
+
 
 (defn all-files
   "Processes all files in the org-directory"
   [opts]
-  (let [config (-> opts prepare-config setup)]
-    (doseq [f (config :org-files)]
-      (single-file config f))))
+  (let [config      (-> opts prepare-config setup)]
+    (->> config
+       process-files
+       write-files)))
