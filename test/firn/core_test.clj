@@ -17,5 +17,5 @@
     (fs/delete-dir (config :dir-firn))
     (build/all-files {:path dir-to-build})))
 
-;; (build-test-files wiki-dir)
+(build-test-files wiki-dir)
 (build-test-files test-dir)
