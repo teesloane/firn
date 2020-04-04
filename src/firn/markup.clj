@@ -3,7 +3,6 @@
   (:require [clojure.string :as s]
             [firn.util :as u]))
 
-
 ;; Renderers
 
 (defn date->html
@@ -127,7 +126,7 @@
       "bold"          (make-child :strong)
       "list"          (make-child (if ordered :ol :ul))
       "list-item"     (make-child :li)
-      "quote-block"   (make-child :div.quote-block)
+      "quote-block"   (make-child :blockquote)
       "table"         (make-child :table)
       "table-row"     (make-child :tr)
       "table-cell"    (make-child :td)
