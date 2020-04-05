@@ -1,9 +1,9 @@
 (ns firn.config
-  (:require [clojure.string :as s]
-            [firn.util :as u]))
+  (:require [clojure.string :as s]))
+
 
 (def starting-config
-  {:dir-attach    "attach"      ; org attachments to get copied into _site.
+  {:dir-attach    "data"        ; org attachments/files to get copied into _site.
    :dir-files     nil           ; where org content lives.
    :dir-layouts   ""            ; where layouts are stored.
    :dir-partials  ""            ; where partials are stored.

@@ -1,32 +1,9 @@
-body {
-  display: flex;
-  flex-direction: column;
-  max-width: 1260px;
-  padding: 24px;
-  margin: 0 auto;
-  font-family: sans-serif;
-}
-
-main {
-  margin: 64px auto 0 !important;
-  font-family: sans-serif;
-  line-height: 1.5;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-}
-
-article {
-  max-width: 650px;
-  padding-right: 24px;
-}
-
 figure {
   margin: 0;
 }
 
 figcaption {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   letter-spacing: 2px;
   padding: 4px 0px;
   margin: 8px 0 4px;
@@ -34,11 +11,7 @@ figcaption {
 }
 
 figcaption::before {
-  content: "◊"
-}
-
-.debug * {
-  outline: 1px solid lavender;
+  content: "◊ "
 }
 
 a {
@@ -55,12 +28,11 @@ pre {
   max-width: 100%;
   overflow-x: scroll;
   padding: 16px 8px;
-  background: #dfdfdf;
+  font-size: 0.8rem;
+  background: #efefef;
 }
 
 p {
-  line-height: 1.6;
-  margin-top: 16px;
 }
 
 ul {
@@ -74,7 +46,7 @@ li > p {
 }
 
 code {
-  font-size: 0.9em !important;
+  font-size: 0.75em !important;
 }
 
 h1 {
@@ -86,7 +58,7 @@ h1 {
 h2 {font-size: 1.12em;}
 
 h1, h2, h3, h4, h5, h6, div, p, section, ul, ol {
-  margin: 0 0 32px 0;
+  /* margin: 0 0 32px 0; */
 }
 
 
@@ -135,10 +107,10 @@ code {
 }
 
 
-.quote-block {
+blockquote {
   margin: 32px 0;
   background: #fafafa;
-  padding: 24px 24px 4px;
+  padding: 12px 24px;
   border-left: 4px solid lightgrey;
 }
 
@@ -203,22 +175,18 @@ img {
 
 
 aside {
-  max-width: 320px;
-  min-width: 320px;
-  max-height: 90vh;
-  overflow: scroll;
-  padding: 0 24px;
-  border-left: 1px solid #efefef;
+  /* max-width: 320px; */
+  /* min-width: 320px; */
+  /* max-height: 90vh; */
+  /* overflow: scroll; */
+  /* padding: 0 24px; */
+  /* border-left: 1px solid #efefef; */
 }
 
 aside section, aside p {
   font-size: 13px;
-  margin-bottom: 16px;
 }
 
-li > p {
-  margin-bottom: 0px;
-}
 
 aside h1 {
   font-size: 0.85rem;

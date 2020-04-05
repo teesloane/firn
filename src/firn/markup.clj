@@ -35,7 +35,7 @@
   (let [link-val        (get v :desc)
         link-href       (get v :path "Missing HREF attribute.")
         ;; img regexs / ctor fns.
-        img-file-regex  #"((file:)|(download:))(.*)\.(jpg|JPG|gif|GIF|png)"
+        img-file-regex  #"(file:)(.*)\.(jpg|JPG|gif|GIF|png)"
         img-http-regex  #"(http:\/\/|https:\/\/)(.*)\.(jpg|JPG|gif|GIF|png)"
         img-rel-regex   #"(\.(.*))\.(jpg|JPG|gif|GIF|png)"
         img-make-url    #(->> (re-matches img-file-regex link-href)

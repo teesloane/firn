@@ -13,12 +13,12 @@
         ;; good place for a partial.
         (when-let [resources (render "Resources" :content)]
           [:details {:open "true"}
-           [:summary.bb.pa3.bg-washed-blue   "Resources"]
+           [:summary.bb.pa3   "Resources"]
            [:div.bg-near-white.pa2.bb resources]])
 
         (when-not (empty? file-logs)
           [:details
-           [:summary.bb.pa3.bg-washed-yellow  "Logbook"]
+           [:summary.bb.pa3  "Logbook"]
            [:div.bg-near-white.pa3.bb
             (for [x file-logs
                   :let [{:keys [year month day]} (x :start)]]
@@ -27,7 +27,7 @@
 
         (when-let [tasks-headline (render "Tasks" :title-raw)]
           [:details
-           [:summary.bb.pa3.bg-washed-red tasks-headline]
+           [:summary.bb.pa3 tasks-headline]
            [:div.bg-near-white.pa3.bb (render "Tasks" :content)]])]
        [:aside.br.flex-auto.overflow-scroll.pa4.w-20
         "Right bar"]]])))
