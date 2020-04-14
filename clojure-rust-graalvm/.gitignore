@@ -1,0 +1,7 @@
+/clojure/target
+/clojure/clojure-rust
+/clojure/resources/libmylib.dylib
+/rust/target
+/target
+
+graal/clojure-rust-graalvm/rust/target
