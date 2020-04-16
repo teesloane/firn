@@ -1,6 +1,5 @@
 (ns firn.core
   (:require [clojure.java.io :as io]
-            [cli-matic.core :refer [run-cmd]]
             [firn.build :as build])
   (:import [iceshelf.clojure.rust ClojureRust])
   (:gen-class))
@@ -20,16 +19,10 @@
             (io/copy (io/input-stream resource) lib-file))))
       (System/setProperty "java.library.path" (.getPath lib-dir)))))
 
-(defn the-thing
-  "slurp a file"
-  [f]
-  (slurp f))
-
 (defn -main
   [& args]
   (init!)
   (clojure.lang.RT/loadLibrary "mylib")
-
   (let [org-str (slurp "foo.org")]
     (prn "res is" (ClojureRust/getFreeMemory org-str)))
   (build/new-site (first args)))

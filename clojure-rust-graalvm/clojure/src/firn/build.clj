@@ -32,42 +32,37 @@
         config (config/default path)]
     config))
 
+(defn copy-site-template!
+  "Takes the default site template and copies files to the dir-firn in confing
+  NOTE: doing this because it's really frustrating / hard to figure out how
+  to copy files from a compiled jar / native image from a resources directory."
+  [dir-out]
+  (let [base-dir        "firn/_firn_starter/"
+        files           ["layouts/default.clj" "partials/head.clj" "partials/nav.clj"]
+        read-files      (map #(hash-map :contents (slurp (io/resource (str base-dir %)))
+                                        :out-name (str dir-out "/" %)) files)]
+    (doseq [f read-files]
+      (io/make-parents (:out-name f))
+      (spit (:out-name f) (:contents f)))))
+
+
+
 
 (defn new-site
   "Creates the folders needed for a new site in your wiki directory.
-  Copies the _firn_starter from resources, into where you are running the cmd.
-  FIXME: This does not work with JARs - it's complicated to copy entire directories from a jar.
-  possible solution: https://stackoverflow.com/a/28682910"
+  Copies the _firn_starter from resources, into where you are running the cmd."
   [path]
   (let [new-config (-> path prepare-config)
-        config     new-config]
+        config     new-config
+        dir-firn   (config :dir-firn)]
 
-    ;;
-    (prn "trying to call the file")
-    (let [; the-test #(-> % .getPath slurp read-string eval)
-          the-test (io/resource "foo.clj")]
+    (let [the-test (io/resource "foo.clj")]
       (println "teh result of calling the eval is" the-test))
 
-    (prn "io/" (io/resource "firn/static/css/bass.css"))
-    (prn "io/" (io/resource "firn/_firn_starter/"))
-    (prn cp/resources (io/resource "firn/_firn_starter"))
-    ;; (prn cp/resources "firn")
-
-    ;; TODO landing mkdir
-    (doseq [[path uris] (cp/resources (io/resource "firn/_firn_starter"))]
-            ;; :let [uri           (first uris)
-            ;;       relative-path (subs path 1)
-            ;;       output-file   (io/file "landing" relative-path)]]
-         (println "stuff: " path "  " "uris: " uris))
-      ;; (with-open [in (io/input-stream uri)]
-      ;;   (io/copy in output-file)))
-  
-
-    (if (fs/exists? (config :dir-firn))
+    (if (fs/exists? dir-firn)
       (println "A _firn directory already exists.")
-      ;; (fs/mkdir (config :dir-firn))
-      (fs/copy-dir (io/resource "firn/_firn_starter") (config :dir-firn)))))
-
+      (do (fs/mkdir dir-firn)
+          (copy-site-template! dir-firn)))))
 
 ;; (prn "io/resource " (io/resource "_firn_starter"))
 ;; (slurp (io/resource "layouts/default.clj"))
