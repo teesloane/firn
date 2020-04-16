@@ -98,7 +98,7 @@
   "Receives config, processes all files and builds up site-data
   logbooks, site-map, link-map, etc.
   This could be recursive, but am using atoms as it could
-  be refactored in the future to be async and to use atoms."
+  be refactored in the future to be async and to use threads."
   [config]
   (let [
         site-links (atom [])
@@ -127,8 +127,6 @@
             (swap! site-logs concat @site-logs (:logbook file-metadata)))
           ;; add links and logs to site wide data.
           (recur org-files output))))))
-
-
 
 (defn all-files
   "Processes all files in the org-directory"

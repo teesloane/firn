@@ -1,5 +1,7 @@
-(ns clj-rust.core
-  (:require [clojure.java.io :as io])
+(ns firn.core
+  (:require [clojure.java.io :as io]
+            [cli-matic.core :refer [run-cmd]]
+            [firn.build :as build])
   (:import [iceshelf.clojure.rust ClojureRust])
   (:gen-class))
 
@@ -18,13 +20,22 @@
             (io/copy (io/input-stream resource) lib-file))))
       (System/setProperty "java.library.path" (.getPath lib-dir)))))
 
+(defn the-thing
+  "slurp a file"
+  [f]
+  (slurp f))
 
 (defn -main
-  [& [unit]]
+  [& args]
   (init!)
-  (clojure.lang.RT/loadLibrary "mylib");
-  (if-not (contains? #{"byte" "megabyte" "gigabyte"} unit)
-    (binding [*out* *err*]
-      (println "Expected unit argument: byte, megabyte or gigabyte.")
-      (when unit (println "Got:" unit)))
-    (prn {:memory/free [(keyword unit) (ClojureRust/getFreeMemory unit)]})))
+  (clojure.lang.RT/loadLibrary "mylib")
+  (build/new-site (first args)))
+
+  ;; (println "foo"))
+  ;; (let [org-str (the-thing org-file)]
+  ;;   (prn "res is" (ClojureRust/getFreeMemory org-str))))
+  ;; (if-not (contains? #{"byte" "megabyte" "gigabyte"} unit)
+  ;;   (binding [*out* *err*]
+  ;;     (println "Expected unit argument: byte, megabyte or gigabyte.")
+  ;;     (when unit (println "Got:" unit)))
+  ;;   (prn {:memory/free [(keyword unit) (ClojureRust/getFreeMemory unit)]})))

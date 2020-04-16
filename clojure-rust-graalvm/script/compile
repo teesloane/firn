@@ -23,17 +23,18 @@ export JAVA_HOME=$GRAALVM_HOME
 cd ../clojure
 lein do clean, uberjar
 
-# test the uberjar
-java -jar -Djava.library.path="resources" target/clj-rust-0.1.0-SNAPSHOT-standalone.jar byte
+# test the uberjar TODO removed for now.
+# java -jar -Djava.library.path="resources" target/firn-0.1.0-SNAPSHOT-standalone.jar byte
 
 # build the GraalVM compiled executable
 
-args=( -jar target/clj-rust-0.1.0-SNAPSHOT-standalone.jar \
+args=( -jar target/firn-0.1.0-SNAPSHOT-standalone.jar \
             "-H:Name=clojure-rust" \
             "-H:+ReportExceptionStackTraces" \
             "-J-Dclojure.spec.skip-macros=true" \
             "-J-Dclojure.compiler.direct-linking=true" \
             "--initialize-at-build-time" \
+            "--report-unsupported-elements-at-runtime" \
             "-H:IncludeResources=libmylib.dylib" \
             "-H:Log=registerResource:" \
             "-H:+JNI" \
