@@ -41,7 +41,10 @@
   (-> io-file file-name-no-ext keyword))
 
 (defn file-list->key-file-map
-  "Takes a list of files and returns a map of filenames as :keywords -> file"
+  "Takes a list of files and returns a map of filenames as :keywords -> file
+  NOTE: It also EVALS the files so they are in memory functions!
+  NOTE: You should probably rename this file because it doens't JUST
+  map keys, it evals stuff."
   [file-list]
   (let [eval-file #(-> % .getPath slurp read-string eval)]
     (into {} (map #(hash-map (io-file->keyword %) (eval-file %)) file-list))))

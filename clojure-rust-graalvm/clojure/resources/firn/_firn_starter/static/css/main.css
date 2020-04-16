@@ -1,0 +1,206 @@
+figure {
+  margin: 0;
+}
+
+figcaption {
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  padding: 4px 0px;
+  margin: 8px 0 4px;
+  font-family: Arial, sans-serif;
+}
+
+figcaption::before {
+  content: "◊ "
+}
+
+a {
+  text-decoration: none;
+  color: #357EDD;
+}
+
+a:visited {
+  color: #00449E;
+
+}
+
+pre {
+  max-width: 100%;
+  overflow-x: scroll;
+  padding: 16px 8px;
+  font-size: 0.8rem;
+  background: #efefef;
+}
+
+p {
+}
+
+ul {
+  padding-left: 16px;
+  list-style-type: none;
+  list-style-type: '– ';
+}
+
+li > p {
+  margin: 8px 0;
+}
+
+code {
+  font-size: 0.75em !important;
+}
+
+h1 {
+  font-size: 1.25em;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+h2 {font-size: 1.12em;}
+
+h1, h2, h3, h4, h5, h6, div, p, section, ul, ol {
+  /* margin: 0 0 32px 0; */
+}
+
+
+/* Tables */
+
+table {
+  /* Remove spacing between table cells (from Normalize.css) */
+  border-collapse: collapse;
+  border-spacing: 0;
+  empty-cells: show;
+  border: 1px solid #cbcbcb;
+  margin: 32px 0 ;
+  width: 100%;
+}
+
+table caption {
+  color: #000;
+  font: italic 85%/1 arial, sans-serif;
+  padding: 1em 0;
+  text-align: center;
+}
+
+table td,
+table th {
+  border-left: 1px solid #cbcbcb;
+  border-width: 0 0 0 1px;
+  font-size: inherit;
+  margin: 0;
+  overflow: visible;
+  padding: 0.5em 1em;
+}
+
+table tr:first-child {
+  background-color: #e0e0e0;
+  color: #000;
+  text-align: left;
+  vertical-align: bottom;
+}
+
+
+code {
+  background: #efefef;
+  font-size: 1.25em;
+  padding: 4px 6px;
+  margin: 0 4px;
+}
+
+
+blockquote {
+  margin: 32px 0;
+  background: #fafafa;
+  padding: 12px 24px;
+  border-left: 4px solid lightgrey;
+}
+
+
+hr {
+  margin: 32px 0;
+  height: 2px;
+  background-color: #afafaf;
+  border: none;
+}
+
+img {
+  width: 100%;
+}
+
+/* Heading Keywords and Priority */
+
+.title-priority {
+  margin: -22px 0 0 -6px;
+  font-size: 8px;
+  min-width: 12px;
+  min-height: 12px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.title-priority__A {
+  color: salmon;
+}
+
+.title-priority__B {
+  color: mediumseagreen;
+}
+
+.title-priority__C {
+  color: lightblue;
+}
+
+.title-keyword > div {
+  font-size: 12px;
+}
+
+.title-keyword__DONE {
+  font-size: 12px;
+  margin-right: 4px;
+  color: lightgrey;
+}
+
+.title-keyword__TODO {
+  font-size: 12px;
+  margin-right: 4px;
+  color: seagreen;
+}
+
+
+/* Sidebar ---  */
+
+/* Displays tasks, resources, and media */
+
+
+
+aside {
+  /* max-width: 320px; */
+  /* min-width: 320px; */
+  /* max-height: 90vh; */
+  /* overflow: scroll; */
+  /* padding: 0 24px; */
+  /* border-left: 1px solid #efefef; */
+}
+
+aside section, aside p {
+  font-size: 13px;
+}
+
+
+aside h1 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  border-bottom: 1px solid lightgrey;
+  margin-bottom: 8px !important;
+}
+
+aside h3,
+aside h4,
+aside h5,
+aside h2 {
+  font-size: 14px;
+  border-bottom: 1px dashed #efefef;
+  margin: 24px 0px 12px !important;
+}

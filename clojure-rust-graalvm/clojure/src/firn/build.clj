@@ -2,6 +2,7 @@
   (:require [firn.config :as config]
             [me.raynes.fs :as fs]
             [clojure.string :as s]
+            [cpath-clj.core :as cp]
             [clojure.java.io :as io])
   (:import [iceshelf.clojure.rust ClojureRust]))
 
@@ -38,13 +39,38 @@
   FIXME: This does not work with JARs - it's complicated to copy entire directories from a jar.
   possible solution: https://stackoverflow.com/a/28682910"
   [path]
-  (let [new-config      (-> path prepare-config)
-        ;; existing-config (first args)
+  (let [new-config (-> path prepare-config)
+        config     new-config]
 
-        config           new-config]
-    (clojure.pprint/pprint config)
-    (prn "io/resource " (io/resource "_firn_starter"))
+    ;;
+    (prn "trying to call the file")
+    (let [; the-test #(-> % .getPath slurp read-string eval)
+          the-test (io/resource "foo.clj")]
+      (println "teh result of calling the eval is" the-test))
+
+    (prn "io/" (io/resource "firn/static/css/bass.css"))
+    (prn "io/" (io/resource "firn/_firn_starter/"))
+    (prn cp/resources (io/resource "firn/_firn_starter"))
+    ;; (prn cp/resources "firn")
+
+    ;; TODO landing mkdir
+    (doseq [[path uris] (cp/resources (io/resource "firn/_firn_starter"))]
+            ;; :let [uri           (first uris)
+            ;;       relative-path (subs path 1)
+            ;;       output-file   (io/file "landing" relative-path)]]
+         (println "stuff: " path "  " "uris: " uris))
+      ;; (with-open [in (io/input-stream uri)]
+      ;;   (io/copy in output-file)))
+  
+
     (if (fs/exists? (config :dir-firn))
       (println "A _firn directory already exists.")
       ;; (fs/mkdir (config :dir-firn))
-      (fs/copy-dir (io/resource "_firn_starter") (config :dir-firn)))))
+      (fs/copy-dir (io/resource "firn/_firn_starter") (config :dir-firn)))))
+
+
+;; (prn "io/resource " (io/resource "_firn_starter"))
+;; (slurp (io/resource "layouts/default.clj"))
+;; (io/resource "layouts/default.clj")
+
+;; (io/resource "foo.clj")

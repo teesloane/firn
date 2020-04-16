@@ -6,7 +6,7 @@ set -eo pipefail
 
 cd rust
 cargo build --release
-cp target/release/libmylib.dylib ../clojure/resources
+cp target/release/libmylib.dylib ../clojure/resources/firn
 
 # check graalvm settings and use its java compiler
 
@@ -35,7 +35,8 @@ args=( -jar target/firn-0.1.0-SNAPSHOT-standalone.jar \
             "-J-Dclojure.compiler.direct-linking=true" \
             "--initialize-at-build-time" \
             "--report-unsupported-elements-at-runtime" \
-            "-H:IncludeResources=libmylib.dylib" \
+            # "-H:IncludeResources=libmylib.dylib" \
+            "-H:IncludeResources=firn/.*" \
             "-H:Log=registerResource:" \
             "-H:+JNI" \
             "--verbose" \

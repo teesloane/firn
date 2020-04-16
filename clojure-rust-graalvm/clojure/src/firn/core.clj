@@ -29,6 +29,9 @@
   [& args]
   (init!)
   (clojure.lang.RT/loadLibrary "mylib")
+
+  (let [org-str (slurp "foo.org")]
+    (prn "res is" (ClojureRust/getFreeMemory org-str)))
   (build/new-site (first args)))
 
   ;; (println "foo"))
