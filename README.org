@@ -1,26 +1,25 @@
-
-🚧 Static site generator using org-mode. Under Development. Not recommended for use.
+#+BEGIN_QUOTE
+Static site generator using org-mode.
+#+END_QUOTE
 
 * What's this?
 
-Firn generates a website from your .org mode files. It's original intention was
-to support the building of a flat file wiki, but it can handle nested folders.
+Firn generates a website from org-mode files. Firn's original intention was
+to support the building of a flat file wiki, but it can also handle nested content.
 
-Currently, running the program on a directory of org files performs the following:
+Currently, running the =firn= binary on a directory of org files performs the following:
 
 - Reads all .org files in the directory recursively.
-- Load up layouts and partials and read these templates from hiccup files.
-- Iterates over files and runs them through [[https://github.com/PoiScript/orgize][Orgize]], then turns the resulting
-  data into html.
-  
-* Usage
+- Parses org-files into data structures with [[https://github.com/PoiScript/orgize][Orgize.]]
+- Collects all file links and logbooks across all files.
+- Passes files through a template system with Hiccup, and renders to HTML.
 
-No out-of-the-box usage yet. You're going to need emacs, a repl and some coffee.
+* TODO Usage
 
-* Assumptions / Limitations
+* TODO Assumptions / Limitations
 
 - the content _directory name_ (ex: "my_wiki") should not exist anywhere else in
-  the path to a file in the wiki.
+  the path to a file in the wiki. (TODO: this might not be a problem anymore.)
   - for example, this is bad: =/development/my_wiki/some_more_dirs/my_wiki/file_1.org=
   - Unlikely that user's will have this, but it's currently a limitation nonetheless.
 - Org mode links should be set to relative. You can probably do this with
@@ -29,19 +28,29 @@ No out-of-the-box usage yet. You're going to need emacs, a repl and some coffee.
 
 * Developing
 
-Versions:
+Prerequisites:
 
-- Clojure / Lein - 1.9.0
-- rustc 1.41.1
+- Download [[https://www.graalvm.org/downloads/][GraalVM]] and set `GRAALVM_HOME`
+- Install [[https://github.com/technomancy/leiningen][lein]]
+- Install [[https://doc.rust-lang.org/cargo/getting-started/installation.html][cargo]] (we use 1.41.1)
 
-Up and atom ⚛ :zap::
+** TODO Building
+
+This creates a single binary called =firn=
 
 #+BEGIN_SRC sh
 git clone git@github.com:theiceshelf/firn.git
 cd firn
-lein deps
-cargo build
+# compile Rust, Clojure and the GraalVM Native Image.
+bin/script/compile
 #+END_SRC
 
-Then boot up your ol' trusty and run cider-jack-in on =firn.core-test= to tamper
-with the built in sample org wiki (=test/firn/demo_org/=)
+** Developing [0%]
+*** TODO - set up dev workflow that uses bin/parser
+*** TODO Document setting up the repl / compiling test org files.
+* Thank-you's
+
+- Thank you to [[https://github.com/borkdude][@borkdude]] for building some awesome libraries ([[https://github.com/borkdude/sci][sci]] is used in
+  firn to evaluate layouts) and for answering questions about compiling with
+  GraalVM /and/ for figuring out how to compile [[https://github.com/borkdude/clojure-rust-graalvm][rust and clojure together]].
+- PoiScript's org-mode [[https://github.com/PoiScript/orgize][parser]].
