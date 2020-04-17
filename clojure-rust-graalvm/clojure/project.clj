@@ -5,7 +5,7 @@
             :url "https://www.eclipse.org/legal/epl-2.0/"}
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [cli-matic "0.3.11"]
-                 [cpath-clj "0.1.2"]
+                 [borkdude/sci "0.0.13-alpha.14"]
                  [me.raynes/fs "1.4.6"]]
 
   :jvm-opts ["-Djava.library.path=./resources"]

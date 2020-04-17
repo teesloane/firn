@@ -2,7 +2,7 @@
   (:require [firn.config :as config]
             [me.raynes.fs :as fs]
             [clojure.string :as s]
-            [cpath-clj.core :as cp]
+            [sci.core :as sci]
             [clojure.java.io :as io])
   (:import [iceshelf.clojure.rust ClojureRust]))
 
@@ -56,16 +56,14 @@
         config     new-config
         dir-firn   (config :dir-firn)]
 
-    (let [the-test (io/resource "foo.clj")]
-      (println "teh result of calling the eval is" the-test))
+    ;; (sci/eval-string (slurp (io/resource "firn/foo.clj")) {:bindings {'println println}})
+    ((sci/eval-string (slurp (io/resource "firn/foo.clj")) {:bindings {'println println}}))
+    (let [x (sci/eval-string (slurp (io/resource "firn/foo.clj")) {:bindings {'println println}})]
+      (+ 5 (x)))
 
+    ;; (let [the-test (sci/eval-string (slurp (io/resource "firn/foo.clj")) {:bindings {'println println}})]
+    ;;   (println "teh result of calling the eval is" (the-test)))
     (if (fs/exists? dir-firn)
       (println "A _firn directory already exists.")
       (do (fs/mkdir dir-firn)
           (copy-site-template! dir-firn)))))
-
-;; (prn "io/resource " (io/resource "_firn_starter"))
-;; (slurp (io/resource "layouts/default.clj"))
-;; (io/resource "layouts/default.clj")
-
-;; (io/resource "foo.clj")
