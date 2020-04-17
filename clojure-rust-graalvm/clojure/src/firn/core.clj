@@ -1,7 +1,6 @@
 (ns firn.core
   (:require [clojure.java.io :as io]
             [firn.build :as build])
-  (:import [iceshelf.clojure.rust ClojureRust])
   (:gen-class))
 
 (defn native-image? []
@@ -23,15 +22,7 @@
   [& args]
   (init!)
   (clojure.lang.RT/loadLibrary "mylib")
-  (let [org-str (slurp "foo.org")]
-    (prn "res is" (ClojureRust/getFreeMemory org-str)))
-  (build/new-site (first args)))
-
-  ;; (println "foo"))
-  ;; (let [org-str (the-thing org-file)]
-  ;;   (prn "res is" (ClojureRust/getFreeMemory org-str))))
-  ;; (if-not (contains? #{"byte" "megabyte" "gigabyte"} unit)
-  ;;   (binding [*out* *err*]
-  ;;     (println "Expected unit argument: byte, megabyte or gigabyte.")
-  ;;     (when unit (println "Got:" unit)))
-  ;;   (prn {:memory/free [(keyword unit) (ClojureRust/getFreeMemory unit)]})))
+  (case (first args)
+    "new"   (build/new-site)
+    "build" (build/all-files)
+    (prn "Please pass the command 'new' or 'build'")))

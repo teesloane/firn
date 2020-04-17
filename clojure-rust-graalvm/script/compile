@@ -52,3 +52,4 @@ cd ../
 mkdir -p target
 cp clojure/clojure-rust target
 cp rust/target/release/libmylib.dylib target
+cp clojure/clojure-rust ~/Dropbox/wiki2
