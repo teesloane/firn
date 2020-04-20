@@ -1,11 +1,12 @@
 (ns firn.build
-  (:require [firn.config :as config]
-            [firn.util :as u]
-            [cheshire.core :as json]
-            [firn.file :as file]
-            [me.raynes.fs :as fs]
+  (:require [cheshire.core :as json]
+            [clojure.java.io :as io]
+            [clojure.java.shell :as sh]
             [clojure.string :as s]
-            [clojure.java.io :as io])
+            [firn.config :as config]
+            [firn.file :as file]
+            [firn.util :as u]
+            [me.raynes.fs :as fs])
   (:import [iceshelf.clojure.rust ClojureRust]))
 
 (set! *warn-on-reflection* true)
@@ -20,9 +21,10 @@
                   drop-last)))
 
 (defn prepare-config
-  "Make a config for the directory in which we run the bin."
-  []
-  (config/default (get-cwd)))
+  "TODO: docstring"
+  [dir-files]
+  (let [wiki-path (if (empty? dir-files) (get-cwd) dir-files)]
+    (config/default wiki-path)))
 
 (defn copy-site-template!
   "Takes the default site template and copies files to the dir-firn in confing
@@ -40,8 +42,8 @@
 (defn new-site
   "Creates the folders needed for a new site in your wiki directory.
   Copies the _firn_starter from resources, into where you are running the cmd."
-  [opts]
-  (let [new-config (prepare-config)
+  [{:keys [dir-files]}]
+  (let [new-config (prepare-config dir-files)
         config     new-config
         dir-firn   (config :dir-firn)]
     (if (fs/exists? dir-firn)
@@ -53,7 +55,7 @@
   "Creates folders for output, slurps in layouts and partials.
   NOTE: should slurp/mkdir/copy-dir be wrapped in try-catches? if-err handling?"
   [{:keys [dir-layouts dir-partials dir-files] :as config}]
-  (when-not (fs/exists? (config :dir-firn)) (new-site))
+  (when-not (fs/exists? (config :dir-firn)) (new-site config))
 
   (let [layout-files  (u/find-files-by-ext dir-layouts "clj")
         partial-files (u/find-files-by-ext dir-partials "clj")
@@ -74,9 +76,17 @@
      config :org-files org-files :layouts layouts-map :partials partials-map)))
 
 (defn parse!
-  "Shells out to the rust binary to parse the org-mode file."
+  "Parse the org-mode file-string.
+  NOTE: When developing with a REPL, this shells out to the rust bin.
+  When compiled to a native image, it uses JNI to talk to the rust .dylib."
   [file-str]
-  (ClojureRust/getFreeMemory file-str))
+  (if (u/native-image?)
+    (ClojureRust/getFreeMemory file-str)
+    (let [parser "../bin/parser"
+            res    (sh/sh parser file-str)]
+        (if-not (= (res :exit) 0)
+          (prn "Orgize failed to parse file." file-str res)
+          (res :out)))))
 
 (defn process-file
   [config f]
@@ -142,8 +152,8 @@
 
 (defn all-files
   "Processes all files in the org-directory"
-  [opts]
-  (let [config (setup (prepare-config))]
+  [{:keys [dir-files]}]
+  (let [config (setup (prepare-config dir-files))]
     (->> config
          process-files
          write-files)))

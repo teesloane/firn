@@ -14,6 +14,12 @@
               (and is-file file-ends-with)))
           fileseq))
 
+(defn native-image?
+  "Check if we are in the native-image or REPL."
+  []
+  (and (= "Substrate VM" (System/getProperty "java.vm.name"))
+       (= "runtime" (System/getProperty "org.graalvm.nativeimage.imagecode"))))
+
 (defn print-err!
   "A semantic error function."
   [& args]

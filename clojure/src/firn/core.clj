@@ -1,18 +1,15 @@
 (ns firn.core
   (:require [clojure.java.io :as io]
             [cli-matic.core :refer [run-cmd]]
+            [firn.util :as u]
             [firn.build :as build])
   (:gen-class))
-
-(defn native-image? []
-  (and (= "Substrate VM" (System/getProperty "java.vm.name"))
-       (= "runtime" (System/getProperty "org.graalvm.nativeimage.imagecode"))))
 
 (defn init!
   "When firn is run as a native image, move the dependencies (the parser bin)
   to the home directory. Not ideal, but this is the best we can do for now!"
   []
-  (when (native-image?)
+  (when (u/native-image?)
     (let [home (System/getProperty "user.home")
           lib-dir (io/file home ".firn")]
       (.mkdirs lib-dir)
@@ -45,10 +42,3 @@
   (init!)
   (clojure.lang.RT/loadLibrary "mylib")
   (run-cmd args CONFIGURATION))
-
-;; (defn -main
-;;   [& args]
-;;   (case (first args)
-;;     "new"   (build/new-site)
-;;     "build" (build/all-files)
-;;     (prn "Please pass the command 'new' or 'build'")))
