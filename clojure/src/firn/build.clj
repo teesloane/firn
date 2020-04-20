@@ -40,7 +40,7 @@
 (defn new-site
   "Creates the folders needed for a new site in your wiki directory.
   Copies the _firn_starter from resources, into where you are running the cmd."
-  []
+  [opts]
   (let [new-config (prepare-config)
         config     new-config
         dir-firn   (config :dir-firn)]
@@ -142,7 +142,7 @@
 
 (defn all-files
   "Processes all files in the org-directory"
-  []
+  [opts]
   (let [config (setup (prepare-config))]
     (->> config
          process-files
