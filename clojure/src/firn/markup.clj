@@ -16,7 +16,8 @@
   NOTE: Has additional :keys `language` and `arguments`
   that could be used for syntax highlighting"
   [{:keys [contents _language _arguments] :as _src-block}]
-  [:pre contents])
+  [:pre
+   [:code contents]])
 
 (defn img-link->figure
   "Renders an image with a figure if the link has a :desc, otherwise, :img"
