@@ -27,6 +27,8 @@ rust/target
 clojure/target
 clojure/clojure-rust
 clojure/test/firn/demo_org/_firn
+clojure/resources/firn/libmylib.dylib
+clojure/firn
 clojure/resources/libmylib.dylib
 rust/target
 target

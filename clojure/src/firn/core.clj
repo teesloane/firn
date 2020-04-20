@@ -7,16 +7,20 @@
   (and (= "Substrate VM" (System/getProperty "java.vm.name"))
        (= "runtime" (System/getProperty "org.graalvm.nativeimage.imagecode"))))
 
-(defn init! []
+(defn init!
+  "When firn is run as a native image, move the dependencies (the parser bin)
+  to the home directory. Not ideal, but this is the best we can do for now!"
+  []
   (when (native-image?)
     (let [home (System/getProperty "user.home")
-          lib-dir (io/file home ".clojure_rust")]
+          lib-dir (io/file home ".firn")]
       (.mkdirs lib-dir)
       (doseq [lib-name ["libmylib.dylib" "libmylib.so"]]
         (when-let [resource (io/resource lib-name)]
           (let [lib-file (io/file lib-dir lib-name)]
             (io/copy (io/input-stream resource) lib-file))))
       (System/setProperty "java.library.path" (.getPath lib-dir)))))
+
 
 (defn -main
   [& args]

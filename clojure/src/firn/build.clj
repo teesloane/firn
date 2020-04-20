@@ -145,5 +145,5 @@
   []
   (let [config (setup (prepare-config))]
     (->> config
-       process-files
-       write-files)))
+         process-files
+         write-files)))
