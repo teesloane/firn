@@ -32,7 +32,10 @@
   to copy files from a compiled jar / native image from a resources directory."
   [dir-out]
   (let [base-dir        "firn/_firn_starter/"
-        files           ["layouts/default.clj" "partials/head.clj" "partials/nav.clj" "static/css/bass.css" "static/css/main.css"]
+        ;; TODO: remove custom templates for release.
+        files           ["layouts/default.clj" "layouts/project.clj" "layouts/index.clj"
+                         "partials/head.clj"   "partials/nav.clj"
+                         "static/css/bass.css" "static/css/main.css"]
         read-files      (map #(hash-map :contents (slurp (io/resource (str base-dir %)))
                                         :out-name (str dir-out "/" %)) files)]
     (doseq [f read-files]
