@@ -20,6 +20,30 @@ CLOCK: [2020-03-30 Mon 14:14]--[2020-03-30 Mon 14:41] =>  0:27
 CLOCK: [2020-03-29 Sun 17:08]--[2020-03-29 Sun 20:31] =>  3:23
 CLOCK: [2020-03-28 Sat 15:45]--[2020-03-28 Sat 18:29] =>  2:44
 :END:
+* Code
+
+#+BEGIN_SRC clojure
+(println "hello")
+
+(ns firn.core-test
+  (:require [firn.build :as build]
+            [me.raynes.fs :as fs]))
+
+(def test-dir      "test/firn/demo_org")
+(def wiki-dir      "~/Dropbox/wiki")
+
+;; A loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong liiiiiiiiiiiiiiiiiiine
+
+(defn build-test-files
+  [dir-to-build]
+  (let [config (build/prepare-config dir-to-build)]
+    (fs/delete-dir (config :dir-firn))
+    (build/all-files {:dir-files dir-to-build})))
+
+(build-test-files wiki-dir)
+(build-test-files test-dir)
+#+END_SRC
+
 * Image Tests                                                                   :ATTACH:
 :PROPERTIES:
 :ID:       ADC88028-FD31-4D0D-AE89-4FA5BB7D13E7
@@ -29,11 +53,11 @@ An org attach image:
 
 [[download:attach/AD/C88028-FD31-4D0D-AE89-4FA5BB7D13E7/_20200329_200052foo.png][Woah!]]
 
-A file image attachment with description: [[file:attach/test-img.png][Test image description!]]
+Just a relative image link
 
-A file image without a description [[file:attach/_20200328_190456bike_tees_jamis_small.jpg][The Bike.]]
+[[./data/test-img.png]]
 
-Just a relative image link [[./attach/test-img.png]]
+Just a relative image link with a description [[./data/test-img.png][An image description]]
 
 http image link https://wiki.xxiivv.com/media/diary/582.jpg
 * Headings <2020-03-27 Fri>

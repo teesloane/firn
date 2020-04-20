@@ -10,9 +10,6 @@ figcaption {
   font-family: Arial, sans-serif;
 }
 
-figcaption::before {
-  content: "◊ "
-}
 
 a {
   text-decoration: none;
@@ -21,18 +18,23 @@ a {
 
 a:visited {
   color: #00449E;
-
 }
 
 pre {
   max-width: 100%;
   overflow-x: scroll;
-  padding: 16px 8px;
+  padding: 20px;
   font-size: 0.8rem;
   background: #efefef;
 }
 
-p {
+pre code {
+  margin: 0;
+  padding: 0px;
+  font-size: 1em;
+  background: none;
+  font-size: 0.9em;
+  line-height: 1.8;
 }
 
 ul {
@@ -45,21 +47,12 @@ li > p {
   margin: 8px 0;
 }
 
-code {
-  font-size: 0.75em !important;
-}
 
-h1 {
-  font-size: 1.25em;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
 
-h2 {font-size: 1.12em;}
 
-h1, h2, h3, h4, h5, h6, div, p, section, ul, ol {
-  /* margin: 0 0 32px 0; */
-}
+/* h1, h2, h3, h4, h5, h6, div, p, section, ul, ol { */
+/*   /\* margin: 0 0 32px 0; *\/ */
+/* } */
 
 
 /* Tables */
@@ -101,7 +94,7 @@ table tr:first-child {
 
 code {
   background: #efefef;
-  font-size: 1.25em;
+  font-size: 0.75em;
   padding: 4px 6px;
   margin: 0 4px;
 }
@@ -136,6 +129,7 @@ img {
   display: inline-flex;
   justify-content: center;
   align-items: center;
+  border: 1px solid salmon;
 }
 
 
@@ -152,55 +146,14 @@ img {
 }
 
 .title-keyword > div {
-  font-size: 12px;
 }
 
 .title-keyword__DONE {
-  font-size: 12px;
   margin-right: 4px;
   color: lightgrey;
 }
 
 .title-keyword__TODO {
-  font-size: 12px;
   margin-right: 4px;
   color: seagreen;
-}
-
-
-/* Sidebar ---  */
-
-/* Displays tasks, resources, and media */
-
-
-
-aside {
-  /* max-width: 320px; */
-  /* min-width: 320px; */
-  /* max-height: 90vh; */
-  /* overflow: scroll; */
-  /* padding: 0 24px; */
-  /* border-left: 1px solid #efefef; */
-}
-
-aside section, aside p {
-  font-size: 13px;
-}
-
-
-aside h1 {
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 3px;
-  border-bottom: 1px solid lightgrey;
-  margin-bottom: 8px !important;
-}
-
-aside h3,
-aside h4,
-aside h5,
-aside h2 {
-  font-size: 14px;
-  border-bottom: 1px dashed #efefef;
-  margin: 24px 0px 12px !important;
 }
