@@ -1,35 +1,27 @@
 (ns firn.build
+  "Provides functions to core, to be called in the cli.
+  Mostly to do with the processing of files / new site."
   (:require [cheshire.core :as json]
             [clojure.java.io :as io]
-            [clojure.java.shell :as sh]
-            [clojure.string :as s]
             [firn.config :as config]
             [firn.file :as file]
             [firn.util :as u]
-            [me.raynes.fs :as fs])
-  (:import [iceshelf.clojure.rust ClojureRust]))
+            [firn.org :as org]
+            [me.raynes.fs :as fs]))
 
 (set! *warn-on-reflection* true)
 
-(defn get-cwd
-  "Because *fs/cwd* gives out the at-the-time jvm path.
-  this works with graal."
-  []
-  (s/join "/" (-> (java.io.File. ".")
-                  .getAbsolutePath
-                  (s/split #"/")
-                  drop-last)))
-
 (defn prepare-config
-  "TODO: docstring"
+  "Takes a path to directory of org files and prepares the
+  firn-wide config map to pass through functions."
   [dir-files]
-  (let [wiki-path (if (empty? dir-files) (get-cwd) dir-files)]
+  (let [wiki-path (if (empty? dir-files) (u/get-cwd) dir-files)]
     (config/default wiki-path)))
 
 (defn copy-site-template!
-  "Takes the default site template and copies files to the dir-firn in confing
-  NOTE: doing this because it's really frustrating / hard to figure out how
-  to copy files from a compiled jar / native image from a resources directory."
+  "Copies the site templates in resources/firn/_firn_default into new site dir.
+  The structure has to be recreated file by file because I haven't figured out
+  how to copy an entire FOLDER from within a jar / native image."
   [dir-out]
   (let [base-dir        "firn/_firn_starter/"
         ;; TODO: remove custom templates for release.
@@ -68,37 +60,23 @@
 
     (fs/mkdir (config :dirname-out)) ;; make _site
 
-    ;; FIXME: These are not good - copying the entire attachment directory and the static folder.
+    ;; copy attachments and static files too final _site dir.
     (when-not (fs/exists? (config :dir-site-attach))
       (fs/copy-dir (config :dir-attach) (config :dir-site-attach)))
-
     (when-not (fs/exists? (config :dir-site-static))
       (fs/copy-dir (config :dir-static) (config :dir-site-static)))
 
     (assoc
      config :org-files org-files :layouts layouts-map :partials partials-map)))
 
-(defn parse!
-  "Parse the org-mode file-string.
-  NOTE: When developing with a REPL, this shells out to the rust bin.
-  When compiled to a native image, it uses JNI to talk to the rust .dylib."
-  [file-str]
-  (if (u/native-image?)
-    (ClojureRust/getFreeMemory file-str)
-    (let [parser "../bin/parser"
-            res    (sh/sh parser file-str)]
-        (if-not (= (res :exit) 0)
-          (prn "Orgize failed to parse file." file-str res)
-          (res :out)))))
-
 (defn process-file
+  "munge the 'file' datastructure; slowly filling it up, using let-shadowing.
+  At the end, we have a data structure that has converted: org-mode file string -> json, edn, logbook, keywords
+  TODO: this could move to the file ns.
+  "
   [config f]
-  ;; munge the "file" datastructure; slowly filling it up, using let-shadowing.
-  ;; At the end, we have a data structure that has converted:
-  ;; org-mode file string -> json, edn, logbook, keywords
-  ;; TODO: this could move to the file ns.
   (let [new-file      (file/make config f)
-        as-json       (->> f slurp parse!)
+        as-json       (->> f slurp org/parse!)
         as-edn        (-> as-json (json/parse-string true))
         new-file      (file/change new-file {:as-json as-json :as-edn as-edn})
         file-metadata (file/extract-metadata new-file)
@@ -122,13 +100,13 @@
 
 (defn process-files
   "Receives config, processes all files and builds up site-data
-  logbooks, site-map, link-map, etc.
-  This could be recursive, but am using atoms as it could
-  be refactored in the future to be async and to use threads."
+  logbooks, site-map, link-map, etc."
   [config]
   (let [site-links (atom [])
         site-logs  (atom [])
         site-map   (atom [])]
+    ;; recurse over the org-files, gradually processing them and
+    ;; pulling out links, logs, and other useful data.
     (loop [org-files (config :org-files)
            output    []]
       (if (empty? org-files)
@@ -145,7 +123,8 @@
               keyword-map    (file/keywords->map processed-file)
               new-site-map   (merge keyword-map {:path (processed-file :path-web)})
               file-metadata  (file/extract-metadata processed-file)]
-          ;; add to sitemap.
+
+          ;; add to sitemap when file is not private.
           (when-not (file/is-private? config processed-file)
             (swap! site-map conj new-site-map)
             (swap! site-links concat @site-links (:links file-metadata))

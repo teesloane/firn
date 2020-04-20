@@ -2,7 +2,23 @@
   "Functions for managing org-related things.
   Most of these functions are for operating on EDN-fied org-file
   Which are created by the rust binary."
-  (:require [clojure.string :as s]))
+  (:require [clojure.string :as s]
+            [firn.util :as u]
+            [clojure.java.shell :as sh])
+  (:import [iceshelf.clojure.rust ClojureRust]))
+
+(defn parse!
+  "Parse the org-mode file-string.
+  NOTE: When developing with a REPL, this shells out to the rust bin.
+  When compiled to a native image, it uses JNI to talk to the rust .dylib."
+  [file-str]
+  (if (u/native-image?)
+    (ClojureRust/getFreeMemory file-str)
+    (let [parser "../bin/parser"
+            res    (sh/sh parser file-str)]
+        (if-not (= (res :exit) 0)
+          (prn "Orgize failed to parse file." file-str res)
+          (res :out)))))
 
 (defn- get-headline-helper
   "Sanitizes a heading of links and just returns text.

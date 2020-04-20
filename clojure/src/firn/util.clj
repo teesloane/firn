@@ -64,4 +64,12 @@
   [f coll]
   (first (filter f coll)))
 
+(defn get-cwd
+  "Because *fs/cwd* gives out the at-the-time jvm path. this works with graal."
+  []
+  (s/join "/" (-> (java.io.File. ".")
+                  .getAbsolutePath
+                  (s/split #"/")
+                  drop-last)))
+
 (def spy #(do (println "DEBUG:" %) %))

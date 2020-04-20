@@ -1,11 +1,9 @@
 (ns firn.file
   "Functions for operating and transforming on an org file, read into memory.
   The term  `file` here, generally refers to a _data structure_ and not a java io file.
-  If the file is a java io file, it should be called `file-io`
+  If the input is is a java io file, it should be called `file-io`
 
-  You can view the file data-structure as it is made by the `make` function.
-  Some of the functions in this namespace are for operating on a io file, others are
-  for operating on the file map of data."
+  You can view the file data-structure as it is made by the `make` function."
   (:require [clojure.string :as s]
             [firn.util :as u]
             [firn.layout :as layout]))
@@ -13,7 +11,7 @@
 
 (defn strip-file-ext
   "Removes a file extension from a file path string.
-  (strip-file-ext foo/jo.jpeg jpeg) ;; => foo/jo"
+  (strip-file-ext foo/bar.jpeg jpeg) ;; => foo/bar"
   [ext string]
   (let [ext-regex (re-pattern (str "\\.(" ext ")$"))
         res (s/replace string ext-regex "")]
@@ -98,10 +96,10 @@
 
 (defn extract-metadata-logbook-helper
   "Extracts the logbook and associates the parent headline's metadata with it.
-  Because we are dealing with a flattened tree sequence we have to loop through items to
-  keep track of headline values that precede a logbook. This is easier and more performant
-  than searching an entire edn-tree of headings to see if they have a logbook to associate with.
-  ... I think. ┬──┬◡ﾉ(° -°ﾉ)"
+  Because we are dealing with a flattened tree sequence we have to loop through
+  items to keep track of headline values that precede a logbook.
+  This is easier and more performant than searching an entire edn-tree of
+  headings to see if they have a logbook to associate with.  ┬──┬◡ﾉ(° -°ﾉ)"
   [tree-seq]
   (loop [tree-items    tree-seq
          output        []

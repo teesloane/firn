@@ -23,11 +23,7 @@ export JAVA_HOME=$GRAALVM_HOME
 cd ../clojure
 lein do clean, uberjar
 
-# test the uberjar TODO removed for now.
-# java -jar -Djava.library.path="resources" target/firn-0.1.0-SNAPSHOT-standalone.jar byte
-
 # build the GraalVM compiled executable
-
 args=( -jar target/firn-0.1.0-SNAPSHOT-standalone.jar \
             "-H:Name=firn" \
             "-H:+ReportExceptionStackTraces" \

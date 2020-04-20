@@ -141,5 +141,5 @@
       "keyword"       "" ;; Don't parse
       "comment-block" "" ;; Don't parse
       "drawer"        "" ;; Don't parse
-      ;; default value. FIXME: Should have a debug value for verbose mode.
+      ;; default value. NOTE: Might be ideal to have a "if dev-mode -> show unparsed block"
       "")))

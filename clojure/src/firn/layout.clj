@@ -41,7 +41,7 @@
         internal-default-layout))))
 
 (defn render
-  "Responsible for rendering org content in layouts."
+  "Enables rendering org content in layouts."
   ;; Render the whole file.
   ([file]
    (let [org-tree (file :as-edn)
@@ -63,7 +63,6 @@
        :title-raw  (-> headline :children first :raw)
        :content    (markup/to-html headline-content)
        :logbook    nil ;; TODO render logbook, possible with options, :logbook-heatmap, :logbook-graph.
-       :properties nil ;; TODO
        headline))))
 
 (defn prepare
