@@ -13,10 +13,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Install dependencies
-      run: lein deps
-    - name: Run tests
-      run: lein test
     - name: setup-graalvm-ce
       uses: rinx/setup-graalvm-ce@v0.0.1
       with:
@@ -25,3 +21,6 @@ jobs:
     - name: setup-native-image
       run: |
         gu install native-image
+    - name: run compile script
+      run: |
+        bin/compile
