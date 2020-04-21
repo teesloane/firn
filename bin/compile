@@ -3,7 +3,7 @@
 set -eo pipefail
 
 # install rust if it's not around. (ci)
-curl https://sh.rustup.rs -sSf | sh
+curl https://sh.rustup.rs -sSf | sh -s -- -y
 # build the rust library
 
 cd rust
