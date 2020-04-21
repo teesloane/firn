@@ -121,7 +121,7 @@ img {
 
 /* Heading Keywords and Priority */
 
-.title-priority {
+.firn_title-priority {
   margin: -22px 0 0 -6px;
   font-size: 8px;
   min-width: 12px;
@@ -133,27 +133,30 @@ img {
 }
 
 
-.title-priority__A {
+.firn_title-priority__A {
   color: salmon;
 }
 
-.title-priority__B {
+.firn_title-priority__B {
   color: mediumseagreen;
 }
 
-.title-priority__C {
+.firn_title-priority__C {
   color: lightblue;
 }
 
-.title-keyword > div {
+.firn_title-keyword > div {
 }
 
-.title-keyword__DONE {
+.firn_title-keyword__DONE {
   margin-right: 4px;
   color: lightgrey;
 }
 
-.title-keyword__TODO {
+.firn_title-keyword__TODO {
   margin-right: 4px;
   color: seagreen;
 }
+
+.firn_heading-timestamp {}
+.firn_heading-cookie {}

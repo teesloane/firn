@@ -1,6 +1,6 @@
 #+TITLE: Layout
 #+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-04-03 16:25>
+#+DATE_UPDATED: <2020-04-20 20:21>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: docs
 
@@ -140,3 +140,28 @@ to functions and data:
 | partials      | a list of partials in your =partials= folder | list      |
 | yield         | Your entire org file, rendered to html       | html      |
 | config        | The site wide config.                        | map       |
+
+* Styling Layouts
+
+You can write css as you normally would by placing css files in the =_firn/static/css=
+folder and then having =firn=  move them into your =_site= folder when run.
+Styling is applied through [[https://github.com/weavejester/hiccup#syntax][hiccup]].
+
+There are some internal styles that are applied when org-mode text is
+transformed into data. These styles are all prefaced with the keyword =firn_=,
+(ie =firn_title-prirority= or =firn_title-keyword=).
+
+The following are the css classes and their rerspective org-mode structure they
+augment, as they come hard-coded into firn:
+
+| Css class                 | Element                                  |
+|---------------------------+------------------------------------------|
+| .firn_title-priority      | Title Priority (ex: [#A] / [#B] etc)     |
+| .firn_title-priority__A   | Targets =[#A]=                           |
+| .firn_title-priority__B   | Etc.                                     |
+| .firn_title-priority__C   | Etc.                                     |
+| .firn_title-keyword       | Targets all keywords =TODO/DONE= etc.    |
+| .firn_title-keyword__TODO | Targets =TODO=                           |
+| .firn_title-keyword__DONE | Targets =DONE=                           |
+| .firn_heading-timestamp   | Heading Timestamps*                      |
+| .firn_heading-cookie      | Targets heading todo-count (ex =[7/10]=) |

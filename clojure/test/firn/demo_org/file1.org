@@ -20,7 +20,7 @@ CLOCK: [2020-03-30 Mon 14:14]--[2020-03-30 Mon 14:41] =>  0:27
 CLOCK: [2020-03-29 Sun 17:08]--[2020-03-29 Sun 20:31] =>  3:23
 CLOCK: [2020-03-28 Sat 15:45]--[2020-03-28 Sat 18:29] =>  2:44
 :END:
-* Code
+* [#B] Code
 
 #+BEGIN_SRC clojure
 (println "hello")
@@ -44,7 +44,7 @@ CLOCK: [2020-03-28 Sat 15:45]--[2020-03-28 Sat 18:29] =>  2:44
 (build-test-files test-dir)
 #+END_SRC
 
-* Image Tests                                                                   :ATTACH:
+* TODO Image Tests [100%]                                                          :ATTACH:
 :PROPERTIES:
 :ID:       ADC88028-FD31-4D0D-AE89-4FA5BB7D13E7
 :END:

@@ -82,8 +82,8 @@
         keywrd         (v :keyword)
         priority       (v :priority)
         value          (v :value)
-        title-priority (u/str->keywrd "span.title-priority.title-priority__" priority)
-        title-keyword  (u/str->keywrd "span.title-keyword.title-keyword__" keywrd)
+        title-priority (u/str->keywrd "span.firn_title-priority.firn_title-priority__" priority)
+        title-keyword  (u/str->keywrd "span.firn_title-keyword.firn_title-keyword__" keywrd)
         h-level        (case level 1 :h1 2 :h2 3 :h3 4 :h4 5 :h5 :h6)
         make-child     #(into [%] (map title->html children))]
     (case typ
@@ -93,8 +93,8 @@
                    (when priority [title-priority (str priority " ")])
                    (make-child :span)]
       "text"      [:span value]
-      "cookie"    [:span.heading-cookie value]
-      "timestamp" [:span.heading-timestamp (date->html v)]
+      "cookie"    [:span.firn_heading-cookie value]
+      "timestamp" [:span.firn_heading-timestamp (date->html v)]
       "code"      [:code value]
       "verbatim"  [:code value]
       "link"      (link->html v)
