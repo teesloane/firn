@@ -1,0 +1,27 @@
+name: Clojure CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: lein deps
+    - name: Run tests
+      run: lein test
+    - name: setup-graalvm-ce
+      uses: rinx/setup-graalvm-ce@v0.0.1
+      with:
+        graalvm-version: "19.3.0"
+        java-version: "java11"
+    - name: setup-native-image
+      run: |
+        gu install native-image
