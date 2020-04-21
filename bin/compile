@@ -4,6 +4,7 @@ set -eo pipefail
 
 # install rust if it's not around. (ci)
 curl https://sh.rustup.rs -sSf | sh -s -- -y
+source $HOME/.cargo/env
 # build the rust library
 
 cd rust
