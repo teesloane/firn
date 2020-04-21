@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+
+# build the rust library
+
+cd rust
+cargo build --release
+cp target/release/libmylib.dylib ../clojure/resources/
+
+# check graalvm settings and use its java compiler
+
+if [ -z "$GRAALVM_HOME" ]; then
+    echo "Please set GRAALVM_HOME"
+    exit 1
+fi
+
+"$GRAALVM_HOME/bin/gu" install native-image || true
+
+export JAVA_HOME=$GRAALVM_HOME
+
+# build clojure uberjar
+cd ../clojure
+lein do clean, uberjar
+
+# build the GraalVM compiled executable
+args=( -jar target/firn-0.1.0-SNAPSHOT-standalone.jar \
+            "-H:Name=firn" \
+            "-H:+ReportExceptionStackTraces" \
+            "-J-Dclojure.spec.skip-macros=true" \
+            "-J-Dclojure.compiler.direct-linking=true" \
+            "--initialize-at-build-time" \
+            "--report-unsupported-elements-at-runtime" \
+            "-H:IncludeResources=libmylib.dylib" \
+            "-H:IncludeResources=firn/.*" \
+            "-H:Log=registerResource:" \
+            "-H:+JNI" \
+            "--verbose" \
+            "--no-fallback" \
+            "--no-server" )
+
+$GRAALVM_HOME/bin/native-image "${args[@]}"
+
+lein clean
+
+cd ../
+
+mkdir -p target
+cp clojure/firn target
+cp rust/target/release/libmylib.dylib target
+cp clojure/firn ~/Dropbox/wiki2
