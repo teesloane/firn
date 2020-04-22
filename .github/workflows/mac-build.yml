@@ -15,6 +15,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    - name: setup lein
+      run: |
+        brew install leiningen
+
     - name: get graal.
       run: |
         bin/setup-graal-osx
