@@ -28,3 +28,7 @@ jobs:
         echo "graal vm home is:"
         echo $GRAALVM_HOME
         bin/compile
+    - uses: actions/upload-artifact@v1
+      with:
+        name: firn-mac
+        path: target/
