@@ -24,3 +24,8 @@ jobs:
     - name: run compile script
       run: |
         bin/compile
+
+    - uses: actions/upload-artifact@v1
+      with:
+        name: firn
+        path: target/
