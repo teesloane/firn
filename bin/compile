@@ -50,6 +50,10 @@ args=( -jar target/firn-0.1.0-SNAPSHOT-standalone.jar \
             "--no-fallback" \
             "--no-server" )
 
+echo  " ---------------------------------------- "
+ls $GRAALVM_HOME
+ls $GRAALVM_HOME/bin
+
 $GRAALVM_HOME/bin/native-image "${args[@]}"
 
 lein clean
