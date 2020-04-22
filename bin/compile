@@ -2,11 +2,20 @@
 
 set -eo pipefail
 
+# install rust if it's not around. (ci)
+curl https://sh.rustup.rs -sSf | sh -s -- -y
+source $HOME/.cargo/env
 # build the rust library
 
 cd rust
 cargo build --release
-cp target/release/libmylib.dylib ../clojure/resources/
+
+# move rust artifact into clojure resources.
+if [ "$(uname)" == "Darwin" ]; then
+    cp target/release/libmylib.dylib ../clojure/resources/ # mac
+elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+    cp target/release/libmylib.so ../clojure/resources/ # linux
+fi
 
 # check graalvm settings and use its java compiler
 
@@ -14,6 +23,7 @@ if [ -z "$GRAALVM_HOME" ]; then
     echo "Please set GRAALVM_HOME"
     exit 1
 fi
+
 
 "$GRAALVM_HOME/bin/gu" install native-image || true
 
@@ -32,12 +42,15 @@ args=( -jar target/firn-0.1.0-SNAPSHOT-standalone.jar \
             "--initialize-at-build-time" \
             "--report-unsupported-elements-at-runtime" \
             "-H:IncludeResources=libmylib.dylib" \
+            "-H:IncludeResources=libmylib.so" \
             "-H:IncludeResources=firn/.*" \
             "-H:Log=registerResource:" \
             "-H:+JNI" \
             "--verbose" \
             "--no-fallback" \
             "--no-server" )
+
+echo  " ---------------------------------------- "
 
 $GRAALVM_HOME/bin/native-image "${args[@]}"
 
@@ -47,5 +60,12 @@ cd ../
 
 mkdir -p target
 cp clojure/firn target
-cp rust/target/release/libmylib.dylib target
-cp clojure/firn ~/Dropbox/wiki2
+
+pwd
+
+# move rust library into target folder.
+# if [ "$(uname)" == "Darwin" ]; then
+    # cp target/release/libmylib.dylib target # mac
+# elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+#     cp target/release/libmylib.so target # linux
+# fi
