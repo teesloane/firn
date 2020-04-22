@@ -3,8 +3,8 @@
 set -e
 GRAALVM_VERSION=$1
 JAVA_VERSION=$2
-TMP_GRAALVM_HOME=/home/runner/bin/graalvm
-GRAALVM_HOME=/home/runner/work/_temp/_github_home/graalvm
+TMP_GRAALVM_HOME=tmp/graalvm
+GRAALVM_HOME=tmp/_github_home/graalvm
 
 echo "Install GRAALVM $GRAALVM_VERSION $JAVA_VERSION"
 
