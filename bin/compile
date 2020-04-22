@@ -10,7 +10,7 @@ source $HOME/.cargo/env
 cd rust
 cargo build --release
 
-# move rust artifact
+# move rust artifact into clojure resources.
 if [ "$(uname)" == "Darwin" ]; then
     cp target/release/libmylib.dylib ../clojure/resources/ # mac
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
@@ -41,6 +41,7 @@ args=( -jar target/firn-0.1.0-SNAPSHOT-standalone.jar \
             "--initialize-at-build-time" \
             "--report-unsupported-elements-at-runtime" \
             "-H:IncludeResources=libmylib.dylib" \
+            "-H:IncludeResources=libmylib.so" \
             "-H:IncludeResources=firn/.*" \
             "-H:Log=registerResource:" \
             "-H:+JNI" \
@@ -56,5 +57,11 @@ cd ../
 
 mkdir -p target
 cp clojure/firn target
-cp rust/target/release/libmylib.dylib target
-cp clojure/firn ~/Dropbox/wiki2
+
+# move rust library into target folder.
+if [ "$(uname)" == "Darwin" ]; then
+    cp target/release/libmylib.dylib target # mac
+elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+    cp target/release/libmylib.so target # linux
+fi
+
