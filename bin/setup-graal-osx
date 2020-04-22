@@ -13,7 +13,7 @@ GRAALVM_TGZ_URI="https://github.com/graalvm/graalvm-ce-builds/releases/download/
 
 curl -sL $GRAALVM_TGZ_URI --output graalvm.tar.gz
 
-mkdir -p $TMP_GRAALVM_HOME
+sudo mkdir -p $TMP_GRAALVM_HOME
 tar -xf graalvm.tar.gz -C $TMP_GRAALVM_HOME --strip-components=1
 chmod -R a+rwx $TMP_GRAALVM_HOME
 
