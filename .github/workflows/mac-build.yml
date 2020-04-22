@@ -24,8 +24,11 @@ jobs:
         bin/setup-graal-osx
     - name: setup-native-image
       run: |
-        ls tmp/graalvm/Contents
+        # ls tmp/graalvm/Contents
+        echo "home is:"
         ls tmp/graalvm/Contents/Home
+        echo "bin is:"
+        ls tmp/graalvm/Contents/Home/bin
         $GRAALVM_HOME/bin/gu install native-image
     - name: run compile script
       run: |
