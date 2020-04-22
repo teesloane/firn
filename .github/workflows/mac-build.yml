@@ -9,6 +9,8 @@ jobs:
   build:
     runs-on: macOS-latest
     steps:
+      env:
+        GRAALVM_HOME: tmp/graalvm/Contents/Home
     - uses: actions/checkout@v2
 
     - name: get graal.
@@ -21,9 +23,6 @@ jobs:
     #     $GRAALVM_HOME/bin/gu install native-image
     - name: run compile script
       run: |
-
         echo "graal vm home is:"
         echo $GRAALVM_HOME
-        export GRAALVM_HOME=tmp/graalvm
-        ls tmp/graalvm
         bin/compile
