@@ -9,6 +9,8 @@ source $HOME/.cargo/env
 
 cd rust
 cargo build --release
+ls -la
+pwd
 cp target/release/libmylib.dylib ../clojure/resources/
 
 # check graalvm settings and use its java compiler
