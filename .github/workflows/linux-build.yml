@@ -18,6 +18,9 @@ jobs:
       with:
         graalvm-version: "19.3.0"
         java-version: "java11"
+    - name: setup lein
+      run: |
+        brew install leiningen
     - name: setup-native-image
       run: |
         gu install native-image
