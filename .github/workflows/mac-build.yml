@@ -10,27 +10,19 @@ jobs:
     runs-on: macOS-latest
 
     env:
-      GRAALVM_HOME: "$(pwd)tmp/graalvm/Contents/Home"
+      GRAALVM_HOME: "$(pwd)/tmp/graalvm/Contents/Home"
 
     steps:
     - uses: actions/checkout@v2
-
     - name: setup lein
       run: |
         brew install leiningen
-
     - name: get graal.
       run: |
         bin/setup-graal-osx
     - name: setup-native-image
       run: |
-        # ls tmp/graalvm/Contents
-        echo "curr directory is"
-        pwd
-        echo "home is:"
-        ls tmp/graalvm/Contents/Home
-        echo "bin is:"
-        ls tmp/graalvm/Contents/Home/bin
+        echo home is: $GRAALVM_HOME
         $GRAALVM_HOME/bin/gu install native-image
     - name: run compile script
       run: |
