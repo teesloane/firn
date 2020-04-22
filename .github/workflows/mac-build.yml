@@ -10,7 +10,7 @@ jobs:
     runs-on: macOS-latest
 
     env:
-      GRAALVM_HOME: tmp/graalvm/Contents/Home
+      GRAALVM_HOME: "$(pwd)tmp/graalvm/Contents/Home"
 
     steps:
     - uses: actions/checkout@v2
@@ -25,6 +25,8 @@ jobs:
     - name: setup-native-image
       run: |
         # ls tmp/graalvm/Contents
+        echo "curr directory is"
+        pwd
         echo "home is:"
         ls tmp/graalvm/Contents/Home
         echo "bin is:"
