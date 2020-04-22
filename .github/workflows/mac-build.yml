@@ -14,6 +14,8 @@ jobs:
     - name: get graal.
       run: |
         bin/setup-graal-osx
+    - name: set graal home
+      run: export GRAALVM_HOME=tmp/graalvm
     # - name: setup-native-image
     #   run: |
     #     $GRAALVM_HOME/bin/gu install native-image
