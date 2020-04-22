@@ -10,7 +10,7 @@ jobs:
     runs-on: macOS-latest
 
     env:
-      GRAALVM_HOME: "$(pwd)/tmp/graalvm/Contents/Home"
+      GRAALVM_HOME: /tmp/graalvm/Contents/Home
 
     steps:
     - uses: actions/checkout@v2
@@ -22,7 +22,6 @@ jobs:
         bin/setup-graal-osx
     - name: setup-native-image
       run: |
-        echo home is: $GRAALVM_HOME
         $GRAALVM_HOME/bin/gu install native-image
     - name: run compile script
       run: |
