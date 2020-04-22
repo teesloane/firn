@@ -24,6 +24,10 @@ if [ -z "$GRAALVM_HOME" ]; then
     exit 1
 fi
 
+echo "inside compile ==============================="
+ls $GRAALVM_HOME
+ls $GRAALVM_HOME/bin
+
 "$GRAALVM_HOME/bin/gu" install native-image || true
 
 export JAVA_HOME=$GRAALVM_HOME
