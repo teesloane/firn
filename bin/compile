@@ -61,10 +61,11 @@ cd ../
 mkdir -p target
 cp clojure/firn target
 
+pwd
+
 # move rust library into target folder.
-if [ "$(uname)" == "Darwin" ]; then
-    cp target/release/libmylib.dylib target # mac
+# if [ "$(uname)" == "Darwin" ]; then
+    # cp target/release/libmylib.dylib target # mac
 # elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
 #     cp target/release/libmylib.so target # linux
-fi
-
+# fi
