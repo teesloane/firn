@@ -11,7 +11,8 @@ cd rust
 cargo build --release
 ls target/release
 pwd
-cp target/release/libmylib.dylib ../clojure/resources/
+cp target/release/libmylib.dylib ../clojure/resources/ # mac
+cp target/release/libmylib.so ../clojure/resources/ # linux
 
 # check graalvm settings and use its java compiler
 
