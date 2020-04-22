@@ -21,4 +21,9 @@ jobs:
     #     $GRAALVM_HOME/bin/gu install native-image
     - name: run compile script
       run: |
+
+        echo "graal vm home is:"
+        echo $GRAALVM_HOME
+        export GRAALVM_HOME=tmp/graalvm
+        ls tmp/graalvm
         bin/compile
