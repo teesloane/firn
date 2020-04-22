@@ -4,7 +4,7 @@ set -e
 GRAALVM_VERSION=$1
 JAVA_VERSION=$2
 TMP_GRAALVM_HOME=tmp/graalvm
-GRAALVM_HOME=tmp/_github_home/graalvm
+# GRAALVM_HOME=tmp/_github_home/graalvm
 
 # GRAALVM_TGZ_URI="https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-${GRAALVM_VERSION}/graalvm-ce-${JAVA_VERSION}-linux-amd64-${GRAALVM_VERSION}.tar.gz"
 GRAALVM_TGZ_URI="https://github.com/graalvm/graalvm-ce-builds/releases/download/vm-20.0.0/graalvm-ce-java11-darwin-amd64-20.0.0.tar.gz"
@@ -15,11 +15,9 @@ mkdir -p $TMP_GRAALVM_HOME
 tar -xf graalvm.tar.gz -C $TMP_GRAALVM_HOME --strip-components=1
 chmod -R a+rwx $TMP_GRAALVM_HOME
 
-echo "inside graalvm home is:"
-ls $TMP_GRAALVM_HOME
+# ls $TMP_GRAALVM_HOME
 
 export PATH=$PATH:$GRAALVM_HOME/bin
-export GRAALVM_HOME=$GRAALVM_HOME
-export GRAALVM_VERSION=$GRAALVM_VERSION
-export JAVA_HOME=$GRAALVM_HOME
-
+# export GRAALVM_HOME=$GRAALVM_HOME
+# export GRAALVM_VERSION=$GRAALVM_VERSION
+# export JAVA_HOME=$GRAALVM_HOME
