@@ -1,0 +1,22 @@
+name: Mac Build
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: macOS-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: get graal.
+      run: |
+        bin/setup-graal-osx
+    - name: setup-native-image
+      run: |
+        gu install native-image
+    - name: run compile script
+      run: |
+        bin/compile
