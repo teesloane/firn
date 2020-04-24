@@ -11,13 +11,6 @@
 
 (set! *warn-on-reflection* true)
 
-(defn prepare-config
-  "Takes a path to directory of org files and prepares the
-  firn-wide config map to pass through functions."
-  [dir-files]
-  (let [wiki-path (if (empty? dir-files) (u/get-cwd) dir-files)]
-    (config/default wiki-path)))
-
 (defn copy-site-template!
   "Copies the site templates in resources/firn/_firn_default into new site dir.
   The structure has to be recreated file by file because I haven't figured out
@@ -27,6 +20,7 @@
         ;; TODO: remove custom templates for release.
         files           ["layouts/default.clj" "layouts/project.clj" "layouts/index.clj"
                          "partials/head.clj"   "partials/nav.clj"
+                         "config.edn"
                          "static/css/bass.css" "static/css/main.css"]
         read-files      (map #(hash-map :contents (slurp (io/resource (str base-dir %)))
                                         :out-name (str dir-out "/" %)) files)]
@@ -38,9 +32,7 @@
   "Creates the folders needed for a new site in your wiki directory.
   Copies the _firn_starter from resources, into where you are running the cmd."
   [{:keys [dir-files]}]
-  (let [new-config (prepare-config dir-files)
-        config     new-config
-        dir-firn   (config :dir-firn)]
+  (let [dir-firn   (config/make-dir-firn dir-files)]
     (if (fs/exists? dir-firn)
       (println "A _firn directory already exists.")
       (do (fs/mkdir dir-firn)
@@ -135,7 +127,7 @@
 (defn all-files
   "Processes all files in the org-directory"
   [{:keys [dir-files]}]
-  (let [config (setup (prepare-config dir-files))]
+  (let [config (setup (config/prepare dir-files))]
     (->> config
          process-files
          write-files)))

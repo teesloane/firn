@@ -51,8 +51,8 @@
 
 (defn file-list->key-file-map
   "Takes a list of files and returns a map of filenames as :keywords -> file
-  NOTE: It also EVALS the files so they are in memory functions!
-  NOTE: You should probably rename this file because it doens't JUST
+  NOTE: It also EVALS (using sci) the files so they are in memory functions!
+  FIXME: You should probably rename this file because it doens't JUST
   map keys, it evals stuff."
   [file-list]
   (let [file-path #(.getPath ^java.io.File %)
