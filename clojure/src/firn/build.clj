@@ -11,32 +11,33 @@
 
 (set! *warn-on-reflection* true)
 
-(defn copy-site-template!
-  "Copies the site templates in resources/firn/_firn_default into new site dir.
-  The structure has to be recreated file by file because I haven't figured out
-  how to copy an entire FOLDER from within a jar / native image."
-  [dir-out]
-  (let [base-dir        "firn/_firn_starter/"
-        ;; TODO: remove custom templates for release.
-        files           ["layouts/default.clj" "layouts/project.clj" "layouts/index.clj"
-                         "partials/head.clj"   "partials/nav.clj"
-                         "config.edn"
-                         "static/css/bass.css" "static/css/main.css"]
-        read-files      (map #(hash-map :contents (slurp (io/resource (str base-dir %)))
-                                        :out-name (str dir-out "/" %)) files)]
-    (doseq [f read-files]
-      (io/make-parents (:out-name f))
-      (spit (:out-name f) (:contents f)))))
+;; TODO: remove custom templates for release.
+(def default-files ["layouts/default.clj"
+                    "layouts/project.clj"
+                    "layouts/index.clj"
+                    "partials/head.clj"
+                    "partials/nav.clj"
+                    "config.edn"
+                    "static/css/bass.css"
+                    "static/css/main.css"])
+
 
 (defn new-site
   "Creates the folders needed for a new site in your wiki directory.
   Copies the _firn_starter from resources, into where you are running the cmd."
   [{:keys [dir-files]}]
-  (let [dir-firn   (config/make-dir-firn dir-files)]
+  (let [dir-firn     (config/make-dir-firn dir-files)
+        base-dir     "firn/_firn_starter/"
+        read-files   (map #(hash-map :contents (slurp (io/resource (str base-dir %)))
+                                     :out-name (str dir-firn "/" %)) default-files)]
     (if (fs/exists? dir-firn)
-      (println "A _firn directory already exists.")
+      (do
+        (println "A _firn directory already exists.")
+        false)
       (do (fs/mkdir dir-firn)
-          (copy-site-template! dir-firn)))))
+          (doseq [f read-files]
+            (io/make-parents (:out-name f))
+            (spit (:out-name f) (:contents f)))))))
 
 (defn setup
   "Creates folders for output, slurps in layouts and partials.
