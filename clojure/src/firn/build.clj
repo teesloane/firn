@@ -21,7 +21,6 @@
                     "static/css/bass.css"
                     "static/css/main.css"])
 
-
 (defn new-site
   "Creates the folders needed for a new site in your wiki directory.
   Copies the _firn_starter from resources, into where you are running the cmd."
@@ -51,7 +50,7 @@
         org-files     (u/find-files-by-ext dir-files "org") ;; could bail if this is empty...
         layouts-map   (u/file-list->key-file-map layout-files)]
 
-    (fs/mkdir (config :dirname-out)) ;; make _site
+    (fs/mkdir (config :dir-site)) ;; make _site
 
     ;; copy attachments and static files too final _site dir.
     (when-not (fs/exists? (config :dir-site-attach))

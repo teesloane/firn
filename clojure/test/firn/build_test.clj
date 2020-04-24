@@ -1,7 +1,8 @@
 (ns firn.build-test
   (:require [firn.build :as sut]
             [me.raynes.fs :as fs]
-            [clojure.test :as t]))
+            [clojure.test :as t]
+            [firn.config :as config]))
            
 
 (def test-dir  "test/firn/demo_org")
@@ -31,3 +32,26 @@
 
   (delete-firn-dir))
 
+
+(t/deftest setup
+  ;; setup requires that you have the _firn site in place; so:
+  (sut/new-site {:dir-files test-dir})
+
+  (let [config       (config/prepare test-dir)
+        setup-config (sut/setup config)]
+    (t/testing "expect org-files, layouts and partials to be a key in config"
+      (t/is (= true (empty? (config :org-files))))
+      (t/is (= true (empty? (config :layouts))))
+      (t/is (= true (empty? (config :partials))))
+
+      (t/is (= true (not (empty? (setup-config :org-files)))))
+      (t/is (= true (not (empty? (setup-config :layouts)))))
+      (t/is (= true (not (empty? (setup-config :partials))))))
+
+    (t/testing "_site should be created"
+      (t/is (= true (fs/exists? (setup-config :dir-site))))))
+
+  (delete-firn-dir))
+
+
+(config/prepare test-dir)
