@@ -15,7 +15,6 @@ Currently, running the =firn= binary on a directory of org files performs the fo
 - Passes files through a template system with Hiccup, and renders to HTML.
 
 * TODO Usage
-
 * TODO Assumptions / Limitations
 
 - the content _directory name_ (ex: "my_wiki") should not exist anywhere else in
@@ -30,8 +29,8 @@ Currently, running the =firn= binary on a directory of org files performs the fo
 
 Prerequisites:
 
-- Download [[https://www.graalvm.org/downloads/][GraalVM]] and set `GRAALVM_HOME`.
--  Use `gu` to install the `native-image` executable.
+- Download [[https://www.graalvm.org/downloads/][GraalVM]] and set =GRAALVM_HOME=.
+-  Use =gu= to install the =native-image= executable.
 - Install [[https://github.com/technomancy/leiningen][lein]]
 - Install [[https://doc.rust-lang.org/cargo/getting-started/installation.html][cargo]] (we use 1.41.1)
 
