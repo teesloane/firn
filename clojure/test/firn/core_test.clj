@@ -1,9 +1,10 @@
 (ns firn.core-test
   (:require [firn.build :as build]
-            [me.raynes.fs :as fs]))
+            [me.raynes.fs :as fs]
+            [firn.config :as config]))
 
 (def test-dir      "test/firn/demo_org")
-(def wiki-dir      "~/Dropbox/wiki")
+(def wiki-dir      "/users/tees/Dropbox/wiki")
 
 
 (defn build-test-files
@@ -14,3 +15,5 @@
 
 (build-test-files wiki-dir)
 (build-test-files test-dir)
+
+(config/prepare test-dir)
