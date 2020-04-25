@@ -13,6 +13,8 @@
   (fs/delete-dir firn-dir))
 
 (t/deftest new-site
+  (delete-firn-dir)
+
   ;; The _firn site shouldn't exist yet when new-site is called.
   (t/testing "The _firn site shouldn't exist yet"
     (t/is (= false (fs/exists? firn-dir))))
@@ -28,9 +30,8 @@
       (t/is (> file-string-length 0))))
 
   (t/testing "Trying to create again when _firn already exists should return false"
-    (t/is (= false (sut/new-site {:dir-files test-dir}))))
+    (t/is (= false (sut/new-site {:dir-files test-dir})))))
 
-  (delete-firn-dir))
 
 
 (t/deftest setup
@@ -52,6 +53,3 @@
       (t/is (= true (fs/exists? (setup-config :dir-site))))))
 
   (delete-firn-dir))
-
-
-(config/prepare test-dir)

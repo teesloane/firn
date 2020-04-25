@@ -5,7 +5,9 @@
 
   You can view the file data-structure as it is made by the `make` function."
   (:require [clojure.string :as s]
+            [cheshire.core :as json]
             [firn.util :as u]
+            [firn.org :as org]
             [firn.layout :as layout]))
            
 
@@ -137,3 +139,52 @@
         as-html  (when-not (is-private? config f)
                    (layout/apply-layout config f layout))]
     (change f {:as-html as-html})))
+
+(defn process-one
+  "Munge the 'file' datastructure; slowly filling it up, using let-shadowing.
+  Essentially, converts `org-mode file string` -> json, edn, logbook, keywords"
+  [config f]
+  (let [new-file      (make config f)
+        as-json       (->> f slurp org/parse!)
+        as-edn        (-> as-json (json/parse-string true))
+        new-file      (change new-file {:as-json as-json :as-edn as-edn})
+        file-metadata (extract-metadata new-file)
+        new-file      (change new-file {:keywords  (get-keywords new-file)
+                                        :org-title (get-keyword new-file "TITLE")
+                                        :links     (file-metadata :links)
+                                        :logbook   (file-metadata :logbook)})]
+    new-file))
+
+(defn process-all
+  "Receives config, processes all files and builds up site-data
+  logbooks, site-map, link-map, etc."
+  [config]
+  (let [site-links (atom [])
+        site-logs  (atom [])
+        site-map   (atom [])]
+    ;; recurse over the org-files, gradually processing them and
+    ;; pulling out links, logs, and other useful data.
+    (loop [org-files (config :org-files)
+           output    []]
+      (if (empty? org-files)
+        (assoc config
+               :processed-files output
+               :site-map        @site-map
+               :site-links      @site-links
+               :site-logs       @site-logs)
+
+        (let [next-file      (first org-files)
+              processed-file (process-one config next-file)
+              org-files      (rest org-files)
+              output         (conj output processed-file)
+              keyword-map    (keywords->map processed-file)
+              new-site-map   (merge keyword-map {:path (processed-file :path-web)})
+              file-metadata  (extract-metadata processed-file)]
+
+          ;; add to sitemap when file is not private.
+          (when-not (is-private? config processed-file)
+            (swap! site-map conj new-site-map)
+            (swap! site-links concat @site-links (:links file-metadata))
+            (swap! site-logs concat @site-logs (:logbook file-metadata)))
+          ;; add links and logs to site wide data.
+          (recur org-files output))))))

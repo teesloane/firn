@@ -1,12 +1,10 @@
 (ns firn.build
   "Provides functions to core, to be called in the cli.
   Mostly to do with the processing of files / new site."
-  (:require [cheshire.core :as json]
-            [clojure.java.io :as io]
+  (:require [clojure.java.io :as io]
             [firn.config :as config]
             [firn.file :as file]
             [firn.util :as u]
-            [firn.org :as org]
             [me.raynes.fs :as fs]))
 
 (set! *warn-on-reflection* true)
@@ -61,22 +59,7 @@
     (assoc
      config :org-files org-files :layouts layouts-map :partials partials-map)))
 
-(defn process-file
-  "munge the 'file' datastructure; slowly filling it up, using let-shadowing.
-  At the end, we have a data structure that has converted: org-mode file string -> json, edn, logbook, keywords
-  TODO: this could move to the file ns.
-  "
-  [config f]
-  (let [new-file      (file/make config f)
-        as-json       (->> f slurp org/parse!)
-        as-edn        (-> as-json (json/parse-string true))
-        new-file      (file/change new-file {:as-json as-json :as-edn as-edn})
-        file-metadata (file/extract-metadata new-file)
-        new-file      (file/change new-file {:keywords  (file/get-keywords new-file)
-                                             :org-title (file/get-keyword new-file "TITLE")
-                                             :links     (file-metadata :links)
-                                             :logbook   (file-metadata :logbook)})]
-    new-file))
+
 
 (defn write-files
   "Takes a config, of which we can presume has :processed-files.
@@ -90,44 +73,12 @@
         (io/make-parents out-file-name)
         (spit out-file-name out-html)))))
 
-(defn process-files
-  "Receives config, processes all files and builds up site-data
-  logbooks, site-map, link-map, etc."
-  [config]
-  (let [site-links (atom [])
-        site-logs  (atom [])
-        site-map   (atom [])]
-    ;; recurse over the org-files, gradually processing them and
-    ;; pulling out links, logs, and other useful data.
-    (loop [org-files (config :org-files)
-           output    []]
-      (if (empty? org-files)
-        (assoc config
-               :processed-files output
-               :site-map        @site-map
-               :site-links      @site-links
-               :site-logs       @site-logs)
 
-        (let [next-file      (first org-files)
-              processed-file (process-file config next-file)
-              org-files      (rest org-files)
-              output         (conj output processed-file)
-              keyword-map    (file/keywords->map processed-file)
-              new-site-map   (merge keyword-map {:path (processed-file :path-web)})
-              file-metadata  (file/extract-metadata processed-file)]
-
-          ;; add to sitemap when file is not private.
-          (when-not (file/is-private? config processed-file)
-            (swap! site-map conj new-site-map)
-            (swap! site-links concat @site-links (:links file-metadata))
-            (swap! site-logs concat @site-logs (:logbook file-metadata)))
-          ;; add links and logs to site wide data.
-          (recur org-files output))))))
 
 (defn all-files
   "Processes all files in the org-directory"
   [{:keys [dir-files]}]
   (let [config (setup (config/prepare dir-files))]
     (->> config
-         process-files
+         file/process-all
          write-files)))
