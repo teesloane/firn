@@ -7,6 +7,7 @@
 ;; This represents the file "object" - a map of value that accumulate from
 ;; parsing and munging an org file.
 
+(t/use-fixtures :each stub/test-wrapper)
 
 (def sample-file
   {:path      "/Users/tees/Projects/firn/firn/clojure/test/firn/demo_org/file-small.org",

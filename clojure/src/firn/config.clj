@@ -65,7 +65,7 @@
       ;; No config found
       (do
         (println "Didn't find a _firn site. Have you run `firn new` yet?")
-        (System/exit 0)) ;; TODO: good place for a "if DEV..." so the repl doesn't close.
+        #_(System/exit 0)) ;; TODO: good place for a "if DEV..." so the repl doesn't close.
       ;; try and read the config
       (try
         (let [read-config    (sci/eval-string (slurp (str (default-config :dir-firn) "/config.edn")))

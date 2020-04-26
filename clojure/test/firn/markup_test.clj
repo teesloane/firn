@@ -11,7 +11,7 @@
                    :file-link    {:type "link", :path "file:file2.org", :desc "File 2"}
                    :http-img     {:type "link",
                                   :path "https://www.fillmurray.com/g/200/300.jpg",
-                                  :desc "Miscellaneous Features :: CIDER Docs"}
+                                  :desc "Fill murray"}
                    :http-link    {:type "link",
                                   :path "https://docs.cider.mx/cider/usage/misc_features.html",
                                   :desc "Miscellaneous Features :: CIDER Docs"}})
@@ -21,18 +21,18 @@
 (t/deftest link->html
   (t/testing "http-link"
     (t/is (= (sut/link->html (sample-links :http-link))
-             [:a
-              {:href "https://docs.cider.mx/cider/usage/misc_features.html"}
+             [:a.firn_external
+              {:href "https://docs.cider.mx/cider/usage/misc_features.html" :target "_blank"}
               "Miscellaneous Features :: CIDER Docs"])))
 
   (t/testing "http-image-link"
     (t/is (= (sut/link->html (sample-links :http-img))
-             [:img
-              {:src "https://www.fillmurray.com/g/200/300.jpg"}])))
+             [:figure [:img {:src "https://www.fillmurray.com/g/200/300.jpg"}] [:figcaption "Fill murray"]])))
+
 
   (t/testing "img-link"
     (t/is (= (sut/link->html (sample-links :img-file))
-             [:img {:src "./test-img.png"}])))
+             [:img {:src "test-img.png"}])))
 
   (t/testing "img-rel-file"
     (t/is (= (sut/link->html (sample-links :img-rel-file))
@@ -40,4 +40,4 @@
 
   (t/testing "internal-link"
     (t/is (= (sut/link->html (sample-links :file-link))
-             [:a {:href "./file2.html"} "File 2"]))))
+             [:a.firn_internal {:href "./file2.html"} "File 2"]))))
