@@ -9,7 +9,6 @@
             [firn.util :as u]
             [firn.org :as org]
             [firn.layout :as layout]))
-           
 
 (defn strip-file-ext
   "Removes a file extension from a file path string.
@@ -23,15 +22,18 @@
   "Determines the web path of the file from the cwd.
   `dirname-files`: demo_org
   `file-path-abs`: /Users/tees/Projects/firn/firn/test/firn/demo_org/jam/jo/foo/file2.org
-  `returns`      : jam/jo/foo/file2"
+  `returns`      : jam/jo/foo/file2
+
+  NOTE: currently, you cannot have the `name` of your folder of org
+  files appear earlier in the path to those files. FIXME: brittle.
+  invalid example: `/users/foo/my-wiki/another-dir/my-wiki/file1.org`"
+
   [dirname-files file-path-abs]
-  (let [path-abs-list (-> file-path-abs (s/split #"/"))]
-    (loop [dirs-reversed (reverse path-abs-list)
-           out           []]
-      (if (= (first dirs-reversed) dirname-files)
-        (->> out reverse (s/join "/") (strip-file-ext "org"))
-        (recur (rest dirs-reversed)
-               (conj out (first dirs-reversed)))))))
+  (->> (s/split file-path-abs #"/")
+       (drop-while #(not (= % dirname-files)))
+       rest
+       (s/join "/")
+       (strip-file-ext "org")))
 
 (defn get-io-name
   "Returns the name of a file from the Java ioFile object w/o an extension."
@@ -115,8 +117,8 @@
             headline-meta-data {:from-headline (-> headline-val :children first :raw)} ;; raw headline for now.
             logbook-aug        #(merge % headline-meta-data)
             new-output         (if (= (:type curr-item) "clock")
-                                (conj output (logbook-aug curr-item))
-                                output)]
+                                 (conj output (logbook-aug curr-item))
+                                 output)]
         (recur remaining-items new-output headline-val)))))
 
 (defn extract-metadata
