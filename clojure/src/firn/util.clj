@@ -21,9 +21,19 @@
        (= "runtime" (System/getProperty "org.graalvm.nativeimage.imagecode"))))
 
 (defn print-err!
-  "A semantic error function."
-  [& args]
-  (apply println args))
+  "A custom error function.
+  Prints errors, expecting a type to specified (:warning, :error etc.)
+  Currently, also returns false after printing error message, so we can
+  use that for control flow or for tests.
+  TODO: read up on error testing and how to best handle these things.
+  "
+  [typ & args]
+  (let [err-types   {:warning       "🚧 Warning:"
+                     :error         "❗ Error:"
+                     :uncategorized "🗒 Uncategorized Error:"}
+        sel-log-typ (get err-types typ (get err-types :uncategorized))]
+    (apply println sel-log-typ args)
+    false))
 
 (defn str->keywrd
   [& args]
@@ -71,5 +81,12 @@
                   .getAbsolutePath
                   (s/split #"/")
                   drop-last)))
+
+(defn dupe-name-in-dir-path?
+  "Takes a str path of a directory and checks if a folder name appears more than
+  once in the path"
+  [dir-path dir-name]
+  (> (get (frequencies (s/split dir-path #"/")) dir-name) 1))
+
 
 (def spy #(do (println "DEBUG:" %) %))

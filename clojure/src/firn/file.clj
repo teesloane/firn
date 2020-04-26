@@ -25,15 +25,18 @@
   `returns`      : jam/jo/foo/file2
 
   NOTE: currently, you cannot have the `name` of your folder of org
-  files appear earlier in the path to those files. FIXME: brittle.
+  files appear earlier in the path to those files.
   invalid example: `/users/foo/my-wiki/another-dir/my-wiki/file1.org`"
 
   [dirname-files file-path-abs]
-  (->> (s/split file-path-abs #"/")
-       (drop-while #(not (= % dirname-files)))
-       rest
-       (s/join "/")
-       (strip-file-ext "org")))
+  (if (u/dupe-name-in-dir-path? file-path-abs dirname-files)
+    (u/print-err! :warning "\nWell, well, well. You've stumbled into one of weird edge cases of using Firn. \nCongrats on getting here! Let's look at what's happening. \n\nThe directory of your org files appears twice in it's path:\n\n<<" file-path-abs ">>\n\nIn order to properly build web-paths for your files, Firn needs to know where your 'web-root' is. \nWe cannot currently detect which folder is your file root. \nTo solve this, either rename your directory of org files: \n\n<<" dirname-files ">>\n\nor rename the earlier instance in the path of the same name.")
+    (->> (s/split file-path-abs #"/")
+         (drop-while #(not (= % dirname-files)))
+         rest
+         (s/join "/")
+         (strip-file-ext "org"))))
+
 
 (defn get-io-name
   "Returns the name of a file from the Java ioFile object w/o an extension."

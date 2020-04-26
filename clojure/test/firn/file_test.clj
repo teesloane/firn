@@ -24,4 +24,8 @@
   (t/testing "It properly builds webpath"
     (t/is
      (= "baz/foo/test"
-        (sut/get-web-path "my-files" "foo/bar/my-files/baz/foo/test.org")))))
+        (sut/get-web-path "my-files" "foo/bar/my-files/baz/foo/test.org"))))
+  (t/testing "It returns false (and print an error msg when an invalid path.)"
+    (t/is
+     (= false
+        (sut/get-web-path "my-files" "foo/bar/my-files/baz/my-files/test.org")))))
