@@ -14,6 +14,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
-      run: lein deps
+      run: cd clojure; lein deps
     - name: Run tests
-      run: lein test
+      run: cd clojure; lein test
