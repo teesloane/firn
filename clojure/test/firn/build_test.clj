@@ -4,7 +4,6 @@
             [me.raynes.fs :as fs]
             [clojure.test :as t]))
 
-
 (t/deftest new-site
   (stub/delete-firn-dir)
 
@@ -24,8 +23,6 @@
 
   (t/testing "Trying to create again when _firn already exists should return false"
     (t/is (= false (sut/new-site {:dir-files stub/test-dir})))))
-
-
 
 (t/deftest setup
   ;; setup requires that you have the _firn site in place; so:

@@ -59,8 +59,6 @@
     (assoc
      config :org-files org-files :layouts layouts-map :partials partials-map)))
 
-
-
 (defn write-files
   "Takes a config, of which we can presume has :processed-files.
   Iterates on these files, and writes them to html using layouts."
@@ -72,8 +70,6 @@
       (when-not (file/is-private? config f)
         (io/make-parents out-file-name)
         (spit out-file-name out-html)))))
-
-
 
 (defn all-files
   "Processes all files in the org-directory"

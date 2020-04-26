@@ -4,7 +4,6 @@
             [firn.config :as config]))
 
 (def test-dir      "test/firn/demo_org")
-(def wiki-dir      "/users/tees/Dropbox/wiki")
 
 (defn build-test-files
   [dir-to-build]
@@ -12,5 +11,4 @@
   (build/new-site {:dir-files dir-to-build})
   (build/all-files {:dir-files dir-to-build}))
 
-(build-test-files wiki-dir)
 (build-test-files test-dir)

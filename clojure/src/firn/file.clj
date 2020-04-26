@@ -66,10 +66,15 @@
   (merge f m))
 
 (defn get-keywords
-  "Returns a list of org-keywords from a file.
-  Presumes that all org files start with a keyword (NOTE: I think.)"
+  "Returns a list of org-keywords from a file. All files must have keywords.
+  FIXME: If no keywords present - prints an error, but processing continues.
+  Should I throw an error or System/exit?"
   [f]
-  (get-in f [:as-edn :children 0 :children]))
+  (let [expected-keywords (get-in f [:as-edn :children 0 :children])]
+    (if (= "keyword" (:type (first expected-keywords)))
+      expected-keywords
+      (u/print-err! :error "The org file <<" (f :name) ">> does not have 'front-matter' Please set at least the #+TITLE keyword for your file."))
+    []))
 
 (defn get-keyword
   "Fetches a(n org) #+keyword from a file, if it exists."
