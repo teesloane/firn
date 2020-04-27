@@ -20,8 +20,8 @@
    :keywords  [{:type "keyword", :key "TITLE", :value "Firn", :post_blank 0} {:type "keyword", :key "DATE_CREATED", :value "<2020-03-01 09:53>", :post_blank 0} {:type "keyword", :key "DATE_UPDATED", :value "<2020-04-26 15:43>", :post_blank 0} {:type "keyword", :key "FIRN_UNDER", :value "project", :post_blank 0} {:type "keyword", :key "FIRN_LAYOUT", :value "project", :post_blank 0}],
    :org-title "Firn",
    :as-edn {:type      "document", :pre_blank 0, :children [{:type "section", :children [{:type "keyword", :key "TITLE", :value "Firn", :post_blank 0} {:type "keyword", :key "DATE_CREATED", :value "<2020-03-01 09:53>", :post_blank 0} {:type "keyword", :key "DATE_UPDATED", :value "<2020-04-26 15:43>", :post_blank 0} {:type "keyword", :key "FIRN_UNDER", :value "project", :post_blank 0} {:type "keyword", :key "FIRN_LAYOUT", :value "project", :post_blank 0}]} {:type  "headline", :level 1, :children [{:type       "title", :level      1, :raw        "Foo", :post_blank 0, :children   [{:type "text", :value "Foo"}]} {:type "section", :children [{:type       "paragraph", :post_blank 0, :children   [{:type "text", :value "Hi there!"}]}]}]}]},
-   :links     ()}
-  )
+   :links     ()})
+
 
 (t/deftest strip-file-ext
   (t/testing "it properly strips extensions."
@@ -44,7 +44,7 @@
 
 (t/deftest make
   (t/testing "Has correct values with the dummy io-file"
-    (let [new-file (sut/make (stub/make-dummy-config)
+    (let [new-file (sut/make (stub/sample-config)
                              stub/test-file-1)]
 
       (t/is (= (new-file :name)    "file1"))
@@ -57,6 +57,27 @@
       (doseq [keywrd res]
         (t/is (= "keyword" (:type keywrd))))))
 
-  (t/testing "A file without keywords should return false"
-    (let [res (sut/get-keywords stub/test-file-no-keywords-processed)]
-      (t/is (= [] res))))) ;; FIXME - should throw an error?
+  #_(t/testing "A file without keywords should return false"
+      (let [res (sut/get-keywords stub/test-file-no-keywords-processed)]
+        (t/is (= false res))))) ;; FIXME - should throw an error?
+
+(t/deftest get-keyword
+  (t/testing "It returns a keyword"
+    (let [res (sut/get-keyword stub/test-file-1-processed "FIRN_LAYOUT")]
+      (t/is (= "default" res)))))
+
+(t/deftest keywords->map
+  (t/testing "A list of keywords gets converted into a map. "
+    (let [res (sut/keywords->map stub/test-file-1-processed)]
+      (t/is (= res {:title "Sample File!" :firn-layout "default"}))
+      res)))
+
+(t/deftest is-private?
+  (t/testing "Returns true when a file has a private keywords"
+    (let [config             (stub/sample-config)
+          file               stub/test-file-private-processed
+          file-2             stub/test-file-private-subfolder-processed
+          is-priv?           (sut/is-private? config file)
+          is-priv-subfolder? (sut/is-private? config file-2)]
+      (t/is(= is-priv? true))
+      (t/is(= is-priv-subfolder? true)))))

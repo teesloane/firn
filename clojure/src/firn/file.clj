@@ -73,8 +73,7 @@
   (let [expected-keywords (get-in f [:as-edn :children 0 :children])]
     (if (= "keyword" (:type (first expected-keywords)))
       expected-keywords
-      (u/print-err! :error "The org file <<" (f :name) ">> does not have 'front-matter' Please set at least the #+TITLE keyword for your file."))
-    []))
+      (u/print-err! :error "The org file <<" (f :name) ">> does not have 'front-matter' Please set at least the #+TITLE keyword for your file."))))
 
 (defn get-keyword
   "Fetches a(n org) #+keyword from a file, if it exists."

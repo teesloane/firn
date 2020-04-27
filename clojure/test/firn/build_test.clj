@@ -29,7 +29,7 @@
   ;; setup requires that you have the _firn site in place; so:
   (sut/new-site {:dir-files stub/test-dir})
 
-  (let [config      (stub/make-dummy-config)
+  (let [config      (stub/sample-config)
         setup-config (sut/setup config)]
     (t/testing "expect org-files, layouts and partials to be a key in config"
       (t/is (= true (empty? (config :org-files))))
