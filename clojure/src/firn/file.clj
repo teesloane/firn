@@ -37,7 +37,6 @@
          (s/join "/")
          (strip-file-ext "org"))))
 
-
 (defn get-io-name
   "Returns the name of a file from the Java ioFile object w/o an extension."
   [f]

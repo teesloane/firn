@@ -4,7 +4,6 @@
             [firn.util :as u]
             [me.raynes.fs :as fs]))
 
-
 (def starting-config
   {:dir-attach    "data"    ; org attachments/files to get copied into _site.
    :dir-files     nil       ; where org content lives.

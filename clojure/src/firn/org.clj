@@ -15,10 +15,10 @@
   (if (u/native-image?)
     (ClojureRust/getFreeMemory file-str)
     (let [parser "../bin/parser"
-            res    (sh/sh parser file-str)]
-        (if-not (= (res :exit) 0)
-          (prn "Orgize failed to parse file." file-str res)
-          (res :out)))))
+          res    (sh/sh parser file-str)]
+      (if-not (= (res :exit) 0)
+        (prn "Orgize failed to parse file." file-str res)
+        (res :out)))))
 
 (defn- get-headline-helper
   "Sanitizes a heading of links and just returns text.

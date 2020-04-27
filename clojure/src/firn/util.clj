@@ -3,7 +3,7 @@
             ;; vendored me.raynes.fs because it needed type hint changes to compiled with graal
             [firn.fs :as fss]
             [sci.core :as sci]))
- 
+
 (defn get-files-of-type
   "Takes an io/file sequence and gets all files of a specific extension."
   [fileseq ext]
@@ -87,6 +87,5 @@
   once in the path"
   [dir-path dir-name]
   (> (get (frequencies (s/split dir-path #"/")) dir-name) 1))
-
 
 (def spy #(do (println "DEBUG:" %) %))

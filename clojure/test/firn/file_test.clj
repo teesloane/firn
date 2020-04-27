@@ -1,4 +1,7 @@
 (ns firn.file-test
+  "These tests heavily rely on the demo files that we process in stubs.clj.
+  Generally, for each function we should have an org file with the minimum
+  required contents for testing."
   (:require [firn.file :as sut]
             [firn.stubs :as stub]
             [clojure.test :as t]))
@@ -6,6 +9,7 @@
 
 ;; This represents the file "object" - a map of value that accumulate from
 ;; parsing and munging an org file.
+
 
 (t/use-fixtures :each stub/test-wrapper)
 
@@ -21,7 +25,6 @@
    :org-title "Firn",
    :as-edn {:type      "document", :pre_blank 0, :children [{:type "section", :children [{:type "keyword", :key "TITLE", :value "Firn", :post_blank 0} {:type "keyword", :key "DATE_CREATED", :value "<2020-03-01 09:53>", :post_blank 0} {:type "keyword", :key "DATE_UPDATED", :value "<2020-04-26 15:43>", :post_blank 0} {:type "keyword", :key "FIRN_UNDER", :value "project", :post_blank 0} {:type "keyword", :key "FIRN_LAYOUT", :value "project", :post_blank 0}]} {:type  "headline", :level 1, :children [{:type       "title", :level      1, :raw        "Foo", :post_blank 0, :children   [{:type "text", :value "Foo"}]} {:type "section", :children [{:type       "paragraph", :post_blank 0, :children   [{:type "text", :value "Hi there!"}]}]}]}]},
    :links     ()})
-
 
 (t/deftest strip-file-ext
   (t/testing "it properly strips extensions."
@@ -55,11 +58,7 @@
   (t/testing "A file with keywords returns a vector where each item is a map with a key of :type 'keyword'"
     (let [res (sut/get-keywords stub/test-file-1-processed)]
       (doseq [keywrd res]
-        (t/is (= "keyword" (:type keywrd))))))
-
-  #_(t/testing "A file without keywords should return false"
-      (let [res (sut/get-keywords stub/test-file-no-keywords-processed)]
-        (t/is (= false res))))) ;; FIXME - should throw an error?
+        (t/is (= "keyword" (:type keywrd)))))))
 
 (t/deftest get-keyword
   (t/testing "It returns a keyword"
@@ -79,5 +78,17 @@
           file-2             stub/test-file-private-subfolder-processed
           is-priv?           (sut/is-private? config file)
           is-priv-subfolder? (sut/is-private? config file-2)]
-      (t/is(= is-priv? true))
-      (t/is(= is-priv-subfolder? true)))))
+      (t/is (= is-priv? true))
+      (t/is (= is-priv-subfolder? true)))))
+
+(t/deftest extract-metadata
+  (let [file stub/test-file-metadata-processed]
+    (prn (file :logbook))
+    (t/testing "Pulls links and logbook entries from a file"
+      (t/is (seq (file :links)))
+      (t/is (seq (file :logbook))))
+    (t/testing "The logbook is associated with a heading."
+      (let [first-entries (-> file :logbook first)]
+        (t/is (= "A headline with a normal log-book." (first-entries :from-headline)))))))
+
+(def x '({:type "clock", :start {:year 2020, :month 4, :day 27, :dayname "Mon", :hour 16, :minute 9}, :end {:year 2020, :month 4, :day 27, :dayname "Mon", :hour 16, :minute 20}, :duration "0:11", :post_blank 0, :from-headline "A headline with a normal log-book.", :from-file "file-metadata", :from-file-path "file-metadata"} {:type "clock", :start {:year 2020, :month 4, :day 26, :dayname "Sun", :hour 16, :minute 9}, :end {:year 2020, :month 4, :day 26, :dayname "Sun", :hour 18, :minute 20}, :duration "2:11", :post_blank 0, :from-headline "A headline with a normal log-book.", :from-file "file-metadata", :from-file-path "file-metadata"} {:type "clock", :start {:year 2020, :month 3, :day 9, :dayname "Mon", :hour 16, :minute 9}, :end {:year 2020, :month 3, :day 9, :dayname "Mon", :hour 18, :minute 20}, :duration "2:11", :post_blank 0, :from-headline "A headline with an out-of-order log-book.", :from-file "file-metadata", :from-file-path "file-metadata"} {:type "clock", :start {:year 2020, :month 4, :day 25, :dayname "Sat", :hour 16, :minute 9}, :end {:year 2020, :month 4, :day 25, :dayname "Sat", :hour 16, :minute 20}, :duration "0:11", :post_blank 0, :from-headline "A headline with an out-of-order log-book.", :from-file "file-metadata", :from-file-path "file-metadata"}))

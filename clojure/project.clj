@@ -12,6 +12,7 @@
 
   :jvm-opts ["-Djava.library.path=./resources"]
   :java-source-paths ["src-java"]
+  :plugins [[lein-cljfmt "0.6.7"]]
   :resources-paths ["resources"]
   :main firn.core
   :profiles {:uberjar {:aot :all

@@ -29,7 +29,6 @@
     (t/is (= (sut/link->html (sample-links :http-img))
              [:figure [:img {:src "https://www.fillmurray.com/g/200/300.jpg"}] [:figcaption "Fill murray"]])))
 
-
   (t/testing "img-link"
     (t/is (= (sut/link->html (sample-links :img-file))
              [:img {:src "test-img.png"}])))

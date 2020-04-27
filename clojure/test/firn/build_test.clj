@@ -6,7 +6,6 @@
 
 (t/use-fixtures :each stub/test-wrapper)
 
-
 (t/deftest new-site
   ;; The _firn site shouldn't exist yet when new-site is called.
   (t/testing "The _firn site shouldn't exist yet"
