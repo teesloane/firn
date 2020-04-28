@@ -104,6 +104,15 @@
      (some? in-priv-folder?)
      (some? is-private?))))
 
+(defn- sort-logbook
+  "Loops over all logbooks, adds start and end unix timestamps."
+  [logbook]
+  (->> logbook
+      ;; adds a unix timestamp for the :start and :end time.
+      (map #(assoc % :start-ts (org/parsed-org-date->unix-time (:start %))
+                     :end-ts   (org/parsed-org-date->unix-time (:end %))))
+      (sort-by :start-ts #(> %1 %2))))
+
 (defn extract-metadata-logbook-helper
   "Extracts the logbook and associates the parent headline's metadata with it.
   Because we are dealing with a flattened tree sequence we have to loop through
@@ -131,14 +140,15 @@
   "Iterates over a tree, and returns metadata for site-wide usage such as
   links (for graphing between documents, tbd) and logbook entries."
   [file]
-  (let [org-tree      (file :as-edn)
-        tree-data     (tree-seq map? :children org-tree)
-        file-metadata {:from-file (file :name) :from-file-path (file :path-web)}
-        links         (filter #(= "link"  (:type %)) tree-data)
-        logbook       (extract-metadata-logbook-helper tree-data)
-        logbook-aug   (map #(merge % file-metadata) logbook)
-        links-aug     (map #(merge % file-metadata) links)]
-    {:links links-aug :logbook logbook-aug}))
+  (let [org-tree       (file :as-edn)
+        tree-data      (tree-seq map? :children org-tree)
+        file-metadata  {:from-file (file :name) :from-file-path (file :path-web)}
+        links          (filter #(= "link"  (:type %)) tree-data)
+        logbook        (extract-metadata-logbook-helper tree-data)
+        logbook-aug    (map #(merge % file-metadata) logbook)
+        logbook-sorted (sort-logbook logbook-aug)
+        links-aug      (map #(merge % file-metadata) links)]
+    {:links links-aug :logbook logbook-sorted}))
 
 (defn htmlify
   "Renders files according to their `layout` keyword."
@@ -187,7 +197,8 @@
               output         (conj output processed-file)
               keyword-map    (keywords->map processed-file)
               new-site-map   (merge keyword-map {:path (processed-file :path-web)})
-              file-metadata  (extract-metadata processed-file)]
+              file-metadata  (extract-metadata processed-file)] ;; FIXME: why are we calling this once when we can pull the results out from `processed-file / via procssed one`?!
+
 
           ;; add to sitemap when file is not private.
           (when-not (is-private? config processed-file)

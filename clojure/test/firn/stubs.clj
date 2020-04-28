@@ -45,7 +45,6 @@
 (def test-file-metadata-processed                 (file/process-one (sample-config) test-file-metadata))
 
 
-
 ;; fixtures
 
 

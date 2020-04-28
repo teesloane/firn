@@ -82,13 +82,18 @@
       (t/is (= is-priv-subfolder? true)))))
 
 (t/deftest extract-metadata
-  (let [file stub/test-file-metadata-processed]
-    (prn (file :logbook))
+  (let [file        stub/test-file-metadata-processed
+        start-times (map #(% :start-ts) (file :logbook))]
     (t/testing "Pulls links and logbook entries from a file"
       (t/is (seq (file :links)))
       (t/is (seq (file :logbook))))
+
     (t/testing "The logbook is associated with a heading."
       (let [first-entries (-> file :logbook first)]
-        (t/is (= "A headline with a normal log-book." (first-entries :from-headline)))))))
+        (t/is (= "A headline with a normal log-book." (first-entries :from-headline)))))
 
-(def x '({:type "clock", :start {:year 2020, :month 4, :day 27, :dayname "Mon", :hour 16, :minute 9}, :end {:year 2020, :month 4, :day 27, :dayname "Mon", :hour 16, :minute 20}, :duration "0:11", :post_blank 0, :from-headline "A headline with a normal log-book.", :from-file "file-metadata", :from-file-path "file-metadata"} {:type "clock", :start {:year 2020, :month 4, :day 26, :dayname "Sun", :hour 16, :minute 9}, :end {:year 2020, :month 4, :day 26, :dayname "Sun", :hour 18, :minute 20}, :duration "2:11", :post_blank 0, :from-headline "A headline with a normal log-book.", :from-file "file-metadata", :from-file-path "file-metadata"} {:type "clock", :start {:year 2020, :month 3, :day 9, :dayname "Mon", :hour 16, :minute 9}, :end {:year 2020, :month 3, :day 9, :dayname "Mon", :hour 18, :minute 20}, :duration "2:11", :post_blank 0, :from-headline "A headline with an out-of-order log-book.", :from-file "file-metadata", :from-file-path "file-metadata"} {:type "clock", :start {:year 2020, :month 4, :day 25, :dayname "Sat", :hour 16, :minute 9}, :end {:year 2020, :month 4, :day 25, :dayname "Sat", :hour 16, :minute 20}, :duration "0:11", :post_blank 0, :from-headline "A headline with an out-of-order log-book.", :from-file "file-metadata", :from-file-path "file-metadata"}))
+    (t/testing "check that logbook gets sorted: most-recent -> least-recent by :start-ts"
+      ;; a clever way (I borrowed) to check if vals in a list are sorted.
+      (t/is (apply >= start-times)))))
+
+

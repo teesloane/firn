@@ -17,7 +17,7 @@ CLOCK: [2020-04-26 Sun 16:09]--[2020-04-26 Sun 18:20] =>  2:11
 
 * A headline with an out-of-order log-book.
 :LOGBOOK:
-CLOCK: [2020-03-09 Mon 16:09]--[2020-03-09 Mon 18:20] =>  2:11
+CLOCK: [2017-03-09 Thu 16:09]--[2017-03-09 Thu 18:20] =>  2:11
 CLOCK: [2020-04-25 Sat 16:09]--[2020-04-25 Sat 16:20] =>  0:11
 :END:
 * A headline with some (2) links.
