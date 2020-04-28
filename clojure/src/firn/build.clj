@@ -44,9 +44,9 @@
 
   (let [layout-files  (u/find-files-by-ext dir-layouts "clj")
         partial-files (u/find-files-by-ext dir-partials "clj")
-        partials-map  (u/file-list->key-file-map partial-files)
+        partials-map  (u/load-fns-into-map partial-files)
         org-files     (u/find-files-by-ext dir-files "org") ;; could bail if this is empty...
-        layouts-map   (u/file-list->key-file-map layout-files)]
+        layouts-map   (u/load-fns-into-map layout-files)]
 
     (fs/mkdir (config :dir-site)) ;; make _site
 

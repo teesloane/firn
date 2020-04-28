@@ -11,11 +11,15 @@
   (:require [clojure.java.io :as io]
             [me.raynes.fs :as fs]
             [firn.config :as config]
+            [clojure.test]
             [firn.file :as file]
             [firn.build :as build]))
 
 (def test-dir    "test/firn/demo_org")
 (def firn-dir    (str test-dir "/_firn"))
+
+(defmethod clojure.test/report :begin-test-var [m]
+  (println "Running test: " (-> m :var meta :name)))
 
 (defn delete-firn-dir
   []
@@ -23,33 +27,32 @@
 
 (defn sample-config
   []
+  (delete-firn-dir)
   (build/new-site {:dir-files test-dir})
   (config/prepare test-dir))
 
 
-;; TODO: This should all get abstracted into a map.
+;; org test files that we can request using "get-test-file"
+(def test-files
+  {:tf-1                 "file1.org"
+   :tf-small             "file-small.org"
+   :tf-private           "file-private.org"
+   :tf-private-subfolder "priv/file1.org"
+   :tf-metadata          "file-metadata.org"})
 
-
-(def test-file-1                       (io/file "test/firn/demo_org/file1.org"))
-;; (def test-file-no-keywords             (io/file "test/firn/demo_org/file-no-keywords.org")) ;; FIXME: this needs to be tested against the binary output.
-(def test-file-small                   (io/file "test/firn/demo_org/file-small.org"))
-(def test-file-private                 (io/file "test/firn/demo_org/file-private.org"))
-(def test-file-private-subfolder       (io/file "test/firn/demo_org/file-private.org"))
-(def test-file-metadata                 (io/file "test/firn/demo_org/file-metadata.org"))
-;; Processed test files.
-(def test-file-1-processed             (file/process-one (sample-config) test-file-1))
-;; (def test-file-no-keywords-processed   (file/process-one (sample-config) test-file-no-keywords))
-(def test-file-small-processed         (file/process-one (sample-config) test-file-1))
-(def test-file-private-processed       (file/process-one (sample-config) test-file-private))
-(def test-file-private-subfolder-processed       (file/process-one (sample-config) test-file-private))
-(def test-file-metadata-processed                 (file/process-one (sample-config) test-file-metadata))
-
+(defn gtf ; stands for get-test-file
+  "Gets a test org file, and can return it as an io object or a processed file."
+  [tf res-form]
+  (let [file-path (str "test/firn/demo_org/" (get test-files tf))
+        prep-config (sample-config)]
+    (case res-form
+      :path      file-path
+      :io        (io/file file-path)
+      :processed (->> file-path io/file (file/process-one prep-config)))))
 
 ;; fixtures
 
-
 (defn test-wrapper
   [f-test]
-  (println "Running test...")
   (delete-firn-dir)
   (f-test))

@@ -1,7 +1,7 @@
 (ns firn.util
   (:require [clojure.string :as s]
             ;; vendored me.raynes.fs because it needed type hint changes to compiled with graal
-            [firn.fs :as fss]
+            [me.raynes.fs :as fs]
             [sci.core :as sci]))
 
 (defn get-files-of-type
@@ -33,9 +33,11 @@
                      :uncategorized "🗒 Uncategorized Error:"}
         sel-log-typ (get err-types typ (get err-types :uncategorized))]
     (apply println sel-log-typ args)
-    false))
+    ;; (System/exit 1) ;; FIXME: this is the correct usage, but makes testing difficult as it interrupts lein test.
+    nil))
 
 (defn str->keywrd
+  "Converts a string to a keyword"
   [& args]
   (keyword (apply str args)))
 
@@ -43,7 +45,7 @@
   "Traverses a directory for all files of a specific extension."
   [dir ext]
   (let [ext-regex (re-pattern (str "^.*\\.(" ext ")$"))
-        files     (fss/find-files dir ext-regex)]
+        files     (fs/find-files dir ext-regex)]
     (if (= 0 (count files))
       (do (println "No" ext "files found at " dir) files)
       files)))
@@ -59,11 +61,14 @@
   [io-file]
   (-> io-file file-name-no-ext keyword))
 
-(defn file-list->key-file-map
+(defn load-fns-into-map
   "Takes a list of files and returns a map of filenames as :keywords -> file
   NOTE: It also EVALS (using sci) the files so they are in memory functions!
-  FIXME: You should probably rename this file because it doens't JUST
-  map keys, it evals stuff."
+ 
+  so:                  `[my-file.clj my-layout.clj]`
+  ------------------------------- ▼ ▼ ▼ ----------------------------------------
+  becomes:    {:my-file fn-evald-1, :my-layout fn-evald-2}"
+
   [file-list]
   (let [file-path #(.getPath ^java.io.File %)
         eval-file #(-> % file-path slurp sci/eval-string)]
