@@ -14,7 +14,7 @@
   [file-str]
   (if (u/native-image?)
     (ClojureRust/getFreeMemory file-str)
-    (let [parser "../bin/parser"
+    (let [parser "resources/parser"
           res    (sh/sh parser file-str)]
       (if-not (= (res :exit) 0)
         (prn "Orgize failed to parse file." file-str res)
