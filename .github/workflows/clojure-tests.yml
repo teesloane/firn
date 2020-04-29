@@ -9,11 +9,15 @@ on:
 jobs:
   build:
 
+    # run on mac for now until I compile the parser for linux.
     runs-on: macOS-latest
     # runs-on: ubuntu-latest
 
     steps:
+
     - uses: actions/checkout@v2
+    - name: install lein
+      run: brew install leiningen
     - name: Install dependencies
       run: cd clojure; lein deps
     - name: Run tests
