@@ -12,7 +12,6 @@
   NOTE: When developing with a REPL, this shells out to the rust bin.
   When compiled to a native image, it uses JNI to talk to the rust .dylib."
   [file-str]
-  (prn "cwd is " (u/get-cwd))
   (if (u/native-image?)
     (ClojureRust/getFreeMemory file-str)
     (let [parser (str (u/get-cwd) "/resources/parser")
