@@ -1,42 +1,59 @@
 (ns firn.stubs
-  (:require  [clojure.test :as t]
-             [cheshire.core :as json]))
+  "Common files and data representations of files for tests.
+  Since Firn moves a data structure (config/file) through pipelines, testing is
+  still a bit loosely defined. For now, we process a series of files with
+  different attributes and test expected output from functions (even though the
+  data has probably run through several functions up to that point.)
 
-(def simple-file
-  {:type "document",
-   :children
-   [{:type "headline",
-     :level 1,
-     :children
-     [{:type "title",
-       :level 1,
-       :raw "A simple file",
-       :children
-       [{:type "text", :value "A simple file"}]}
-      {:type "section",
-       :children
-       [{:type "paragraph",
-         :children
-         [{:type "text",
-           :value "Hi there"}]}]}]}]})
+  When we can, we pass the minimal needed inputs for unit tests, but for the
+  rest, we have the stubs in this namespace.
+  "
+  (:require [clojure.java.io :as io]
+            [me.raynes.fs :as fs]
+            [firn.config :as config]
+            [clojure.test]
+            [firn.file :as file]
+            [firn.build :as build]))
 
-(def list-items
-  {:type "list",
-   :indent 0,
-   :ordered true,
-   :children
-   [{:type "list-item",
-     :bullet "1) ",
-     :children
-     [{:type "paragraph",
-       :children
-       [{:type "text", :value "hi\r"}]}]}
-    {:type "list-item",
-     :bullet "2) ",
-     :children
-     [{:type "paragraph",
-       :children
-       [{:type "text",
-         :value "hithere"}]}]}]})
+(def test-dir    "test/firn/demo_org")
+(def firn-dir    (str test-dir "/_firn"))
+
+(defmethod clojure.test/report :begin-test-var [m]
+  (println "Running test: " (-> m :var meta :name)))
+
+(defn delete-firn-dir
+  []
+  (fs/delete-dir firn-dir))
+
+(defn sample-config
+  []
+  (delete-firn-dir)
+  (build/new-site {:dir-files test-dir})
+  (config/prepare test-dir))
 
 
+;; org test files that we can request using "get-test-file"
+(def test-files
+  {:tf-1                 "file1.org"
+   :tf-small             "file-small.org"
+   :tf-private           "file-private.org"
+   :tf-private-subfolder "priv/file1.org"
+   :tf-layout            "file-layout.org"
+   :tf-metadata          "file-metadata.org"})
+
+(defn gtf ; stands for get-test-file
+  "Gets a test org file, and can return it as an io object or a processed file."
+  [tf res-form]
+  (let [file-path (str "test/firn/demo_org/" (get test-files tf))
+        prep-config (sample-config)]
+    (case res-form
+      :path      file-path
+      :io        (io/file file-path)
+      :processed (->> file-path io/file (file/process-one prep-config)))))
+
+;; fixtures
+
+(defn test-wrapper
+  [f-test]
+  (delete-firn-dir)
+  (f-test))

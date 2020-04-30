@@ -49,7 +49,7 @@
 
     (cond
       ;; Images ---
-      ;; img file or attach: `file:` | `download:`
+      ;; img file or attach: `file:`
       (re-matches img-file-regex link-href)
       (img-link->figure {:desc link-val :path (img-make-url)})
 
@@ -63,10 +63,10 @@
 
       ;; org files
       (re-matches org-file-regex link-href)
-      [:a.internal {:href (file-path (re-matches org-file-regex link-href))} link-val]
+      [:a.firn_internal {:href (file-path (re-matches org-file-regex link-href))} link-val]
 
       (re-matches http-link-regex link-href)
-      [:a.external {:href link-href :target "_blank"} link-val]
+      [:a.firn_external {:href link-href :target "_blank"} link-val]
 
       :else
       [:a {:href link-href}])))

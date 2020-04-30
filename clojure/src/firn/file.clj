@@ -5,9 +5,10 @@
 
   You can view the file data-structure as it is made by the `make` function."
   (:require [clojure.string :as s]
+            [cheshire.core :as json]
             [firn.util :as u]
+            [firn.org :as org]
             [firn.layout :as layout]))
-           
 
 (defn strip-file-ext
   "Removes a file extension from a file path string.
@@ -21,15 +22,20 @@
   "Determines the web path of the file from the cwd.
   `dirname-files`: demo_org
   `file-path-abs`: /Users/tees/Projects/firn/firn/test/firn/demo_org/jam/jo/foo/file2.org
-  `returns`      : jam/jo/foo/file2"
+  `returns`      : jam/jo/foo/file2
+
+  NOTE: currently, you cannot have the `name` of your folder of org
+  files appear earlier in the path to those files.
+  invalid example: `/users/foo/my-wiki/another-dir/my-wiki/file1.org`"
+
   [dirname-files file-path-abs]
-  (let [path-abs-list (-> file-path-abs (s/split #"/"))]
-    (loop [dirs-reversed (reverse path-abs-list)
-           out           []]
-      (if (= (first dirs-reversed) dirname-files)
-        (->> out reverse (s/join "/") (strip-file-ext "org"))
-        (recur (rest dirs-reversed)
-               (conj out (first dirs-reversed)))))))
+  (if (u/dupe-name-in-dir-path? file-path-abs dirname-files)
+    (u/print-err! :warning "\nWell, well, well. You've stumbled into one of weird edge cases of using Firn. \nCongrats on getting here! Let's look at what's happening. \n\nThe directory of your org files appears twice in it's path:\n\n<<" file-path-abs ">>\n\nIn order to properly build web-paths for your files, Firn needs to know where your 'web-root' is. \nWe cannot currently detect which folder is your file root. \nTo solve this, either rename your directory of org files: \n\n<<" dirname-files ">>\n\nor rename the earlier instance in the path of the same name.")
+    (->> (s/split file-path-abs #"/")
+         (drop-while #(not (= % dirname-files)))
+         rest
+         (s/join "/")
+         (strip-file-ext "org"))))
 
 (defn get-io-name
   "Returns the name of a file from the Java ioFile object w/o an extension."
@@ -59,10 +65,14 @@
   (merge f m))
 
 (defn get-keywords
-  "Returns a list of org-keywords from a file.
-  Presumes that all org files start with a keyword (NOTE: I think.)"
+  "Returns a list of org-keywords from a file. All files must have keywords.
+  FIXME: If no keywords present - prints an error, but processing continues.
+  Should I throw an error or System/exit?"
   [f]
-  (get-in f [:as-edn :children 0 :children]))
+  (let [expected-keywords (get-in f [:as-edn :children 0 :children])]
+    (if (= "keyword" (:type (first expected-keywords)))
+      expected-keywords
+      (u/print-err! :error "The org file <<" (f :name) ">> does not have 'front-matter' Please set at least the #+TITLE keyword for your file."))))
 
 (defn get-keyword
   "Fetches a(n org) #+keyword from a file, if it exists."
@@ -94,6 +104,15 @@
      (some? in-priv-folder?)
      (some? is-private?))))
 
+(defn- sort-logbook
+  "Loops over all logbooks, adds start and end unix timestamps."
+  [logbook]
+  (->> logbook
+      ;; adds a unix timestamp for the :start and :end time.
+      (map #(assoc % :start-ts (org/parsed-org-date->unix-time (:start %))
+                     :end-ts   (org/parsed-org-date->unix-time (:end %))))
+      (sort-by :start-ts #(> %1 %2))))
+
 (defn extract-metadata-logbook-helper
   "Extracts the logbook and associates the parent headline's metadata with it.
   Because we are dealing with a flattened tree sequence we have to loop through
@@ -113,22 +132,23 @@
             headline-meta-data {:from-headline (-> headline-val :children first :raw)} ;; raw headline for now.
             logbook-aug        #(merge % headline-meta-data)
             new-output         (if (= (:type curr-item) "clock")
-                                (conj output (logbook-aug curr-item))
-                                output)]
+                                 (conj output (logbook-aug curr-item))
+                                 output)]
         (recur remaining-items new-output headline-val)))))
 
 (defn extract-metadata
   "Iterates over a tree, and returns metadata for site-wide usage such as
   links (for graphing between documents, tbd) and logbook entries."
   [file]
-  (let [org-tree      (file :as-edn)
-        tree-data     (tree-seq map? :children org-tree)
-        file-metadata {:from-file (file :name) :from-file-path (file :path-web)}
-        links         (filter #(= "link"  (:type %)) tree-data)
-        logbook       (extract-metadata-logbook-helper tree-data)
-        logbook-aug   (map #(merge % file-metadata) logbook)
-        links-aug     (map #(merge % file-metadata) links)]
-    {:links links-aug :logbook logbook-aug}))
+  (let [org-tree       (file :as-edn)
+        tree-data      (tree-seq map? :children org-tree)
+        file-metadata  {:from-file (file :name) :from-file-path (file :path-web)}
+        links          (filter #(= "link"  (:type %)) tree-data)
+        logbook        (extract-metadata-logbook-helper tree-data)
+        logbook-aug    (map #(merge % file-metadata) logbook)
+        logbook-sorted (sort-logbook logbook-aug)
+        links-aug      (map #(merge % file-metadata) links)]
+    {:links links-aug :logbook logbook-sorted}))
 
 (defn htmlify
   "Renders files according to their `layout` keyword."
@@ -137,3 +157,53 @@
         as-html  (when-not (is-private? config f)
                    (layout/apply-layout config f layout))]
     (change f {:as-html as-html})))
+
+(defn process-one
+  "Munge the 'file' datastructure; slowly filling it up, using let-shadowing.
+  Essentially, converts `org-mode file string` -> json, edn, logbook, keywords"
+  [config f]
+  (let [new-file      (make config f)
+        as-json       (->> f slurp org/parse!)
+        as-edn        (-> as-json (json/parse-string true))
+        new-file      (change new-file {:as-json as-json :as-edn as-edn})
+        file-metadata (extract-metadata new-file)
+        new-file      (change new-file {:keywords  (get-keywords new-file)
+                                        :org-title (get-keyword new-file "TITLE")
+                                        :links     (file-metadata :links)
+                                        :logbook   (file-metadata :logbook)})]
+    new-file))
+
+(defn process-all
+  "Receives config, processes all files and builds up site-data
+  logbooks, site-map, link-map, etc."
+  [config]
+  (let [site-links (atom [])
+        site-logs  (atom [])
+        site-map   (atom [])]
+    ;; recurse over the org-files, gradually processing them and
+    ;; pulling out links, logs, and other useful data.
+    (loop [org-files (config :org-files)
+           output    []]
+      (if (empty? org-files)
+        (assoc config
+               :processed-files output
+               :site-map        @site-map
+               :site-links      @site-links
+               :site-logs       @site-logs)
+
+        (let [next-file      (first org-files)
+              processed-file (process-one config next-file)
+              org-files      (rest org-files)
+              output         (conj output processed-file)
+              keyword-map    (keywords->map processed-file)
+              new-site-map   (merge keyword-map {:path (processed-file :path-web)})
+              file-metadata  (extract-metadata processed-file)] ;; FIXME: why are we calling this once when we can pull the results out from `processed-file / via procssed one`?!
+
+
+          ;; add to sitemap when file is not private.
+          (when-not (is-private? config processed-file)
+            (swap! site-map conj new-site-map)
+            (swap! site-links concat @site-links (:links file-metadata))
+            (swap! site-logs concat @site-logs (:logbook file-metadata)))
+          ;; add links and logs to site wide data.
+          (recur org-files output))))))

@@ -14,11 +14,11 @@
   [file-str]
   (if (u/native-image?)
     (ClojureRust/getFreeMemory file-str)
-    (let [parser "../bin/parser"
-            res    (sh/sh parser file-str)]
-        (if-not (= (res :exit) 0)
-          (prn "Orgize failed to parse file." file-str res)
-          (res :out)))))
+    (let [parser (str (u/get-cwd) "/resources/parser")
+          res    (sh/sh parser (s/trim-newline file-str))]
+      (if-not (= (res :exit) 0)
+        (prn "Orgize failed to parse file." file-str res)
+        (res :out)))))
 
 (defn- get-headline-helper
   "Sanitizes a heading of links and just returns text.
@@ -61,3 +61,12 @@
   [tree name]
   (let [headline (get-headline tree name)]
     (update headline :children (fn [d] (filter #(not= (:type %) "title") d)))))
+
+(defn parsed-org-date->unix-time
+  "Converts the parsed org date (ex: [2020-04-27 Mon 15:39] -> 1588003740000)
+  and turns it into a unix timestamp."
+  [{:keys [year month day hour minute] :as pod}]
+  (let [pod->str    (str year "-" month "-" day "T" hour ":" minute ":00.000-0000")
+        sdf         (java.text.SimpleDateFormat. "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+        parsed-date (.parse sdf pod->str)]
+    (.getTime parsed-date)))

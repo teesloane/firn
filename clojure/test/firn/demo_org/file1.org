@@ -78,6 +78,9 @@ A =file:= link [[file:file2.org][File 2]]
 
 Some tables with texte markup in them
 
-|   1 |     2 |        3 | 4 |      5 |
-|-----+-------+----------+---+--------|
+|   1 |   2 |      3 | 4 |    5 |
+|-----+-----+--------+---+------|
 | foo | =foo= | /italic/ |   | *bold* |
+* A heading with a line of content
+
+Foo.

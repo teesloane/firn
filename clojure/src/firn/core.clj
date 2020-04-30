@@ -21,6 +21,8 @@
 
 
 ;; CLI commands
+
+
 (def CONFIGURATION
   {:app         {:command     "firn"
                  :description "A static-site generator for org-mode."
@@ -34,7 +36,6 @@
                   :description "Scaffolds files and folders needed to start a new site."
                   :opts        []
                   :runs        build/new-site}]})
-
 
 (defn -main
   "Parsed command line arguments and runs corresponding functions."
