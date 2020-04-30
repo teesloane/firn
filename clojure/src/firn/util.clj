@@ -33,8 +33,8 @@
                      :uncategorized "🗒 Uncategorized Error:"}
         sel-log-typ (get err-types typ (get err-types :uncategorized))]
     (apply println sel-log-typ args)
-    ;; (System/exit 1) ;; FIXME: this is the correct usage, but makes testing difficult as it interrupts lein test.
-    nil))
+    (System/exit 1))) ;; FIXME: this is the correct usage, but makes testing difficult as it interrupts lein test.
+
 
 (defn str->keywrd
   "Converts a string to a keyword"

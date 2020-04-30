@@ -45,5 +45,5 @@
       (doseq [f files]
         (t/is (= ".org" (fs/extension (.getPath f)))))))
   (t/testing "It returns an empty list when nothing is found"
-    (let [no-files (sut/find-files-by-ext stub/test-dir "fake-extension")]
+    (let [no-files (sut/find-files-by-ext stub/test-dir "foo")]
       (t/is (= (count no-files) 0)))))
