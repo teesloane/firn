@@ -5,6 +5,13 @@
             [firn.config :as config]
             [firn.file :as file]
             [firn.util :as u]
+            [mount.core :refer [defstate] :as mount]
+            [org.httpkit.server :as http]
+            ;; [reitit.ring :as ring]
+            [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
+            [ring.middleware.file :as r-file]
+            [ring.util.response :as response]
+            ;; [ring.adapter.jetty :as jetty]
             [me.raynes.fs :as fs]))
 
 (set! *warn-on-reflection* true)
@@ -78,3 +85,20 @@
     (->> config
          file/process-all
          write-files)))
+
+
+
+;; -- Server --
+
+(defn handler [request]
+  (let [uri   (request :uri)
+        final (str "/Users/tees/Dropbox/wiki/_firn/_site" uri ".html" )]
+    (response/file-response final )))
+
+
+(defn serve
+  [opts]
+  (mount/start))
+
+(serve {})
+

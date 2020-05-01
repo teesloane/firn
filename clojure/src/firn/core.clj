@@ -35,10 +35,16 @@
                  {:command     "new"
                   :description "Scaffolds files and folders needed to start a new site."
                   :opts        []
-                  :runs        build/new-site}]})
+                  :runs        build/new-site}
+                 {:command     "serve"
+                  :description "Runs a development server for processed org files."
+                  :opts        []
+                  :runs        build/serve}]})
+
 
 (defn -main
-  "Parsed command line arguments and runs corresponding functions."
+  "Parsed command line arguments and runs corresponding functions.
+  NOTE: This cannot be used from a REPL; run-cmd invokes system/exit."
   [& args]
   (init!)
   (clojure.lang.RT/loadLibrary "mylib")
