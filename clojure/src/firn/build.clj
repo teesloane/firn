@@ -6,7 +6,7 @@
             [firn.file :as file]
             [firn.util :as u]
             [mount.core :refer [defstate] :as mount]
-            ;; [org.httpkit.server :as http]
+            [org.httpkit.server :as http]
             ;; [reitit.ring :as ring]
             [ring.middleware.file :as r-file]
             [ring.util.response :as response]
@@ -14,6 +14,7 @@
             [me.raynes.fs :as fs]))
 
 (set! *warn-on-reflection* true)
+(declare server)
 
 ;; TODO: remove custom templates for release.
 (def default-files ["layouts/default.clj"
@@ -88,22 +89,17 @@
 
 ;; -- Server --
 
-(defn handler [request]
-  (let [uri   (request :uri)
-        final (str "/Users/tees/Dropbox/wiki/_firn/_site" uri ".html" )]
-    (prn "REQUEST URI IS "  uri)
-    (if-let [res (response/file-response final)]
-      res
-      (response/response "File not found"))))
-
-(defn handler2
+(defn handler
   [req]
-  (response/response "Hi there"))
+  (response/response "404. File Not Found"))
+
 
 (defstate server
-  :start (let [port 3000]
+  :start (let [port 3333]
            (println "🔥 starting on port:" port "🔥")
-           (jetty/run-jetty (r-file/wrap-file  handler2 "/Users/tees/Dropbox/wiki/_firn/_site") {:port port}))
+           (http/run-server
+            (r-file/wrap-file  handler "/Users/tees/Dropbox/wiki/_firn/_site")
+            {:port port}))
   :stop (when server (server :timeout 100)))
 
 (defn serve
@@ -111,6 +107,3 @@
   (mount/start))
 
 ;; (serve {})
-
-(mount/start)
-(mount/stop)

@@ -7,10 +7,9 @@
                  [cheshire "5.10.0"]
                  [cli-matic "0.3.11"]
                  [hiccup "1.0.5"]
-                 ;; [http-kit "2.3.0"]
+                 [http-kit "2.3.0"]
                  [me.raynes/fs "1.4.6"]
                  [ring "1.8.0"]
-                 [metosin/reitit "0.3.9"] ;; possibly remove
                  [mount "0.1.16"]
                  [org.clojure/clojure "1.9.0"]
                  [ring/ring-defaults "0.3.2"]]
