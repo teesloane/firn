@@ -6,12 +6,11 @@
             [firn.file :as file]
             [firn.util :as u]
             [mount.core :refer [defstate] :as mount]
-            [org.httpkit.server :as http]
+            ;; [org.httpkit.server :as http]
             ;; [reitit.ring :as ring]
-            [ring.middleware.defaults :refer [wrap-defaults api-defaults]]
             [ring.middleware.file :as r-file]
             [ring.util.response :as response]
-            ;; [ring.adapter.jetty :as jetty]
+            [ring.adapter.jetty :as jetty]
             [me.raynes.fs :as fs]))
 
 (set! *warn-on-reflection* true)
@@ -87,18 +86,31 @@
          write-files)))
 
 
-
 ;; -- Server --
 
 (defn handler [request]
   (let [uri   (request :uri)
         final (str "/Users/tees/Dropbox/wiki/_firn/_site" uri ".html" )]
-    (response/file-response final )))
+    (prn "REQUEST URI IS "  uri)
+    (if-let [res (response/file-response final)]
+      res
+      (response/response "File not found"))))
 
+(defn handler2
+  [req]
+  (response/response "Hi there"))
+
+(defstate server
+  :start (let [port 3000]
+           (println "🔥 starting on port:" port "🔥")
+           (jetty/run-jetty (r-file/wrap-file  handler2 "/Users/tees/Dropbox/wiki/_firn/_site") {:port port}))
+  :stop (when server (server :timeout 100)))
 
 (defn serve
   [opts]
   (mount/start))
 
-(serve {})
+;; (serve {})
 
+(mount/start)
+(mount/stop)
