@@ -86,24 +86,31 @@
          file/process-all
          write-files)))
 
-
 ;; -- Server --
 
-(defn handler
-  [req]
-  (response/response "404. File Not Found"))
-
+(defn file-server-middleware
+  [{:keys [dir-site dir-files]}]
+  (fn [request]
+    ;; Run our build setup.
+    ;; This is naive; everytime we visit a page it runs the build step.
+    (all-files {:dir-files dir-files})
+    (let [res-with-file (r-file/wrap-file request dir-site)]
+      (res-with-file request))))
 
 (defstate server
-  :start (let [port 3333]
-           (println "🔥 starting on port:" port "🔥")
-           (http/run-server
-            (r-file/wrap-file  handler "/Users/tees/Dropbox/wiki/_firn/_site")
-            {:port port}))
+  :start (let [args          (mount/args)
+               path          (get args :-path (u/get-cwd))
+               path-to-site  (str path "_firn/_site")
+               opts          {:dir-site path-to-site :dir-files path}
+               port          3333]
+           (if-not (fs/exists? path-to-site)
+             (println "Couldn't find a _firn/ folder. Have you run `Firn new` and created a site yet?")
+             (do (println "🏔 Starting Firn development server on:" port)
+                 (http/run-server (file-server-middleware opts) {:port port}))))
   :stop (when server (server :timeout 100)))
 
 (defn serve
   [opts]
-  (mount/start))
+  (mount/start-with-args opts))
 
-;; (serve {})
+;; (serve {:-path "/Users/tees/Dropbox/wiki/"})
