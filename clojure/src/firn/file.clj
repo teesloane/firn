@@ -106,11 +106,11 @@
 
 (defn- sort-logbook
   "Loops over all logbooks, adds start and end unix timestamps."
-  [logbook]
+  [logbook file]
   (->> logbook
       ;; adds a unix timestamp for the :start and :end time.
-      (map #(assoc % :start-ts (org/parsed-org-date->unix-time (:start %))
-                     :end-ts   (org/parsed-org-date->unix-time (:end %))))
+      (map #(assoc % :start-ts (org/parsed-org-date->unix-time (:start %) file)
+                     :end-ts   (org/parsed-org-date->unix-time (:end %) file)))
       (sort-by :start-ts #(> %1 %2))))
 
 (defn extract-metadata-logbook-helper
@@ -146,7 +146,7 @@
         links          (filter #(= "link"  (:type %)) tree-data)
         logbook        (extract-metadata-logbook-helper tree-data)
         logbook-aug    (map #(merge % file-metadata) logbook)
-        logbook-sorted (sort-logbook logbook-aug)
+        logbook-sorted (sort-logbook logbook-aug file)
         links-aug      (map #(merge % file-metadata) links)]
     {:links links-aug :logbook logbook-sorted}))
 

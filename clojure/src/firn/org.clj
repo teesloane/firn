@@ -65,8 +65,12 @@
 (defn parsed-org-date->unix-time
   "Converts the parsed org date (ex: [2020-04-27 Mon 15:39] -> 1588003740000)
   and turns it into a unix timestamp."
-  [{:keys [year month day hour minute] :as pod}]
+  [{:keys [year month day hour minute] :as pod}
+   {:keys [name] :as file}]
   (let [pod->str    (str year "-" month "-" day "T" hour ":" minute ":00.000-0000")
-        sdf         (java.text.SimpleDateFormat. "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-        parsed-date (.parse sdf pod->str)]
-    (.getTime parsed-date)))
+        sdf         (java.text.SimpleDateFormat. "yyyy-MM-dd'T'HH:mm:ss.SSSZ")]
+    (try
+      (.getTime (.parse sdf pod->str))
+      ;; TODO: This should probably run System.exit / use print-err!
+      (catch Exception e
+        (println (str "\nFailed to parse the logbook for :" "<<"name">>" "\nThe logbook may be incorrectly formatted.\nError value:" e))))))
