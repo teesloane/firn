@@ -44,7 +44,9 @@
 
 (defn -main
   "Parsed command line arguments and runs corresponding functions.
-  NOTE: This cannot be used from a REPL; run-cmd invokes system/exit."
+  NOTE: This cannot be used from a REPL; run-cmd invokes system/exit.
+  TODO: Replace with tools.cli - CLI-matic is quite large code wise, actually
+  and requires hacks for long running processes."
   [& args]
   (init!)
   (clojure.lang.RT/loadLibrary "mylib")
