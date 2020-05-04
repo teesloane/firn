@@ -124,5 +124,4 @@
   ;; TODO: build the whole site before running the server.
   (mount/start-with-args opts))
 
-(serve {:-path "/Users/tees/Dropbox/wiki/"})
-
+;; (serve {:-path "/Users/tees/Dropbox/wiki/"})
