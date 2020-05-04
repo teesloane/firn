@@ -8,7 +8,8 @@
             [cheshire.core :as json]
             [firn.util :as u]
             [firn.org :as org]
-            [firn.layout :as layout]))
+            [firn.layout :as layout]
+            [clojure.java.io :as io]))
 
 (defn strip-file-ext
   "Removes a file extension from a file path string.
@@ -156,8 +157,8 @@
   (let [layout   (keyword (get-keyword f "FIRN_LAYOUT"))
         as-html  (when-not (is-private? config f)
                    (layout/apply-layout config f layout))]
-    as-html
-    #_(change f {:as-html as-html})))
+    ;; as-html
+    (change f {:as-html as-html})))
 
 (defn process-one
   "Munge the 'file' datastructure; slowly filling it up, using let-shadowing.
@@ -172,8 +173,8 @@
                                         :org-title (get-keyword new-file "TITLE")
                                         :links     (file-metadata :links)
                                         :logbook   (file-metadata :logbook)})
-        new-file      (change new-file {:as-html (htmlify config new-file)})]
-    new-file))
+        final-file    (htmlify config new-file)]
+    final-file))
 
 (defn process-all
   "Receives config, processes all files and builds up site-data
@@ -187,11 +188,12 @@
     (loop [org-files (config :org-files)
            output    {}]
       (if (empty? org-files)
-        (assoc config
-               :processed-files output
-               :site-map        @site-map
-               :site-links      @site-links
-               :site-logs       @site-logs)
+        ;; LOOP/RECUR: BREAK run one more loop on all files, and create their
+        ;; html, now ;; that we have processed everything.
+        (let [config-with-data (assoc config :processed-files output :site-map @site-map :site-links @site-links :site-logs  @site-logs)
+              with-html        (into {} (for [[k pf] output] [k (htmlify config-with-data pf)]))
+              final            (assoc config :processed-files with-html)]
+          final)
 
         (let [next-file      (first org-files)
               processed-file (process-one config next-file)
@@ -201,11 +203,21 @@
               new-site-map   (merge keyword-map {:path (processed-file :path-web)})
               file-metadata  (extract-metadata processed-file)] ;; FIXME: why are we calling this once when we can pull the results out from `processed-file / via procssed one`?!
 
-
           ;; add to sitemap when file is not private.
           (when-not (is-private? config processed-file)
+            ;; (swap! site-map concat @site-map new-site-map)
             (swap! site-map conj new-site-map)
             (swap! site-links concat @site-links (:links file-metadata))
             (swap! site-logs concat @site-logs (:logbook file-metadata)))
           ;; add links and logs to site wide data.
           (recur org-files output))))))
+
+
+
+(defn reload-requested-file
+  "Take a request to a file, pulls the file out of memory
+  grabs the path of the original file, reslurps it and reprocesses"
+  [file config]
+  (let [re-slurped (-> file :path io/file)
+        re-processed (process-one config re-slurped)]
+    re-processed))

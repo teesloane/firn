@@ -44,6 +44,13 @@
             (io/make-parents (:out-name f))
             (spit (:out-name f) (:contents f)))))))
 
+(defn copy-static-files
+  [config]
+  (when-not (fs/exists? (config :dir-site-attach))
+    (fs/copy-dir (config :dir-attach) (config :dir-site-attach)))
+  (when-not (fs/exists? (config :dir-site-static))
+    (fs/copy-dir (config :dir-static) (config :dir-site-static))))
+
 (defn setup
   "Creates folders for output, slurps in layouts and partials.
   NOTE: should slurp/mkdir/copy-dir be wrapped in try-catches? if-err handling?"
@@ -58,7 +65,7 @@
 
     (fs/mkdir (config :dir-site)) ;; make _site
 
-    ;; copy attachments and static files too final _site dir.
+    ;; copy attachments and static files to final _site dir.
     (when-not (fs/exists? (config :dir-site-attach))
       (fs/copy-dir (config :dir-attach) (config :dir-site-attach)))
     (when-not (fs/exists? (config :dir-site-static))
@@ -87,41 +94,53 @@
 
 ;; -- Server --
 
-(defn file-server-middleware
-  [{:keys [dir-site dir-files] :as config}]
-
+(defn handler
+  "Handles web requests for the development server.
+  FIXME: Needs a file watcher for determining when to copy files into dir-site"
+  [{:keys [dir-firn dir-site] :as config}]
   (fn [request]
-    ;; This is naive; everytime we visit a page it runs the build step.
-    (let [res-file-system ((r-file/wrap-file request dir-site) request)
-          req-uri-file    (s/join "" (-> request :uri rest)) ;; we have to trim the requested uri because it comes in as "/my-link"; but they are in memory as "my-link"
-          file-html       (get-in config [:processed-files req-uri-file :as-html])
+    (let [; first we try and get the request to load from the files system
+          res-file-system ((r-file/wrap-file request dir-site) request)
+          ;; then we pull the uri out of req and format it: `/this-is/my-req` -> `this-is/my-req`
+          req-uri-file    (s/join "" (-> request :uri rest))
+          ;; use the uri to pull values out of memory in config
+          memory-file     (get-in config [:processed-files req-uri-file])
+          ;; a ring response for when nothing is found.
           four-oh-four    {:status 404 :body "File not found."}]
-      ;; TODO: - re-process single file when hit by route.
-      ;; TODO: - all links with .html in them need to be stripped?
       ;; TODO: - make sure index is rendering from memory?
       (cond
-        (some? file-html)       (response file-html)
-        (some? res-file-system) res-file-system
-        :else                   four-oh-four))))
+        ;; If the request was found to match in the config...
+        (some? memory-file)
+        ;; let's re-slurp the file in case it's changed
+        ;; someday this will be handled by a file watcher.
+        (let [reloaded-file (file/reload-requested-file memory-file config)]
+          ;; then we can respones with the reloaded-files's html.
+          (response (reloaded-file :as-html)))
+
+        ;; If the file isn't found in memory, let's try using a file in the _firn/_site fs.
+        (some? res-file-system)
+        res-file-system
+
+        :else
+        four-oh-four))))
 
 (defstate server
   :start (let [args         (mount/args)
                dir-files    (get args :-path (u/get-cwd))
-               path-to-site (str dir-files "_firn/_site")
-               ;; config       (setup (config/prepare dir-files))
-               config       (-> (config/prepare dir-files) setup file/process-all) ;; basically doing `all-files`
+               path-to-site (str dir-files "/_firn/_site")
+               ;; build all files and prepare a config.
+               config       (-> dir-files config/prepare setup file/process-all)
                port         3333]
            (println "Building site...")
-           ;; (all-files {:dir-files dir-files}) ;; we don't need this; we hold files in memory rn
            (if-not (fs/exists? path-to-site)
              (println "Couldn't find a _firn/ folder. Have you run `Firn new` and created a site yet?")
              (do (println "🏔 Starting Firn development server on:" port)
-                 (http/run-server (file-server-middleware config) {:port port}))))
+                 (http/run-server (handler config) {:port port}))))
   :stop (when server (server :timeout 100)))
 
 (defn serve
   [opts]
-  ;; TODO: build the whole site before running the server.
   (mount/start-with-args opts))
 
-;; (serve {:-path "/Users/tees/Dropbox/wiki/"})
+;; cider won't boot if this is uncommented at jack-in:
+(serve {:-path "/Users/tees/Projects/firn/firn/clojure/test/firn/demo_org"})
