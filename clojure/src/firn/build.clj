@@ -143,4 +143,4 @@
   (mount/start-with-args opts))
 
 ;; cider won't boot if this is uncommented at jack-in:
-(serve {:-path "/Users/tees/Projects/firn/firn/clojure/test/firn/demo_org"})
+;; (serve {:-path "/Users/tees/Projects/firn/firn/clojure/test/firn/demo_org"})
