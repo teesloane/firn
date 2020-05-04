@@ -190,10 +190,13 @@
       (if (empty? org-files)
         ;; LOOP/RECUR: BREAK run one more loop on all files, and create their
         ;; html, now ;; that we have processed everything.
+        ;; this is messy.
+        ;; could be extracted into htmlize.
         (let [config-with-data (assoc config :processed-files output :site-map @site-map :site-links @site-links :site-logs  @site-logs)
               with-html        (into {} (for [[k pf] output] [k (htmlify config-with-data pf)]))
               final            (assoc config :processed-files with-html)]
           final)
+
 
         (let [next-file      (first org-files)
               processed-file (process-one config next-file)

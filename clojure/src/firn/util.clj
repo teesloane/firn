@@ -35,7 +35,6 @@
     (apply println sel-log-typ args)
     (System/exit 1))) ;; FIXME: this is the correct usage, but makes testing difficult as it interrupts lein test.
 
-
 (defn str->keywrd
   "Converts a string to a keyword"
   [& args]
@@ -55,6 +54,16 @@
   [io-file]
   (let [f (.getName ^java.io.File io-file)]
     (-> f (s/split #"\.") (first))))
+
+(defn remove-ext
+  "removes an extension from a string. TODO: test me"
+  ([s]
+   (-> s (s/split #"\.") first))
+  ([s ext]
+   (let [split (s/split s #"\.")
+         filename (first split)
+         -ext (last split)]
+     (if (= ext -ext) filename s))))
 
 (defn io-file->keyword
   "Turn a filename into a keyword."

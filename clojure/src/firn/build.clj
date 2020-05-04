@@ -94,23 +94,24 @@
 
 ;; -- Server --
 
+(defn- prep-uri
+  [req]
+  (let [stripped (s/join "" (-> req :uri rest))]
+    (u/remove-ext stripped "html")))
+
 (defn handler
   "Handles web requests for the development server.
-  FIXME: Needs a file watcher for determining when to copy files into dir-site"
-  [{:keys [dir-firn dir-site] :as config}]
+  FIXME: Needs a file watcher for determining when to copy files into dir-site
+  TODO: - make sure index is rendering from memory?"
+  [{:keys [dir-site] :as config}]
   (fn [request]
-    (let [; first we try and get the request to load from the files system
-          res-file-system ((r-file/wrap-file request dir-site) request)
-          ;; then we pull the uri out of req and format it: `/this-is/my-req` -> `this-is/my-req`
-          req-uri-file    (s/join "" (-> request :uri rest))
-          ;; use the uri to pull values out of memory in config
-          memory-file     (get-in config [:processed-files req-uri-file])
-          ;; a ring response for when nothing is found.
-          four-oh-four    {:status 404 :body "File not found."}]
-      ;; TODO: - make sure index is rendering from memory?
+    (let [res-file-system ((r-file/wrap-file request dir-site) request)   ; look for file in FS
+          req-uri-file    (prep-uri request)                              ; fmt the uri: `/this-is/my-req.html` -> `this-is/my-req`
+          memory-file     (get-in config [:processed-files req-uri-file]) ; use the uri to pull values out of memory in config
+          four-oh-four    {:status 404 :body "File not found."}]          ; a ring response for when nothing is found.
       (cond
-        ;; If the request was found to match in the config...
-        (some? memory-file)
+
+        (some? memory-file) ; If req-uri finds the file in the config's memory...
         ;; let's re-slurp the file in case it's changed
         ;; someday this will be handled by a file watcher.
         (let [reloaded-file (file/reload-requested-file memory-file config)]
@@ -118,11 +119,8 @@
           (response (reloaded-file :as-html)))
 
         ;; If the file isn't found in memory, let's try using a file in the _firn/_site fs.
-        (some? res-file-system)
-        res-file-system
-
-        :else
-        four-oh-four))))
+        (some? res-file-system) res-file-system
+        :else                   four-oh-four))))
 
 (defstate server
   :start (let [args         (mount/args)
@@ -144,3 +142,4 @@
 
 ;; cider won't boot if this is uncommented at jack-in:
 ;; (serve {:-path "/Users/tees/Projects/firn/firn/clojure/test/firn/demo_org"})
+;; (serve {:-path "/Users/tees/Dropbox/wiki"})
