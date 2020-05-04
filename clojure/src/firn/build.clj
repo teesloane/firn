@@ -2,17 +2,15 @@
   "Provides functions to core, to be called in the cli.
   Mostly to do with the processing of files / new site."
   (:require [clojure.java.io :as io]
+            [clojure.string :as s]
             [firn.config :as config]
             [firn.file :as file]
             [firn.util :as u]
-            [mount.core :refer [defstate] :as mount]
-            [org.httpkit.server :as http]
-            ;; [reitit.ring :as ring]
-            [ring.middleware.file :as r-file]
-            [ring.util.response :refer [response]]
-            ;; [ring.adapter.jetty :as jetty]
             [me.raynes.fs :as fs]
-            [clojure.string :as s]))
+            [mount.core :as mount :refer [defstate]]
+            [org.httpkit.server :as http]
+            [ring.middleware.file :as r-file]
+            [ring.util.response :refer [response]]))
 
 (set! *warn-on-reflection* true)
 (declare server)
@@ -101,7 +99,11 @@
 
 (defn handler
   "Handles web requests for the development server.
-  FIXME: Needs a file watcher for determining when to copy files into dir-site
+  FIXME: Needs a file watcher for determining when to copy:
+  - anything in static
+  - anything in data
+  - anything in layouts/partials
+  -> into dir-site
   TODO: - make sure index is rendering from memory?"
   [{:keys [dir-site] :as config}]
   (fn [request]

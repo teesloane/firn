@@ -174,6 +174,7 @@
                                         :links     (file-metadata :links)
                                         :logbook   (file-metadata :logbook)})
         final-file    (htmlify config new-file)]
+             
     final-file))
 
 (defn process-all
@@ -214,8 +215,6 @@
             (swap! site-logs concat @site-logs (:logbook file-metadata)))
           ;; add links and logs to site wide data.
           (recur org-files output))))))
-
-
 
 (defn reload-requested-file
   "Take a request to a file, pulls the file out of memory
