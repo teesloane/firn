@@ -4,7 +4,8 @@
             [firn.config :as config]))
 
 (def test-dir      "test/firn/demo_org")
-(def wiki-dir      "/Users/tees/Dropbox/wiki/")
+;; do not commit:
+;; (def wiki-dir      "/Users/tees/Dropbox/wiki/")
 
 (defn build-test-files
   [dir-to-build]
@@ -12,5 +13,6 @@
   (build/new-site {:dir-files dir-to-build})
   (build/all-files {:dir-files dir-to-build}))
 
+;; do not commit:
 ;; (build-test-files test-dir)
-(build-test-files wiki-dir)
+;; (build-test-files wiki-dir)
