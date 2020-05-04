@@ -29,4 +29,5 @@
 ;; ie; missing end-date.
 (t/deftest parsed-org-date->unix-time
   (t/testing "returns the expected value."
-    (t/is (= 1585683360000 (sut/parsed-org-date->unix-time (sample-logentry :start))))))
+    (t/is (= 1585683360000
+             (sut/parsed-org-date->unix-time (sample-logentry :start) (stub/gtf :tf-1 :processed))))))

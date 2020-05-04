@@ -9,9 +9,10 @@
             [org.httpkit.server :as http]
             ;; [reitit.ring :as ring]
             [ring.middleware.file :as r-file]
-            [ring.util.response :as response]
-            [ring.adapter.jetty :as jetty]
-            [me.raynes.fs :as fs]))
+            [ring.util.response :refer [response]]
+            ;; [ring.adapter.jetty :as jetty]
+            [me.raynes.fs :as fs]
+            [clojure.string :as s]))
 
 (set! *warn-on-reflection* true)
 (declare server)
@@ -70,13 +71,11 @@
   "Takes a config, of which we can presume has :processed-files.
   Iterates on these files, and writes them to html using layouts."
   [config]
-  (doseq [f (config :processed-files)]
-    (let [out-file-name (str (config :dir-site) (f :path-web) ".html")
-          out-file      (file/htmlify config f)
-          out-html      (out-file :as-html)]
+  (doseq [[_ f] (config :processed-files)]
+    (let [out-file-name (str (config :dir-site) (f :path-web) ".html")]
       (when-not (file/is-private? config f)
         (io/make-parents out-file-name)
-        (spit out-file-name out-html)))))
+        (spit out-file-name (f :as-html))))))
 
 (defn all-files
   "Processes all files in the org-directory"
@@ -89,28 +88,41 @@
 ;; -- Server --
 
 (defn file-server-middleware
-  [{:keys [dir-site dir-files]}]
+  [{:keys [dir-site dir-files] :as config}]
+
   (fn [request]
-    ;; Run our build setup.
     ;; This is naive; everytime we visit a page it runs the build step.
-    (all-files {:dir-files dir-files})
-    (let [res-with-file (r-file/wrap-file request dir-site)]
-      (res-with-file request))))
+    (let [res-file-system ((r-file/wrap-file request dir-site) request)
+          req-uri-file    (s/join "" (-> request :uri rest)) ;; we have to trim the requested uri because it comes in as "/my-link"; but they are in memory as "my-link"
+          file-html       (get-in config [:processed-files req-uri-file :as-html])
+          four-oh-four    {:status 404 :body "File not found."}]
+      ;; TODO: - re-process single file when hit by route.
+      ;; TODO: - all links with .html in them need to be stripped?
+      ;; TODO: - make sure index is rendering from memory?
+      (cond
+        (some? file-html)       (response file-html)
+        (some? res-file-system) res-file-system
+        :else                   four-oh-four))))
 
 (defstate server
-  :start (let [args          (mount/args)
-               path          (get args :-path (u/get-cwd))
-               path-to-site  (str path "_firn/_site")
-               opts          {:dir-site path-to-site :dir-files path}
-               port          3333]
+  :start (let [args         (mount/args)
+               dir-files    (get args :-path (u/get-cwd))
+               path-to-site (str dir-files "_firn/_site")
+               ;; config       (setup (config/prepare dir-files))
+               config       (-> (config/prepare dir-files) setup file/process-all) ;; basically doing `all-files`
+               port         3333]
+           (println "Building site...")
+           ;; (all-files {:dir-files dir-files}) ;; we don't need this; we hold files in memory rn
            (if-not (fs/exists? path-to-site)
              (println "Couldn't find a _firn/ folder. Have you run `Firn new` and created a site yet?")
              (do (println "🏔 Starting Firn development server on:" port)
-                 (http/run-server (file-server-middleware opts) {:port port}))))
+                 (http/run-server (file-server-middleware config) {:port port}))))
   :stop (when server (server :timeout 100)))
 
 (defn serve
   [opts]
+  ;; TODO: build the whole site before running the server.
   (mount/start-with-args opts))
 
-;; (serve {:-path "/Users/tees/Dropbox/wiki/"})
+(serve {:-path "/Users/tees/Dropbox/wiki/"})
+

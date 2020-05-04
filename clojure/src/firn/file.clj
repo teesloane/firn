@@ -156,7 +156,8 @@
   (let [layout   (keyword (get-keyword f "FIRN_LAYOUT"))
         as-html  (when-not (is-private? config f)
                    (layout/apply-layout config f layout))]
-    (change f {:as-html as-html})))
+    as-html
+    #_(change f {:as-html as-html})))
 
 (defn process-one
   "Munge the 'file' datastructure; slowly filling it up, using let-shadowing.
@@ -170,7 +171,8 @@
         new-file      (change new-file {:keywords  (get-keywords new-file)
                                         :org-title (get-keyword new-file "TITLE")
                                         :links     (file-metadata :links)
-                                        :logbook   (file-metadata :logbook)})]
+                                        :logbook   (file-metadata :logbook)})
+        new-file      (change new-file {:as-html (htmlify config new-file)})]
     new-file))
 
 (defn process-all
@@ -183,7 +185,7 @@
     ;; recurse over the org-files, gradually processing them and
     ;; pulling out links, logs, and other useful data.
     (loop [org-files (config :org-files)
-           output    []]
+           output    {}]
       (if (empty? org-files)
         (assoc config
                :processed-files output
@@ -194,7 +196,7 @@
         (let [next-file      (first org-files)
               processed-file (process-one config next-file)
               org-files      (rest org-files)
-              output         (conj output processed-file)
+              output         (assoc output (processed-file :path-web) processed-file)
               keyword-map    (keywords->map processed-file)
               new-site-map   (merge keyword-map {:path (processed-file :path-web)})
               file-metadata  (extract-metadata processed-file)] ;; FIXME: why are we calling this once when we can pull the results out from `processed-file / via procssed one`?!
