@@ -1,7 +1,6 @@
 (ns firn.util
   (:require [clojure.string :as s]
-            ;; vendored me.raynes.fs because it needed type hint changes to compiled with graal
-            [me.raynes.fs :as fs]
+            [clojure.java.io :as io]
             [sci.core :as sci]))
 
 (defn get-files-of-type
@@ -40,11 +39,38 @@
   [& args]
   (keyword (apply str args)))
 
+(def ^{:doc "Current working directory. This cannot be changed in the JVM.
+             Changing this will only change the working directory for functions
+             in this library."
+       :dynamic true}
+  *cwd* (.getCanonicalFile (io/file ".")))
+
+(defn ^java.io.File file
+  "If `path` is a period, replaces it with cwd and creates a new File object
+   out of it and `paths`. Or, if the resulting File object does not constitute
+   an absolute path, makes it absolutely by creating a new File object out of
+   the `paths` and cwd."
+  [path & paths]
+  (when-let [path (apply io/file (if (= path ".") *cwd* path) paths)]
+    (if (.isAbsolute ^java.io.File path)
+      path
+      (io/file *cwd* path))))
+
+(defn find-files*
+  "Find files in `path` by `pred`."
+  [path pred]
+  (filter pred (-> path file file-seq)))
+
+(defn find-files
+  "Find files matching given `pattern`."
+  [path pattern]
+  (find-files* path #(re-matches pattern (.getName ^java.io.File %))))
+
 (defn find-files-by-ext
   "Traverses a directory for all files of a specific extension."
   [dir ext]
   (let [ext-regex (re-pattern (str "^.*\\.(" ext ")$"))
-        files     (fs/find-files dir ext-regex)]
+        files     (find-files dir ext-regex)]
     (if (= 0 (count files))
       (do (println "No" ext "files found at " dir) files)
       files)))
