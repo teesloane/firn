@@ -5,7 +5,9 @@
             [clojure.string :as s]
             [firn.config :as config]
             [firn.file :as file]
+            [juxt.dirwatch :refer [watch-dir close-watcher]]
             [firn.util :as u]
+            [sci.core :as sci]
             [me.raynes.fs :as fs]
             [mount.core :as mount :refer [defstate]]
             [org.httpkit.server :as http]
@@ -42,6 +44,18 @@
             (io/make-parents (:out-name f))
             (spit (:out-name f) (:contents f)))))))
 
+(defn get-clj-files->m
+  "Gets layouts and partials and stores them and their slurped contents in a map."
+  [config]
+
+  (let [{:keys [dir-layouts dir-partials]} config
+        layout-files (u/find-files-by-ext dir-layouts "clj")
+        partial-files (u/find-files-by-ext dir-partials "clj")
+        partials-map  (u/load-fns-into-map partial-files)
+        layouts-map   (u/load-fns-into-map layout-files)]
+    {:layouts layouts-map :partials partials-map}))
+
+;; TODO - this isn't being used yet.
 (defn copy-static-files
   [config]
   (when-not (fs/exists? (config :dir-site-attach))
@@ -91,6 +105,7 @@
          write-files)))
 
 ;; -- Server --
+;; TODO - move all server stuff
 
 (defn- prep-uri
   [req]
@@ -105,38 +120,76 @@
   - anything in layouts/partials
   -> into dir-site
   TODO: - make sure index is rendering from memory?"
-  [{:keys [dir-site] :as config}]
+  [config!]
   (fn [request]
-    (let [res-file-system ((r-file/wrap-file request dir-site) request)   ; look for file in FS
-          req-uri-file    (prep-uri request)                              ; fmt the uri: `/this-is/my-req.html` -> `this-is/my-req`
-          memory-file     (get-in config [:processed-files req-uri-file]) ; use the uri to pull values out of memory in config
+    (let [dir-site        (get @config! :dir-site)
+          res-file-system ((r-file/wrap-file request dir-site) request)     ; look for file in FS
+          req-uri-file    (prep-uri request)                                ; fmt the uri: `/this-is/my-req.html` -> `this-is/my-req`
+          memory-file     (get-in @config! [:processed-files req-uri-file]) ; use the uri to pull values out of memory in config
           four-oh-four    {:status 404 :body "File not found."}]          ; a ring response for when nothing is found.
       (cond
 
-        (some? memory-file) ; If req-uri finds the file in the config's memory...
-        ;; let's re-slurp the file in case it's changed
-        ;; someday this will be handled by a file watcher.
-        (let [reloaded-file (file/reload-requested-file memory-file config)]
-          ;; then we can respones with the reloaded-files's html.
-          (response (reloaded-file :as-html)))
+        (some? memory-file)                    ; If req-uri finds the file in the config's memory...
+        (let [reloaded-file (file/reload-requested-file memory-file @config!)] ; reslurp in case it has changed.
+          (response (reloaded-file :as-html))) ; then we can respones with the reloaded-files's html.
 
         ;; If the file isn't found in memory, let's try using a file in the _firn/_site fs.
-        (some? res-file-system) res-file-system
-        :else                   four-oh-four))))
+        (some? res-file-system)
+        res-file-system
+
+        :else four-oh-four))))
+
+(defn handle-watcher
+  "Handles reloading. Expects config to be partially applied."
+  [config! watched-file]
+  ;; LEAVING OFF - find out if this works (reloading a single file into mem)
+  (let [file-path                  (.getPath ^java.io.File (watched-file :file))
+        {:keys [partials layouts]} (get-clj-files->m @config!)]
+
+    (swap! config! assoc :partials partials :layouts layouts)
+    (println "Reloadinig File... " watched-file)))
 
 (defstate server
-  :start (let [args         (mount/args)
-               dir-files    (get args :-path (u/get-cwd))
-               path-to-site (str dir-files "/_firn/_site")
-               ;; build all files and prepare a config.
-               config       (-> dir-files config/prepare setup file/process-all)
-               port         3333]
-           (println "Building site...")
-           (if-not (fs/exists? path-to-site)
-             (println "Couldn't find a _firn/ folder. Have you run `Firn new` and created a site yet?")
-             (do (println "🏔 Starting Firn development server on:" port)
-                 (http/run-server (handler config) {:port port}))))
-  :stop (when server (server :timeout 100)))
+  :start
+  (let [state!         (mount/args) ;; this is an atom
+
+        dir-files    (get @state! :path (u/get-cwd))
+        path-to-site (str dir-files "/_firn/_site")
+        ;; build all files and prepare a config.
+        config       (-> dir-files config/prepare setup file/process-all)
+        ;; config is an atom so we can swap! in reloaded files.
+        config!      (atom config)
+        {:keys       [dir-layouts dir-partials dir-static]} config
+        watch-list   (map io/file [dir-layouts dir-partials dir-static])
+        port         3333]
+
+    ;; start watchers
+    ;; this needs to happen only once because repl.
+    (println "starting file watcher!")
+    (swap! state! assoc :watcher (apply watch-dir (partial handle-watcher config!) watch-list))
+    (println "stateis " @state!)
+
+    (println "Building site...")
+    (if-not (fs/exists? path-to-site)
+      (println "Couldn't find a _firn/ folder. Have you run `Firn new` and created a site yet?")
+      (do (println "🏔 Starting Firn development server on:" port)
+          (http/run-server (handler config!) {:port port}))))
+
+  :stop
+  (when server
+    (let [state   @(mount/args)
+          watcher (state :watcher)]
+      (prn "watcher is " watcher)
+      (when watcher
+        (prn "Disconnecting file watchers." watcher)
+        (close-watcher watcher)))
+
+    (prn "Shutting down server")
+    (server :timeout 100)))
+
+
+;; -- Repl Land --
+
 
 (defn serve
   [opts]
@@ -144,7 +197,8 @@
   (promise))
 
 ;; cider won't boot if this is uncommented at jack-in:
-;; (serve {:-path "/Users/tees/Projects/firn/firn/clojure/test/firn/demo_org"})
+(serve (atom {:path    "/Users/tees/Projects/firn/firn/clojure/test/firn/demo_org"
+              :watcher nil}))
 ;; (serve {:-path "/Users/tees/Dropbox/wiki"})
 
 ;; (mount/stop)
