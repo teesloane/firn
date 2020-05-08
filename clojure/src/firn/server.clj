@@ -80,6 +80,7 @@
                 dir-site-static dir-attach
                 dir-site-data]} @config!]
 
+    (prn "Reloading files..." file-path)
     (cond
       (match-dir-and-action dir-partials :modxcreate)
       (swap! config! assoc-in [:partials file-name-as-kywrd] (u/read-and-eval-clj file))
@@ -135,7 +136,6 @@
   (do
     (server :timeout 100)
     (when @file-watcher
-      (prn "file watcher is" @file-watcher)
       (close-watcher @file-watcher)
       (reset! file-watcher nil))))
 

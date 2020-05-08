@@ -45,8 +45,8 @@ cd firn
 bin/script/compile
 #+END_SRC
 
-** Developing [0%]
-*** TODO - set up dev workflow that uses bin/parser
+** Developing [50%]
+- set  an environment variable in your shell / emacs (m-x setenv) : =DEV=TRUE=
 *** TODO Document setting up the repl / compiling test org files.
 * Thank-you's
 

@@ -2,7 +2,8 @@
   (:require [firn.util :as sut]
             [firn.stubs :as stub]
             [clojure.test :as t]
-            [me.raynes.fs :as fs]))
+            [me.raynes.fs :as fs]
+            [firn.file :as file]))
 
 (t/deftest dupe-name-in-dir-path?
   (t/testing "Returns true on a path that has a duplicate dir"

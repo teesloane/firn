@@ -5,7 +5,7 @@
 
 (def test-dir      "test/firn/demo_org")
 ;; do not commit:
-;; (def wiki-dir      "/Users/tees/Dropbox/wiki/")
+(def wiki-dir      "/Users/tees/Dropbox/wiki/")
 
 (defn build-test-files
   [dir-to-build]
@@ -15,4 +15,4 @@
 
 ;; do not commit:
 (build-test-files test-dir)
-;; (build-test-files wiki-dir)
+(build-test-files wiki-dir)

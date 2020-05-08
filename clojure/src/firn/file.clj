@@ -41,15 +41,6 @@
 
     (throw (Exception. "Ensure you are passing the right possible keywords to read-clj."))))
 
-
-(defn strip-file-ext
-  "Removes a file extension from a file path string.
-  (strip-file-ext foo/bar.jpeg jpeg) ;; => foo/bar"
-  [ext string]
-  (let [ext-regex (re-pattern (str "\\.(" ext ")$"))
-        res (s/replace string ext-regex "")]
-    res))
-
 (defn get-web-path
   "Determines the web path of the file from the cwd.
   `dirname-files`: demo_org
@@ -67,7 +58,7 @@
          (drop-while #(not (= % dirname-files)))
          rest
          (s/join "/")
-         (strip-file-ext "org"))))
+         (u/remove-ext))))
 
 (defn get-io-name
   "Returns the name of a file from the Java ioFile object w/o an extension."

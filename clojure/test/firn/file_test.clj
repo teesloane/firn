@@ -26,11 +26,6 @@
    :as-edn {:type      "document", :pre_blank 0, :children [{:type "section", :children [{:type "keyword", :key "TITLE", :value "Firn", :post_blank 0} {:type "keyword", :key "DATE_CREATED", :value "<2020-03-01 09:53>", :post_blank 0} {:type "keyword", :key "DATE_UPDATED", :value "<2020-04-26 15:43>", :post_blank 0} {:type "keyword", :key "FIRN_UNDER", :value "project", :post_blank 0} {:type "keyword", :key "FIRN_LAYOUT", :value "default", :post_blank 0}]} {:type  "headline", :level 1, :children [{:type       "title", :level      1, :raw        "Foo", :post_blank 0, :children   [{:type "text", :value "Foo"}]} {:type "section", :children [{:type       "paragraph", :post_blank 0, :children   [{:type "text", :value "Hi there!"}]}]}]}]},
    :links     ()})
 
-(t/deftest strip-file-ext
-  (t/testing "it properly strips extensions."
-    (t/is (= "foo" (sut/strip-file-ext "org" "foo.org")))
-    (t/is (= "my-file" (sut/strip-file-ext "jpeg" "my-file.jpeg")))))
-
 (t/deftest get-io-name
   (t/testing "Get a file name extension from a java io object"
     (t/is (= "file1" (sut/get-io-name (stub/gtf :tf-1 :io))))))
