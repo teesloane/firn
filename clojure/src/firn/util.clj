@@ -136,7 +136,7 @@
                      :uncategorized "🗒 Uncategorized Error:"}
         sel-log-typ (get err-types typ (get err-types :uncategorized))]
     (apply println sel-log-typ args)
-    (when dev? (System/exit 1))))
+    (when-not dev? (System/exit 1))))
 
 (defn native-image?
   "Check if we are in the native-image or REPL."
