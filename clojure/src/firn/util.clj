@@ -6,6 +6,8 @@
 
 ;; Some of these are borrowed from me.raynes.fs because I need to add ;; type hints for GraalVM
 
+(def dev? (if (= (System/getenv "DEV") "TRUE") true false))
+
 (def ^{:doc "Current working directory. This cannot be changed in the JVM.
              Changing this will only change the working directory for functions
              in this library."
@@ -65,7 +67,8 @@
 ;; Mostly for operating on paths: `file/paths/woo/hoo.org`
 
 (defn remove-ext
-  "removes an extension from a string. TODO: test me"
+  "removes an extension from a string.
+  Optionally, you can specify to only do so for specified extensions."
   ([s]
    (-> s (s/split #"\.") first))
   ([s ext]
@@ -126,15 +129,14 @@
   "A custom error function.
   Prints errors, expecting a type to specified (:warning, :error etc.)
   Currently, also returns false after printing error message, so we can
-  use that for control flow or for tests.
-  FIXME: System exit should not happen in dev."
+  use that for control flow or for tests."
   [typ & args]
   (let [err-types   {:warning       "🚧 Warning:"
                      :error         "❗ Error:"
                      :uncategorized "🗒 Uncategorized Error:"}
         sel-log-typ (get err-types typ (get err-types :uncategorized))]
     (apply println sel-log-typ args)
-    (System/exit 1)))
+    (when dev? (System/exit 1))))
 
 (defn native-image?
   "Check if we are in the native-image or REPL."

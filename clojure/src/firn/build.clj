@@ -7,7 +7,6 @@
             [firn.file :as file]
             [juxt.dirwatch :refer [watch-dir close-watcher]]
             [firn.util :as u]
-            [sci.core :as sci]
             [me.raynes.fs :as fs]
             [mount.core :as mount :refer [defstate]]
             [org.httpkit.server :as http]
@@ -16,20 +15,19 @@
 
 ;; (set! *warn-on-reflection* true)
 
+
 (declare server)
-(def file-watcher (atom nil))
+(def file-watcher  (atom nil))
+(def dev-files     ["layouts/project.clj" "partials/nav.clj" "static/css/bass.css"])
+(def default-files
+  (concat
+   (when u/dev? dev-files)
+   ["layouts/default.clj"
+    "layouts/index.clj"
+    "partials/head.clj"
+    "config.edn"
+    "static/css/main.css"]))
 
-;; --
-
-;; TODO: remove custom templates for release.
-(def default-files ["layouts/default.clj"
-                    "layouts/project.clj"
-                    "layouts/index.clj"
-                    "partials/head.clj"
-                    "partials/nav.clj"
-                    "config.edn"
-                    "static/css/bass.css"
-                    "static/css/main.css"])
 
 (defn new-site
   "Creates the folders needed for a new site in your wiki directory.
@@ -48,18 +46,17 @@
             (io/make-parents (:out-name f))
             (spit (:out-name f) (:contents f)))))))
 
-
 (defn setup
   "Creates folders for output, slurps in layouts and partials.
   NOTE: should slurp/mkdir/copy-dir be wrapped in try-catches? if-err handling?"
-  [{:keys [dir-site   dir-files       dir-site-attach
+  [{:keys [dir-site   dir-files       dir-site-data
            dir-attach dir-site-static dir-static] :as config}]
   (when-not (fs/exists? (config :dir-firn)) (new-site config))
   (fs/mkdir dir-site) ;; make _site
 
   ;; copy attachments and static files to final _site dir.
-  (fs/delete-dir dir-site-attach)
-  (fs/copy-dir dir-attach dir-site-attach)
+  (fs/delete-dir dir-site-data)
+  (fs/copy-dir dir-attach dir-site-data)
 
   (fs/delete-dir dir-site-static)
   (fs/copy-dir dir-static dir-site-static)
@@ -97,10 +94,6 @@
 
 (defn handler
   "Handles web requests for the development server.
-  FIXME: Needs a file watcher for determining when to copy:
-  - anything in static
-  - anything in data
-  -> into dir-site
   TODO: - make sure index is rendering from memory?"
   [config!]
   (fn [request]
@@ -128,7 +121,6 @@
   (let [file-path      (.getPath ^java.io.File file)
         differing-path (u/get-differing-path dest file-path)
         final-path     (str dir-site differing-path)]
-    (prn "final path is" final-path "is it a directory?" (fs/directory? final-path))
     (case action
       :delete
       (if (fs/directory? file)
@@ -145,8 +137,7 @@
 
 (defn handle-watcher
   "Handles reloading. Expects `config!` to be partially applied.
-  Whenever a file changes, as set up by `watch-dir`, run this fn.
-  TODO: handle deleting of folders as well!"
+  Whenever a file changes, as set up by `watch-dir`, run this fn."
   [config! {:keys [file action]}]
   (let [file-path            (.getPath ^java.io.File file)
         file-name-as-kywrd   (u/io-file->keyword file)
@@ -158,7 +149,7 @@
         {:keys [dir-partials    dir-layouts
                 dir-static      dir-site
                 dir-site-static dir-attach
-                dir-site-attach]} @config!]
+                dir-site-data]} @config!]
 
     (cond
       (match-dir-and-action dir-partials :modxcreate)
@@ -168,13 +159,13 @@
       (swap! config! assoc-in [:layouts file-name-as-kywrd] (u/read-and-eval-clj file))
 
       (match-dir-and-action dir-attach :modxcreate)
-      (watcher-dir-action file dir-site-attach dir-site :modxcreate)
+      (watcher-dir-action file dir-site-data dir-site :modxcreate)
 
       (match-dir-and-action dir-static :modxcreate)
       (watcher-dir-action file dir-site-static dir-site :modxcreate)
 
       (match-dir-and-action dir-attach :delete)
-      (watcher-dir-action file dir-site-attach dir-site :delete)
+      (watcher-dir-action file dir-site-data dir-site :delete)
 
       (match-dir-and-action dir-static :delete)
       (watcher-dir-action file dir-site-static dir-site :delete)
@@ -219,7 +210,6 @@
       (close-watcher @file-watcher)
       (reset! file-watcher nil))))
 
-
 ;; -- Repl Land --
 
 (defn serve
@@ -227,7 +217,5 @@
   (mount/start-with-args opts)
   (promise)) ;; NOTE: this is for CLI-matic stuff for now.
 
-;; cider won't boot if this is uncommented at jack-in:
-;; keep commented or run from repl
-(serve {:path "/Users/tees/Projects/firn/firn/clojure/test/firn/demo_org"})
+;; (serve {:path "/Users/tees/Projects/firn/firn/clojure/test/firn/demo_org"})
 ;; (mount/stop)

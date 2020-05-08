@@ -39,12 +39,8 @@
   (t/testing "It properly builds webpath"
     (t/is
      (= "baz/foo/test"
-        (sut/get-web-path "my-files" "foo/bar/my-files/baz/foo/test.org"))))
-  ;; this test breaks the repl/lein test because of System.exit. TODO: find a solution for this.
-  #_(t/testing "It returns false (and print an error msg when an invalid path.)"
-      (t/is
-       (= false
-          (sut/get-web-path "my-files" "foo/bar/my-files/baz/my-files/test.org")))))
+        (sut/get-web-path "my-files" "foo/bar/my-files/baz/foo/test.org")))))
+
 
 (t/deftest make
   (t/testing "Has correct values with the dummy io-file"

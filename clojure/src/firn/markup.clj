@@ -30,8 +30,7 @@
 
 (defn link->html
   "Parses links from the org-tree.
-  Checks if a link is an HTTP link or File link.
-  TODO: Cleanup a bit more someday."
+  Checks if a link is an HTTP link or File link."
   [v]
   (let [link-val        (get v :desc)
         link-href       (get v :path "Missing HREF attribute.")

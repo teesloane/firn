@@ -97,9 +97,7 @@
   (merge f m))
 
 (defn get-keywords
-  "Returns a list of org-keywords from a file. All files must have keywords.
-  FIXME: If no keywords present - prints an error, but processing continues.
-  Should I throw an error or System/exit?"
+  "Returns a list of org-keywords from a file. All files must have keywords."
   [f]
   (let [expected-keywords (get-in f [:as-edn :children 0 :children])]
     (if (= "keyword" (:type (first expected-keywords)))
@@ -220,11 +218,10 @@
     (loop [org-files (config :org-files)
            output    {}]
       (if (empty? org-files)
-        ;; LOOP/RECUR: BREAK run one more loop on all files, and create their
-        ;; html, now ;; that we have processed everything.
-        ;; this is messy.
-        ;; could be extracted into htmlize.
-        (let [config-with-data (assoc config :processed-files output :site-map @site-map :site-links @site-links :site-logs  @site-logs)
+        ;; LOOP/RECUR: run one more loop on all files, and create their html,
+        ;; now that we have processed everything.
+        (let [config-with-data (assoc config :processed-files output :site-map @site-map
+                                             :site-links @site-links :site-logs  @site-logs)
               with-html        (into {} (for [[k pf] output] [k (htmlify config-with-data pf)]))
               final            (assoc config :processed-files with-html)]
           final)
@@ -236,7 +233,7 @@
               output         (assoc output (processed-file :path-web) processed-file)
               keyword-map    (keywords->map processed-file)
               new-site-map   (merge keyword-map {:path (processed-file :path-web)})
-              file-metadata  (extract-metadata processed-file)] ;; FIXME: why are we calling this once when we can pull the results out from `processed-file / via procssed one`?!
+              file-metadata  (select-keys processed-file [:keywords :org-title :links :logbook])]
 
           ;; add to sitemap when file is not private.
           (when-not (is-private? config processed-file)
