@@ -40,6 +40,7 @@
              :dir-partials    (str dir-files "/_firn/partials/")
              ;; all outputted _site directories.
              :dir-site        (str dir-files "/_firn/_site/")
+             ;; TODO -attach should be -data.
              :dir-site-attach (str dir-files "/_firn/_site/" (base-config :dir-attach))
              :dir-site-static (str dir-files "/_firn/_site/static/")
              :dir-static      (str dir-files "/_firn/static/")

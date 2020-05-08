@@ -3,6 +3,11 @@
   The term  `file` here, generally refers to a _data structure_ and not a java io file.
   If the input is is a java io file, it should be called `file-io`
 
+  TODO: consider moving the 'file as map' stuff into a new namespace, maybe 'doc' or 'document'.
+  It's just too conflated with io-file.
+  or: rename file io -> ns: io
+  or: move all io stuff into util and keep this ns as is.
+
   You can view the file data-structure as it is made by the `make` function."
   (:require [clojure.string :as s]
             [cheshire.core :as json]
@@ -10,6 +15,32 @@
             [firn.org :as org]
             [firn.layout :as layout]
             [clojure.java.io :as io]))
+
+;; -- Getters
+
+(defn get-layouts
+  "Get a map of layouts"
+  [{:keys [dir-layouts]}]
+  (-> dir-layouts (u/find-files-by-ext "clj") (u/load-fns-into-map)))
+
+(defn get-partials
+  "Get a map of layouts"
+  [{:keys [dir-partials]}]
+  (-> dir-partials (u/find-files-by-ext "clj") (u/load-fns-into-map)))
+
+(defn read-clj
+  "Reads a folder full of clj files, such as partials or layouts.
+  pass a symbol for dir to request a specific folder."
+  [dir {:keys [dir-partials dir-layouts]}]
+  (case dir
+    :layouts
+    (-> dir-layouts (u/find-files-by-ext "clj") (u/load-fns-into-map))
+
+    :partials
+    (-> dir-partials (u/find-files-by-ext "clj") (u/load-fns-into-map))
+
+    (throw (Exception. "Ensure you are passing the right possible keywords to read-clj."))))
+
 
 (defn strip-file-ext
   "Removes a file extension from a file path string.

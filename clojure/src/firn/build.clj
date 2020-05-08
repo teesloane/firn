@@ -14,8 +14,12 @@
             [ring.middleware.file :as r-file]
             [ring.util.response :refer [response]]))
 
-(set! *warn-on-reflection* true)
+;; (set! *warn-on-reflection* true)
+
 (declare server)
+(def file-watcher (atom nil))
+
+;; --
 
 ;; TODO: remove custom templates for release.
 (def default-files ["layouts/default.clj"
@@ -44,47 +48,26 @@
             (io/make-parents (:out-name f))
             (spit (:out-name f) (:contents f)))))))
 
-(defn get-clj-files->m
-  "Gets layouts and partials and stores them and their slurped contents in a map."
-  [config]
-
-  (let [{:keys [dir-layouts dir-partials]} config
-        layout-files (u/find-files-by-ext dir-layouts "clj")
-        partial-files (u/find-files-by-ext dir-partials "clj")
-        partials-map  (u/load-fns-into-map partial-files)
-        layouts-map   (u/load-fns-into-map layout-files)]
-    {:layouts layouts-map :partials partials-map}))
-
-;; TODO - this isn't being used yet.
-(defn copy-static-files
-  [config]
-  (when-not (fs/exists? (config :dir-site-attach))
-    (fs/copy-dir (config :dir-attach) (config :dir-site-attach)))
-  (when-not (fs/exists? (config :dir-site-static))
-    (fs/copy-dir (config :dir-static) (config :dir-site-static))))
 
 (defn setup
   "Creates folders for output, slurps in layouts and partials.
   NOTE: should slurp/mkdir/copy-dir be wrapped in try-catches? if-err handling?"
-  [{:keys [dir-layouts dir-partials dir-files] :as config}]
+  [{:keys [dir-site   dir-files       dir-site-attach
+           dir-attach dir-site-static dir-static] :as config}]
   (when-not (fs/exists? (config :dir-firn)) (new-site config))
+  (fs/mkdir dir-site) ;; make _site
 
-  (let [layout-files  (u/find-files-by-ext dir-layouts "clj")
-        partial-files (u/find-files-by-ext dir-partials "clj")
-        partials-map  (u/load-fns-into-map partial-files)
-        org-files     (u/find-files-by-ext dir-files "org") ;; could bail if this is empty...
-        layouts-map   (u/load-fns-into-map layout-files)]
+  ;; copy attachments and static files to final _site dir.
+  (fs/delete-dir dir-site-attach)
+  (fs/copy-dir dir-attach dir-site-attach)
 
-    (fs/mkdir (config :dir-site)) ;; make _site
+  (fs/delete-dir dir-site-static)
+  (fs/copy-dir dir-static dir-site-static)
 
-    ;; copy attachments and static files to final _site dir.
-    (when-not (fs/exists? (config :dir-site-attach))
-      (fs/copy-dir (config :dir-attach) (config :dir-site-attach)))
-    (when-not (fs/exists? (config :dir-site-static))
-      (fs/copy-dir (config :dir-static) (config :dir-site-static)))
-
-    (assoc
-     config :org-files org-files :layouts layouts-map :partials partials-map)))
+  (assoc config
+         :org-files (u/find-files-by-ext dir-files "org")
+         :layouts  (file/read-clj :layouts config)
+         :partials (file/read-clj :partials config)))
 
 (defn write-files
   "Takes a config, of which we can presume has :processed-files.
@@ -105,7 +88,7 @@
          write-files)))
 
 ;; -- Server --
-;; TODO - move all server stuff
+;; TODO - move all server stuff to a new ns.
 
 (defn- prep-uri
   [req]
@@ -117,7 +100,6 @@
   FIXME: Needs a file watcher for determining when to copy:
   - anything in static
   - anything in data
-  - anything in layouts/partials
   -> into dir-site
   TODO: - make sure index is rendering from memory?"
   [config!]
@@ -139,66 +121,113 @@
 
         :else four-oh-four))))
 
-(defn handle-watcher
-  "Handles reloading. Expects config to be partially applied."
-  [config! watched-file]
-  ;; LEAVING OFF - find out if this works (reloading a single file into mem)
-  (let [file-path                  (.getPath ^java.io.File (watched-file :file))
-        {:keys [partials layouts]} (get-clj-files->m @config!)]
+(defn- watcher-dir-action
+  "The watcher has to sometimes copy whole directories,
+  say if a folder gets dropped into the watched folders."
+  [file dest dir-site action]
+  (let [file-path      (.getPath ^java.io.File file)
+        differing-path (u/get-differing-path dest file-path)
+        final-path     (str dir-site differing-path)]
+    (prn "final path is" final-path "is it a directory?" (fs/directory? final-path))
+    (case action
+      :delete
+      (if (fs/directory? file)
+        (fs/delete-dir final-path) ;; this doesn't seem to be working.
+        (fs/delete final-path))
 
-    (swap! config! assoc :partials partials :layouts layouts)
-    (println "Reloadinig File... " watched-file)))
+      :modxcreate
+      (if (fs/directory? file)
+        (do (fs/delete-dir final-path)
+            (fs/copy-dir file final-path))
+        (do
+          (fs/delete final-path)
+          (fs/copy+ file final-path))))))
+
+(defn handle-watcher
+  "Handles reloading. Expects `config!` to be partially applied.
+  Whenever a file changes, as set up by `watch-dir`, run this fn.
+  TODO: handle deleting of folders as well!"
+  [config! {:keys [file action]}]
+  (let [file-path            (.getPath ^java.io.File file)
+        file-name-as-kywrd   (u/io-file->keyword file)
+        f-modxcreate         (or (= action :modify) (= action :create))
+        f-actions            {:modxcreate f-modxcreate :delete (= action :delete)}
+        match-dir-and-action #(and (s/includes? file-path %1) (get f-actions %2))
+
+        ;; The dirs we are moving things to<->from
+        {:keys [dir-partials    dir-layouts
+                dir-static      dir-site
+                dir-site-static dir-attach
+                dir-site-attach]} @config!]
+
+    (cond
+      (match-dir-and-action dir-partials :modxcreate)
+      (swap! config! assoc-in [:partials file-name-as-kywrd] (u/read-and-eval-clj file))
+
+      (match-dir-and-action dir-layouts :modxcreate)
+      (swap! config! assoc-in [:layouts file-name-as-kywrd] (u/read-and-eval-clj file))
+
+      (match-dir-and-action dir-attach :modxcreate)
+      (watcher-dir-action file dir-site-attach dir-site :modxcreate)
+
+      (match-dir-and-action dir-static :modxcreate)
+      (watcher-dir-action file dir-site-static dir-site :modxcreate)
+
+      (match-dir-and-action dir-attach :delete)
+      (watcher-dir-action file dir-site-attach dir-site :delete)
+
+      (match-dir-and-action dir-static :delete)
+      (watcher-dir-action file dir-site-static dir-site :delete)
+
+      ;; NOTE: 🐛 🐛  Might be a race condition with the watchers:
+      ;; either way, `modify` actions are still showing up after the `delete`
+      ;; shows up.
+     
+      (match-dir-and-action dir-partials :delete)
+      (swap! config! update :partials dissoc file-name-as-kywrd)
+
+      (match-dir-and-action dir-layouts :delete)
+      (swap! config! update :layouts dissoc file-name-as-kywrd))))
+
 
 (defstate server
   :start
-  (let [state!         (mount/args) ;; this is an atom
-
-        dir-files    (get @state! :path (u/get-cwd))
+  (let [args         (mount/args)
+        dir-files    (get args :path (u/get-cwd))
         path-to-site (str dir-files "/_firn/_site")
-        ;; build all files and prepare a config.
-        config       (-> dir-files config/prepare setup file/process-all)
-        ;; config is an atom so we can swap! in reloaded files.
-        config!      (atom config)
-        {:keys       [dir-layouts dir-partials dir-static]} config
-        watch-list   (map io/file [dir-layouts dir-partials dir-static])
+        ;; build all files and prepare a mutable config (for reloading)
+        config!      (atom (-> dir-files config/prepare setup file/process-all))
+        {:keys       [dir-layouts dir-partials dir-static dir-attach]} @config!
+        watch-list   (map io/file [dir-layouts dir-partials dir-static dir-attach])
         port         3333]
 
     ;; start watchers
-    ;; this needs to happen only once because repl.
-    (println "starting file watcher!")
-    (swap! state! assoc :watcher (apply watch-dir (partial handle-watcher config!) watch-list))
-    (println "stateis " @state!)
+    (reset! file-watcher (apply watch-dir (partial handle-watcher config!) watch-list))
 
     (println "Building site...")
     (if-not (fs/exists? path-to-site)
       (println "Couldn't find a _firn/ folder. Have you run `Firn new` and created a site yet?")
-      (do (println "🏔 Starting Firn development server on:" port)
+      (do (println "⚠ The Firn development server is in beta. \n You may need to restart from time to time if you run into issues.")
+          (println "🏔 Starting Firn development server on:" port)
           (http/run-server (handler config!) {:port port}))))
 
   :stop
-  (when server
-    (let [state   @(mount/args)
-          watcher (state :watcher)]
-      (prn "watcher is " watcher)
-      (when watcher
-        (prn "Disconnecting file watchers." watcher)
-        (close-watcher watcher)))
-
-    (prn "Shutting down server")
-    (server :timeout 100)))
+  (do
+    (server :timeout 100)
+    (when @file-watcher
+      (prn "file watcher is" @file-watcher)
+      (close-watcher @file-watcher)
+      (reset! file-watcher nil))))
 
 
 ;; -- Repl Land --
 
-
 (defn serve
   [opts]
   (mount/start-with-args opts)
-  (promise))
+  (promise)) ;; NOTE: this is for CLI-matic stuff for now.
 
 ;; cider won't boot if this is uncommented at jack-in:
-(serve (atom {:path    "/Users/tees/Projects/firn/firn/clojure/test/firn/demo_org"
-              :watcher nil}))
-;; (serve {:-path "/Users/tees/Dropbox/wiki"})
-
+;; keep commented or run from repl
+(serve {:path "/Users/tees/Projects/firn/firn/clojure/test/firn/demo_org"})
 ;; (mount/stop)

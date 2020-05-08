@@ -14,5 +14,5 @@
   (build/all-files {:dir-files dir-to-build}))
 
 ;; do not commit:
-;; (build-test-files test-dir)
+(build-test-files test-dir)
 ;; (build-test-files wiki-dir)
