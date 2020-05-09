@@ -12,7 +12,6 @@
             [ring.middleware.file :as r-file]
             [ring.util.response :refer [response]]))
 
-
 (declare server)
 (def file-watcher  (atom nil))
 
@@ -119,7 +118,6 @@
       (match-dir-and-action dir-layouts :delete)
       (swap! config! update :layouts dissoc file-name-as-kywrd))))
 
-
 (defstate server
   :start
   (let [args         (mount/args)
@@ -148,17 +146,15 @@
       (close-watcher @file-watcher)
       (reset! file-watcher nil))))
 
-;; -- Repl Land --
-
 (defn serve
   [opts]
   (mount/start-with-args opts)
   (promise)) ; NOTE: this is for CLI-matic stuff for now.)
 
+;; -- Repl Land --
 
 ;; (build/new-site {:dir-files "/Users/tees/Dropbox/wiki"})
-(build/all-files {:dir-files "/Users/tees/Dropbox/wiki"})
+;; (build/all-files {:dir-files "/Users/tees/Dropbox/wiki"})
 ;; (serve {:dir-files "/Users/tees/Projects/firn/firn/clojure/test/firn/demo_org"})
 ;; (serve {:dir-files "/Users/tees/Dropbox/wiki"})
-
 ;; (mount/stop)
