@@ -16,6 +16,8 @@
 (def file-watcher  (atom nil))
 
 (defn- prep-uri
+  "Strips a uri of preceding `/` and then removes `.html` if it exists.
+  `/this-is/my-req.html` -> `this-is/my-req`"
   [req]
   (let [stripped (s/join "" (-> req :uri rest))]
     (u/remove-ext stripped "html")))
@@ -26,23 +28,21 @@
   (fn [request]
     (let [dir-site        (get @config! :dir-site)
           res-file-system ((r-file/wrap-file request dir-site) request)     ; look for file in FS
-          req-uri-file    (prep-uri request)                                ; fmt the uri: `/this-is/my-req.html` -> `this-is/my-req`
+          req-uri-file    (prep-uri request)
           memory-file     (get-in @config! [:processed-files req-uri-file]) ; use the uri to pull values out of memory in config
-          index-file      (get-in @config! [:processed-files "index"])       ; use the uri to pull values out of memory in config
-          four-oh-four    {:status 404 :body "File not found."}]          ; a ring response for when nothing is found.
+          index-file      (get-in @config! [:processed-files "index"])      ; use the uri to pull values out of memory in config
+          four-oh-four    {:status 404 :body "File not found."}]            ; a ring response for when nothing is found.
 
       (cond
         ;; Handle reloading of the index / no uri
         (= req-uri-file "")
         (let [reloaded-file (file/reload-requested-file index-file @config!)] ; reslurp in case it has changed.
-          (prn "response html is" (reloaded-file :name))
-          (response (reloaded-file :as-html))) ; then we can respones with the reloaded-files's html.
-
+          (response (reloaded-file :as-html)))
 
         ;; Handle when the route matches a file in memory
         (some? memory-file)                    ; If req-uri finds the file in the config's memory...
         (let [reloaded-file (file/reload-requested-file memory-file @config!)] ; reslurp in case it has changed.
-          (response (reloaded-file :as-html))) ; then we can respones with the reloaded-files's html.
+          (response (reloaded-file :as-html)))
 
         ;; Handle loading from file system if nothign else found.
         (some? res-file-system)
