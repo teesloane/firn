@@ -72,6 +72,7 @@
   [f m]
   (merge f m))
 
+;; FIXME: this gets called A LOT, it seems. Might want to profile.
 (defn get-keywords
   "Returns a list of org-keywords from a file. All files must have keywords."
   [f]
@@ -90,8 +91,7 @@
    [{:type keyword, :key TITLE, :value Firn, :post_blank 0}
     {:type keyword, :key DATE_CREATED, :value 2020-03-01--09-53, :post_blank 0}]
                                Becomes 
-   {:title Firn, :date-created 2020-03-01--09-53, :status active, :firn-layout project}
-  "
+   {:title Firn, :date-created 2020-03-01--09-53, :status active, :firn-layout project}"
   [f]
   (let [kw            (get-keywords f)
         lower-case-it #(when % (s/lower-case %))
