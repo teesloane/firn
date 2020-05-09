@@ -2,7 +2,8 @@
   (:require [clojure.java.io :as io]
             [cli-matic.core :refer [run-cmd]]
             [firn.util :as u]
-            [firn.build :as build])
+            [firn.build :as build]
+            [firn.server :as server])
   (:gen-class))
 
 (defn init!
@@ -39,7 +40,7 @@
                  {:command     "serve"
                   :description "Runs a development server for processed org files."
                   :opts        []
-                  :runs        build/serve}]})
+                  :runs        server/serve}]})
 
 
 (defn -main
