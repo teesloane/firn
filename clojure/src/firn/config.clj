@@ -5,7 +5,7 @@
             [me.raynes.fs :as fs]))
 
 (def starting-config
-  {:dir-attach    "data"    ; org attachments/files to get copied into _site.
+  {:dir-data    "data"    ; org attachments/files to get copied into _site.
    :dir-files     nil       ; where org content lives.
    :dir-layouts   ""        ; where layouts are stored.
    :dir-partials  ""        ; where partials are stored.
@@ -34,13 +34,13 @@
    (let [base-config (merge starting-config external-config)]
      (merge starting-config
             {:dir-firn        (make-dir-firn dir-files)
-             :dir-attach      (str dir-files "/" (base-config :dir-attach))
+             :dir-data      (str dir-files "/" (base-config :dir-data))
              :dir-files       dir-files
              :dir-layouts     (str dir-files "/_firn/layouts/")
              :dir-partials    (str dir-files "/_firn/partials/")
              ;; all outputted _site directories.
              :dir-site        (str dir-files "/_firn/_site/")
-             :dir-site-data (str dir-files "/_firn/_site/" (base-config :dir-attach))
+             :dir-site-data (str dir-files "/_firn/_site/" (base-config :dir-data))
              :dir-site-static (str dir-files "/_firn/_site/static/")
              :dir-static      (str dir-files "/_firn/static/")
              :dirname-files   (-> dir-files (s/split #"/") last)})))) ;; the name of the dir where files are.

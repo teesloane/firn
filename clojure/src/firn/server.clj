@@ -77,10 +77,11 @@
         ;; The dirs we are moving things to<->from
         {:keys [dir-partials    dir-layouts
                 dir-static      dir-site
-                dir-site-static dir-attach
+                dir-site-static dir-data
                 dir-site-data]} @config!]
 
     (prn "Reloading files..." file-path)
+
     (cond
       (match-dir-and-action dir-partials :modxcreate)
       (swap! config! assoc-in [:partials file-name-as-kywrd] (u/read-and-eval-clj file))
@@ -88,13 +89,13 @@
       (match-dir-and-action dir-layouts :modxcreate)
       (swap! config! assoc-in [:layouts file-name-as-kywrd] (u/read-and-eval-clj file))
 
-      (match-dir-and-action dir-attach :modxcreate)
+      (match-dir-and-action dir-data :modxcreate)
       (watcher-dir-action file dir-site-data dir-site :modxcreate)
 
       (match-dir-and-action dir-static :modxcreate)
       (watcher-dir-action file dir-site-static dir-site :modxcreate)
 
-      (match-dir-and-action dir-attach :delete)
+      (match-dir-and-action dir-data :delete)
       (watcher-dir-action file dir-site-data dir-site :delete)
 
       (match-dir-and-action dir-static :delete)
@@ -118,8 +119,8 @@
         path-to-site (str dir-files "/_firn/_site")
         ;; build all files and prepare a mutable config (for reloading)
         config!      (atom (-> dir-files config/prepare build/setup file/process-all))
-        {:keys       [dir-layouts dir-partials dir-static dir-attach]} @config!
-        watch-list   (map io/file [dir-layouts dir-partials dir-static dir-attach])
+        {:keys       [dir-layouts dir-partials dir-static dir-data]} @config!
+        watch-list   (map io/file [dir-layouts dir-partials dir-static dir-data])
         port         3333]
 
     ;; start watchers
@@ -147,4 +148,5 @@
   (promise)) ; NOTE: this is for CLI-matic stuff for now.)
 
 ;; (serve {:path "/Users/tees/Projects/firn/firn/clojure/test/firn/demo_org"})
+(serve {:path "/Users/tees/Dropbox/wiki"})
 ;; (mount/stop)

@@ -41,13 +41,13 @@
   "Creates folders for output, slurps in layouts and partials.
   NOTE: should slurp/mkdir/copy-dir be wrapped in try-catches? if-err handling?"
   [{:keys [dir-site   dir-files       dir-site-data
-           dir-attach dir-site-static dir-static] :as config}]
+           dir-data dir-site-static dir-static] :as config}]
   (when-not (fs/exists? (config :dir-firn)) (new-site config))
   (fs/mkdir dir-site) ;; make _site
 
   ;; copy attachments and static files to final _site dir.
   (fs/delete-dir dir-site-data)
-  (fs/copy-dir dir-attach dir-site-data)
+  (fs/copy-dir dir-data dir-site-data)
 
   (fs/delete-dir dir-site-static)
   (fs/copy-dir dir-static dir-site-static)
