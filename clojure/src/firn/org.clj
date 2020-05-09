@@ -2,10 +2,10 @@
   "Functions for managing org-related things.
   Most of these functions are for operating on EDN-fied org-file
   Which are created by the rust binary."
-  (:require [clojure.string :as s]
-            [firn.util :as u]
-            [clojure.java.shell :as sh])
-  (:import [iceshelf.clojure.rust ClojureRust]))
+  (:require [clojure.java.shell :as sh]
+            [clojure.string :as s]
+            [firn.util :as u])
+  (:import iceshelf.clojure.rust.ClojureRust))
 
 (defn parse!
   "Parse the org-mode file-string.

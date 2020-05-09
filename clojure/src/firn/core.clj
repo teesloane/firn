@@ -1,10 +1,10 @@
 (ns firn.core
-  (:require [clojure.java.io :as io]
-            [cli-matic.core :refer [run-cmd]]
-            [firn.util :as u]
+  (:gen-class)
+  (:require [cli-matic.core :refer [run-cmd]]
+            [clojure.java.io :as io]
             [firn.build :as build]
-            [firn.server :as server])
-  (:gen-class))
+            [firn.server :as server]
+            [firn.util :as u]))
 
 (defn init!
   "When firn is run as a native image, move the dependencies (the parser bin)

@@ -1,8 +1,8 @@
 (ns firn.config
   (:require [clojure.string :as s]
-            [sci.core :as sci]
             [firn.util :as u]
-            [me.raynes.fs :as fs]))
+            [me.raynes.fs :as fs]
+            [sci.core :as sci]))
 
 (def starting-config
   {:dir-data    "data"    ; org attachments/files to get copied into _site.

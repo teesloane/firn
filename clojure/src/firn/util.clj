@@ -1,8 +1,7 @@
 (ns firn.util
-  (:require [clojure.string :as s]
-            [clojure.java.io :as io]
+  (:require [clojure.java.io :as io]
+            [clojure.string :as s]
             [sci.core :as sci]))
-
 
 ;; Some of these are borrowed from me.raynes.fs because I need to add ;; type hints for GraalVM
 
@@ -82,7 +81,6 @@
   (let [file-path (.getPath ^java.io.File io-file)
         eval-file (-> file-path slurp sci/eval-string)]
     eval-file))
-
 
 (defn load-fns-into-map
   "Takes a list of files and returns a map of filenames as :keywords -> file

@@ -4,12 +4,12 @@
   If the input is is a java io file, it should be called `file-io`
 
   You can view the file data-structure as it is made by the `make` function."
-  (:require [clojure.string :as s]
-            [cheshire.core :as json]
-            [firn.util :as u]
-            [firn.org :as org]
+  (:require [cheshire.core :as json]
+            [clojure.java.io :as io]
+            [clojure.string :as s]
             [firn.layout :as layout]
-            [clojure.java.io :as io]))
+            [firn.org :as org]
+            [firn.util :as u]))
 
 ;; -- Getters
 

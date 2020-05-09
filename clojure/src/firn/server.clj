@@ -1,11 +1,11 @@
 (ns firn.server
   (:require [clojure.java.io :as io]
             [clojure.string :as s]
+            [firn.build :as build]
             [firn.config :as config]
             [firn.file :as file]
-            [juxt.dirwatch :refer [watch-dir close-watcher]]
             [firn.util :as u]
-            [firn.build :as build]
+            [juxt.dirwatch :refer [close-watcher watch-dir]]
             [me.raynes.fs :as fs]
             [mount.core :as mount :refer [defstate]]
             [org.httpkit.server :as http]
