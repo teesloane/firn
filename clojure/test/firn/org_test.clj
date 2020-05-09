@@ -6,7 +6,6 @@
 (def sample-logentry
   {:type "clock", :start {:year 2020, :month 3, :day 31, :dayname "Tue", :hour 19, :minute 36}, :end {:year 2020, :month 3, :day 31, :dayname "Tue", :hour 19, :minute 46}, :duration "0:10", :post_blank 0})
 
-
 (t/deftest parse!
   (let [res (sut/parse! "* A headline")]
     (t/is (= res "{\"type\":\"document\",\"pre_blank\":0,\"children\":[{\"type\":\"headline\",\"level\":1,\"children\":[{\"type\":\"title\",\"level\":1,\"raw\":\"A headline\",\"post_blank\":0,\"children\":[{\"type\":\"text\",\"value\":\"A headline\"}]}]}]}\n"))))
@@ -17,7 +16,6 @@
     (t/testing "It returns the expected value."
       (t/is (= (res :type) "headline"))
       (t/is (> (count (res :children)) 0)))))
-
 
 (t/deftest get-headline-content
   (let [file (stub/gtf :tf-1 :processed)

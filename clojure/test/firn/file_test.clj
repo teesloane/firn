@@ -36,7 +36,6 @@
      (= "baz/foo/test"
         (sut/get-web-path "my-files" "foo/bar/my-files/baz/foo/test.org")))))
 
-
 (t/deftest make
   (t/testing "Has correct values with the dummy io-file"
     (let [test-file (stub/gtf :tf-1 :io)

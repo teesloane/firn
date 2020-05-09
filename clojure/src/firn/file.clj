@@ -115,9 +115,9 @@
   [logbook file]
   (->> logbook
       ;; adds a unix timestamp for the :start and :end time.
-      (map #(assoc % :start-ts (org/parsed-org-date->unix-time (:start %) file)
-                     :end-ts   (org/parsed-org-date->unix-time (:end %) file)))
-      (sort-by :start-ts #(> %1 %2))))
+       (map #(assoc % :start-ts (org/parsed-org-date->unix-time (:start %) file)
+                    :end-ts   (org/parsed-org-date->unix-time (:end %) file)))
+       (sort-by :start-ts #(> %1 %2))))
 
 (defn extract-metadata-logbook-helper
   "Extracts the logbook and associates the parent headline's metadata with it.
@@ -179,7 +179,7 @@
                                         :links     (file-metadata :links)
                                         :logbook   (file-metadata :logbook)})
         final-file    (htmlify config new-file)]
-             
+
     final-file))
 
 (defn process-all
@@ -197,7 +197,7 @@
         ;; LOOP/RECUR: run one more loop on all files, and create their html,
         ;; now that we have processed everything.
         (let [config-with-data (assoc config :processed-files output :site-map @site-map
-                                             :site-links @site-links :site-logs  @site-logs)
+                                      :site-links @site-links :site-logs  @site-logs)
               with-html        (into {} (for [[k pf] output] [k (htmlify config-with-data pf)]))
               final            (assoc config-with-data :processed-files with-html)]
           final)
