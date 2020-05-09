@@ -5,7 +5,7 @@
             [firn.config :as config]
             [firn.file :as file]
             [firn.util :as u]
-            [juxt.dirwatch :refer [close-watcher watch-dir]]
+            [firn.dirwatch :refer [close-watcher watch-dir]]
             [me.raynes.fs :as fs]
             [mount.core :as mount :refer [defstate]]
             [org.httpkit.server :as http]

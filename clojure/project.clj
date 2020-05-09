@@ -8,7 +8,7 @@
                  [cli-matic "0.3.11"]
                  [hiccup "1.0.5"]
                  [http-kit "2.3.0"]
-                 [juxt/dirwatch "0.2.5"]
+                 ;; [juxt/dirwatch "0.2.5"] ;; vendored
                  [me.raynes/fs "1.4.6"]
                  [ring "1.8.0"]
                  [mount "0.1.16"]

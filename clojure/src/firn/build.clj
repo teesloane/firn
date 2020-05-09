@@ -8,7 +8,7 @@
             [me.raynes.fs :as fs]))
 
 
-;; (set! *warn-on-reflection* true)
+(set! *warn-on-reflection* true)
 
 
 (def dev-files     ["layouts/project.clj" "partials/nav.clj" "static/css/bass.css"])
