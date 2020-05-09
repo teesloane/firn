@@ -22,22 +22,30 @@
     (u/remove-ext stripped "html")))
 
 (defn handler
-  "Handles web requests for the development server.
-  TODO: - make sure index is rendering from memory?"
+  "Handles web requests for the development server."
   [config!]
   (fn [request]
     (let [dir-site        (get @config! :dir-site)
           res-file-system ((r-file/wrap-file request dir-site) request)     ; look for file in FS
           req-uri-file    (prep-uri request)                                ; fmt the uri: `/this-is/my-req.html` -> `this-is/my-req`
           memory-file     (get-in @config! [:processed-files req-uri-file]) ; use the uri to pull values out of memory in config
+          index-file      (get-in @config! [:processed-files "index"])       ; use the uri to pull values out of memory in config
           four-oh-four    {:status 404 :body "File not found."}]          ; a ring response for when nothing is found.
-      (cond
 
+      (cond
+        ;; Handle reloading of the index / no uri
+        (= req-uri-file "")
+        (let [reloaded-file (file/reload-requested-file index-file @config!)] ; reslurp in case it has changed.
+          (prn "response html is" (reloaded-file :name))
+          (response (reloaded-file :as-html))) ; then we can respones with the reloaded-files's html.
+
+
+        ;; Handle when the route matches a file in memory
         (some? memory-file)                    ; If req-uri finds the file in the config's memory...
         (let [reloaded-file (file/reload-requested-file memory-file @config!)] ; reslurp in case it has changed.
           (response (reloaded-file :as-html))) ; then we can respones with the reloaded-files's html.
 
-        ;; If the file isn't found in memory, let's try using a file in the _firn/_site fs.
+        ;; Handle loading from file system if nothign else found.
         (some? res-file-system)
         res-file-system
 
@@ -115,7 +123,7 @@
 (defstate server
   :start
   (let [args         (mount/args)
-        dir-files    (get args :path (u/get-cwd))
+        dir-files    (get args :dir-files (u/get-cwd))
         path-to-site (str dir-files "/_firn/_site")
         ;; build all files and prepare a mutable config (for reloading)
         config!      (atom (-> dir-files config/prepare build/setup file/process-all))
@@ -147,6 +155,10 @@
   (mount/start-with-args opts)
   (promise)) ; NOTE: this is for CLI-matic stuff for now.)
 
-;; (serve {:path "/Users/tees/Projects/firn/firn/clojure/test/firn/demo_org"})
-(serve {:path "/Users/tees/Dropbox/wiki"})
+
+;; (build/new-site {:dir-files "/Users/tees/Dropbox/wiki"})
+(build/all-files {:dir-files "/Users/tees/Dropbox/wiki"})
+;; (serve {:dir-files "/Users/tees/Projects/firn/firn/clojure/test/firn/demo_org"})
+;; (serve {:dir-files "/Users/tees/Dropbox/wiki"})
+
 ;; (mount/stop)
