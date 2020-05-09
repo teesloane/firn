@@ -3,11 +3,6 @@
   The term  `file` here, generally refers to a _data structure_ and not a java io file.
   If the input is is a java io file, it should be called `file-io`
 
-  TODO: consider moving the 'file as map' stuff into a new namespace, maybe 'doc' or 'document'.
-  It's just too conflated with io-file.
-  or: rename file io -> ns: io
-  or: move all io stuff into util and keep this ns as is.
-
   You can view the file data-structure as it is made by the `make` function."
   (:require [clojure.string :as s]
             [cheshire.core :as json]
@@ -27,19 +22,6 @@
   "Get a map of layouts"
   [{:keys [dir-partials]}]
   (-> dir-partials (u/find-files-by-ext "clj") (u/load-fns-into-map)))
-
-(defn read-clj
-  "Reads a folder full of clj files, such as partials or layouts.
-  pass a symbol for dir to request a specific folder."
-  [dir {:keys [dir-partials dir-layouts]}]
-  (case dir
-    :layouts
-    (-> dir-layouts (u/find-files-by-ext "clj") (u/load-fns-into-map))
-
-    :partials
-    (-> dir-partials (u/find-files-by-ext "clj") (u/load-fns-into-map))
-
-    (throw (Exception. "Ensure you are passing the right possible keywords to read-clj."))))
 
 (defn get-web-path
   "Determines the web path of the file from the cwd.
@@ -65,6 +47,19 @@
   [f]
   (let [f-name (.getName ^java.io.File f)]
     (-> f-name (s/split #"\.") (first))))
+
+(defn read-clj
+  "Reads a folder full of clj files, such as partials or layouts.
+  pass a symbol for dir to request a specific folder."
+  [dir {:keys [dir-partials dir-layouts]}]
+  (case dir
+    :layouts
+    (-> dir-layouts (u/find-files-by-ext "clj") (u/load-fns-into-map))
+
+    :partials
+    (-> dir-partials (u/find-files-by-ext "clj") (u/load-fns-into-map))
+
+    (throw (Exception. "Ensure you are passing the right possible keywords to read-clj."))))
 
 (defn make
   "Creates a file; which is to say, a map of data & metadata about an org-file."
@@ -216,7 +211,6 @@
               with-html        (into {} (for [[k pf] output] [k (htmlify config-with-data pf)]))
               final            (assoc config :processed-files with-html)]
           final)
-
 
         (let [next-file      (first org-files)
               processed-file (process-one config next-file)
