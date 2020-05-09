@@ -13,16 +13,6 @@
 
 ;; -- Getters
 
-(defn get-layouts
-  "Get a map of layouts"
-  [{:keys [dir-layouts]}]
-  (-> dir-layouts (u/find-files-by-ext "clj") (u/load-fns-into-map)))
-
-(defn get-partials
-  "Get a map of layouts"
-  [{:keys [dir-partials]}]
-  (-> dir-partials (u/find-files-by-ext "clj") (u/load-fns-into-map)))
-
 (defn get-web-path
   "Determines the web path of the file from the cwd.
   `dirname-files`: demo_org
