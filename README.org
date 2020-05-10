@@ -45,7 +45,7 @@ It's possible to run a server that will live-reload your files a you make change
 - In order for files to link to each other, org-mode links should be set to
   *relative*. You can probably do this with dir-locals and setting
   [[https://emacs.stackexchange.com/questions/32601/how-can-i-get-with-org-store-link-relative-path-instead-of-absolute][org-link-file-path-type]] to =relative=. Read [[file:docs/setup.org][setup]] for more details.
-- Firn was built to be used alongside the suggested structure of [[https://github.com/org-roam/org-roam][Org Roam]]
+- Firn was built to be used alongside the suggested structure of [[https://github.com/org-roam/org-roam][Org Roam]].
 
 * Developing
 
