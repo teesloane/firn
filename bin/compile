@@ -48,6 +48,7 @@ args=( -jar target/firn-0.1.0-SNAPSHOT-standalone.jar \
             "-H:ReflectionConfigurationFiles=reflection.json"
             "-H:+JNI" \
             "--verbose" \
+            "--add-modules java.xml.bind" \  # to get linux to compile properly ?
             "--no-fallback" \
             "--no-server" )
 
