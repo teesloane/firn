@@ -149,7 +149,7 @@
 (defn serve
   [opts]
   (mount/start-with-args opts)
-  (promise)) ; NOTE: this is for CLI-matic stuff for now.)
+  (promise)) ; NOTE: The promise prevents the System/exit of CLI-matic.
 
 ;; -- Repl Land --
 
