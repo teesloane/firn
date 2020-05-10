@@ -1,2 +1,2 @@
-{:dir-data   "data"    ; org attachments/files to get copied into _site.
+{:dir-data   "data"      ; org attachments/files to get copied into _site.
  :ignored-dirs ["priv"]} ; Directories to ignore org files in.

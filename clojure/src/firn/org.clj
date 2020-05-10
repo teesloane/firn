@@ -73,4 +73,4 @@
     (try
       (.getTime (.parse sdf pod->str))
       (catch Exception e
-        (u/print-err! :error  (str "\nFailed to parse the logbook for :" "<<" name ">>" "\nThe logbook may be incorrectly formatted.\nError value:" e))))))
+        (u/print-err! :error  (str "Failed to parse the logbook for file:" "<<" name ">>" "\nThe logbook may be incorrectly formatted.\nError value:" e))))))

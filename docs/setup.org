@@ -1,17 +1,18 @@
-#+TITLE: Editor Setup
+#+TITLE: Firn Setup
 #+DATE_CREATED: <2020-03-27 Fri>
-#+DATE_UPDATED: <2020-03-28 22:05>
+#+DATE_UPDATED: <2020-05-10 15:01>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: docs
 
-The following are notes on how to best setup your editor and folder for a Firn site.
+The following are notes on how to best setup your editor and folder for a Firn
+site.
 
 * Folder Structure.
 
-Aim to have a flat wiki. This works well with [[https://github.com/jethrokuan/org-roam][Org-Roam]], which I use in this
-setup currently. Not required, but useful.
-
-You can have nested folders, which /will/ translate into nested url paths.
+Firn was originally intended to build sites from a flat wiki structure but this
+is not mandatory. This works well with [[https://github.com/jethrokuan/org-roam][Org-Roam]], which I use in this setup
+currently. Not required, but useful. You can have nested folders, which /will/
+translate into nested url paths.
 
 An example directory:
 
@@ -34,13 +35,13 @@ An example directory:
 
 #+END_SRC
 * Links
-
 ** Linking between files
 
 All links should be relative.
 
-In your wiki directory, add a =.dir-locals= file with these contents to make
-sure org links are relative:
+In your wiki directory, add a =.dir-locals.el= file with these contents to make
+sure org links are relative (or just change it in your config.el if you don't
+mind having this setting apply across all org files.):
 
 #+BEGIN_SRC elisp
 ((org-mode
@@ -51,12 +52,10 @@ sure org links are relative:
 
 When it comes to attachments:
 
-- It's recommended to put all images/attachments in a single folder  (your =:dir-data=)
-- =File:= links (to images, etc) are the best way to go for now.
-  - pro: you can view images inline in graphical versions of emacs.
-- Org-attach can work, but isn't officially supported. If you do use it:
-  - You'll want to use [[https://github.com/abo-abo/org-download][org-download]], =attachment:= links don't work currently.
-  - be aware that inline image viewing might not work.
+- It's recommended to put all images/attachments in a single folder (your
+  =:dir-data=)
+- You can configure which directory this is via the =:dir-data= key in your
+  config.
 
 * Other Things
 ** How To get auto timestamp on =DATE_UPDATED= on every file in emacs.
@@ -82,3 +81,8 @@ When it comes to attachments:
 #+BEGIN_SRC elisp
 (add-hook 'write-file-hooks 'time-stamp) ; update timestamp, if it exists, when saving
 #+END_SRC
+** Ignoring certain files or directories.
+
+Setting the keyword ~#+FIRN_PRIVATE: true~ in an org-mode file will cause the file
+not to be rendered. Similarly, you can set an entire directory to be ignored in
+your =config.edn=
