@@ -7,6 +7,20 @@
 
 (def dev? (if (= (System/getenv "DEV") "TRUE") true false))
 
+(defn print-err!
+  "A custom error function.
+  Prints errors, expecting a type to specified (:warning, :error etc.)
+  Currently, also returns false after printing error message, so we can
+  use that for control flow or for tests."
+  [typ & args]
+  (let [err-types   {:warning       "🚧 Warning:"
+                     :error         "❗ Error:"
+                     :uncategorized "🗒 Uncategorized Error:"}
+        sel-log-typ (get err-types typ (get err-types :uncategorized))]
+    (apply println sel-log-typ args)
+    (when-not (and dev? (= sel-log-typ :error))
+      (System/exit 1))))
+
 (def ^{:doc "Current working directory. This cannot be changed in the JVM.
              Changing this will only change the working directory for functions
              in this library."
@@ -40,7 +54,7 @@
   (let [ext-regex (re-pattern (str "^.*\\.(" ext ")$"))
         files     (find-files dir ext-regex)]
     (if (= 0 (count files))
-      (do (println "No" ext "files found at " dir) files)
+      (do (print-err! :warning "No" ext "files found at " dir) files)
       files)))
 
 (defn file-name-no-ext
@@ -123,18 +137,7 @@
 ;; For interception thread macros and enabling printing the passed in value.
 (def spy #(do (println "DEBUG:" %) %))
 
-(defn print-err!
-  "A custom error function.
-  Prints errors, expecting a type to specified (:warning, :error etc.)
-  Currently, also returns false after printing error message, so we can
-  use that for control flow or for tests."
-  [typ & args]
-  (let [err-types   {:warning       "🚧 Warning:"
-                     :error         "❗ Error:"
-                     :uncategorized "🗒 Uncategorized Error:"}
-        sel-log-typ (get err-types typ (get err-types :uncategorized))]
-    (apply println sel-log-typ args)
-    (when-not dev? (System/exit 1))))
+
 
 (defn native-image?
   "Check if we are in the native-image or REPL."
