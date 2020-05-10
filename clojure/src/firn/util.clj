@@ -18,7 +18,7 @@
                      :uncategorized "🗒 Uncategorized Error:"}
         sel-log-typ (get err-types typ (get err-types :uncategorized))]
     (apply println sel-log-typ args)
-    (when-not (and dev? (= sel-log-typ :error))
+    (when (and (not dev?) (= typ :error))
       (System/exit 1))))
 
 (def ^{:doc "Current working directory. This cannot be changed in the JVM.
