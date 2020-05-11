@@ -3,12 +3,17 @@
   :url "http://example.com/FIXME"
   :license {:name "EPL-2.0 OR GPL-2.0-or-later WITH Classpath-exception-2.0"
             :url "https://www.eclipse.org/legal/epl-2.0/"}
-  :dependencies [[org.clojure/clojure "1.9.0"]
-                 [cli-matic "0.3.11"]
-                 [borkdude/sci "0.0.13-alpha.14"]
-                 [hiccup "1.0.5"]
+  :dependencies [[borkdude/sci "0.0.13-alpha.14"]
                  [cheshire "5.10.0"]
-                 [me.raynes/fs "1.4.6"]]
+                 [cli-matic "0.3.11"]
+                 [hiccup "1.0.5"]
+                 [http-kit "2.3.0"]
+                 ;; [juxt/dirwatch "0.2.5"] ;; vendored
+                 [me.raynes/fs "1.4.6"]
+                 [ring "1.8.0"]
+                 [mount "0.1.16"]
+                 [org.clojure/clojure "1.9.0"]
+                 [ring/ring-defaults "0.3.2"]]
 
   :jvm-opts ["-Djava.library.path=./resources"]
   :java-source-paths ["src-java"]

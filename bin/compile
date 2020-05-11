@@ -45,10 +45,13 @@ args=( -jar target/firn-0.1.0-SNAPSHOT-standalone.jar \
             "-H:IncludeResources=libmylib.so" \
             "-H:IncludeResources=firn/.*" \
             "-H:Log=registerResource:" \
+            "-H:ReflectionConfigurationFiles=reflection.json"
             "-H:+JNI" \
             "--verbose" \
+            "--allow-incomplete-classpath" \
             "--no-fallback" \
             "--no-server" )
+
 
 echo  " ---------------------------------------- "
 

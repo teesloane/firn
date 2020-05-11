@@ -2,7 +2,8 @@
   (:require [firn.util :as sut]
             [firn.stubs :as stub]
             [clojure.test :as t]
-            [me.raynes.fs :as fs]))
+            [me.raynes.fs :as fs]
+            [firn.file :as file]))
 
 (t/deftest dupe-name-in-dir-path?
   (t/testing "Returns true on a path that has a duplicate dir"
@@ -47,3 +48,13 @@
   (t/testing "It returns an empty list when nothing is found"
     (let [no-files (sut/find-files-by-ext stub/test-dir "foo")]
       (t/is (= (count no-files) 0)))))
+
+(t/deftest remove-ext
+  (t/testing "It removes the extension from a string."
+    (t/is (= "foo" (sut/remove-ext "foo.org"))))
+
+  (t/testing "It removes a specified extension"
+    (t/is (= "foo" (sut/remove-ext "foo.html" "html"))))
+
+  (t/testing "It does not remove the extension if the specified extension does not match"
+    (t/is (= "foo.html" (sut/remove-ext "foo.html" "org")))))

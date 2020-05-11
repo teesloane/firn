@@ -12,10 +12,10 @@
         [:article.mb4
          (for [l projects]
            [:div.fl.w-third.pa0.mv2
-            [:a.f6 {:href (l :path)} (l :title)]])]
+            [:a.f6 {:href (str (l :path) ".html")} (l :title)]])]
         ;; Research
         [:h3 "Research"]
         [:article
          (for [l research]
            [:div.fl.w-third.pa0.mv2
-            [:a.f6 {:href (l :path)} (l :title)]])]]]])))
+            [:a.f6 {:href (str (l :path) ".html")} (l :title)]])]]]])))

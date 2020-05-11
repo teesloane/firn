@@ -1,9 +1,10 @@
 (ns firn.core
-  (:require [clojure.java.io :as io]
-            [cli-matic.core :refer [run-cmd]]
-            [firn.util :as u]
-            [firn.build :as build])
-  (:gen-class))
+  (:gen-class)
+  (:require [cli-matic.core :refer [run-cmd]]
+            [clojure.java.io :as io]
+            [firn.build :as build]
+            [firn.server :as server]
+            [firn.util :as u]))
 
 (defn init!
   "When firn is run as a native image, move the dependencies (the parser bin)
@@ -35,10 +36,17 @@
                  {:command     "new"
                   :description "Scaffolds files and folders needed to start a new site."
                   :opts        []
-                  :runs        build/new-site}]})
+                  :runs        build/new-site}
+                 {:command     "serve"
+                  :description "Runs a development server for processed org files."
+                  :opts        []
+                  :runs        server/serve}]})
 
 (defn -main
-  "Parsed command line arguments and runs corresponding functions."
+  "Parsed command line arguments and runs corresponding functions.
+  NOTE: This cannot be used from a REPL; run-cmd invokes system/exit.
+  TODO: Replace with tools.cli - CLI-matic is quite large code wise, actually
+  and requires hacks for long running processes."
   [& args]
   (init!)
   (clojure.lang.RT/loadLibrary "mylib")

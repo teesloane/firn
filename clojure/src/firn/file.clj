@@ -4,19 +4,14 @@
   If the input is is a java io file, it should be called `file-io`
 
   You can view the file data-structure as it is made by the `make` function."
-  (:require [clojure.string :as s]
-            [cheshire.core :as json]
-            [firn.util :as u]
+  (:require [cheshire.core :as json]
+            [clojure.java.io :as io]
+            [clojure.string :as s]
+            [firn.layout :as layout]
             [firn.org :as org]
-            [firn.layout :as layout]))
+            [firn.util :as u]))
 
-(defn strip-file-ext
-  "Removes a file extension from a file path string.
-  (strip-file-ext foo/bar.jpeg jpeg) ;; => foo/bar"
-  [ext string]
-  (let [ext-regex (re-pattern (str "\\.(" ext ")$"))
-        res (s/replace string ext-regex "")]
-    res))
+;; -- Getters
 
 (defn get-web-path
   "Determines the web path of the file from the cwd.
@@ -30,18 +25,31 @@
 
   [dirname-files file-path-abs]
   (if (u/dupe-name-in-dir-path? file-path-abs dirname-files)
-    (u/print-err! :warning "\nWell, well, well. You've stumbled into one of weird edge cases of using Firn. \nCongrats on getting here! Let's look at what's happening. \n\nThe directory of your org files appears twice in it's path:\n\n<<" file-path-abs ">>\n\nIn order to properly build web-paths for your files, Firn needs to know where your 'web-root' is. \nWe cannot currently detect which folder is your file root. \nTo solve this, either rename your directory of org files: \n\n<<" dirname-files ">>\n\nor rename the earlier instance in the path of the same name.")
+    (u/print-err! :error "\nWell, well, well. You've stumbled into one of weird edge cases of using Firn. \nCongrats on getting here! Let's look at what's happening. \n\nThe directory of your org files appears twice in it's path:\n\n<<" file-path-abs ">>\n\nIn order to properly build web-paths for your files, Firn needs to know where your 'web-root' is. \nWe cannot currently detect which folder is your file root. \nTo solve this, either rename your directory of org files: \n\n<<" dirname-files ">>\n\nor rename the earlier instance in the path of the same name.")
     (->> (s/split file-path-abs #"/")
          (drop-while #(not (= % dirname-files)))
          rest
          (s/join "/")
-         (strip-file-ext "org"))))
+         (u/remove-ext))))
 
 (defn get-io-name
   "Returns the name of a file from the Java ioFile object w/o an extension."
   [f]
   (let [f-name (.getName ^java.io.File f)]
     (-> f-name (s/split #"\.") (first))))
+
+(defn read-clj
+  "Reads a folder full of clj files, such as partials or layouts.
+  pass a symbol for dir to request a specific folder."
+  [dir {:keys [dir-partials dir-layouts]}]
+  (case dir
+    :layouts
+    (-> dir-layouts (u/find-files-by-ext "clj") (u/load-fns-into-map))
+
+    :partials
+    (-> dir-partials (u/find-files-by-ext "clj") (u/load-fns-into-map))
+
+    (throw (Exception. "Ensure you are passing the right possible keywords to read-clj."))))
 
 (defn make
   "Creates a file; which is to say, a map of data & metadata about an org-file."
@@ -64,10 +72,9 @@
   [f m]
   (merge f m))
 
+;; FIXME: this gets called A LOT, it seems. Might want to profile.
 (defn get-keywords
-  "Returns a list of org-keywords from a file. All files must have keywords.
-  FIXME: If no keywords present - prints an error, but processing continues.
-  Should I throw an error or System/exit?"
+  "Returns a list of org-keywords from a file. All files must have keywords."
   [f]
   (let [expected-keywords (get-in f [:as-edn :children 0 :children])]
     (if (= "keyword" (:type (first expected-keywords)))
@@ -84,8 +91,7 @@
    [{:type keyword, :key TITLE, :value Firn, :post_blank 0}
     {:type keyword, :key DATE_CREATED, :value 2020-03-01--09-53, :post_blank 0}]
                                Becomes 
-   {:title Firn, :date-created 2020-03-01--09-53, :status active, :firn-layout project}
-  "
+   {:title Firn, :date-created 2020-03-01--09-53, :status active, :firn-layout project}"
   [f]
   (let [kw            (get-keywords f)
         lower-case-it #(when % (s/lower-case %))
@@ -106,12 +112,12 @@
 
 (defn- sort-logbook
   "Loops over all logbooks, adds start and end unix timestamps."
-  [logbook]
+  [logbook file]
   (->> logbook
       ;; adds a unix timestamp for the :start and :end time.
-      (map #(assoc % :start-ts (org/parsed-org-date->unix-time (:start %))
-                     :end-ts   (org/parsed-org-date->unix-time (:end %))))
-      (sort-by :start-ts #(> %1 %2))))
+       (map #(assoc % :start-ts (org/parsed-org-date->unix-time (:start %) file)
+                    :end-ts   (org/parsed-org-date->unix-time (:end %) file)))
+       (sort-by :start-ts #(> %1 %2))))
 
 (defn extract-metadata-logbook-helper
   "Extracts the logbook and associates the parent headline's metadata with it.
@@ -146,7 +152,7 @@
         links          (filter #(= "link"  (:type %)) tree-data)
         logbook        (extract-metadata-logbook-helper tree-data)
         logbook-aug    (map #(merge % file-metadata) logbook)
-        logbook-sorted (sort-logbook logbook-aug)
+        logbook-sorted (sort-logbook logbook-aug file)
         links-aug      (map #(merge % file-metadata) links)]
     {:links links-aug :logbook logbook-sorted}))
 
@@ -156,6 +162,7 @@
   (let [layout   (keyword (get-keyword f "FIRN_LAYOUT"))
         as-html  (when-not (is-private? config f)
                    (layout/apply-layout config f layout))]
+    ;; as-html
     (change f {:as-html as-html})))
 
 (defn process-one
@@ -170,8 +177,10 @@
         new-file      (change new-file {:keywords  (get-keywords new-file)
                                         :org-title (get-keyword new-file "TITLE")
                                         :links     (file-metadata :links)
-                                        :logbook   (file-metadata :logbook)})]
-    new-file))
+                                        :logbook   (file-metadata :logbook)})
+        final-file    (htmlify config new-file)]
+
+    final-file))
 
 (defn process-all
   "Receives config, processes all files and builds up site-data
@@ -183,22 +192,23 @@
     ;; recurse over the org-files, gradually processing them and
     ;; pulling out links, logs, and other useful data.
     (loop [org-files (config :org-files)
-           output    []]
+           output    {}]
       (if (empty? org-files)
-        (assoc config
-               :processed-files output
-               :site-map        @site-map
-               :site-links      @site-links
-               :site-logs       @site-logs)
+        ;; LOOP/RECUR: run one more loop on all files, and create their html,
+        ;; now that we have processed everything.
+        (let [config-with-data (assoc config :processed-files output :site-map @site-map
+                                      :site-links @site-links :site-logs  @site-logs)
+              with-html        (into {} (for [[k pf] output] [k (htmlify config-with-data pf)]))
+              final            (assoc config-with-data :processed-files with-html)]
+          final)
 
         (let [next-file      (first org-files)
               processed-file (process-one config next-file)
               org-files      (rest org-files)
-              output         (conj output processed-file)
+              output         (assoc output (processed-file :path-web) processed-file)
               keyword-map    (keywords->map processed-file)
               new-site-map   (merge keyword-map {:path (processed-file :path-web)})
-              file-metadata  (extract-metadata processed-file)] ;; FIXME: why are we calling this once when we can pull the results out from `processed-file / via procssed one`?!
-
+              file-metadata  (select-keys processed-file [:keywords :org-title :links :logbook])]
 
           ;; add to sitemap when file is not private.
           (when-not (is-private? config processed-file)
@@ -207,3 +217,11 @@
             (swap! site-logs concat @site-logs (:logbook file-metadata)))
           ;; add links and logs to site wide data.
           (recur org-files output))))))
+
+(defn reload-requested-file
+  "Take a request to a file, pulls the file out of memory
+  grabs the path of the original file, reslurps it and reprocesses"
+  [file config]
+  (let [re-slurped (-> file :path io/file)
+        re-processed (process-one config re-slurped)]
+    re-processed))
