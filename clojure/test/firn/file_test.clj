@@ -14,17 +14,17 @@
 (t/use-fixtures :each stub/test-wrapper)
 
 (def sample-file
-  {:path      "/Users/tees/Projects/firn/firn/clojure/test/firn/demo_org/file-small.org",
-   :as-json   "{\"type\":\"document\",\"pre_blank\":0,\"children\":[{\"type\":\"section\",\"children\":[{\"type\":\"keyword\",\"key\":\"TITLE\",\"value\":\"Firn\",\"post_blank\":0},{\"type\":\"keyword\",\"key\":\"DATE_CREATED\",\"value\":\"<2020-03-01 09:53>\",\"post_blank\":0},{\"type\":\"keyword\",\"key\":\"DATE_UPDATED\",\"value\":\"<2020-04-26 15:43>\",\"post_blank\":0},{\"type\":\"keyword\",\"key\":\"FIRN_UNDER\",\"value\":\"project\",\"post_blank\":0},{\"type\":\"keyword\",\"key\":\"FIRN_LAYOUT\",\"value\":\"project\",\"post_blank\":0}]},{\"type\":\"headline\",\"level\":1,\"children\":[{\"type\":\"title\",\"level\":1,\"raw\":\"Foo\",\"post_blank\":0,\"children\":[{\"type\":\"text\",\"value\":\"Foo\"}]},{\"type\":\"section\",\"children\":[{\"type\":\"paragraph\",\"post_blank\":0,\"children\":[{\"type\":\"text\",\"value\":\"Hi there!\"}]}]}]}]}\n",
-   :logbook   (),
-   :as-html   "<html>Stub text.</html>",
-   :name      "file-small",
-   :original  nil,
-   :path-web  "file-small",
-   :keywords  [{:type "keyword", :key "TITLE", :value "Firn", :post_blank 0} {:type "keyword", :key "DATE_CREATED", :value "<2020-03-01 09:53>", :post_blank 0} {:type "keyword", :key "DATE_UPDATED", :value "<2020-04-26 15:43>", :post_blank 0} {:type "keyword", :key "FIRN_UNDER", :value "project", :post_blank 0} {:type "keyword", :key "FIRN_LAYOUT", :value "project", :post_blank 0}],
-   :org-title "Firn",
-   :as-edn {:type      "document", :pre_blank 0, :children [{:type "section", :children [{:type "keyword", :key "TITLE", :value "Firn", :post_blank 0} {:type "keyword", :key "DATE_CREATED", :value "<2020-03-01 09:53>", :post_blank 0} {:type "keyword", :key "DATE_UPDATED", :value "<2020-04-26 15:43>", :post_blank 0} {:type "keyword", :key "FIRN_UNDER", :value "project", :post_blank 0} {:type "keyword", :key "FIRN_LAYOUT", :value "default", :post_blank 0}]} {:type  "headline", :level 1, :children [{:type       "title", :level      1, :raw        "Foo", :post_blank 0, :children   [{:type "text", :value "Foo"}]} {:type "section", :children [{:type       "paragraph", :post_blank 0, :children   [{:type "text", :value "Hi there!"}]}]}]}]},
-   :links     ()})
+  {:path     "/Users/tees/Projects/firn/firn/clojure/test/firn/demo_org/file-small.org",
+   :as-json  "{\"type\":\"document\",\"pre_blank\":0,\"children\":[{\"type\":\"section\",\"children\":[{\"type\":\"keyword\",\"key\":\"TITLE\",\"value\":\"Firn\",\"post_blank\":0},{\"type\":\"keyword\",\"key\":\"DATE_CREATED\",\"value\":\"<2020-03-01 09:53>\",\"post_blank\":0},{\"type\":\"keyword\",\"key\":\"DATE_UPDATED\",\"value\":\"<2020-04-26 15:43>\",\"post_blank\":0},{\"type\":\"keyword\",\"key\":\"FIRN_UNDER\",\"value\":\"project\",\"post_blank\":0},{\"type\":\"keyword\",\"key\":\"FIRN_LAYOUT\",\"value\":\"project\",\"post_blank\":0}]},{\"type\":\"headline\",\"level\":1,\"children\":[{\"type\":\"title\",\"level\":1,\"raw\":\"Foo\",\"post_blank\":0,\"children\":[{\"type\":\"text\",\"value\":\"Foo\"}]},{\"type\":\"section\",\"children\":[{\"type\":\"paragraph\",\"post_blank\":0,\"children\":[{\"type\":\"text\",\"value\":\"Hi there!\"}]}]}]}]}\n",
+   :logbook  (),
+   :as-html  "<html>Stub text.</html>",
+   :name     "file-small",
+   :original nil,
+   :path-web "file-small",
+   :keywords [{:type "keyword", :key "TITLE", :value "Firn", :post_blank 0} {:type "keyword", :key "DATE_CREATED", :value "<2020-03-01 09:53>", :post_blank 0} {:type "keyword", :key "DATE_UPDATED", :value "<2020-04-26 15:43>", :post_blank 0} {:type "keyword", :key "FIRN_UNDER", :value "project", :post_blank 0} {:type "keyword", :key "FIRN_LAYOUT", :value "project", :post_blank 0}],
+   :meta     {}
+   :as-edn   {:type "document", :pre_blank 0, :children [{:type "section", :children [{:type "keyword", :key "TITLE", :value "Firn", :post_blank 0} {:type "keyword", :key "DATE_CREATED", :value "<2020-03-01 09:53>", :post_blank 0} {:type "keyword", :key "DATE_UPDATED", :value "<2020-04-26 15:43>", :post_blank 0} {:type "keyword", :key "FIRN_UNDER", :value "project", :post_blank 0} {:type "keyword", :key "FIRN_LAYOUT", :value "default", :post_blank 0}]} {:type "headline", :level 1, :children [{:type "title", :level 1, :raw "Foo", :post_blank 0, :children [{:type "text", :value "Foo"}]} {:type "section", :children [{:type "paragraph", :post_blank 0, :children [{:type "text", :value "Hi there!"}]}]}]}]},
+   :links    ()})
 
 (t/deftest get-io-name
   (t/testing "Get a file name extension from a java io object"
@@ -105,7 +105,9 @@
   (let [test-file     (stub/gtf :tf-1 :io)
         sample-config (stub/sample-config)
         processed     (sut/process-one sample-config test-file)]
-    (t/is (every? #(contains? processed %) [:path :as-json :meta :as-html :name :original :path-web :keywords :org-title :as-edn]))))
+    (t/is (every? #(contains? processed %)
+                  [:path :as-json  :meta     :as-html
+                   :name :original :path-web :keywords  :as-edn]))))
 
 (t/deftest sum-logbook
   (t/testing "It returns the expected output"
