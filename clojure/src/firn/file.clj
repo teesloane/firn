@@ -64,7 +64,6 @@
      :name      name     ; the file name
      :path      path-abs ; dir path to the file.
      :path-web  path-web ; path to file from cwd.
-     :org-title nil      ; the #+TITLE value.
      :original  nil}))   ; the file as as javaFile object.
 
 (defn change
@@ -169,9 +168,8 @@
         links-aug      (map #(merge % file-metadata) links)]
     {:links         links-aug
      :logbook       logbook-sorted
-     :logbook-total (sum-logbook logbook) ;nil ;; TODO: this is going to be fun to calculate. Need to parse times.
+     :logbook-total (sum-logbook logbook)
      :keywords      (get-keywords file)
-     :org-title     (get-keyword file "TITLE") ;; FIXME - dedupe this, remove keyword
      :title         (get-keyword file "TITLE")
      :firn-under    (get-keyword file "FIRN_UNDER")
      :date-updated  (get-keyword file "DATE_UPDATED")
