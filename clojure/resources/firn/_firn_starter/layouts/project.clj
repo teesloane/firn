@@ -1,3 +1,4 @@
+;; TODO - clean / remove this; it's custom
 (defn project
   [{:keys [site-map render title partials file-logs]}]
 

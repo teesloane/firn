@@ -1,16 +1,17 @@
 #+TITLE: Org Tree
 #+DATE_CREATED: <2020-03-25 Wed>
-#+DATE_UPDATED: <2020-04-01 11:06>
+#+DATE_UPDATED: <2020-05-11 09:22>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: docs
 
-Org files are parsed using a parser library called [[https://github.com/PoiScript/orgize][Orgize]]. When you create a new
-site with Firn, you will find the parser binary in =_firn/bin/=.
+Summary: This document describes the structure of the data representing a parsed
+org-file. Read this document if you want to learn about how an org-file looks as
+data, or if you want to learn how to manipulate that data for display in your
+site.
 
-Firn calls out to Orgize to send the read file contents of an org-mode file.
-
-It's useful to know the shape of the data that comes out of parsing from Orgize
-and where it is stored in the process of running Firn.
+Org files are parsed using a parser library called [[https://github.com/PoiScript/orgize][Orgize]]. When processing or
+serving your site, Firn sends your org-file as a string into Orgize, and gets
+back a data structure representing the contents of your file.
 
 The parsing of Org content happens in =firn.build/dataify-file=, the content of
 the the org-tree, parsed from json, is stored in the config object: ={:curr-file

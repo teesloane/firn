@@ -154,7 +154,16 @@
         logbook-aug    (map #(merge % file-metadata) logbook)
         logbook-sorted (sort-logbook logbook-aug file)
         links-aug      (map #(merge % file-metadata) links)]
-    {:links links-aug :logbook logbook-sorted}))
+    {:links         links-aug
+     :logbook       logbook-sorted
+     :logbook-total nil ;; TODO: this is going to be fun to calculate. Need to parse times.
+     :keywords      (get-keywords file)
+     :org-title     (get-keyword file "TITLE") ;; FIXME - dedupe this, remove keyword
+     :title         (get-keyword file "TITLE")
+     :firn-under    (get-keyword file "FIRN_UNDER")
+     :date-updated  (get-keyword file "DATE_UPDATED")
+     :date-created  (get-keyword file "DATE_CREATED")}))
+    
 
 (defn htmlify
   "Renders files according to their `layout` keyword."
@@ -174,10 +183,11 @@
         as-edn        (-> as-json (json/parse-string true))
         new-file      (change new-file {:as-json as-json :as-edn as-edn})
         file-metadata (extract-metadata new-file)
-        new-file      (change new-file {:keywords  (get-keywords new-file)
-                                        :org-title (get-keyword new-file "TITLE")
-                                        :links     (file-metadata :links)
-                                        :logbook   (file-metadata :logbook)})
+        new-file      (change new-file {:meta file-metadata} #_{:keywords  (get-keywords new-file)
+                                                                :org-title (get-keyword new-file "TITLE")
+                                                                :meta      (file-metadata)
+                                                                :links     (file-metadata :links)
+                                                                :logbook   (file-metadata :logbook)})
         final-file    (htmlify config new-file)]
 
     final-file))
@@ -196,6 +206,7 @@
       (if (empty? org-files)
         ;; LOOP/RECUR: run one more loop on all files, and create their html,
         ;; now that we have processed everything.
+        ;; FIXME bad formatting in assoc
         (let [config-with-data (assoc config :processed-files output :site-map @site-map
                                       :site-links @site-links :site-logs  @site-logs)
               with-html        (into {} (for [[k pf] output] [k (htmlify config-with-data pf)]))
@@ -207,14 +218,13 @@
               org-files      (rest org-files)
               output         (assoc output (processed-file :path-web) processed-file)
               keyword-map    (keywords->map processed-file)
-              new-site-map   (merge keyword-map {:path (processed-file :path-web)})
-              file-metadata  (select-keys processed-file [:keywords :org-title :links :logbook])]
+              new-site-map   (merge keyword-map {:path (processed-file :path-web)})]
 
           ;; add to sitemap when file is not private.
           (when-not (is-private? config processed-file)
             (swap! site-map conj new-site-map)
-            (swap! site-links concat @site-links (:links file-metadata))
-            (swap! site-logs concat @site-logs (:logbook file-metadata)))
+            (swap! site-links concat @site-links (-> processed-file :meta :links) #_(:links file-metadata)) ;; FIXME clean up
+            (swap! site-logs concat @site-logs (-> processed-file :meta :links) #_(:logbook file-metadata))) ;; FIXME: cleanup
           ;; add links and logs to site wide data.
           (recur org-files output))))))
 
