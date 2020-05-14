@@ -67,7 +67,7 @@
 
 (defn prepare
   "Prepare functions and data to be available in layout functions.
-  FIXME: pretty sure this being called twice as well. Do PERF work."
+  TODO: pretty sure this being called twice as well. Do PERF work."
   [config file]
   (prn "logbook-total " (-> file :meta :logbook-total))
   {;; Layout stuff --

@@ -63,6 +63,7 @@
      :keywords  nil      ; list of keywords at top of org file: #+TITLE:, #+CATEGORY, etc.
      :name      name     ; the file name
      :path      path-abs ; dir path to the file.
+     :meta      {}       ; is filled when process-file / extract-metadata is run.
      :path-web  path-web ; path to file from cwd.
      :original  nil}))   ; the file as as javaFile object.
 
@@ -213,9 +214,11 @@
       (if (empty? org-files)
         ;; LOOP/RECUR: run one more loop on all files, and create their html,
         ;; now that we have processed everything.
-        ;; FIXME bad formatting in assoc
-        (let [config-with-data (assoc config :processed-files output :site-map @site-map
-                                      :site-links @site-links :site-logs  @site-logs)
+        (let [config-with-data (assoc config
+                                      :processed-files output
+                                      :site-map        @site-map
+                                      :site-links      @site-links
+                                      :site-logs       @site-logs)
               with-html        (into {} (for [[k pf] output] [k (htmlify config-with-data pf)]))
               final            (assoc config-with-data :processed-files with-html)]
           final)
@@ -230,8 +233,8 @@
           ;; add to sitemap when file is not private.
           (when-not (is-private? config processed-file)
             (swap! site-map conj new-site-map)
-            (swap! site-links concat @site-links (-> processed-file :meta :links) #_(:links file-metadata)) ;; FIXME clean up
-            (swap! site-logs concat @site-logs (-> processed-file :meta :links) #_(:logbook file-metadata))) ;; FIXME: cleanup
+            (swap! site-links concat @site-links (-> processed-file :meta :links))
+            (swap! site-logs concat @site-logs (-> processed-file :meta :links)))
           ;; add links and logs to site wide data.
           (recur org-files output))))))
 
