@@ -197,11 +197,7 @@
         as-edn        (-> as-json (json/parse-string true))
         new-file      (change new-file {:as-json as-json :as-edn as-edn})
         file-metadata (extract-metadata new-file)
-        new-file      (change new-file {:meta file-metadata} #_{:keywords  (get-keywords new-file)
-                                                                :org-title (get-keyword new-file "TITLE")
-                                                                :meta      (file-metadata)
-                                                                :links     (file-metadata :links)
-                                                                :logbook   (file-metadata :logbook)})
+        new-file      (change new-file {:meta file-metadata})
         final-file    (htmlify config new-file)]
 
     final-file))

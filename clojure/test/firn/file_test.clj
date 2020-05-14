@@ -79,13 +79,14 @@
 
 (t/deftest extract-metadata
   (let [file        (stub/gtf :tf-metadata :processed)
-        start-times (map #(% :start-ts) (file :logbook))]
+        start-times (map #(% :start-ts) (-> file :meta :logbook))]
     (t/testing "Pulls links and logbook entries from a file"
-      (t/is (seq (file :links)))
-      (t/is (seq (file :logbook))))
+      (t/is (seq (get-in file [:meta :links])))
+      (t/is (seq (get-in file [:meta :logbook])))
+      (t/is (= "File Logbook" (get-in file [:meta :title]))))
 
     (t/testing "The logbook is associated with a heading."
-      (let [first-entries (-> file :logbook first)]
+      (let [first-entries (-> file :meta :logbook first)]
         (t/is (= "A headline with a normal log-book." (first-entries :from-headline)))))
 
     (t/testing "check that logbook gets sorted: most-recent -> least-recent by :start-ts"
@@ -104,4 +105,4 @@
   (let [test-file     (stub/gtf :tf-1 :io)
         sample-config (stub/sample-config)
         processed     (sut/process-one sample-config test-file)]
-    (t/is (every? #(contains? processed %) [:path :as-json :logbook :as-html :name :original :path-web :keywords :org-title :as-edn :links]))))
+    (t/is (every? #(contains? processed %) [:path :as-json :meta :as-html :name :original :path-web :keywords :org-title :as-edn]))))

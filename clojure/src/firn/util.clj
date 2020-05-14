@@ -150,18 +150,19 @@
   (keyword (apply str args)))
 
 
-;; Time -----
+;; Time ------------------------------------------------------------------------
+;; NOTE: timestr->hours-min + timevec->time-str could use better input testing?
+;; At the very least, `Integer.` is an opportunity for errors when parsing.
 
-;; TODO TESTME
 (defn timestr->hours-min
-  "Splits `1:36` -> [1 36]"
+  "Splits `1:36` -> [1 36]
+  NOTE: figure out what's idiomatic for handling bad inputs?"
   [tstr]
   (let [split   (s/split tstr #":")
         hours   (Integer. (first split))
         minutes (Integer. (second split))]
     [hours minutes]))
 
-;; TODO TESTME
 (defn timevec->time-str
   "Converts a vector of hours and minutes into readable time string.
   `[3 94]` > `4:34`"
