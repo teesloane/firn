@@ -148,3 +148,25 @@
   "Converts a string to a keyword"
   [& args]
   (keyword (apply str args)))
+
+
+;; Time -----
+
+;; TODO TESTME
+(defn timestr->hours-min
+  "Splits `1:36` -> [1 36]"
+  [tstr]
+  (let [split   (s/split tstr #":")
+        hours   (Integer. (first split))
+        minutes (Integer. (second split))]
+    [hours minutes]))
+
+;; TODO TESTME
+(defn timevec->time-str
+  "Converts a vector of hours and minutes into readable time string.
+  `[3 94]` > `4:34`"
+  [[hours min]]
+  (let [min->hrs       (int (Math/floor (/ min 60)))
+        left-over-mins (mod  min 60)
+        new-timevec    [(+ hours min->hrs) left-over-mins]]
+    (s/join ":" new-timevec)))
