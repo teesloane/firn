@@ -110,9 +110,8 @@
      (some? in-priv-folder?)
      (some? is-private?))))
 
-;; TODO test me.
 (defn sum-logbook
-  "iterates over a logbook and parses string log sums and sums 'em up"
+  "Iterates over a logbook and parses logbook :duration's and sums 'em up"
   [logbook]
   (let [hours-minutes [0 0]
         ;; Reduce ain't pretty. Should clean this up someday.

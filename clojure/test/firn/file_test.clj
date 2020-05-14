@@ -106,3 +106,10 @@
         sample-config (stub/sample-config)
         processed     (sut/process-one sample-config test-file)]
     (t/is (every? #(contains? processed %) [:path :as-json :meta :as-html :name :original :path-web :keywords :org-title :as-edn]))))
+
+(t/deftest sum-logbook
+  (t/testing "It returns the expected output"
+    (let [file (stub/gtf :tf-metadata :processed)
+          res  (sut/sum-logbook (-> file :meta :logbook))]
+      (t/is (= res "4:44"))
+      (t/is (= (type res) java.lang.String)))))

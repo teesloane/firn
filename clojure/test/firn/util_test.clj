@@ -66,7 +66,6 @@
       (t/is (= res1 [1 36]))
       (t/is (= res2 [13 06])))))
 
-
 (t/deftest timevec->time-str
   (t/testing "It returns expected output"
     (let [res1 (sut/timevec->time-str [33 42])
