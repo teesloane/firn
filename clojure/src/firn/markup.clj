@@ -113,7 +113,9 @@
         ordered        (get v :ordered)                               ;; for lists
         val            (if value (s/trim-newline value) value)
         headline-level (get v :level)
-        headline-el    (u/str->keywrd "div.headline-" headline-level) ;; => :div.headline-n
+        headline-el    (u/str->keywrd "div.firn_headline-" headline-level)
+        ;; FIXME: use filter not map; remove empty leaf nodes.
+        ;; or, since we're using recursion, maybe just do it in to-html
         make-child     #(into [%] (map to-html children))]
     (case type
       "document"      (make-child :div)

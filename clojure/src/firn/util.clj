@@ -138,7 +138,6 @@
 (def spy #(do (println "DEBUG:" %) %))
 
 
-
 (defn native-image?
   "Check if we are in the native-image or REPL."
   []

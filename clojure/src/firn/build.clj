@@ -74,4 +74,3 @@
     (->> config
          file/process-all
          write-files)))
-
