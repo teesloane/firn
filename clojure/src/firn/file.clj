@@ -110,6 +110,20 @@
      (some? in-priv-folder?)
      (some? is-private?))))
 
+;; TODO test me.
+(defn sum-logbook
+  "iterates over a logbook and parses string log sums and sums 'em up"
+  [logbook]
+  (let [hours-minutes [0 0]
+        ;; Reduce ain't pretty. Should clean this up someday.
+        reduce-fn     (fn [[acc-hours acc-minutes] log-entry]
+                        (let [[hour min] (u/timestr->hours-min (:duration log-entry))
+                              new-res    [(+ acc-hours hour) (+ acc-minutes min)]]
+                          new-res))]
+    (->> logbook
+       (reduce reduce-fn hours-minutes)
+       (u/timevec->time-str))))
+
 (defn- sort-logbook
   "Loops over all logbooks, adds start and end unix timestamps."
   [logbook file]
@@ -156,7 +170,7 @@
         links-aug      (map #(merge % file-metadata) links)]
     {:links         links-aug
      :logbook       logbook-sorted
-     :logbook-total nil ;; TODO: this is going to be fun to calculate. Need to parse times.
+     :logbook-total (sum-logbook logbook) ;nil ;; TODO: this is going to be fun to calculate. Need to parse times.
      :keywords      (get-keywords file)
      :org-title     (get-keyword file "TITLE") ;; FIXME - dedupe this, remove keyword
      :title         (get-keyword file "TITLE")

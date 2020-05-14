@@ -69,24 +69,25 @@
   "Prepare functions and data to be available in layout functions.
   FIXME: pretty sure this being called twice as well. Do PERF work."
   [config file]
+  (prn "logbook-total " (-> file :meta :logbook-total))
   {;; Layout stuff --
-   :render       (partial render file)
-   :partials     (config :partials)
-   :yield        (render file)
+   :render        (partial render file)
+   :partials      (config :partials)
+   :yield         (render file)
    ;; Site-side stuff --
-   :site-map     (config :site-map)
-   :site-links   (config :site-links)
-   :site-logs    (config :site-logs)
-   :config       config
-   ;; File wide stuff --
-   :meta         (file :meta)
-   :logbook      (-> file :meta :logbook)
-   ;; ALSO, add logbook-sum.
-   :file-links   (-> file :meta :links)
-   :title        (-> file :meta :title)
-   :firn-under   (-> file :meta :firn-under)
-   :date-updated (-> file :meta :date-updated)
-   :date-created (-> file :meta :date-created)})
+   :site-map      (config :site-map)
+   :site-links    (config :site-links)
+   :site-logs     (config :site-logs)
+   :config        config
+   ;; File wide meta --
+   :meta          (file :meta)
+   :logbook       (-> file :meta :logbook)
+   :file-links    (-> file :meta :links)
+   :title         (-> file :meta :title)
+   :firn-under    (-> file :meta :firn-under)
+   :logbook-total (-> file :meta :logbook-total)
+   :date-updated  (-> file :meta :date-updated)
+   :date-created  (-> file :meta :date-created)})
 
 
    ;; the whole config object.
