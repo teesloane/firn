@@ -97,7 +97,6 @@
   (let [sample-file   (dissoc sample-file :as-html)
         sample-config (stub/sample-config)
         htmlified     (sut/htmlify sample-config sample-file)]
-    (prn (:as-html htmlified))
     (t/testing "has :as-html config"
       (t/is (contains? htmlified :as-html)))))
 
