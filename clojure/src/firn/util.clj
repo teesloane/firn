@@ -100,6 +100,7 @@
         eval-file (-> file-path slurp sci/eval-string)]
     eval-file))
 
+
 (defn load-fns-into-map
   "Takes a list of files and returns a map of filenames as :keywords -> file
   NOTE: It also EVALS (using sci) the files so they are in memory functions!
@@ -158,13 +159,17 @@
 ;; NOTE: timestr->hours-min + timevec->time-str could use better input testing?
 ;; At the very least, `Integer.` is an opportunity for errors when parsing.
 
+(defn parse-int [number-string]
+  (try (Integer/parseInt number-string)
+    (catch Exception e nil)))
+
 (defn timestr->hours-min
   "Splits `1:36` -> [1 36]
   NOTE: figure out what's idiomatic for handling bad inputs?"
   [tstr]
   (let [split   (s/split tstr #":")
-        hours   (Integer. ^java.lang.Integer (first split))
-        minutes (Integer. ^java.lang.Integer (second split))]
+        hours   (parse-int (first split))
+        minutes (parse-int (second split))]
     [hours minutes]))
 
 (defn timevec->time-str
