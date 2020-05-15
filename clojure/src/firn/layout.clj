@@ -80,6 +80,7 @@
    :site-logs     (config :site-logs)
    :config        config
    ;; File wide meta --
+   :file          file
    :meta          (file :meta)
    :logbook       (-> file :meta :logbook)
    :file-links    (-> file :meta :links)
