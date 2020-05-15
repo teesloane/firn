@@ -1,6 +1,6 @@
 #+TITLE: Layout
 #+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-04-20 20:21>
+#+DATE_UPDATED: <2020-05-15 10:44>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: docs
 
@@ -91,7 +91,7 @@ content that can then be shared across layouts:
 * How do I drill down into the content of a heading?
 
 First, a =heading= refers to a bullet heading in org-mode (the kind that are
-toggleable with the =tab=) key. A =heading= can have =sub-headings=, =drawers=
+toggle-able with the =tab key)=. A =heading= can have =sub-headings=, =drawers=
 (properties, logbooks, etc) and general text content (tables, lists, prose, etc.)
 
 Because a heading can contain so much data, the =render= function, made
@@ -128,18 +128,61 @@ file-specific meta-data. Example meta-data:
 The =prepare= [[file:../src/firn/layout.clj::69][function]] in the =layout= namespace sets up layouts to have access
 to functions and data:
 
-| Function/Data | Intent                                       | Data-type |
-|---------------+----------------------------------------------+-----------|
-| render        | Enables rendering parts of an org file.      | function  |
-| title         | The org mode file.                           | string    |
-| site-map      | A list of all files on the wiki              | list      |
-| site-links    | A list of all links across all documents     | list      |
-| site-logs     | A list of ALL logbook entries.               | list      |
-| file-logs     | A list of logbooks entries per file.         | list      |
-| file-links    | A list of links per file                     | list      |
-| partials      | a list of partials in your =partials= folder | list      |
-| yield         | Your entire org file, rendered to html       | html      |
-| config        | The site wide config.                        | map       |
+| Function/Data | Intent                                                 | Data-type |
+|---------------+--------------------------------------------------------+-----------|
+| config        | The site wide config.                                  | map       |
+| file-links    | A list of links per file                               | list      |
+| file          | The file as a data structure.                          | map       |
+| logbook       | A list of logbooks entries per file.                   | list      |
+| partials      | a list of invokable partials in your =partials= folder   | list      |
+| render        | Enables rendering parts of an org file.                | function  |
+| site-links    | A list of all links across all documents               | list      |
+| site-logs     | A list of ALL logbook entries.                         | list      |
+| site-map      | A list of all files on the wiki                        | list      |
+| title         | The org mode file.                                     | string    |
+| yield         | Your entire org file, rendered to html                 | html      |
+| meta          | A map of metadata about the file (logbook, links, etc) | map       |
+| title         | The #+TITLE value of the file.                         | string    |
+| firn-under    | The #+FIRN_UNDER value of the file                     | string    |
+| date-updated  | The #+DATE_UPDATED value of the file                   | string    |
+| date-created  | The #+DATE_CREATED value of the file                   | string    |
+| logbook-total | The sum of all the logbook entries                     | string    |
+
+This may seem like a lot of information to make available to a layout template. And that's because it is. But thanks to destructuring in Clojure, you can make your templates only ask for what they need.
+
+#+BEGIN_SRC clojure
+(defn project
+  [{:keys [ render partials logbook] :as data}]
+  (let [{:keys [head nav]} partials]
+    (head
+     [:body
+      (nav)
+      [:main.main-container
+       (page-header data)
+       [:div.container
+        (main-section render)
+        (sidebar render logbook)]]])))
+#+END_SRC
+
+The above template only needs access to =render=, =partials= and the =logbook=. Then functions, such as =page-header= can simply take the data map and destructure what /it/ needs again:
+
+#+BEGIN_SRC clojure
+(defn page-header
+  [{:keys [title logbook-total date-updated date-created firn-under]}]
+  (let [rndr (fn [i s]
+               (when i [:span.flex.pr2
+                        [:h4.italic.bold.pr1 s " "]
+                        [:h4.italic.thin i]]))]
+    [:div.page_meta
+     [:h1.page_meta_title title]
+     [:div.flex
+      (rndr date-created "Published: ")
+      (rndr date-updated "Last Updated: ")
+      (rndr firn-under "File Under: ")
+      (when-not (= logbook-total "0:0")
+        (rndr logbook-total "Time Logged: "))]]))
+
+#+END_SRC
 
 * Styling Layouts
 
@@ -154,14 +197,14 @@ transformed into data. These styles are all prefaced with the keyword =firn_=,
 The following are the css classes and their rerspective org-mode structure they
 augment, as they come hard-coded into firn:
 
-| Css class                 | Element                                  |
-|---------------------------+------------------------------------------|
-| .firn_title-priority      | Title Priority (ex: [#A] / [#B] etc)     |
+| Css class                 | Element                                |
+|---------------------------+----------------------------------------|
+| .firn_title-priority      | Title Priority (ex: [#A] / [#B] etc)   |
 | .firn_title-priority__A   | Targets =[#A]=                           |
-| .firn_title-priority__B   | Etc.                                     |
-| .firn_title-priority__C   | Etc.                                     |
+| .firn_title-priority__B   | Etc.                                   |
+| .firn_title-priority__C   | Etc.                                   |
 | .firn_title-keyword       | Targets all keywords =TODO/DONE= etc.    |
 | .firn_title-keyword__TODO | Targets =TODO=                           |
 | .firn_title-keyword__DONE | Targets =DONE=                           |
-| .firn_heading-timestamp   | Heading Timestamps*                      |
+| .firn_heading-timestamp   | Heading Timestamps*                    |
 | .firn_heading-cookie      | Targets heading todo-count (ex =[7/10]=) |
