@@ -1,7 +1,11 @@
 (ns firn.util
   (:require [clojure.java.io :as io]
             [clojure.string :as s]
-            [sci.core :as sci]))
+            [sci.core :as sci])
+  (:import (java.lang Integer)))
+
+
+(set! *warn-on-reflection* true)
 
 ;; Some of these are borrowed from me.raynes.fs because I need to add ;; type hints for GraalVM
 
@@ -159,8 +163,8 @@
   NOTE: figure out what's idiomatic for handling bad inputs?"
   [tstr]
   (let [split   (s/split tstr #":")
-        hours   (Integer. (first split))
-        minutes (Integer. (second split))]
+        hours   (Integer. ^java.lang.Integer (first split))
+        minutes (Integer. ^java.lang.Integer (second split))]
     [hours minutes]))
 
 (defn timevec->time-str
