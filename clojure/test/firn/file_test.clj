@@ -14,17 +14,17 @@
 (t/use-fixtures :each stub/test-wrapper)
 
 (def sample-file
-  {:path      "/Users/tees/Projects/firn/firn/clojure/test/firn/demo_org/file-small.org",
-   :as-json   "{\"type\":\"document\",\"pre_blank\":0,\"children\":[{\"type\":\"section\",\"children\":[{\"type\":\"keyword\",\"key\":\"TITLE\",\"value\":\"Firn\",\"post_blank\":0},{\"type\":\"keyword\",\"key\":\"DATE_CREATED\",\"value\":\"<2020-03-01 09:53>\",\"post_blank\":0},{\"type\":\"keyword\",\"key\":\"DATE_UPDATED\",\"value\":\"<2020-04-26 15:43>\",\"post_blank\":0},{\"type\":\"keyword\",\"key\":\"FIRN_UNDER\",\"value\":\"project\",\"post_blank\":0},{\"type\":\"keyword\",\"key\":\"FIRN_LAYOUT\",\"value\":\"project\",\"post_blank\":0}]},{\"type\":\"headline\",\"level\":1,\"children\":[{\"type\":\"title\",\"level\":1,\"raw\":\"Foo\",\"post_blank\":0,\"children\":[{\"type\":\"text\",\"value\":\"Foo\"}]},{\"type\":\"section\",\"children\":[{\"type\":\"paragraph\",\"post_blank\":0,\"children\":[{\"type\":\"text\",\"value\":\"Hi there!\"}]}]}]}]}\n",
-   :logbook   (),
-   :as-html   "<html>Stub text.</html>",
-   :name      "file-small",
-   :original  nil,
-   :path-web  "file-small",
-   :keywords  [{:type "keyword", :key "TITLE", :value "Firn", :post_blank 0} {:type "keyword", :key "DATE_CREATED", :value "<2020-03-01 09:53>", :post_blank 0} {:type "keyword", :key "DATE_UPDATED", :value "<2020-04-26 15:43>", :post_blank 0} {:type "keyword", :key "FIRN_UNDER", :value "project", :post_blank 0} {:type "keyword", :key "FIRN_LAYOUT", :value "project", :post_blank 0}],
-   :org-title "Firn",
-   :as-edn {:type      "document", :pre_blank 0, :children [{:type "section", :children [{:type "keyword", :key "TITLE", :value "Firn", :post_blank 0} {:type "keyword", :key "DATE_CREATED", :value "<2020-03-01 09:53>", :post_blank 0} {:type "keyword", :key "DATE_UPDATED", :value "<2020-04-26 15:43>", :post_blank 0} {:type "keyword", :key "FIRN_UNDER", :value "project", :post_blank 0} {:type "keyword", :key "FIRN_LAYOUT", :value "default", :post_blank 0}]} {:type  "headline", :level 1, :children [{:type       "title", :level      1, :raw        "Foo", :post_blank 0, :children   [{:type "text", :value "Foo"}]} {:type "section", :children [{:type       "paragraph", :post_blank 0, :children   [{:type "text", :value "Hi there!"}]}]}]}]},
-   :links     ()})
+  {:path     "/Users/tees/Projects/firn/firn/clojure/test/firn/demo_org/file-small.org",
+   :as-json  "{\"type\":\"document\",\"pre_blank\":0,\"children\":[{\"type\":\"section\",\"children\":[{\"type\":\"keyword\",\"key\":\"TITLE\",\"value\":\"Firn\",\"post_blank\":0},{\"type\":\"keyword\",\"key\":\"DATE_CREATED\",\"value\":\"<2020-03-01 09:53>\",\"post_blank\":0},{\"type\":\"keyword\",\"key\":\"DATE_UPDATED\",\"value\":\"<2020-04-26 15:43>\",\"post_blank\":0},{\"type\":\"keyword\",\"key\":\"FIRN_UNDER\",\"value\":\"project\",\"post_blank\":0},{\"type\":\"keyword\",\"key\":\"FIRN_LAYOUT\",\"value\":\"project\",\"post_blank\":0}]},{\"type\":\"headline\",\"level\":1,\"children\":[{\"type\":\"title\",\"level\":1,\"raw\":\"Foo\",\"post_blank\":0,\"children\":[{\"type\":\"text\",\"value\":\"Foo\"}]},{\"type\":\"section\",\"children\":[{\"type\":\"paragraph\",\"post_blank\":0,\"children\":[{\"type\":\"text\",\"value\":\"Hi there!\"}]}]}]}]}\n",
+   :logbook  (),
+   :as-html  "<html>Stub text.</html>",
+   :name     "file-small",
+   :original nil,
+   :path-web "file-small",
+   :keywords [{:type "keyword", :key "TITLE", :value "Firn", :post_blank 0} {:type "keyword", :key "DATE_CREATED", :value "<2020-03-01 09:53>", :post_blank 0} {:type "keyword", :key "DATE_UPDATED", :value "<2020-04-26 15:43>", :post_blank 0} {:type "keyword", :key "FIRN_UNDER", :value "project", :post_blank 0} {:type "keyword", :key "FIRN_LAYOUT", :value "project", :post_blank 0}],
+   :meta     {}
+   :as-edn   {:type "document", :pre_blank 0, :children [{:type "section", :children [{:type "keyword", :key "TITLE", :value "Firn", :post_blank 0} {:type "keyword", :key "DATE_CREATED", :value "<2020-03-01 09:53>", :post_blank 0} {:type "keyword", :key "DATE_UPDATED", :value "<2020-04-26 15:43>", :post_blank 0} {:type "keyword", :key "FIRN_UNDER", :value "project", :post_blank 0} {:type "keyword", :key "FIRN_LAYOUT", :value "default", :post_blank 0}]} {:type "headline", :level 1, :children [{:type "title", :level 1, :raw "Foo", :post_blank 0, :children [{:type "text", :value "Foo"}]} {:type "section", :children [{:type "paragraph", :post_blank 0, :children [{:type "text", :value "Hi there!"}]}]}]}]},
+   :links    ()})
 
 (t/deftest get-io-name
   (t/testing "Get a file name extension from a java io object"
@@ -79,13 +79,14 @@
 
 (t/deftest extract-metadata
   (let [file        (stub/gtf :tf-metadata :processed)
-        start-times (map #(% :start-ts) (file :logbook))]
+        start-times (map #(% :start-ts) (-> file :meta :logbook))]
     (t/testing "Pulls links and logbook entries from a file"
-      (t/is (seq (file :links)))
-      (t/is (seq (file :logbook))))
+      (t/is (seq (get-in file [:meta :links])))
+      (t/is (seq (get-in file [:meta :logbook])))
+      (t/is (= "File Logbook" (get-in file [:meta :title]))))
 
     (t/testing "The logbook is associated with a heading."
-      (let [first-entries (-> file :logbook first)]
+      (let [first-entries (-> file :meta :logbook first)]
         (t/is (= "A headline with a normal log-book." (first-entries :from-headline)))))
 
     (t/testing "check that logbook gets sorted: most-recent -> least-recent by :start-ts"
@@ -96,7 +97,6 @@
   (let [sample-file   (dissoc sample-file :as-html)
         sample-config (stub/sample-config)
         htmlified     (sut/htmlify sample-config sample-file)]
-    (prn (:as-html htmlified))
     (t/testing "has :as-html config"
       (t/is (contains? htmlified :as-html)))))
 
@@ -104,4 +104,13 @@
   (let [test-file     (stub/gtf :tf-1 :io)
         sample-config (stub/sample-config)
         processed     (sut/process-one sample-config test-file)]
-    (t/is (every? #(contains? processed %) [:path :as-json :logbook :as-html :name :original :path-web :keywords :org-title :as-edn :links]))))
+    (t/is (every? #(contains? processed %)
+                  [:path :as-json  :meta     :as-html
+                   :name :original :path-web :keywords  :as-edn]))))
+
+(t/deftest sum-logbook
+  (t/testing "It returns the expected output"
+    (let [file (stub/gtf :tf-metadata :processed)
+          res  (sut/sum-logbook (-> file :meta :logbook))]
+      (t/is (= res "4:44"))
+      (t/is (= (type res) java.lang.String)))))

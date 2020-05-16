@@ -1,7 +1,11 @@
 (ns firn.util
   (:require [clojure.java.io :as io]
             [clojure.string :as s]
-            [sci.core :as sci]))
+            [sci.core :as sci])
+  (:import (java.lang Integer)))
+
+
+(set! *warn-on-reflection* true)
 
 ;; Some of these are borrowed from me.raynes.fs because I need to add ;; type hints for GraalVM
 
@@ -96,6 +100,7 @@
         eval-file (-> file-path slurp sci/eval-string)]
     eval-file))
 
+
 (defn load-fns-into-map
   "Takes a list of files and returns a map of filenames as :keywords -> file
   NOTE: It also EVALS (using sci) the files so they are in memory functions!
@@ -138,7 +143,6 @@
 (def spy #(do (println "DEBUG:" %) %))
 
 
-
 (defn native-image?
   "Check if we are in the native-image or REPL."
   []
@@ -149,3 +153,30 @@
   "Converts a string to a keyword"
   [& args]
   (keyword (apply str args)))
+
+
+;; Time ------------------------------------------------------------------------
+;; NOTE: timestr->hours-min + timevec->time-str could use better input testing?
+;; At the very least, `Integer.` is an opportunity for errors when parsing.
+
+(defn parse-int [number-string]
+  (try (Integer/parseInt number-string)
+    (catch Exception e nil)))
+
+(defn timestr->hours-min
+  "Splits `1:36` -> [1 36]
+  NOTE: figure out what's idiomatic for handling bad inputs?"
+  [tstr]
+  (let [split   (s/split tstr #":")
+        hours   (parse-int (first split))
+        minutes (parse-int (second split))]
+    [hours minutes]))
+
+(defn timevec->time-str
+  "Converts a vector of hours and minutes into readable time string.
+  `[3 94]` > `4:34`"
+  [[hours min]]
+  (let [min->hrs       (int (Math/floor (/ min 60)))
+        left-over-mins (mod  min 60)
+        new-timevec    [(+ hours min->hrs) left-over-mins]]
+    (s/join ":" new-timevec)))

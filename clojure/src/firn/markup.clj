@@ -44,7 +44,7 @@
         ;; file regexs / ctor fns
         org-file-regex  #"(file:)(.*)\.(org)"
         http-link-regex #"https?:\/\/(?![^\" ]*(?:jpg|png|gif))[^\" ]+"
-        file-path       #(str "./" (nth %  2) ".html")]
+        file-path       #(str "./" (nth %  2) ".html")] ;; TODO: find out if we want to construct links to .html, or just have server/based/paths
 
     (cond
       ;; Images ---
@@ -113,7 +113,9 @@
         ordered        (get v :ordered)                               ;; for lists
         val            (if value (s/trim-newline value) value)
         headline-level (get v :level)
-        headline-el    (u/str->keywrd "div.headline-" headline-level) ;; => :div.headline-n
+        headline-el    (u/str->keywrd "div.firn_headline-" headline-level)
+        ;; FIXME: use filter not map; remove empty leaf nodes.
+        ;; or, since we're using recursion, maybe just do it in to-html
         make-child     #(into [%] (map to-html children))]
     (case type
       "document"      (make-child :div)

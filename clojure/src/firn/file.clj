@@ -63,8 +63,8 @@
      :keywords  nil      ; list of keywords at top of org file: #+TITLE:, #+CATEGORY, etc.
      :name      name     ; the file name
      :path      path-abs ; dir path to the file.
+     :meta      {}       ; is filled when process-file / extract-metadata is run.
      :path-web  path-web ; path to file from cwd.
-     :org-title nil      ; the #+TITLE value.
      :original  nil}))   ; the file as as javaFile object.
 
 (defn change
@@ -110,6 +110,19 @@
      (some? in-priv-folder?)
      (some? is-private?))))
 
+(defn sum-logbook
+  "Iterates over a logbook and parses logbook :duration's and sums 'em up"
+  [logbook]
+  (let [hours-minutes [0 0]
+        ;; Reduce ain't pretty. Should clean this up someday.
+        reduce-fn     (fn [[acc-hours acc-minutes] log-entry]
+                        (let [[hour min] (u/timestr->hours-min (:duration log-entry))
+                              new-res    [(+ acc-hours hour) (+ acc-minutes min)]]
+                          new-res))]
+    (->> logbook
+       (reduce reduce-fn hours-minutes)
+       (u/timevec->time-str))))
+
 (defn- sort-logbook
   "Loops over all logbooks, adds start and end unix timestamps."
   [logbook file]
@@ -154,7 +167,15 @@
         logbook-aug    (map #(merge % file-metadata) logbook)
         logbook-sorted (sort-logbook logbook-aug file)
         links-aug      (map #(merge % file-metadata) links)]
-    {:links links-aug :logbook logbook-sorted}))
+    {:links         links-aug
+     :logbook       logbook-sorted
+     :logbook-total (sum-logbook logbook)
+     :keywords      (get-keywords file)
+     :title         (get-keyword file "TITLE")
+     :firn-under    (get-keyword file "FIRN_UNDER")
+     :date-updated  (get-keyword file "DATE_UPDATED")
+     :date-created  (get-keyword file "DATE_CREATED")}))
+    
 
 (defn htmlify
   "Renders files according to their `layout` keyword."
@@ -174,10 +195,7 @@
         as-edn        (-> as-json (json/parse-string true))
         new-file      (change new-file {:as-json as-json :as-edn as-edn})
         file-metadata (extract-metadata new-file)
-        new-file      (change new-file {:keywords  (get-keywords new-file)
-                                        :org-title (get-keyword new-file "TITLE")
-                                        :links     (file-metadata :links)
-                                        :logbook   (file-metadata :logbook)})
+        new-file      (change new-file {:meta file-metadata})
         final-file    (htmlify config new-file)]
 
     final-file))
@@ -196,8 +214,11 @@
       (if (empty? org-files)
         ;; LOOP/RECUR: run one more loop on all files, and create their html,
         ;; now that we have processed everything.
-        (let [config-with-data (assoc config :processed-files output :site-map @site-map
-                                      :site-links @site-links :site-logs  @site-logs)
+        (let [config-with-data (assoc config
+                                      :processed-files output
+                                      :site-map        @site-map
+                                      :site-links      @site-links
+                                      :site-logs       @site-logs)
               with-html        (into {} (for [[k pf] output] [k (htmlify config-with-data pf)]))
               final            (assoc config-with-data :processed-files with-html)]
           final)
@@ -207,14 +228,13 @@
               org-files      (rest org-files)
               output         (assoc output (processed-file :path-web) processed-file)
               keyword-map    (keywords->map processed-file)
-              new-site-map   (merge keyword-map {:path (processed-file :path-web)})
-              file-metadata  (select-keys processed-file [:keywords :org-title :links :logbook])]
+              new-site-map   (merge keyword-map {:path (processed-file :path-web)})]
 
           ;; add to sitemap when file is not private.
           (when-not (is-private? config processed-file)
             (swap! site-map conj new-site-map)
-            (swap! site-links concat @site-links (:links file-metadata))
-            (swap! site-logs concat @site-logs (:logbook file-metadata)))
+            (swap! site-links concat @site-links (-> processed-file :meta :links))
+            (swap! site-logs concat @site-logs (-> processed-file :meta :links)))
           ;; add links and logs to site wide data.
           (recur org-files output))))))
 

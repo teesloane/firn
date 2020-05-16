@@ -58,3 +58,17 @@
 
   (t/testing "It does not remove the extension if the specified extension does not match"
     (t/is (= "foo.html" (sut/remove-ext "foo.html" "org")))))
+
+(t/deftest timestr->hours-min
+  (t/testing "It returns expected output"
+    (let [res1 (sut/timestr->hours-min "1:36")
+          res2 (sut/timestr->hours-min "13:06")]
+      (t/is (= res1 [1 36]))
+      (t/is (= res2 [13 06])))))
+
+(t/deftest timevec->time-str
+  (t/testing "It returns expected output"
+    (let [res1 (sut/timevec->time-str [33 42])
+          res2 (sut/timevec->time-str [3 94])]
+      (t/is (= res1 "33:42"))
+      (t/is (= res2 "4:34")))))

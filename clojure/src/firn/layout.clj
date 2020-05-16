@@ -66,18 +66,32 @@
        headline))))
 
 (defn prepare
-  "Prepare functions and data to be available in layout functions."
+  "Prepare functions and data to be available in layout functions.
+  TODO: pretty sure this being called twice as well. Do PERF work."
   [config file]
-  {:render     (partial render file)
-   :title      (-> file :org-title)
-   :site-map   (config :site-map)
-   :site-links (config :site-links)
-   :site-logs  (config :site-logs)
-   :file-logs  (file :logbook)
-   :file-links (file :links)
-   :partials   (config :partials)
-   :yield      (render file)
-   :config     config})
+  {;; Layout stuff --
+   :render        (partial render file)
+   :partials      (config :partials)
+   :yield         (render file)
+   ;; Site-side stuff --
+   :site-map      (config :site-map)
+   :site-links    (config :site-links)
+   :site-logs     (config :site-logs)
+   :config        config
+   ;; File wide meta --
+   :file          file
+   :meta          (file :meta)
+   :logbook       (-> file :meta :logbook)
+   :file-links    (-> file :meta :links)
+   :title         (-> file :meta :title)
+   :firn-under    (-> file :meta :firn-under)
+   :logbook-total (-> file :meta :logbook-total)
+   :date-updated  (-> file :meta :date-updated)
+   :date-created  (-> file :meta :date-created)})
+
+
+   ;; the whole config object.
+
 
 (defn apply-layout
   "If a file has a template, render the file with it, or use the default layout"

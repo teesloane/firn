@@ -48,8 +48,8 @@ args=( -jar target/firn-0.1.0-SNAPSHOT-standalone.jar \
             "-H:ReflectionConfigurationFiles=reflection.json"
             "-H:+JNI" \
             "--verbose" \
+            # get compilation on linux working:
             "--allow-incomplete-classpath" \
-            "--no-fallback" \
             "--no-server" )
 
 
