@@ -67,13 +67,11 @@ bin/script/compile
 ** Developing
 - From the directory you run your repl, set an environment variable of: =DEV=TRUE=
 - If you use Emacs, you can set the environment variable to =M-x setenv=
-- There is a directory for testing Firn on a set of dummy org files, located at =clojure/test/firn/demo_org=
+- There is a directory for testing Firn on a set of dummy org files, located at
+  =clojure/test/firn/demo_org=
 - You can run test / build commands inside the =core-test= namespace.
-
-*** Developing the Rust Library
-The rust library is a small file that is set up to parse the org file content. =rust/src/lib.rs= is responsible for building the library that Java talks to via JNI.
-
-When developing, we can't talk to this library so we have a small file at =rust/src/bin/dev-parser.rs= that can compile the parser to be interfaced when shelling out with Clojure.
+- to package up a new version of the rust binary for development (a binary we
+  can shell out to,) run the script =bin/build-dev-parser=
 * Thank-you's
 
 - Thank you to [[https://github.com/borkdude][@borkdude]] for building some awesome libraries ([[https://github.com/borkdude/sci][sci]] is used in
