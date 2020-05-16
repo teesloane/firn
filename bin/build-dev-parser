@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+cd ../rust
+cargo build
+mv target/debug/dev-parser ../bin/parser
