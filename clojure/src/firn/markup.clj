@@ -44,7 +44,7 @@
         ;; file regexs / ctor fns
         org-file-regex  #"(file:)(.*)\.(org)"
         http-link-regex #"https?:\/\/(?![^\" ]*(?:jpg|png|gif))[^\" ]+"
-        file-path       #(str "./" (nth %  2) ".html")]
+        file-path       #(str "./" (nth %  2) ".html")] ;; TODO: find out if we want to construct links to .html, or just have server/based/paths
 
     (cond
       ;; Images ---
