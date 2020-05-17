@@ -1,0 +1,11 @@
+#+TITLE: Limitations
+
+* Footnotes
+
+Currently it seems that *in dev-mode* - ie. when in the repl and using the pre-compiled rust parser, footnotes definitions that have children on the same line are not parse-able:
+
+=[fn:1] Content here < fails the parser.=
+
+Whereas, if you add a newline and add the content below, it works.
+
+So, far this seems to be fine using the final compiled Firn binary.

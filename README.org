@@ -48,11 +48,9 @@ It's possible to run a server that will live-reload your files a you make change
 - Firn was built to be used alongside the suggested structure of [[https://github.com/org-roam/org-roam][Org Roam]].
 
 * Developing
-
 ** Prerequisites:
-
 - Download [[https://www.graalvm.org/downloads/][GraalVM]] and set =GRAALVM_HOME=.
--  Use =gu= to install the =native-image= executable.
+- Use =gu= to install the =native-image= executable.
 - Install [[https://github.com/technomancy/leiningen][lein]]
 - Install [[https://doc.rust-lang.org/cargo/getting-started/installation.html][cargo]] (we use 1.41.1)
 
@@ -66,12 +64,14 @@ cd firn
 # compile Rust, Clojure and the GraalVM Native Image.
 bin/script/compile
 #+END_SRC
-
 ** Developing
 - From the directory you run your repl, set an environment variable of: =DEV=TRUE=
 - If you use Emacs, you can set the environment variable to =M-x setenv=
-- There is a directory for testing Firn on a set of dummy org files, located at =clojure/test/firn/demo_org=
+- There is a directory for testing Firn on a set of dummy org files, located at
+  =clojure/test/firn/demo_org=
 - You can run test / build commands inside the =core-test= namespace.
+- to package up a new version of the rust binary for development (a binary we
+  can shell out to,) run the script =bin/build-dev-parser=
 * Thank-you's
 
 - Thank you to [[https://github.com/borkdude][@borkdude]] for building some awesome libraries ([[https://github.com/borkdude/sci][sci]] is used in

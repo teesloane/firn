@@ -114,3 +114,4 @@
           res  (sut/sum-logbook (-> file :meta :logbook))]
       (t/is (= res "4:44"))
       (t/is (= (type res) java.lang.String)))))
+

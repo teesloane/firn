@@ -3,7 +3,10 @@
   (:require [clojure.string :as s]
             [firn.util :as u]))
 
+(declare to-html)
+
 ;; Renderers
+
 
 (defn date->html
   [v]
@@ -102,6 +105,23 @@
       "bold"      (make-child :strong)
       "")))
 
+(defn- footnote-ref
+  [v]
+  [:a.firn_footnote-ref
+   {:id   (str "fn-" (v :label))
+    :href (str "#" (v :label))}
+   [:sup (v :label)]])
+
+(defn- footnote-def
+  [v]
+  (let [make-child     #(into [%] (map to-html (v :children)))]
+    [:span.firn_footnote-def
+     [:span {:id (v :label)
+             :style "padding-right: 8px"} (v :label)]
+     (make-child :span)
+     [:a {:href (str "#fn-" (v :label))
+          :style "padding-left: 4px"} "↩"]]))
+
 (defn to-html
   "Recursively Parses the org-edn into hiccup.
   Some values don't get parsed (drawers) - yet. They return empty strings.
@@ -134,6 +154,8 @@
       "table-cell"    (make-child :td)
       "source-block"  (src-block->html v)
       "link"          (link->html v)
+      "fn-ref"        (footnote-ref v)
+      "fn-def"        (footnote-def v)
       "code"          [:code val]
       "verbatim"      [:code val]
       "rule"          [:hr]

@@ -15,10 +15,11 @@
   [file-str]
   (if (u/native-image?)
     (ClojureRust/getFreeMemory file-str)
-    (let [parser (str (u/get-cwd) "/resources/parser")
-          res    (sh/sh parser (s/trim-newline file-str))]
+    (let [parser   (str (u/get-cwd) "/resources/parser")
+          stripped (s/trim-newline file-str)
+          res      (sh/sh parser stripped)]
       (if-not (= (res :exit) 0)
-        (prn "Orgize failed to parse file." file-str res)
+        (prn "Orgize failed to parse file." stripped res)
         (res :out)))))
 
 (defn- get-headline-helper
@@ -73,4 +74,5 @@
     (try
       (.getTime (.parse sdf pod->str))
       (catch Exception e
-        (u/print-err! :error  (str "Failed to parse the logbook for file:" "<<" name ">>" "\nThe logbook may be incorrectly formatted.\nError value:" e))))))
+        (u/print-err! :warning  (str "Failed to parse the logbook for file:" "<<" name ">>" "\nThe logbook may be incorrectly formatted.\nError value:" e))
+        "???"))))

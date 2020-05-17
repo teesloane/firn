@@ -160,3 +160,10 @@ img {
 
 .firn_heading-timestamp {}
 .firn_heading-cookie {}
+
+
+/* footnotes */
+.firn_footnote-def {
+  display: flex;
+  align-items: center;
+}
