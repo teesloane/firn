@@ -1,6 +1,6 @@
 #+TITLE: Org Tree
 #+DATE_CREATED: <2020-03-25 Wed>
-#+DATE_UPDATED: <2020-05-16 21:44>
+#+DATE_UPDATED: <2020-05-17 13:17>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: docs
 
@@ -411,7 +411,7 @@ after being parsed to json and converted to edn:
 
 An org file with footnotes, looks like this:
 
-#+BEGIN_SRC elisp
+#+BEGIN_SRC clojure
 {:type "document",
  :pre_blank 0,
  :children
