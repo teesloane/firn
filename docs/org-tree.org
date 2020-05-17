@@ -1,6 +1,6 @@
 #+TITLE: Org Tree
 #+DATE_CREATED: <2020-03-25 Wed>
-#+DATE_UPDATED: <2020-05-11 09:22>
+#+DATE_UPDATED: <2020-05-16 21:44>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: docs
 
@@ -17,7 +17,7 @@ The parsing of Org content happens in =firn.build/dataify-file=, the content of
 the the org-tree, parsed from json, is stored in the config object: ={:curr-file
 {:as-edn ...}}=
 
-A [[file:../test/firn/demo_org/file1.org][simple org file]] with a few headings, tasks, logbook, etc, looks like this
+A [[file:../clojure/test/firn/demo_org/file1.org][simple org file]] with a few headings, tasks, logbook, etc, looks like this
 after being parsed to json and converted to edn:
 
 #+BEGIN_SRC clojure
@@ -406,4 +406,61 @@ after being parsed to json and converted to edn:
              :children
              [{:type "text",
                :value "bold"}]}]}]}]}]}]}]}
+#+END_SRC
+
+
+An org file with footnotes, looks like this:
+
+#+BEGIN_SRC elisp
+{:type "document",
+ :pre_blank 0,
+ :children
+ [{:type "section",
+   :children
+   [{:type "keyword",
+     :key "TITLE",
+     :value "File Footnotes",
+     :post_blank 0}
+    {:type "keyword",
+     :key "FIRN_LAYOUT",
+     :value "default",
+     :post_blank 1}]}
+  {:type "headline",
+   :level 1,
+   :children
+   [{:type "title",
+     :level 1,
+     :raw "File heading",
+     :post_blank 1,
+     :children [{:type "text", :value "File heading"}]}
+    {:type "section",
+     :children
+     [{:type "paragraph",
+       :post_blank 1,
+       :children
+       [{:type "text", :value "I am a file with a footnote "}
+        {:type "fn-ref", :label "1"}]}
+      {:type "paragraph",
+       :post_blank 1,
+       :children
+       [{:type "text", :value "what about some context "}
+        {:type "fn-ref", :label "boo"}]}]}]}
+  {:type "headline",
+   :level 1,
+   :children
+   [{:type "title",
+     :level 1,
+     :raw "Footnotes",
+     :post_blank 1,
+     :children [{:type "text", :value "Footnotes"}]}
+    {:type "section",
+     :children
+     [{:type "fn-def", :label "boo", :post_blank 2}
+      {:type "paragraph",
+       :post_blank 1,
+       :children [{:type "text", :value "sock"}]}
+      {:type "fn-def", :label "1", :post_blank 0}
+      {:type "paragraph",
+       :post_blank 0,
+       :children [{:type "text", :value "Hello there"}]}]}]}]}
 #+END_SRC

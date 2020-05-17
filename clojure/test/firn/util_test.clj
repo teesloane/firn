@@ -5,6 +5,8 @@
             [me.raynes.fs :as fs]
             [firn.file :as file]))
 
+(def num-testing-files 8)
+
 (t/deftest dupe-name-in-dir-path?
   (t/testing "Returns true on a path that has a duplicate dir"
     (t/is (= true (sut/dupe-name-in-dir-path?  "/Users/foo/bar/my-dir/some-files/my-dir/foo" "my-dir")))
@@ -42,7 +44,7 @@
 (t/deftest find-files-by-ext
   (t/testing "It finds the demo_org org files."
     (let [files (sut/find-files-by-ext stub/test-dir "org")]
-      (t/is (= 7 (count files))) ; not the best test, but only has to be updated when number of org sample files change.
+      (t/is (= num-testing-files (count files))) ; not the best test, but only has to be updated when number of org sample files change.
       (doseq [f files]
         (t/is (= ".org" (fs/extension (.getPath f)))))))
   (t/testing "It returns an empty list when nothing is found"

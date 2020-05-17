@@ -41,6 +41,7 @@
    :tf-private           "file-private.org"
    :tf-private-subfolder "priv/file1.org"
    :tf-layout            "file-layout.org"
+   :tf-footnotes         "file-footnotes.org"
    :tf-metadata          "file-metadata.org"})
 
 (defn gtf ; stands for get-test-file

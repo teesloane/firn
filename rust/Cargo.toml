@@ -1,7 +1,6 @@
 [package]
 name = "mylib"
 version = "0.1.0"
-authors = ["Michiel Borkent <michielborkent@gmail.com>"]
 edition = "2018"
 
 [lib]
@@ -13,5 +12,5 @@ crate_type = ["cdylib"]
 jni = "0.14.0"
 heim = "0.0.10"
 futures = "0.3.1"
-orgize = "0.7.0"
+orgize = "0.8.3"
 serde_json = "1.0.48"
