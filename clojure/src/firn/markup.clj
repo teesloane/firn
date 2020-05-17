@@ -115,12 +115,12 @@
 (defn- footnote-def
   [v]
   (let [make-child     #(into [%] (map to-html (v :children)))]
-    [:div.firn_footnote-def
-     [:span
-      [:span {:id (v :label)
-              :style "padding-right: 8px"} (v :label)]
-      (make-child :span)
-      [:a {:href (str "#fn-" (v :label))} "↩"]]]))
+    [:span.firn_footnote-def
+     [:span {:id (v :label)
+             :style "padding-right: 8px"} (v :label)]
+     (make-child :span)
+     [:a {:href (str "#fn-" (v :label))
+          :style "padding-left: 4px"} "↩"]]))
 
 (defn to-html
   "Recursively Parses the org-edn into hiccup.
