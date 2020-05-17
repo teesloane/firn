@@ -33,6 +33,7 @@ pub extern "system" fn Java_iceshelf_clojure_rust_ClojureRust_getFreeMemoryRust(
 
     // Then we have to create a new Java string to return. Again, more info
     // in the `strings` module.
+    println!("{:?}", &unit[..]);
     let org = Org::parse(&unit[..]);
     let org_string = to_string(&org).unwrap();
     let output = env.new_string(format!("{}", org_string))
