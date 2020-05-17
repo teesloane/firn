@@ -3,7 +3,10 @@
   (:require [clojure.string :as s]
             [firn.util :as u]))
 
+(declare to-html)
+
 ;; Renderers
+
 
 (defn date->html
   [v]
@@ -104,18 +107,20 @@
 
 (defn- footnote-ref
   [v]
-  [:a {:id   (str "fn-" (v :label))
-       :href (str "#" (v :label))}
+  [:a.firn_footnote-ref
+   {:id   (str "fn-" (v :label))
+    :href (str "#" (v :label))}
    [:sup (v :label)]])
 
 (defn- footnote-def
   [v]
-  [:div
-   [:hr]
-   [:span
-    [:span {:id (v :label)
-            :style "padding-right: 8px"} (v :label)]
-    [:a {:href (str "#fn-" (v :label))} "↩"]]])
+  (let [make-child     #(into [%] (map to-html (v :children)))]
+    [:div.firn_footnote-def
+     [:span
+      [:span {:id (v :label)
+              :style "padding-right: 8px"} (v :label)]
+      (make-child :span)
+      [:a {:href (str "#fn-" (v :label))} "↩"]]]))
 
 (defn to-html
   "Recursively Parses the org-edn into hiccup.
