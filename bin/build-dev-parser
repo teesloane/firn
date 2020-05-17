@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# expects script to be called from bin/
 cd ../rust
 cargo build
-mv target/debug/dev-parser ../bin/parser
+cp target/debug/dev-parser ../bin/parser
+cp target/debug/dev-parser ../clojure/resources/parser

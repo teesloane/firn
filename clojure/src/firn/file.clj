@@ -72,7 +72,6 @@
   [f m]
   (merge f m))
 
-;; FIXME: this gets called A LOT, it seems. Might want to profile.
 (defn get-keywords
   "Returns a list of org-keywords from a file. All files must have keywords."
   [f]
@@ -126,11 +125,13 @@
 (defn- sort-logbook
   "Loops over all logbooks, adds start and end unix timestamps."
   [logbook file]
-  (->> logbook
-      ;; adds a unix timestamp for the :start and :end time.
-       (map #(assoc % :start-ts (org/parsed-org-date->unix-time (:start %) file)
-                    :end-ts   (org/parsed-org-date->unix-time (:end %) file)))
-       (sort-by :start-ts #(> %1 %2))))
+  (let [mf #(org/parsed-org-date->unix-time %1 file)]
+    (->> logbook
+         ;; Filter out timestamps if they don't have a start or end.
+         (filter #(and (% :start) (% :end) (% :duration)))
+         ;; adds a unix timestamp for the :start and :end time so that's sortable.
+         (map #(assoc % :start-ts (mf (:start %)) :end-ts (mf (:end %))))
+         (sort-by :start-ts #(> %1 %2)))))
 
 (defn extract-metadata-logbook-helper
   "Extracts the logbook and associates the parent headline's metadata with it.
@@ -169,13 +170,12 @@
         links-aug      (map #(merge % file-metadata) links)]
     {:links         links-aug
      :logbook       logbook-sorted
-     :logbook-total (sum-logbook logbook)
+     :logbook-total (sum-logbook logbook-sorted)
      :keywords      (get-keywords file)
      :title         (get-keyword file "TITLE")
      :firn-under    (get-keyword file "FIRN_UNDER")
      :date-updated  (get-keyword file "DATE_UPDATED")
      :date-created  (get-keyword file "DATE_CREATED")}))
-    
 
 (defn htmlify
   "Renders files according to their `layout` keyword."
