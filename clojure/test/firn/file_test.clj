@@ -115,9 +115,3 @@
       (t/is (= res "4:44"))
       (t/is (= (type res) java.lang.String)))))
 
-;; (t/deftest footnote-file
-;;   (t/testing "It parses footnotes"
-;;     (let [config             (stub/sample-config)
-;;           file-footnotes     (stub/gtf :tf-footnotes :processed)]
-;;       (prn file-footnotes)
-;;       (t/is (= true true)))))
