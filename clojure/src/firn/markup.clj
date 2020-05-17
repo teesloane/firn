@@ -102,6 +102,21 @@
       "bold"      (make-child :strong)
       "")))
 
+(defn- footnote-ref
+  [v]
+  [:a {:id   (str "fn-" (v :label))
+       :href (str "#" (v :label))}
+   [:sup (v :label)]])
+
+(defn- footnote-def
+  [v]
+  [:div
+   [:hr]
+   [:span
+    [:span {:id (v :label)
+            :style "padding-right: 8px"} (v :label)]
+    [:a {:href (str "#fn-" (v :label))} "↩"]]])
+
 (defn to-html
   "Recursively Parses the org-edn into hiccup.
   Some values don't get parsed (drawers) - yet. They return empty strings.
@@ -134,6 +149,8 @@
       "table-cell"    (make-child :td)
       "source-block"  (src-block->html v)
       "link"          (link->html v)
+      "fn-ref"        (footnote-ref v)
+      "fn-def"        (footnote-def v)
       "code"          [:code val]
       "verbatim"      [:code val]
       "rule"          [:hr]
