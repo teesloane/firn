@@ -2,7 +2,9 @@
 
 * Footnotes
 
-Currently it seems that *in dev-mode* - ie. when in the repl and using the pre-compiled rust parser, footnotes definitions that have children on the same line are not parse-able:
+Currently it seems that *in dev-mode* - ie. when in the repl and using the
+pre-compiled rust parser, footnotes definitions that have children on the same
+line are not parse-able:
 
 =[fn:1] Content here < fails the parser.=
 
