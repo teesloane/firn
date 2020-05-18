@@ -25,7 +25,7 @@
   "Creates the folders needed for a new site in your wiki directory.
   Copies the _firn_starter from resources, into where you are running the cmd."
   [{:keys [dir-files]}]
-  (let [dir-files    (if (empty? dir-files) (u/get-cwd) dir-files)
+  (let [dir-files    (if (empty? dir-files) (System/getProperty "user.dir") #_(u/get-cwd) dir-files)
         _ (prn "dir files is" dir-files)
         dir-firn     (config/make-dir-firn dir-files)
         base-dir     "firn/_firn_starter/"
@@ -37,6 +37,8 @@
           (doseq [f read-files]
             (io/make-parents (:out-name f))
             (spit (:out-name f) (:contents f)))))))
+
+
 
 (defn setup
   "Creates folders for output, slurps in layouts and partials.
