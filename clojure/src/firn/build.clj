@@ -26,6 +26,7 @@
   Copies the _firn_starter from resources, into where you are running the cmd."
   [{:keys [dir-files]}]
   (let [dir-files    (if (empty? dir-files) (u/get-cwd) dir-files)
+        _ (prn "dir files is" dir-files)
         dir-firn     (config/make-dir-firn dir-files)
         base-dir     "firn/_firn_starter/"
         read-files   (map #(hash-map :contents (slurp (io/resource (str base-dir %)))
@@ -37,8 +38,11 @@
             (io/make-parents (:out-name f))
             (spit (:out-name f) (:contents f)))))))
 
+(new-site {})
+
 (defn setup
   "Creates folders for output, slurps in layouts and partials.
+
   NOTE: should slurp/mkdir/copy-dir be wrapped in try-catches? if-err handling?"
   [{:keys [dir-site   dir-files       dir-site-data
            dir-data dir-site-static dir-static] :as config}]
