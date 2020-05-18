@@ -25,12 +25,16 @@
   "Creates the folders needed for a new site in your wiki directory.
   Copies the _firn_starter from resources, into where you are running the cmd."
   [{:keys [dir-files]}]
-  (let [dir-files    (if (empty? dir-files) (System/getProperty "user.dir") #_(u/get-cwd) dir-files)
-        _ (prn "dir files is" dir-files)
-        dir-firn     (config/make-dir-firn dir-files)
-        base-dir     "firn/_firn_starter/"
-        read-files   (map #(hash-map :contents (slurp (io/resource (str base-dir %)))
-                                     :out-name (str dir-firn "/" %)) default-files)]
+  (let [dir-files  (if (empty? dir-files) (System/getProperty "user.dir") #_(u/get-cwd) dir-files)
+        _          (prn "dir files is" dir-files)
+        foo-fn     #(u/get-cwd)
+        foo-def    (u/get-cwd)
+        _          (prn "anoynmous get cwd result foo-fn call " (foo-def))
+        _          (prn "anoynmous get cwd result foo-def " foo-fn)
+        dir-firn   (config/make-dir-firn dir-files)
+        base-dir   "firn/_firn_starter/"
+        read-files (map #(hash-map :contents (slurp (io/resource (str base-dir %)))
+                                   :out-name (str dir-firn "/" %)) default-files)]
     (if (fs/exists? dir-firn)
       (u/print-err! :error "A _firn directory already exists.")
       (do (fs/mkdir dir-firn)
