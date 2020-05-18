@@ -29,8 +29,8 @@
         _          (prn "dir files is" dir-files)
         foo-fn     #(u/get-cwd)
         foo-def    (u/get-cwd)
-        _          (prn "anoynmous get cwd result foo-fn call " (foo-def))
-        _          (prn "anoynmous get cwd result foo-def " foo-fn)
+        _          (prn "anoynmous get cwd result foo-fn call " (foo-fn))
+        _          (prn "anoynmous get cwd result foo-def " foo-def)
         dir-firn   (config/make-dir-firn dir-files)
         base-dir   "firn/_firn_starter/"
         read-files (map #(hash-map :contents (slurp (io/resource (str base-dir %)))
