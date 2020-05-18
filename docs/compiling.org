@@ -1,5 +1,7 @@
 #+TITLE: Compiling
 
+Notes on getting the Firn binary compiling with GraalVM.
+
 * On Linux
 
 #+BEGIN_SRC
