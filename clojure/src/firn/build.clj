@@ -38,8 +38,6 @@
             (io/make-parents (:out-name f))
             (spit (:out-name f) (:contents f)))))))
 
-(new-site {})
-
 (defn setup
   "Creates folders for output, slurps in layouts and partials.
 
