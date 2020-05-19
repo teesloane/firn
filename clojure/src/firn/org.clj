@@ -76,3 +76,48 @@
       (catch Exception e
         (u/print-err! :warning  (str "Failed to parse the logbook for file:" "<<" name ">>" "\nThe logbook may be incorrectly formatted.\nError value:" e))
         "???"))))
+
+;; -- stats
+
+(def cal-schema
+  [[1 31] [2 28] [3 31] [4 30] [5 31] [6 30]
+   [7 31] [8 31] [9 30] [10 31] [11 30] [12 31]])
+
+(defn build-year
+  "Takes a year and constructs all 365 days for it.
+  used to push logbook vals into the list for charting."
+  [year]
+  (vec
+   (flatten
+    (for [month cal-schema
+          :let  [curr-month    (first month)
+                 days-in-month (range 1 (+ 1 (second month)))]]
+
+      (for [day days-in-month]
+        {:day         day
+         :month       curr-month
+         :year        year
+         :log-count   0
+         :logs-raw    []
+         :logs-sum    "00:00"})))))
+
+(defn- update-logbook-day
+  [x]
+  #(-> %
+       (assoc :log-count (inc (% :log-count)))
+       (assoc :logs-raw  (conj (% :logs-raw) x))
+       (assoc :logs-sum  (u/timestr->add-time (% :logs-sum) (x :duration)))))
+
+(defn logbook-year-stats
+  "Takes a logbook and pushes it's data into a year calendar."
+  [year logbook]
+  (let [year-cal (build-year year)]
+    (loop [-logbook logbook
+           output   year-cal]
+      (if (empty? -logbook)
+        output
+        (let [x             (first -logbook)
+              xs            (rest -logbook)
+              day-to-update (+ 1 (-> x :start :day))
+              n-output      (update output day-to-update (update-logbook-day x))]
+          (recur xs n-output))))))

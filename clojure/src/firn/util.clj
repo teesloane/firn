@@ -177,6 +177,15 @@
   `[3 94]` > `4:34`"
   [[hours min]]
   (let [min->hrs       (int (Math/floor (/ min 60)))
-        left-over-mins (mod  min 60)
-        new-timevec    [(+ hours min->hrs) left-over-mins]]
-    (s/join ":" new-timevec)))
+        total-hours    (+ hours min->hrs)
+        left-over-mins (mod  min 60)]
+    (format "%d:%02d" total-hours left-over-mins)))
+
+
+;; TODO: TEST ME
+(defn timestr->add-time
+  "(timestr->add-time `10:02` `00:02`) =>  10:04"
+  [existing-ts to-add]
+  (let [[eh em]   (timestr->hours-min existing-ts)
+        [tah tam] (timestr->hours-min to-add)]
+    (timevec->time-str [(+ eh tah) (+ em tam)])))
