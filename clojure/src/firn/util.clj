@@ -172,6 +172,11 @@
         minutes (parse-int (second split))]
     [hours minutes]))
 
+(defn timestr->hours
+  [tstr]
+  (first (timestr->hours-min tstr)))
+
+
 (defn timevec->time-str
   "Converts a vector of hours and minutes into readable time string.
   `[3 94]` > `4:34`"
