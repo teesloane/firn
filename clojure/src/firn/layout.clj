@@ -48,10 +48,18 @@
          yield    (markup/to-html org-tree)] ;; this has lots of nil vals in it.
      yield))
 
-  ([file headline-name]
-   (let [org-tree (file :as-edn)
-         headline (org/get-headline org-tree headline-name)]
-     (markup/to-html headline)))
+  ([file action]
+   (cond
+     ;; Render a heading.
+     (string? action)
+     (let [org-tree (file :as-edn)
+           headline (org/get-headline org-tree action)]
+       (markup/to-html headline))
+
+     ;; render a logbook polyline chart.
+     (= action :logbook-polyline)
+     (org/poly-line (-> file :meta :logbook))))
+
 
   ;; pass in a keyword to retrieve some munged piece of the data
   ([file headline-name piece]
@@ -62,7 +70,6 @@
        :title      (-> headline :children first  markup/to-html)
        :title-raw  (-> headline :children first :raw)
        :content    (markup/to-html headline-content)
-       :logbook    nil ;; TODO render logbook, possible with options, :logbook-heatmap, :logbook-graph.
        headline))))
 
 (defn prepare
@@ -88,9 +95,6 @@
    :logbook-total (-> file :meta :logbook-total)
    :date-updated  (-> file :meta :date-updated)
    :date-created  (-> file :meta :date-created)})
-
-
-   ;; the whole config object.
 
 
 (defn apply-layout

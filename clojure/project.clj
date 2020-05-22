@@ -10,6 +10,7 @@
                  [http-kit "2.3.0"]
                  ;; [juxt/dirwatch "0.2.5"] ;; vendored
                  [me.raynes/fs "1.4.6"]
+                 [tick "0.4.23-alpha"]
                  [ring "1.8.0"]
                  [mount "0.1.16"]
                  [org.clojure/clojure "1.9.0"]

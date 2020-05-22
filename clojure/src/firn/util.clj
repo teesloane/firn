@@ -163,19 +163,33 @@
   (try (Integer/parseInt number-string)
     (catch Exception e nil)))
 
+;; FIXME: Test
 (defn timestr->hours-min
-  "Splits `1:36` -> [1 36]
-  NOTE: figure out what's idiomatic for handling bad inputs?"
+  "Splits `1:36` -> [1 36]"
   [tstr]
   (let [split   (s/split tstr #":")
         hours   (parse-int (first split))
         minutes (parse-int (second split))]
     [hours minutes]))
 
+;; FIXME: Test
 (defn timestr->hours
   [tstr]
   (first (timestr->hours-min tstr)))
 
+;; FIXME: Test
+(defn timestr->minutes
+  "convert `03:25` into minutes 205"
+  [tstr]
+  (let [[h m] (timestr->hours-min tstr)]
+    (+ (* h 60) m)))
+
+;; FIXME: Test
+(defn timestr->hour-float
+  "Converts `03:25` -> `3.41` "
+  [tstr]
+  (float
+   (/ (int (* 100 (/ (timestr->minutes tstr) 60))) 100)))
 
 (defn timevec->time-str
   "Converts a vector of hours and minutes into readable time string.

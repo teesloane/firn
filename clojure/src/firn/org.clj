@@ -4,7 +4,9 @@
   Which are created by the rust binary."
   (:require [clojure.java.shell :as sh]
             [clojure.string :as s]
+            [tick.alpha.api :as t]
             [firn.util :as u])
+
   (:import iceshelf.clojure.rust.ClojureRust))
 
 (defn parse!
@@ -79,98 +81,98 @@
 
 ;; -- stats --
 
-;; Days of each month
-(def cal-schema
-  [[1 31] [2 28] [3 31] [4 30] [5 31] [6 30]
-   [7 31] [8 31] [9 30] [10 31] [11 30] [12 31]])
-
-(defn- build-year
-  "constructs a list of 365 days.
-  used to push logbook vals into the list for charting."
+(defn- build-year-tick
   [year]
-  (vec
-   (flatten
-    (for [month cal-schema
-          :let  [curr-month    (first month)
-                 days-in-month (range 1 (+ 1 (second month)))]]
+  (let [interval           (t/bounds (t/year year))
+        ;;This  creates a year of values that look like: #time/date-time "2019-01-01T00:00"
+        date-times-of-year (t/range (t/beginning interval)
+                                    (t/end interval)
+                                    (t/new-period 1 :days))
+        ;; but we just need dates : 2019-01-01 (not yet possible in tick?)
+        dates-of-year      (map t/date date-times-of-year)
+        build-days         #(hash-map
+                             :date      %
+                             :log-count 0
+                             :logs-raw  []
+                             :log-sum   "00:00"
+                             :hour-sum   0)]
 
-      (for [day days-in-month]
-        ;; construct a day; this gets modified later in logbook-year-stats.
-        {:day         day
-         :month       curr-month
-         :year        year
-         :hours       0
-         :log-count   0
-         :logs-raw    []
-         :log-sum    "00:00"})))))
+    (->> dates-of-year (map build-days) vec)))
+
+
+(defn find-index-of
+  [pred sequence]
+  (first (keep-indexed (fn [i x] (when (pred x) i))
+                       sequence)))
+
+(defn find-day-to-update
+  [calendar-year log-entry]
+  (let [{:keys [day month year]} (log-entry :start)
+        logbook-date             (t/new-date year month day)]
+    (find-index-of #(= (% :date) logbook-date) calendar-year)))
 
 (defn- update-logbook-day
   "Updates a day in a calander from build-year with logbook data."
-  [log-entry]
-  #(-> %
-       (assoc :log-count (inc (% :log-count)))
-       (assoc :year      (-> log-entry :start :year))
-       (assoc :logs-raw  (conj (% :logs-raw) log-entry))
-       (assoc :log-sum   (u/timestr->add-time (% :log-sum) (log-entry :duration)))
-       (assoc :hours     (u/timestr->hours (% :log-sum)))))
+  [{:keys [duration] :as log-entry}]
+  (fn [{:keys [log-count logs-raw log-sum day] :as cal-day}]
+    (let [log-count (inc log-count)
+          logs-raw  (conj logs-raw log-entry)
+          log-sum   (u/timestr->add-time log-sum duration)]
+      (merge
+       cal-day
+       {:log-count log-count
+        :logs-raw  logs-raw
+        :log-sum   log-sum
+        :hour-sum  (u/timestr->hour-float log-sum)}))))
+
 
 (defn logbook-year-stats
-  "Takes a logbook and pushes it's data into a year calendar."
+  "Takes a logbook and pushes it's data into a year calendar.
+  Returns a map that looks like:
+  2020 = [ { :day 1, ... } { :day 2, ... } { :day 3, ... } { :day 4, ... } ... ]
+  2019 = [ { :day 1, ... } { :day 2, ... } { :day 3, ... } { :day 4, ... } ... ]
+  "
   [logbook]
   (loop [logbook logbook
-         output   {}]
+         output  {}]
     (if (empty? logbook)
       output
       (let [x             (first logbook)
             xs            (rest logbook)
             log-year      (-> x :start :year)
-            day-to-update (- (-> x :start :day) 1) ; account for 0 based index.
-            ;; create the "year" if it doesnt exist yet.
-            output        (if (contains? output log-year)
-                            output
-                            (assoc output log-year (build-year log-year))) ;;make year if there isn't one already.
-            output      (update-in output [log-year day-to-update] (update-logbook-day x))]
+            output        (if (contains? output log-year) output
+                              (assoc output log-year (build-year-tick log-year))) ; make year if there isn't one already.
+            day-to-update (find-day-to-update (get output log-year) x)
+            output        (update-in output [log-year day-to-update] (update-logbook-day x))]
         (recur xs output)))))
 
-(defn make-poly-line
-  [logbook]
-  [:div
-   (for [year (logbook-year-stats logbook)
-         :let [poly-line-pts (map-indexed (fn [idx item] [idx (get item :hours 0)]) year)
-               points-as-str (apply str (map #(str "" (first %) "," (second %) " ") poly-line-pts))]]
+;; Rendered charts:
 
-     [:svg {:viewbox "0 0 500 100", :class "chart"}
-      [:polyline {:fill         "none",
-                  :stroke       "#0074d9",
-                  :stroke-width "3",
-                  :points       points-as-str}]])])
+(defn poly-line
+  "Takes a logbook, formats it so that it can be plotted along a polyline."
+  ([logbook]
+   (poly-line logbook {}))
+  ([logbook
+    {:keys [width height]
+     :or   {width 365 height 100}
+     :as   opts}]
+   [:div
+    (for [[year year-of-logs] (logbook-year-stats logbook)
+          :let [
+                max-log     (apply max-key :hour-sum year-of-logs) ;; Don't need this yet.
+                ;; This should be measured against the height and whatever the max-log is.
+                g-multiplier (/ height 8) ;; 8 - max hours we expect someone to log in a day
+                fmt-points  #(str %1 "," (* g-multiplier (%2 :hour-sum)))
+                points      (s/join " " (->> year-of-logs (map-indexed fmt-points)))]]
 
 
-;; sample ground.
-;; (def sample-logbook
-;;   [
-;;    {:type     "clock",
-;;     :start    {:year 2020, :month 3, :day 31, :dayname "Tue", :hour 19, :minute 36},
-;;     :end      {:year 2020, :month 3, :day 31, :dayname "Tue", :hour 19, :minute 46},
-;;     :duration "0:10"}
-;;    {:type     "clock",
-;;     :start    {:year 2020, :month 3, :day 31, :dayname "Tue", :hour 13, :minute 15},
-;;     :end      {:year 2020, :month 3, :day 31, :dayname "Tue", :hour 17, :minute 36},
-;;     :duration "4:21"}
-;;    {:type     "clock",
-;;     :start    {:year 2020, :month 3, :day 31, :dayname "Tue", :hour 10, :minute 55},
-;;     :end      {:year 2020, :month 3, :day 31, :dayname "Tue", :hour 12, :minute 17},
-;;     :duration "1:22"}
-;;    {:type     "clock",
-;;     :start    {:year 2020, :month 3, :day 30, :dayname "Mon", :hour 14, :minute 14},
-;;     :end      {:year 2020, :month 3, :day 30, :dayname "Mon", :hour 14, :minute 41},
-;;     :duration "0:27"}
-;;    {:type     "clock",
-;;     :start    {:year 2020, :month 3, :day 29, :dayname "Sun", :hour 17, :minute 8},
-;;     :end      {:year 2020, :month 3, :day 29, :dayname "Sun", :hour 20, :minute 31},
-;;     :duration "3:23"}
-;;    {:type     "clock",
-;;     :start    {:year 2019, :month 1, :day 1, :dayname "Sat", :hour 15, :minute 45},
-;;     :end      {:year 2019, :month 1, :day 1, :dayname "Sat", :hour 18, :minute 29},
-;;     :duration "2:44"}])
-;; (make-poly-line sample-logbook)
+      [:div
+       [:h5.firn_heading.firn_heading-5 year]
+       [:svg {:viewbox (str "0 0 " width " " height),
+              :class   "chart"}
+        [:g {:transform "translate(0, 100) scale(1, -1)"}
+         [:polyline {:fill         "none",
+                     :stroke       "#0074d9",
+                     :stroke-width "1",
+                     :points points}]]]])]))
+
