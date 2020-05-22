@@ -1,0 +1,12 @@
+#+TITLE: Compiling
+
+Notes on getting the Firn binary compiling with GraalVM.
+
+* On Linux
+
+#+BEGIN_SRC
+Error: Basic header file missing (<zlib.h>). Make sure headers are available on your system.
+com.oracle.svm.core.util.UserError$UserException: Basic header file missing (<zlib.h>). Make sure headers are available on your system.
+#+END_SRC
+
+- Try installing [[https://github.com/oracle/graal/issues/957#issuecomment-512801732][zlib]]

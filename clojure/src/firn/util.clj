@@ -70,10 +70,7 @@
 (defn get-cwd
   "Because *fs/cwd* gives out the at-the-time jvm path. this works with graal."
   []
-  (s/join "/" (-> (java.io.File. ".")
-                  .getAbsolutePath
-                  (s/split #"/")
-                  drop-last)))
+  (System/getProperty "user.dir"))
 
 (defn io-file->keyword
   "Turn a filename into a keyword."

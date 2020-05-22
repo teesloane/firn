@@ -1,13 +1,18 @@
 #+BEGIN_QUOTE
-Static site generator for org-mode.
-Status: ⚠️ Alpha.
+Static site generator for org-mode. Status: ⚠️ Alpha.
 #+END_QUOTE
 
 * Overview
 
-Firn generates a static site from org-mode files. It is a bit different from other static site generators, in that it intends to be a drop in solution for creating sites from already existing folders of org-files. Further, because org-mode has great  capacity for collecting and displaying different kinds of data (links, logbooks, drawers, task keywords, tags) we can make this data available when org-content is parsed into a data structure (read more [[file:docs/org-tree.org][here]]).
+Firn generates a static site from org-mode files. It is a bit different from
+other static site generators, in that it intends to be a drop in solution for
+creating sites from already existing folders of org-files. Further, because
+org-mode has great capacity for collecting and displaying different kinds of
+data (links, logbooks, drawers, task keywords, tags) we can make this data
+available when org-content is parsed into a data structure (read more [[file:docs/org-tree.org][here]]).
 
-Currently, running the =firn= binary on a directory of org files performs the following:
+Currently, running the =firn= binary on a directory of org files performs the
+following:
 
 - Reads all .org files in the directory recursively.
 - Parses org-files into data structures with [[https://github.com/PoiScript/orgize][Orgize.]]
@@ -18,13 +23,15 @@ Currently, running the =firn= binary on a directory of org files performs the fo
 
 *Note!*
 
-Firn is currently being developed; many things are subject to change, or may be simply broken. Currently, only binaries for MacOs  are being successfully compiled.
+Firn is currently being developed; many things are subject to change, or may be
+simply broken. Currently, only binaries for MacOs are being successfully
+compiled.
 
 ** Building a static site
 *** With Binary
 
-1. Download the Firn Binary. (Currently there are no releases, but you can always navigate to a successful [[https://github.com/theiceshelf/firn/actions/runs/100693222][CI build]] and grab one.)
-2. Move the binary in your path.
+1. Download the [[https://github.com/theiceshelf/firn/releases][Firn Binary]].
+2. Move the binary into your path.
 3. Navigate to the directory of your org-mode files.
 4. Run =firn new=. This will create a =_firn= directory.
 5. Run =firn build=, still in the directory of your org-mode files.
@@ -32,20 +39,26 @@ Firn is currently being developed; many things are subject to change, or may be 
 
 *** With the Repo
 
-You also clone this repo and start a repl and run the build commands from the codebase yourself, take a look at =build.clj= for a starting point.
+You also clone this repo and start a repl and run the build commands from the
+codebase yourself, take a look at =build.clj= or =server.clj= for a starting point.
 
 ** Development server
-It's possible to run a server that will live-reload your files a you make changes to templates and partials. Navigate to your directory of files and run =firn serve=
+
+It's possible to run a server that will live-reload your files a you make
+changes to templates and partials. Navigate to your directory of files and run
+=firn serve=.
 
 ** Configuration and Recommendations
 
 - When you run =firn new= you create a folder with a =config.edn= file that allows
   you to customize some elements of how Firn runs. The possible customization
-  options are currently limited and are described in the file.
+  options are currently limited and are described in the =config.edn= file
 - In order for files to link to each other, org-mode links should be set to
   *relative*. You can probably do this with dir-locals and setting
-  [[https://emacs.stackexchange.com/questions/32601/how-can-i-get-with-org-store-link-relative-path-instead-of-absolute][org-link-file-path-type]] to =relative=. Read [[file:docs/setup.org][setup]] for more details.
-- Firn was built to be used alongside the suggested structure of [[https://github.com/org-roam/org-roam][Org Roam]].
+  [[https://emacs.stackexchange.com/questions/32601/how-can-i-get-with-org-store-link-relative-path-instead-of-absolute][org-link-file-path-type]]
+  to =relative=. Read [[file:docs/setup.org][setup]] for more details
+- Firn was built to be used alongside the suggested structure of
+  [[https://github.com/org-roam/org-roam][Org Roam]]
 
 * Developing
 ** Prerequisites:
@@ -59,8 +72,7 @@ It's possible to run a server that will live-reload your files a you make change
 This creates a single binary called =firn=.
 
 #+BEGIN_SRC sh
-git clone git@github.com:theiceshelf/firn.git
-cd firn
+git clone git@github.com:theiceshelf/firn.git cd firn
 # compile Rust, Clojure and the GraalVM Native Image.
 bin/script/compile
 #+END_SRC
@@ -71,7 +83,7 @@ bin/script/compile
   =clojure/test/firn/demo_org=
 - You can run test / build commands inside the =core-test= namespace.
 - to package up a new version of the rust binary for development (a binary we
-  can shell out to,) run the script =bin/build-dev-parser=
+  can shell out to) run the script =bin/build-dev-parser=
 * Thank-you's
 
 - Thank you to [[https://github.com/borkdude][@borkdude]] for building some awesome libraries ([[https://github.com/borkdude/sci][sci]] is used in
