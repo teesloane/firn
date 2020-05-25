@@ -165,7 +165,7 @@
 
 (defn parse-int [number-string]
   (try (Integer/parseInt number-string)
-    (catch Exception e nil)))
+       (catch Exception e nil)))
 
 (defn timestr->hours-min
   "Splits `1:36` -> [1 36]"
@@ -187,6 +187,7 @@
   (double
    (/ (int (* 100 (/ (timestr->minutes tstr) 60))) 100)))
 
+
 (defn timevec->time-str
   "Converts a vector of hours and minutes into readable time string.
   `[3 94]` > `4:34`"
@@ -202,3 +203,25 @@
   (let [[eh em]   (timestr->hours-min existing-ts)
         [tah tam] (timestr->hours-min to-add)]
     (timevec->time-str [(+ eh tah) (+ em tam)])))
+
+
+(defn build-year
+  "constructs a vector maps, representing 365 days;
+  Each map is (in a later function) updated with whatever logbook entries
+  match on the same day,"
+  [year]
+  (let [interval           (t/bounds (t/year year))
+        ;;This  creates a year of values that look like: #time/date-time "2019-01-01T00:00"
+        date-times-of-year (t/range (t/beginning interval)
+                                    (t/end interval)
+                                    (t/new-period 1 :days))
+        ;; but we just need dates : 2019-01-01 (not yet possible in tick?)
+        dates-of-year      (map t/date date-times-of-year)
+        build-days         #(hash-map
+                             :date      %
+                             :log-count 0
+                             :logs-raw  []
+                             :log-sum   "00:00"
+                             :hour-sum   0)]
+
+    (->> dates-of-year (map build-days) vec)))
