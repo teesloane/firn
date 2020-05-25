@@ -81,6 +81,7 @@
 
 ;; -- stats --
 
+;; TODO - test me; move to utils.year.
 (defn- build-year-tick
   [year]
   (let [interval           (t/bounds (t/year year))
@@ -100,6 +101,7 @@
     (->> dates-of-year (map build-days) vec)))
 
 
+;; TODO - move to util.s.
 (defn find-index-of
   [pred sequence]
   (first (keep-indexed (fn [i x] (when (pred x) i))
@@ -126,6 +128,7 @@
         :hour-sum  (u/timestr->hour-float log-sum)}))))
 
 
+;; TODO TEST ME.
 (defn logbook-year-stats
   "Takes a logbook and pushes it's data into a year calendar.
   Returns a map that looks like:
