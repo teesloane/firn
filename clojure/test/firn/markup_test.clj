@@ -42,4 +42,4 @@
 
   (t/testing "internal-link"
     (t/is (= (sut/link->html (sample-links :file-link))
-             [:a.firn_internal {:href "./file2.html"} "File 2"]))))
+             [:a.firn_internal {:href "./file2"} "File 2"]))))
