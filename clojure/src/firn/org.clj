@@ -81,37 +81,12 @@
 
 ;; -- stats --
 
-;; TODO - test me; move to utils.year.
-(defn- build-year-tick
-  [year]
-  (let [interval           (t/bounds (t/year year))
-        ;;This  creates a year of values that look like: #time/date-time "2019-01-01T00:00"
-        date-times-of-year (t/range (t/beginning interval)
-                                    (t/end interval)
-                                    (t/new-period 1 :days))
-        ;; but we just need dates : 2019-01-01 (not yet possible in tick?)
-        dates-of-year      (map t/date date-times-of-year)
-        build-days         #(hash-map
-                             :date      %
-                             :log-count 0
-                             :logs-raw  []
-                             :log-sum   "00:00"
-                             :hour-sum   0)]
 
-    (->> dates-of-year (map build-days) vec)))
-
-
-;; TODO - move to util.s.
-(defn find-index-of
-  [pred sequence]
-  (first (keep-indexed (fn [i x] (when (pred x) i))
-                       sequence)))
-
-(defn find-day-to-update
+(defn- find-day-to-update
   [calendar-year log-entry]
   (let [{:keys [day month year]} (log-entry :start)
         logbook-date             (t/new-date year month day)]
-    (find-index-of #(= (% :date) logbook-date) calendar-year)))
+    (u/find-index-of #(= (% :date) logbook-date) calendar-year)))
 
 (defn- update-logbook-day
   "Updates a day in a calander from build-year with logbook data."
@@ -128,7 +103,6 @@
         :hour-sum  (u/timestr->hour-float log-sum)}))))
 
 
-;; TODO TEST ME.
 (defn logbook-year-stats
   "Takes a logbook and pushes it's data into a year calendar.
   Returns a map that looks like:
@@ -144,7 +118,7 @@
             xs            (rest logbook)
             log-year      (-> x :start :year)
             output        (if (contains? output log-year) output
-                              (assoc output log-year (build-year-tick log-year))) ; make year if there isn't one already.
+                              (assoc output log-year (u/build-year log-year))) ; make year if there isn't one already.
             day-to-update (find-day-to-update (get output log-year) x)
             output        (update-in output [log-year day-to-update] (update-logbook-day x))]
         (recur xs output)))))

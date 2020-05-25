@@ -1,6 +1,7 @@
 (ns firn.util
   (:require [clojure.java.io :as io]
             [clojure.string :as s]
+            [tick.alpha.api :as t]
             [sci.core :as sci])
   (:import (java.lang Integer)))
 
@@ -101,7 +102,7 @@
 (defn load-fns-into-map
   "Takes a list of files and returns a map of filenames as :keywords -> file
   NOTE: It also EVALS (using sci) the files so they are in memory functions!
- 
+
   so:                  `[my-file.clj my-layout.clj]`
   ------------------------------- ▼ ▼ ▼ ----------------------------------------
   becomes:    {:my-file fn-evald-1, :my-layout fn-evald-2}"
@@ -130,6 +131,12 @@
         (recur (rest list-a) (rest list-b))))))
 
 ;; General fns ----
+
+(defn find-index-of
+  "Finds the index of an item that matches a predicate."
+  [pred sequence]
+  (first (keep-indexed (fn [i x] (when (pred x) i))
+                       sequence)))
 
 (defn find-first
   "Find the first item in a collection."
@@ -177,7 +184,7 @@
 (defn timestr->hour-float
   "Converts `03:25` -> `3.41` "
   [tstr]
-  (float
+  (double
    (/ (int (* 100 (/ (timestr->minutes tstr) 60))) 100)))
 
 (defn timevec->time-str
