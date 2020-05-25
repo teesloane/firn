@@ -113,7 +113,7 @@
   (let [year-2020    (sut/build-year 2020)
         year-2019    (sut/build-year 2019)
         sample-day   (dissoc (first year-2019) :date)
-        expected-day {:log-sum "00:00", :log-count 0, :logs-raw [], :hour-sum 0}]
+        expected-day {:log-sum "00:00", :date-str "2019-01-01" :log-count 0, :logs-raw [], :hour-sum 0}]
 
     (t/testing "It handles leap years and regular years."
       (t/is (= 366 (count year-2020))) ;; leap year.
