@@ -153,8 +153,8 @@
   ([logbook]
    (poly-line logbook {}))
   ([logbook
-    {:keys [width height]
-     :or   {width 365 height 100}
+    {:keys [width height stroke]
+     :or   {width 365 height 100 stroke "#0074d9"}
      :as   opts}]
    [:div
     (for [[year year-of-logs] (logbook-year-stats logbook)
@@ -168,11 +168,11 @@
 
       [:div
        [:h5.firn_heading.firn_heading-5 year]
-       [:svg {:viewbox (str "0 0 " width " " height),
+       [:svg {:viewbox (format "0 0 %s %s" width height),
               :class   "chart"}
-        [:g {:transform "translate(0, 100) scale(1, -1)"}
+        [:g {:transform (format "translate(0, %s) scale(1, -1)", height)}
          [:polyline {:fill         "none",
-                     :stroke       "#0074d9",
+                     :stroke       stroke,
                      :stroke-width "1",
                      :points points}]]]])]))
 

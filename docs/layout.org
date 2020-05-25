@@ -1,6 +1,6 @@
 #+TITLE: Layout
 #+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-05-21 20:20>
+#+DATE_UPDATED: <2020-05-23 20:31>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: docs
 
@@ -118,15 +118,15 @@ View the code block below to see the multiple ways of using the =render= functio
 #+END_SRC
 
 * How can I access data in my layouts?
-
+** Overview
 Currently, you can also access some site-wide meta-data in your layouts, as well as
 file-specific meta-data. Example meta-data:
 
 - All logbooks across all files.
 - All links across all files (which might be ideal for say... setting up a link graph.)
+- Here's a full list of data/functions you can use in your layouts.
 
-The =prepare= [[file:../src/firn/layout.clj::69][function]] in the =layout= namespace sets up layouts to have access
-to functions and data:
+** All Data/Function
 
 | Function/Data | Intent                                                 | Data-type |
 |---------------+--------------------------------------------------------+-----------|
@@ -135,12 +135,11 @@ to functions and data:
 | file          | The file as a data structure.                          | map       |
 | logbook       | A list of logbooks entries per file.                   | list      |
 | partials      | a list of invokable partials in your =partials= folder   | list      |
-| render        | Enables rendering parts of an org file.                | function  |
+| render        | Enables rendering parts or entirety of an org file.    | function  |
 | site-links    | A list of all links across all documents               | list      |
 | site-logs     | A list of ALL logbook entries.                         | list      |
 | site-map      | A list of all files on the wiki                        | list      |
 | title         | The org mode file.                                     | string    |
-| yield         | Your entire org file, rendered to html                 | html      |
 | meta          | A map of metadata about the file (logbook, links, etc) | map       |
 | title         | The #+TITLE value of the file.                         | string    |
 | firn-under    | The #+FIRN_UNDER value of the file                     | string    |
@@ -148,7 +147,7 @@ to functions and data:
 | date-created  | The #+DATE_CREATED value of the file                   | string    |
 | logbook-total | The sum of all the logbook entries                     | string    |
 
-This may seem like a lot of information to make available to a layout template. And that's because it is. But thanks to destructuring in Clojure, you can make your templates only ask for what they need.
+This may seem like a lot of information to make available to a layout template. And that's because it is. But thanks to destructuring in Clojure, you can make your templates only ask for what they need:
 
 #+BEGIN_SRC clojure
 (defn project
@@ -182,6 +181,62 @@ The above template only needs access to =render=, =partials= and the =logbook=. 
       (when-not (= logbook-total "0:0")
         (rndr logbook-total "Time Logged: "))]]))
 
+#+END_SRC
+
+** The ~Render~ function.
+
+Render is used to render content from your org file. It's an important one - if you don't use it, you won't see any org-mode content. It can render multiple kinds of content:
+
+*Render an entire file:*
+
+#+BEGIN_SRC clojure
+(defn default
+  [{:keys [render partials]}]
+  (let [{:keys [head]} partials]
+
+    (head
+     [:body
+       [:div (render :file)]])))
+#+END_SRC
+
+*Render a headline and it's contents*
+
+#+BEGIN_SRC clojure
+(defn default
+  [{:keys [render partials]}]
+  (let [{:keys [head]} partials]
+    (head
+     [:body
+       [:div (render "Notes")]])))
+#+END_SRC
+
+*Render just a headline title*, or the raw title.
+
+#+BEGIN_SRC clojure
+(defn default
+  [{:keys [render partials]}]
+  (let [{:keys [head]} partials]
+    (head
+     [:body
+       ; render the headline title in "raw" plain text.
+       [:div (render "Notes" :title-raw)]
+       ; render the headline title in "rich" text (can be bold, have italic, etc.)
+       [:div (render "Notes" :title)]])))
+#+END_SRC
+
+*Render a Logbook as a polyline SVG:*
+
+Graphs all logbook entries for the current file in a polyline, generating a chart for each year.
+
+[[file:data/polyline.png][Polyline example chart]]
+
+#+BEGIN_SRC clojure
+(defn default
+  [{:keys [render partials]}]
+  (let [{:keys [head]} partials]
+    (head
+     [:body
+       [:div (render :logbook-polyline {:width 365})]])))
 #+END_SRC
 
 * Styling Layouts

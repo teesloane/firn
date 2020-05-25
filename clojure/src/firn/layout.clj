@@ -1,12 +1,9 @@
 (ns firn.layout
   "Namespace responsible for using layouts.
   Layouts enable users to have custom layouts for the static site generators.
-  This occurs by slurping in some layout files -- which are just `.clj` files, for now
-  And then applying them inline.
+  This occurs by slurping in some layout files -- which are just `.clj` files
+  And then applying them inline."
 
-  NOTE: will change (apply-layouts, especially) in the future:
-  ; a) probably can't compile down with GRAAL and
-  ; b) eval is not a good idea, probably."
   (:require [firn.markup :as markup]
             [firn.org :as org]
             [hiccup.core :as h]))
@@ -41,36 +38,51 @@
         internal-default-layout))))
 
 (defn render
-  "Enables rendering org content in layouts."
-  ;; Render the whole file.
-  ([file]
-   (let [org-tree (file :as-edn)
-         yield    (markup/to-html org-tree)] ;; this has lots of nil vals in it.
-     yield))
-
+  "Renders something from your org-mode file.
+  This would be a nice multi-method if we could find a way
+  to partially apply the file map to it."
   ([file action]
-   (cond
-     ;; Render a heading.
-     (string? action)
-     (let [org-tree (file :as-edn)
-           headline (org/get-headline org-tree action)]
-       (markup/to-html headline))
-
-     ;; render a logbook polyline chart.
-     (= action :logbook-polyline)
-     (org/poly-line (-> file :meta :logbook))))
+   (render file action {}))
+  ([file action opts]
+   (let [org-tree     (file :as-edn)
+         is-headline? (string? action)]
+     (cond
+       ;; render the whole file.
+       (= action :file)
+       (markup/to-html (file :as-edn))
 
 
-  ;; pass in a keyword to retrieve some munged piece of the data
-  ([file headline-name piece]
-   (let [org-tree         (file :as-edn)
-         headline         (org/get-headline org-tree headline-name)
-         headline-content (org/get-headline-content org-tree headline-name)]
-     (case piece
-       :title      (-> headline :children first  markup/to-html)
-       :title-raw  (-> headline :children first :raw)
-       :content    (markup/to-html headline-content)
-       headline))))
+       ;; render a headline title.
+       (and is-headline? (= opts :title))
+       (let [hl (org/get-headline org-tree action)]
+         (-> hl :children first  markup/to-html))
+
+       ;; render the headline raw.
+       (and is-headline? (= opts :title-raw))
+       (let [hl (org/get-headline org-tree action)]
+         (-> hl :children first :raw))
+
+       ;; render just the content of a headline.
+       (and is-headline? (= opts :content))
+       (let [headline-content (org/get-headline-content org-tree action)]
+         (markup/to-html headline-content))
+
+       ;; render a heading (title and contnet).
+       (and is-headline? (= nil action))
+       (markup/to-html (org/get-headline org-tree action))
+
+       ;; render a polyline graph of the logbook of the file.
+       (= action :logbook-polyline)
+       (org/poly-line (-> file :meta :logbook) opts)
+
+       :else
+       (str "DEBUG: Incorrect use of `render` function in template:
+             <br> action: => " action " <code> << is this a valid value? </code>
+             <br> opts:  => " opts " <code> << is this a valid value? </code>"
+            "<br> ")))))
+
+
+
 
 (defn prepare
   "Prepare functions and data to be available in layout functions.
@@ -79,7 +91,6 @@
   {;; Layout stuff --
    :render        (partial render file)
    :partials      (config :partials)
-   :yield         (render file)
    ;; Site-side stuff --
    :site-map      (config :site-map)
    :site-links    (config :site-links)
