@@ -209,6 +209,11 @@
   [^Integer y ^Integer m ^Integer d]
   (LocalDate/of y m d))
 
+(defn date-str
+  [date]
+  (.toString ^java.time.LocalDate date))
+
+
 (defn date-range
   "Creates a range of dates between date A and date B.
   (date-range [])"
@@ -229,6 +234,7 @@
   [year]
   (let [dates-of-year (date-range [year 1 1] [(inc year) 1 1])
         build-days    #(hash-map :date %
+                                 :date-str (date-str %)
                                  :log-count 0
                                  :logs-raw  []
                                  :log-sum   "00:00"

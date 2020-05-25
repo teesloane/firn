@@ -84,8 +84,8 @@
 (defn- find-day-to-update
   [calendar-year log-entry]
   (let [{:keys [day month year]} (log-entry :start)
-        logbook-date             (LocalDate/of year month day)]
-    (u/find-index-of #(= (% :date) logbook-date) calendar-year)))
+        logbook-date             (u/date-str (u/date-make year month day))]
+    (u/find-index-of #(= (% :date-str) logbook-date) calendar-year)))
 
 (defn- update-logbook-day
   "Updates a day in a calander from build-year with logbook data."
@@ -129,8 +129,8 @@
   ([logbook]
    (poly-line logbook {}))
   ([logbook
-    {:keys [width height stroke]
-     :or   {width 365 height 100 stroke "#0074d9"}
+    {:keys [width height stroke stroke-width]
+     :or   {width 365 height 100 stroke "#0074d9" stroke-width 1}
      :as   opts}]
    [:div
     (for [[year year-of-logs] (logbook-year-stats logbook)
@@ -146,7 +146,7 @@
        [:h5.firn_heading.firn_heading-5 year]
        [:svg {:viewbox (format "0 0 %s %s" width height),
               :class   "chart"}
-        [:g {:transform (format "translate(0, %s) scale(1, -1)", height)}
+        [:g {:transform (format "translate(0, %s) scale(1, -1)", (- height (* stroke-width 1.25)))}
          [:polyline {:fill         "none",
                      :stroke       stroke,
                      :stroke-width "1",
