@@ -160,7 +160,6 @@
   (try (Integer/parseInt number-string)
     (catch Exception e nil)))
 
-;; FIXME: Test
 (defn timestr->hours-min
   "Splits `1:36` -> [1 36]"
   [tstr]
@@ -169,19 +168,12 @@
         minutes (parse-int (second split))]
     [hours minutes]))
 
-;; FIXME: Test
-(defn timestr->hours
-  [tstr]
-  (first (timestr->hours-min tstr)))
-
-;; FIXME: Test
 (defn timestr->minutes
   "convert `03:25` into minutes 205"
   [tstr]
   (let [[h m] (timestr->hours-min tstr)]
     (+ (* h 60) m)))
 
-;; FIXME: Test
 (defn timestr->hour-float
   "Converts `03:25` -> `3.41` "
   [tstr]
@@ -197,8 +189,6 @@
         left-over-mins (mod  min 60)]
     (format "%d:%02d" total-hours left-over-mins)))
 
-
-;; TODO: TEST ME
 (defn timestr->add-time
   "(timestr->add-time `10:02` `00:02`) =>  10:04"
   [existing-ts to-add]

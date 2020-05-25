@@ -74,3 +74,28 @@
           res2 (sut/timevec->time-str [3 94])]
       (t/is (= res1 "33:42"))
       (t/is (= res2 "4:34")))))
+
+(t/deftest timestr->minutes
+  (t/testing "It returns expected output"
+    (let [res1 (sut/timestr->minutes "34:42")
+          res2 (sut/timestr->minutes "02:40")]
+      (t/is (= res1 2082))
+      (t/is (= res2 160)))))
+
+
+(t/deftest timestr->hour-float
+  (t/testing "It returns expected output"
+    (let [res1 (sut/timestr->hour-float "03:25")
+          res2 (sut/timestr->hour-float "02:40")
+          hundo #(int (* 100 %))]
+      ;; we have to multiply floats by 100 and
+      ;; convert to ints to compare them successfully.
+      (t/is (= (hundo res1) (hundo 3.41)))
+      (t/is (= (hundo res2) (hundo 2.66))))))
+
+(t/deftest timestr->add-time
+  (t/testing "It returns expected output"
+    (let [res1 (sut/timestr->add-time "10:02" "00:02")
+          res2 (sut/timestr->add-time "2:40" "14:45")]
+      (t/is (= res1 "10:04"))
+      (t/is (= res2 "17:25")))))
