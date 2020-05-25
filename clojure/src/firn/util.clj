@@ -1,9 +1,10 @@
 (ns firn.util
   (:require [clojure.java.io :as io]
             [clojure.string :as s]
-            [tick.alpha.api :as t]
             [sci.core :as sci])
-  (:import (java.lang Integer)))
+  (:import (java.lang Integer)
+           (java.time LocalDate)))
+
 
 
 (set! *warn-on-reflection* true)
@@ -204,24 +205,34 @@
         [tah tam] (timestr->hours-min to-add)]
     (timevec->time-str [(+ eh tah) (+ em tam)])))
 
+(defn date-make
+  [^Integer y ^Integer m ^Integer d]
+  (LocalDate/of y m d))
+
+(defn date-range
+  "Creates a range of dates between date A and date B.
+  (date-range [])"
+  [[sy sm sd] [ey em ed]]
+  (let [ s-date (date-make  sy sm sd)
+         e-date (date-make ey em ed)]
+    (loop [curr-day s-date
+           range    [s-date]]
+      (if (= curr-day e-date)
+        (drop-last range)
+        (let [new-d (.plusDays ^java.time.LocalDate curr-day 1)]
+          (recur new-d (conj range new-d)))))))
 
 (defn build-year
   "constructs a vector maps, representing 365 days;
   Each map is (in a later function) updated with whatever logbook entries
-  match on the same day,"
+  match on the same day"
   [year]
-  (let [interval           (t/bounds (t/year year))
-        ;;This  creates a year of values that look like: #time/date-time "2019-01-01T00:00"
-        date-times-of-year (t/range (t/beginning interval)
-                                    (t/end interval)
-                                    (t/new-period 1 :days))
-        ;; but we just need dates : 2019-01-01 (not yet possible in tick?)
-        dates-of-year      (map t/date date-times-of-year)
-        build-days         #(hash-map
-                             :date      %
-                             :log-count 0
-                             :logs-raw  []
-                             :log-sum   "00:00"
-                             :hour-sum   0)]
+  (let [dates-of-year (date-range [year 1 1] [(inc year) 1 1])
+        build-days    #(hash-map :date %
+                                 :log-count 0
+                                 :logs-raw  []
+                                 :log-sum   "00:00"
+                                 :hour-sum   0)]
 
     (->> dates-of-year (map build-days) vec)))
+

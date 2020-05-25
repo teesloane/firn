@@ -4,10 +4,9 @@
   Which are created by the rust binary."
   (:require [clojure.java.shell :as sh]
             [clojure.string :as s]
-            [tick.alpha.api :as t]
             [firn.util :as u])
-
-  (:import iceshelf.clojure.rust.ClojureRust))
+  (:import iceshelf.clojure.rust.ClojureRust)
+  (:import (java.time LocalDate)))
 
 (defn parse!
   "Parse the org-mode file-string.
@@ -85,7 +84,7 @@
 (defn- find-day-to-update
   [calendar-year log-entry]
   (let [{:keys [day month year]} (log-entry :start)
-        logbook-date             (t/new-date year month day)]
+        logbook-date             (LocalDate/of year month day)]
     (u/find-index-of #(= (% :date) logbook-date) calendar-year)))
 
 (defn- update-logbook-day
