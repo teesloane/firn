@@ -47,7 +47,8 @@
     :validate [#(< 0 % 0x10000) "Must be a number between 0 and 65536"]]
    ;; A boolean option defaulting to nil
    ["-h" "--help"]
-   ["-d" "--dir PATH" "Directory to build/serve"]])
+   ["-d" "--dir PATH" "Directory to build/serve"
+    :default (u/get-cwd)]])
 
 (defn validate-args
   "Validate command line arguments. Either return a map indicating the program
@@ -86,6 +87,7 @@
         (init!)
         (clojure.lang.RT/loadLibrary "mylib")
         (case action
-          "serve"  (server/serve    {:dir-files (options :dir)})
-          "build"  (build/all-files {:dir-files (options :dir)})
+          "serve"  (server/serve    options)
+          "build"  (build/all-files options)
           "new"    (build/new-site  {}))))))
+

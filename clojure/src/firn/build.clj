@@ -66,8 +66,8 @@
 
 (defn all-files
   "Processes all files in the org-directory"
-  [{:keys [dir-files]}]
-  (let [config (setup (config/prepare dir-files))]
+  [{:keys [dir]}]
+  (let [config (setup (config/prepare dir))]
     (->> config
          file/process-all
          write-files)))

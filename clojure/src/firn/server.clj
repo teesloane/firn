@@ -120,12 +120,12 @@
 
 (defstate server
   :start
-  (let [{:keys [dir-files port]
-         :or   {dir-files (u/get-cwd)
+  (let [{:keys [dir port]
+         :or   {dir (u/get-cwd)
                 port 3333}}           (mount/args)
-        path-to-site                  (str dir-files "/_firn/_site")
+        path-to-site                  (str dir "/_firn/_site")
         ;; NOTE: consider making this global, and so available to a sci repl?
-        config!                       (atom (-> dir-files config/prepare build/setup file/process-all))
+        config!                       (atom (-> dir config/prepare build/setup file/process-all))
         {:keys [dir-layouts dir-partials dir-static dir-data]} @config!
         watch-list                    (map io/file [dir-layouts dir-partials dir-static dir-data])]
 
