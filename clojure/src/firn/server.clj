@@ -35,7 +35,7 @@
 
       (cond
         ;; Handle reloading of the index / no uri
-        (= req-uri-file "")
+        (and (= req-uri-file "") (some? index-file))
         (let [reloaded-file (file/reload-requested-file index-file @config!)] ; reslurp in case it has changed.
           (response (reloaded-file :as-html)))
 
