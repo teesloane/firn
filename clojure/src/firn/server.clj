@@ -151,7 +151,8 @@
   ([]
    (serve {}))
   ([opts]
-   (mount/start-with-args opts)))
+   (mount/start-with-args opts)
+   (promise))) ;; keep the cli from exiting.
 
 ;; -- Repl Land --
 
