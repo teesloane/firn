@@ -143,7 +143,7 @@
 
 
       [:div
-       [:h5.firn_heading.firn_heading-5 year]
+       [:h5.firn-headline.firn-headline-5 year]
        [:svg {:viewbox (format "0 0 %s %s" width height),
               :class   "chart"}
         [:g {:transform (format "translate(0, %s) scale(1, -1)", (- height (* stroke-width 1.25)))}

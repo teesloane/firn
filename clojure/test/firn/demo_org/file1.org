@@ -60,18 +60,18 @@ Just a relative image link
 Just a relative image link with a description [[./data/test-img.png][An image description]]
 
 http image link https://wiki.xxiivv.com/media/diary/582.jpg
-* Headings <2020-03-27 Fri>
+* Headlines <2020-03-27 Fri>
 :PROPERTIES:
 :foo: bar
 :END:
 and some stuff with a date: <2020-03-27 Fri>
-** TODO Heading (2) with /keyword/
-** TODO [#B] Heading 2 with priority
-*** Heading 3
-**** Heading 4
-***** Heading 5
-****** Heading 6
-******* Heading 7
+** TODO Headline (2) with /keyword/
+** TODO [#B] Headline 2 with priority
+*** Headline 3
+**** Headline 4
+***** Headline 5
+****** Headline 6
+******* Headline 7
 * Some Links
 A =file:= link [[file:file2.org][File 2]]
 * Tables

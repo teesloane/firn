@@ -1,6 +1,6 @@
 #+TITLE: Layout
 #+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-05-23 20:31>
+#+DATE_UPDATED: <2020-05-25 21:05>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: docs
 
@@ -26,7 +26,7 @@ cd firn_example; touch foo.org
 
 Navigate to =foo.org= and open the file. Edit it to include the following:
 
-*NOTE*: Because the snippet below is org-mode code, you will need to remove the =\=  preceding the =*= Headings.
+*NOTE*: Because the snippet below is org-mode code, you will need to remove the =\=  preceding the =*= Headlines.
 
 #+BEGIN_SRC org
 
@@ -88,25 +88,25 @@ content that can then be shared across layouts:
    body])
 #+END_SRC
 
-* How do I drill down into the content of a heading?
+* How do I drill down into the content of a headline?
 
-First, a =heading= refers to a bullet heading in org-mode (the kind that are
-toggle-able with the =tab key)=. A =heading= can have =sub-headings=, =drawers=
+First, a =headline= refers to a bullet headline in org-mode (the kind that are
+toggle-able with the =tab key)=. A =headline= can have =sub-headlines=, =drawers=
 (properties, logbooks, etc) and general text content (tables, lists, prose, etc.)
 
-Because a heading can contain so much data, the =render= function, made
-available to your layouts, aims to make getting content out of a heading easier.
+Because a headline can contain so much data, the =render= function, made
+available to your layouts, aims to make getting content out of a headline easier.
 
 View the code block below to see the multiple ways of using the =render= function
 
 #+BEGIN_SRC clojure
-;; In it's simplest form you can render a heading in it's entirety.
-;; This will search through the headings for a headline with that name specifically
+;; In it's simplest form you can render a headline in it's entirety.
+;; This will search through the headlines for a headline with that name specifically
 ;; and then render it to HTML.
-[:div (render "My Heading")]]
+[:div (render "My Headline")]]
 
 ;; Next, you can ask to just render the headline's title:
-[:div (render "My Heading" :title)]] ; => "My Heading"
+[:div (render "My Headline" :title)]] ; => "My Headline"
 
 ;; You can also ask to get the "raw" text, which will just return the
 ;; plain-text of the title -- you're just getting <string> rather than
@@ -261,8 +261,8 @@ augment, as they come hard-coded into firn:
 | .firn_title-keyword             | Targets all keywords =TODO/DONE= etc.         |
 | .firn_title-keyword__TODO       | Targets =TODO=                                |
 | .firn_title-keyword__DONE       | Targets =DONE=                                |
-| .firn_heading-timestamp         | Heading Timestamps*                         |
-| .firn_heading-cookie            | Targets heading todo-count (ex =[7/10]=)      |
+| .firn-headline-timestamp        | Headline Timestamps*                        |
+| .firn-headline-cookie           | Targets headline todo-count (ex =[7/10]=)     |
 | .firn_headline-section          | A "*" container and it's contents           |
 | .firn_headline-section-${level} | Target specific headline+container by level |
-| .firn_heading-${1-6}            | Target h1-h6                                |
+| .firn-headline-${1-6}           | Target h1-h6                                |

@@ -7,7 +7,6 @@
 
 ;; Renderers
 
-
 (defn date->html
   [v]
   (let [{:keys [year month day hour minute]} (v :start)]
@@ -86,15 +85,15 @@
         keywrd           (v :keyword)
         priority         (v :priority)
         value            (v :value)
-        heading-priority (u/str->keywrd "span.firn_heading-priority.firn_heading-priority__" priority)
-        heading-keyword  (u/str->keywrd "span.firn_heading-keyword.firn_heading-keyword__" keywrd)
+        heading-priority (u/str->keywrd "span.firn-headline-priority.firn-headline-priority__" priority)
+        heading-keyword  (u/str->keywrd "span.firn-headline-keyword.firn-headline-keyword__" keywrd)
         h-level          (case level
-                           1 :h1.firn_heading.firn_heading-1
-                           2 :h2.firn_heading.firn_heading-2
-                           3 :h3.firn_heading.firn_heading-3
-                           4 :h4.firn_heading.firn_heading-4
-                           5 :h5.firn_heading.firn_heading-5
-                           :h6.firn_heading-6)
+                           1 :h1.firn-headline.firn-headline-1
+                           2 :h2.firn-headline.firn-headline-2
+                           3 :h3.firn-headline.firn-headline-3
+                           4 :h4.firn-headline.firn-headline-4
+                           5 :h5.firn-headline.firn-headline-5
+                           :h6.firn-headline-6)
         make-child       #(into [%] (map title->html children))]
     (case typ
       "headline"  (make-child :div)
@@ -103,8 +102,8 @@
                    (when priority [heading-priority (str priority " ")])
                    (make-child :span)]
       "text"      [:span value]
-      "cookie"    [:span.firn_heading-cookie value]
-      "timestamp" [:span.firn_heading-timestamp (date->html v)]
+      "cookie"    [:span.firn-headline-cookie value]
+      "timestamp" [:span.firn-headline-timestamp (date->html v)]
       "code"      [:code value]
       "verbatim"  [:code value]
       "link"      (link->html v)
