@@ -135,8 +135,7 @@
     (println "Building site...")
     (if-not (fs/exists? path-to-site)
       (println "Couldn't find a _firn/ folder. Have you run `Firn new` and created a site yet?")
-      (do (println "⚠ The Firn development server is in beta. \n You may need to restart from time to time if you run into issues.")
-          (println "🏔 Starting Firn development server on:" port)
+      (do (println "🏔 Starting Firn development server on:" port)
           (http/run-server (handler config!) {:port port}))))
 
   :stop
