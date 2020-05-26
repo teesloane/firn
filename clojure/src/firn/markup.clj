@@ -49,7 +49,7 @@
         ;; file regexs / ctor fns
         org-file-regex  #"(file:)(.*)\.(org)"
         http-link-regex #"https?:\/\/(?![^\" ]*(?:jpg|png|gif))[^\" ]+"
-        file-path       #(str "./" (nth %  2) ".html")] ;; TODO: find out if we want to construct links to .html, or just have server/based/paths
+        file-path       #(str "./" (nth %  2))]
 
     (cond
       ;; Images ---
@@ -80,21 +80,27 @@
   (keywords, priorities, timestamps -> can all be found in a headline.)
   That aren't found in the `children` values and so need special parsing."
   [v]
-  (let [level          (v :level)
-        typ            (v :type)
-        children       (v :children)
-        keywrd         (v :keyword)
-        priority       (v :priority)
-        value          (v :value)
-        title-priority (u/str->keywrd "span.firn_title-priority.firn_title-priority__" priority)
-        title-keyword  (u/str->keywrd "span.firn_title-keyword.firn_title-keyword__" keywrd)
-        h-level        (case level 1 :h1 2 :h2 3 :h3 4 :h4 5 :h5 :h6)
-        make-child     #(into [%] (map title->html children))]
+  (let [level            (v :level)
+        typ              (v :type)
+        children         (v :children)
+        keywrd           (v :keyword)
+        priority         (v :priority)
+        value            (v :value)
+        heading-priority (u/str->keywrd "span.firn_heading-priority.firn_heading-priority__" priority)
+        heading-keyword  (u/str->keywrd "span.firn_heading-keyword.firn_heading-keyword__" keywrd)
+        h-level          (case level
+                           1 :h1.firn_heading.firn_heading-1
+                           2 :h2.firn_heading.firn_heading-2
+                           3 :h3.firn_heading.firn_heading-3
+                           4 :h4.firn_heading.firn_heading-4
+                           5 :h5.firn_heading.firn_heading-5
+                           :h6.firn_heading-6)
+        make-child       #(into [%] (map title->html children))]
     (case typ
       "headline"  (make-child :div)
       "title"     [h-level
-                   (when keywrd [title-keyword (str keywrd " ")])
-                   (when priority [title-priority (str priority " ")])
+                   (when keywrd [heading-keyword (str keywrd " ")])
+                   (when priority [heading-priority (str priority " ")])
                    (make-child :span)]
       "text"      [:span value]
       "cookie"    [:span.firn_heading-cookie value]
@@ -135,7 +141,7 @@
         ordered        (get v :ordered)                               ;; for lists
         val            (if value (s/trim-newline value) value)
         headline-level (get v :level)
-        headline-el    (u/str->keywrd "div.firn_headline-" headline-level)
+        headline-el    (u/str->keywrd "div.firn_headline-section.firn_headline-section-" headline-level)
         make-child     #(into [%] (map to-html children))]
     (case type
       "document"      (make-child :div)

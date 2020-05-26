@@ -2,7 +2,9 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as s]
             [sci.core :as sci])
-  (:import (java.lang Integer)))
+  (:import (java.lang Integer)
+           (java.time LocalDate)))
+
 
 
 (set! *warn-on-reflection* true)
@@ -101,7 +103,7 @@
 (defn load-fns-into-map
   "Takes a list of files and returns a map of filenames as :keywords -> file
   NOTE: It also EVALS (using sci) the files so they are in memory functions!
- 
+
   so:                  `[my-file.clj my-layout.clj]`
   ------------------------------- ▼ ▼ ▼ ----------------------------------------
   becomes:    {:my-file fn-evald-1, :my-layout fn-evald-2}"
@@ -131,6 +133,12 @@
 
 ;; General fns ----
 
+(defn find-index-of
+  "Finds the index of an item that matches a predicate."
+  [pred sequence]
+  (first (keep-indexed (fn [i x] (when (pred x) i))
+                       sequence)))
+
 (defn find-first
   "Find the first item in a collection."
   [f coll]
@@ -158,22 +166,79 @@
 
 (defn parse-int [number-string]
   (try (Integer/parseInt number-string)
-    (catch Exception e nil)))
+       (catch Exception e nil)))
 
 (defn timestr->hours-min
-  "Splits `1:36` -> [1 36]
-  NOTE: figure out what's idiomatic for handling bad inputs?"
+  "Splits `1:36` -> [1 36]"
   [tstr]
   (let [split   (s/split tstr #":")
         hours   (parse-int (first split))
         minutes (parse-int (second split))]
     [hours minutes]))
 
+(defn timestr->minutes
+  "convert `03:25` into minutes 205"
+  [tstr]
+  (let [[h m] (timestr->hours-min tstr)]
+    (+ (* h 60) m)))
+
+(defn timestr->hour-float
+  "Converts `03:25` -> `3.41` "
+  [tstr]
+  (double
+   (/ (int (* 100 (/ (timestr->minutes tstr) 60))) 100)))
+
+
 (defn timevec->time-str
   "Converts a vector of hours and minutes into readable time string.
   `[3 94]` > `4:34`"
   [[hours min]]
   (let [min->hrs       (int (Math/floor (/ min 60)))
-        left-over-mins (mod  min 60)
-        new-timevec    [(+ hours min->hrs) left-over-mins]]
-    (s/join ":" new-timevec)))
+        total-hours    (+ hours min->hrs)
+        left-over-mins (mod  min 60)]
+    (format "%d:%02d" total-hours left-over-mins)))
+
+(defn timestr->add-time
+  "(timestr->add-time `10:02` `00:02`) =>  10:04"
+  [existing-ts to-add]
+  (let [[eh em]   (timestr->hours-min existing-ts)
+        [tah tam] (timestr->hours-min to-add)]
+    (timevec->time-str [(+ eh tah) (+ em tam)])))
+
+(defn date-make
+  [^Integer y ^Integer m ^Integer d]
+  (LocalDate/of y m d))
+
+(defn date-str
+  [date]
+  (.toString ^java.time.LocalDate date))
+
+
+(defn date-range
+  "Creates a range of dates between date A and date B.
+  (date-range [])"
+  [[sy sm sd] [ey em ed]]
+  (let [ s-date (date-make  sy sm sd)
+         e-date (date-make ey em ed)]
+    (loop [curr-day s-date
+           range    [s-date]]
+      (if (= curr-day e-date)
+        (drop-last range)
+        (let [new-d (.plusDays ^java.time.LocalDate curr-day 1)]
+          (recur new-d (conj range new-d)))))))
+
+(defn build-year
+  "constructs a vector maps, representing 365 days;
+  Each map is (in a later function) updated with whatever logbook entries
+  match on the same day"
+  [year]
+  (let [dates-of-year (date-range [year 1 1] [(inc year) 1 1])
+        build-days    #(hash-map :date %
+                                 :date-str (date-str %)
+                                 :log-count 0
+                                 :logs-raw  []
+                                 :log-sum   "00:00"
+                                 :hour-sum   0)]
+
+    (->> dates-of-year (map build-days) vec)))
+

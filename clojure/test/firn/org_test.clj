@@ -29,3 +29,26 @@
   (t/testing "returns the expected value."
     (t/is (= 1585683360000
              (sut/parsed-org-date->unix-time (sample-logentry :start) (stub/gtf :tf-1 :processed))))))
+
+(t/deftest logbook-year-stats
+  (let [logbook        (-> (stub/gtf :tf-metadata :processed) :meta :logbook)
+        res            (sut/logbook-year-stats logbook)
+        first-of-2020  (first (get res 2020))
+        second-of-2020 (second (get res 2020))]
+
+    ;; the sample logbook has dates from 2017 and 2020.
+    (t/is (contains? res 2020))
+    (t/is (contains? res 2017))
+
+    ;; there is no log entry for 2020-01-01 so we expect
+    ;; to it be an unaltered map, as produced by build-year
+    (t/is (= (first-of-2020 :log-sum) "00:00"))
+    (t/is (= (first-of-2020 :log-count) 0))
+    (t/is (= (-> first-of-2020 :logs-raw count) 0))
+    (t/is (= (first-of-2020 :hour-sum) 0))
+
+    ;; however, the second day, DOES have a log entry, (see file-metadata.org)
+    (t/is (= (second-of-2020 :log-sum) "0:11"))
+    (t/is (= (second-of-2020 :log-count) 1))
+    (t/is (= (second-of-2020 :hour-sum) 0.18))
+    (t/is (= (-> second-of-2020 :logs-raw count) 1))))

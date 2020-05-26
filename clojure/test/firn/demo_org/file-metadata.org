@@ -11,7 +11,7 @@ when a file is parsed. It should:
 
 * A headline with a normal log-book.
 :LOGBOOK:
-CLOCK: [2020-04-27 Mon 16:09]--[2020-04-27 Mon 16:20] =>  0:11
+CLOCK: [2020-01-02 Thu 16:09]--[2020-01-02 Thu 16:20] =>  0:11
 CLOCK: [2020-04-26 Sun 16:09]--[2020-04-26 Sun 18:20] =>  2:11
 :END:
 

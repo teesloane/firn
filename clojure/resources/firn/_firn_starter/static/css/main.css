@@ -1,3 +1,15 @@
+figure {
+  margin: 0;
+}
+
+figcaption {
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  padding: 4px 0px;
+  margin: 8px 0 4px;
+  font-family: Arial, sans-serif;
+}
+
 
 a {
   text-decoration: none;
@@ -34,13 +46,6 @@ ul {
 li > p {
   margin: 8px 0;
 }
-
-
-
-
-/* h1, h2, h3, h4, h5, h6, div, p, section, ul, ol { */
-/*   /\* margin: 0 0 32px 0; *\/ */
-/* } */
 
 
 /* Tables */
@@ -109,63 +114,42 @@ img {
 
 /* Heading Keywords and Priority */
 
-.firn_title-priority {
-  margin: -22px 0 0 -6px;
+.firn_heading-priority {
+  margin: -22px 8px 0 -6px;
   font-size: 8px;
   min-width: 12px;
   min-height: 12px;
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid salmon;
+  /* border: 1px solid salmon; */
 }
 
 
-.firn_title-priority__A {
+.firn_heading-priority__A {
   color: salmon;
 }
 
-.firn_title-priority__B {
+.firn_heading-priority__B {
   color: mediumseagreen;
 }
 
-.firn_title-priority__C {
+.firn_heading-priority__C {
   color: lightblue;
 }
 
-.firn_title-keyword > div {
+.firn_heading-keyword > div {
 }
 
-.firn_title-keyword__DONE {
+.firn_heading-keyword__DONE {
   margin-right: 4px;
   color: lightgrey;
 }
 
-.firn_title-keyword__TODO {
+.firn_heading-keyword__TODO {
   margin-right: 4px;
   color: seagreen;
 }
 
 .firn_heading-timestamp {}
 .firn_heading-cookie {}
-
-
-/* footnotes */
-.firn_footnote-def {
-  display: flex;
-  align-items: center;
-}
-
-/* Images */
-
-.firn_img-with-caption-wrapper {
-  margin: 0;
-}
-
-.firn_img-caption {
-  font-size: 0.75rem;
-  letter-spacing: 2px;
-  padding: 4px 0px;
-  margin: 8px 0 4px;
-  font-family: Arial, sans-serif;
-}

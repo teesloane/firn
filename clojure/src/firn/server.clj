@@ -124,6 +124,7 @@
         dir-files    (get args :dir-files (u/get-cwd))
         path-to-site (str dir-files "/_firn/_site")
         ;; build all files and prepare a mutable config (for reloading)
+        ;; TODO: consider making this global, and so available to a sci repl?
         config!      (atom (-> dir-files config/prepare build/setup file/process-all))
         {:keys       [dir-layouts dir-partials dir-static dir-data]} @config!
         watch-list   (map io/file [dir-layouts dir-partials dir-static dir-data])

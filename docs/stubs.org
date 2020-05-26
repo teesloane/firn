@@ -1,0 +1,104 @@
+#+TITLE: Stubs
+
+* Sample Edn Logbook
+
+This is a logbook after it has been augmented with metadata:
+- where the file came from.
+- the path to that file.
+- the start and end times as timestamps (useful for sorting by start/end)
+
+#+BEGIN_SRC clojure
+
+(def x
+  [{:end-ts 1589965680000,
+    :start {:year 2020, :month 5, :day 20, :dayname "Wed", :hour 8, :minute 38},
+    :start-ts 1589963880000,
+    :type "clock",
+    :from-file-path "french",
+    :duration "0:30",
+    :from-headline "Meta",
+    :post_blank 0,
+    :end {:year 2020, :month 5, :day 20, :dayname "Wed", :hour 9, :minute 8},
+    :from-file "french"}
+   {:end-ts 1578998280000,
+    :start {:year 2020, :month 1, :day 14, :dayname "Tue", :hour 9, :minute 47},
+    :start-ts 1578995220000,
+    :type "clock",
+    :from-file-path "french",
+    :duration "0:51",
+    :from-headline "Meta",
+    :post_blank 0,
+    :end {:year 2020, :month 1, :day 14, :dayname "Tue", :hour 10, :minute 38},
+    :from-file "french"}
+   {:end-ts 1578949440000,
+    :start {:year 2020, :month 1, :day 13, :dayname "Mon", :hour 20, :minute 26},
+    :start-ts 1578947160000,
+    :type "clock",
+    :from-file-path "french",
+    :duration "0:38",
+    :from-headline "Meta",
+    :post_blank 0,
+    :end {:year 2020, :month 1, :day 13, :dayname "Mon", :hour 21, :minute 4},
+    :from-file "french"}
+   {:end-ts 1575369840000,
+    :start {:year 2019, :month 12, :day 3, :dayname "Tue", :hour 10, :minute 24},
+    :start-ts 1575368640000,
+    :type "clock",
+    :from-file-path "french",
+    :duration "0:20",
+    :from-headline "Meta",
+    :post_blank 0,
+    :end {:year 2019, :month 12, :day 3, :dayname "Tue", :hour 10, :minute 44},
+    :from-file "french"}
+   {:end-ts 1574413920000,
+    :start {:year 2019, :month 11, :day 22, :dayname "Fri", :hour 8, :minute 58},
+    :start-ts 1574413080000,
+    :type "clock",
+    :from-file-path "french",
+    :duration "0:14",
+    :from-headline "Meta",
+    :post_blank 0,
+    :end {:year 2019, :month 11, :day 22, :dayname "Fri", :hour 9, :minute 12},
+    :from-file "french"}
+   {:end-ts 1574161560000,
+    :start
+    {:year 2019, :month 11, :day 19, :dayname "Tue", :hour 10, :minute 46},
+    :start-ts 1574160360000,
+    :type "clock",
+    :from-file-path "french",
+    :duration "0:20",
+    :from-headline "Meta",
+    :post_blank 0,
+    :end {:year 2019, :month 11, :day 19, :dayname "Tue", :hour 11, :minute 6},
+    :from-file "french"}
+   {:end-ts 1571132100000,
+    :start {:year 2019, :month 10, :day 15, :dayname "Tue", :hour 8, :minute 12},
+    :start-ts 1571127120000,
+    :type "clock",
+    :from-file-path "french",
+    :duration "1:23",
+    :from-headline "Meta",
+    :post_blank 0,
+    :end {:year 2019, :month 10, :day 15, :dayname "Tue", :hour 9, :minute 35},
+    :from-file "french"}
+   {:end-ts 1570702500000,
+    :start {:year 2019, :month 10, :day 10, :dayname "Thu", :hour 9, :minute 53},
+    :start-ts 1570701180000,
+    :type "clock",
+    :from-file-path "french",
+    :duration "0:22",
+    :from-headline "Meta",
+    :post_blank 0,
+    :end {:year 2019, :month 10, :day 10, :dayname "Thu", :hour 10, :minute 15},
+    :from-file "french"}
+   {:end-ts 1570640760000,
+    :start {:year 2019, :month 10, :day 9, :dayname "Wed", :hour 16, :minute 39},
+    :start-ts 1570639140000,
+    :type "clock",
+    :from-file-path "french",
+    :duration "0:27",
+    :from-headline "Meta",
+    :post_blank 0,
+    :end {:year 2019, :month 10, :day 9, :dayname "Wed", :hour 17, :minute 6},
+    :from-file "french"}])
+#+END_SRC
