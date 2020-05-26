@@ -47,12 +47,11 @@
 
 (defn clean-config
   "Takes the user config and strips any keys from it that shouldn't be changed
-  in the internal config.
-  TODO: Write tests for this."
+  in the internal config before they get merged together."
   [cfg]
   (let [permanent-keys #{:dir-firn          :dir-layouts   :dir-partials
                          :dir-static        :dir-site      :dir-site-static
-                         :dir-site-data   :dir-files     :dirname-files
+                         :dir-site-data     :dir-files     :dirname-files
                          :layouts           :org-files     :partials}]
     (apply dissoc cfg (filter #(contains? cfg %) permanent-keys))))
 

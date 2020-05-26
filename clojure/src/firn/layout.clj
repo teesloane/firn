@@ -83,7 +83,7 @@
 
 (defn prepare
   "Prepare functions and data to be available in layout functions.
-  TODO: pretty sure this being called twice as well. Do PERF work."
+  NOTE: pretty sure this being called twice as well. Do PERF work."
   [config file]
   {;; Layout stuff --
    :render        (partial render file)

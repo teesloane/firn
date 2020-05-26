@@ -7,19 +7,13 @@
             [firn.util :as u]
             [me.raynes.fs :as fs]))
 
-
 (set! *warn-on-reflection* true)
 
-
-(def dev-files     ["layouts/project.clj" "partials/nav.clj" "static/css/bass.css"])
 (def default-files
-  (concat
-   (when u/dev? dev-files)
    ["layouts/default.clj"
-    "layouts/index.clj"
     "partials/head.clj"
     "config.edn"
-    "static/css/main.css"]))
+    "static/css/main.css"])
 
 (defn new-site
   "Creates the folders needed for a new site in your wiki directory.
