@@ -24,14 +24,14 @@ following:
 *Note!*
 
 Firn is currently being developed; many things are subject to change, or may be
-simply broken. Currently, only binaries for MacOs are being successfully
+simply broken. Currently, only binaries for MacOS and Linux are being successfully
 compiled.
 
 ** Building a static site
 *** With Binary
 
 1. Download the [[https://github.com/theiceshelf/firn/releases][Firn Binary]].
-2. Move the binary into your path.
+2. Move the binary into your path (you may need to run =chmod + x firn= to make it executable).
 3. Navigate to the directory of your org-mode files.
 4. Run =firn new=. This will create a =_firn= directory.
 5. Run =firn build=, still in the directory of your org-mode files.
