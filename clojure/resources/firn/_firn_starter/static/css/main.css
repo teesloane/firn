@@ -1,16 +1,3 @@
-figure {
-  margin: 0;
-}
-
-figcaption {
-  font-size: 0.75rem;
-  letter-spacing: 2px;
-  padding: 4px 0px;
-  margin: 8px 0 4px;
-  font-family: Arial, sans-serif;
-}
-
-
 a {
   text-decoration: none;
   color: #357EDD;
@@ -108,6 +95,10 @@ hr {
   border: none;
 }
 
+/* Images */
+.firn-img-with-caption {}
+.firn-img-caption {}
+
 img {
   width: 100%;
 }
@@ -122,7 +113,6 @@ img {
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  /* border: 1px solid salmon; */
 }
 
 

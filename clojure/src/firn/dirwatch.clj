@@ -19,8 +19,6 @@
 
 (set! *warn-on-reflection* true)
 
-;; TODO: Implement a version that uses polling to emulate this functionality on JDK6 and below.
-
 (defonce pool-counter (atom 0))
 
 (defonce pool

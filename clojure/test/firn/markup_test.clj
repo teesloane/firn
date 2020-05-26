@@ -27,9 +27,9 @@
 
   (t/testing "http-image-link"
     (t/is (= (sut/link->html (sample-links :http-img))
-             [:span.firn_img-with-caption-wrapper
+             [:span.firn-img-with-caption
               [:img {:src "https://www.fillmurray.com/g/200/300.jpg"}]
-              [:span.firn_img-caption "Fill murray"]])))
+              [:span.firn-img-caption "Fill murray"]])))
            
 
   (t/testing "img-link"

@@ -23,8 +23,6 @@
     (t/testing "It returns the expected value."
       (t/is (= (-> res :children first :type) "section")))))
 
-;; TODO - test that this throws/prints an error when an incorrectly formatted timestamp.
-;; ie; missing end-date.
 (t/deftest parsed-org-date->unix-time
   (t/testing "returns the expected value."
     (t/is (= 1585683360000

@@ -27,9 +27,9 @@
   ;; NOTE: I would like to use :figure/figcaption here but we can't
   ;; https://stackoverflow.com/a/5163443
   (if desc
-    [:span.firn_img-with-caption-wrapper
+    [:span.firn-img-with-caption
      [:img {:src path}]
-     [:span.firn_img-caption desc]]
+     [:span.firn-img-caption desc]]
     [:img {:src path}]))
 
 (defn link->html
