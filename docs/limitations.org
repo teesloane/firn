@@ -1,5 +1,9 @@
 #+TITLE: Limitations
 
+* Development Server
+
+The file watcher (reloading of files on change) is a bit slow.
+
 * Footnotes
 
 Currently it seems that *in dev-mode* - ie. when in the repl and using the

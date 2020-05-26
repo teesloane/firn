@@ -74,10 +74,20 @@
   []
   (System/getProperty "user.dir"))
 
+(defn snake->kebab
+  "Convert strings with underscores to hyphens."
+  ([s]
+   (s/replace s #"_" "-"))
+  ([s key-it?]
+   (-> s
+    (s/replace #"_" "-")
+    (s/replace #" " "-")
+    (keyword))))
+
 (defn io-file->keyword
   "Turn a filename into a keyword."
   [io-file]
-  (-> io-file file-name-no-ext keyword))
+  (-> io-file file-name-no-ext (snake->kebab :key-it)))
 
 ;; File Path fns ----
 ;; Mostly for operating on paths: `file/paths/woo/hoo.org`

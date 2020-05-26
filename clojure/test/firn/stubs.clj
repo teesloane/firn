@@ -42,7 +42,8 @@
    :tf-private-subfolder "priv/file1.org"
    :tf-layout            "file-layout.org"
    :tf-footnotes         "file-footnotes.org"
-   :tf-metadata          "file-metadata.org"})
+   :tf-metadata          "file-metadata.org"
+   :tf-underscores       "file_underscores.org"})
 
 (defn gtf ; stands for get-test-file
   "Gets a test org file, and can return it as an io object or a processed file."

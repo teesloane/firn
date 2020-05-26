@@ -2,10 +2,9 @@
   (:require [firn.util :as sut]
             [firn.stubs :as stub]
             [clojure.test :as t]
-            [me.raynes.fs :as fs]
-            [firn.file :as file]))
+            [me.raynes.fs :as fs]))
 
-(def num-testing-files 8)
+(def num-testing-files 9)
 
 (t/deftest dupe-name-in-dir-path?
   (t/testing "Returns true on a path that has a duplicate dir"
@@ -37,9 +36,11 @@
       (t/is (= sci.impl.vars.SciVar (type (res :default)))))))
 
 (t/deftest io-file->keyword
-  (let [res (sut/io-file->keyword (stub/gtf :tf-1 :io))]
+  (let [res  (sut/io-file->keyword (stub/gtf :tf-1 :io))
+        res2 (sut/io-file->keyword (stub/gtf :tf-underscores :io))]
     (t/testing "a file name becomes a keyword"
-      (t/is (= :file1 res)))))
+      (t/is (= :file1 res))
+      (t/is (= :file-underscores res2)))))
 
 (t/deftest find-files-by-ext
   (t/testing "It finds the demo_org org files."
@@ -69,6 +70,13 @@
           res2 (sut/find-index-of #(> (% :baz) 20) test-seq2)]
       (t/is (= res1 2))
       (t/is (= res2 0)))))
+
+(t/deftest snake->kebab
+  (t/testing "expected outpout"
+    (let [res1 (sut/snake->kebab "foo_bar")
+          res2 (sut/snake->kebab "foo_bar foo" :key-it)]
+      (t/is (= res1 "foo-bar"))
+      (t/is (= res2 :foo-bar-foo)))))
 
 ;; -- Time / Date Tests --------------------------------------------------------
 
