@@ -9,7 +9,8 @@
   (let [test-file     (stub/gtf :tf-1 :processed)
         sample-config (stub/sample-config)
         res           (sut/prepare sample-config test-file)]
-    (t/is (every? #(contains? res %) [:render :title :site-map :site-links :site-logs :meta :partials :yield :config]))))
+    (t/is (every? #(contains? res %) [:render :title :site-map :site-links :site-logs :meta :partials :config]))))
+
 
 (t/deftest get-layout
   (t/testing "The tf-layout file returns a sci function.")

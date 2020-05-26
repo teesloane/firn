@@ -61,6 +61,17 @@
   (t/testing "It does not remove the extension if the specified extension does not match"
     (t/is (= "foo.html" (sut/remove-ext "foo.html" "org")))))
 
+(t/deftest find-index-of
+  (t/testing "returns expected output."
+    (let [test-seq1 [ 1 2 3 4 5 6 7]
+          res1      (sut/find-index-of #(= % 3) test-seq1)
+          test-seq2 [{:foo "bar" :baz 30} {:foo "non" :baz 10 :x "30"} {:baz 60}]
+          res2 (sut/find-index-of #(> (% :baz) 20) test-seq2)]
+      (t/is (= res1 2))
+      (t/is (= res2 0)))))
+
+;; -- Time / Date Tests --------------------------------------------------------
+
 (t/deftest timestr->hours-min
   (t/testing "It returns expected output"
     (let [res1 (sut/timestr->hours-min "1:36")
@@ -74,3 +85,38 @@
           res2 (sut/timevec->time-str [3 94])]
       (t/is (= res1 "33:42"))
       (t/is (= res2 "4:34")))))
+
+(t/deftest timestr->minutes
+  (t/testing "It returns expected output"
+    (let [res1 (sut/timestr->minutes "34:42")
+          res2 (sut/timestr->minutes "02:40")]
+      (t/is (= res1 2082))
+      (t/is (= res2 160)))))
+
+(t/deftest timestr->hour-float
+  (t/testing "It returns expected output"
+    (let [res1 (sut/timestr->hour-float "03:25")
+          res2 (sut/timestr->hour-float "02:40")]
+      ;; we have to multiply floats by 100 and
+      ;; convert to ints to compare them successfully.
+      (t/is (=  res1  3.41))
+      (t/is (=  res2  2.66)))))
+
+(t/deftest timestr->add-time
+  (t/testing "It returns expected output"
+    (let [res1 (sut/timestr->add-time "10:02" "00:02")
+          res2 (sut/timestr->add-time "2:40" "14:45")]
+      (t/is (= res1 "10:04"))
+      (t/is (= res2 "17:25")))))
+
+(t/deftest build-year
+  (let [year-2020    (sut/build-year 2020)
+        year-2019    (sut/build-year 2019)
+        sample-day   (dissoc (first year-2019) :date)
+        expected-day {:log-sum "00:00", :date-str "2019-01-01" :log-count 0, :logs-raw [], :hour-sum 0}]
+
+    (t/testing "It handles leap years and regular years."
+      (t/is (= 366 (count year-2020))) ;; leap year.
+      (t/is (= 365 (count year-2019))))
+    (t/testing "The day has expected keys"
+      (t/is (= sample-day expected-day)))))
