@@ -112,9 +112,9 @@ img {
   width: 100%;
 }
 
-/* Heading Keywords and Priority */
+/* Headline Keywords and Priority */
 
-.firn_heading-priority {
+.firn-headline-priority {
   margin: -22px 8px 0 -6px;
   font-size: 8px;
   min-width: 12px;
@@ -126,30 +126,30 @@ img {
 }
 
 
-.firn_heading-priority__A {
+.firn-headline-priority__A {
   color: salmon;
 }
 
-.firn_heading-priority__B {
+.firn-headline-priority__B {
   color: mediumseagreen;
 }
 
-.firn_heading-priority__C {
+.firn-headline-priority__C {
   color: lightblue;
 }
 
-.firn_heading-keyword > div {
+.firn-headline-keyword > div {
 }
 
-.firn_heading-keyword__DONE {
+.firn-headline-keyword__DONE {
   margin-right: 4px;
   color: lightgrey;
 }
 
-.firn_heading-keyword__TODO {
+.firn-headline-keyword__TODO {
   margin-right: 4px;
   color: seagreen;
 }
 
-.firn_heading-timestamp {}
-.firn_heading-cookie {}
+.firn-headline-timestamp {}
+.firn-headline-cookie {}

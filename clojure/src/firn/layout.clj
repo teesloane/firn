@@ -81,9 +81,6 @@
              <br> opts:  => " opts " <code> << is this a valid value? </code>"
             "<br> ")))))
 
-
-
-
 (defn prepare
   "Prepare functions and data to be available in layout functions.
   TODO: pretty sure this being called twice as well. Do PERF work."

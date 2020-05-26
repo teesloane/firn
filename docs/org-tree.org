@@ -1,6 +1,6 @@
 #+TITLE: Org Tree
 #+DATE_CREATED: <2020-03-25 Wed>
-#+DATE_UPDATED: <2020-05-17 13:17>
+#+DATE_UPDATED: <2020-05-25 21:06>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: docs
 
@@ -231,10 +231,10 @@ after being parsed to json and converted to edn:
    :children
    [{:type "title",
      :level 1,
-     :raw "Headings <2020-03-27 Fri>",
+     :raw "Headlines <2020-03-27 Fri>",
      :properties {:foo "bar"},
      :children
-     [{:type "text", :value "Headings "}
+     [{:type "text", :value "Headlines "}
       {:type "timestamp",
        :timestamp_type "active",
        :start
@@ -262,10 +262,10 @@ after being parsed to json and converted to edn:
      [{:type "title",
        :level 2,
        :keyword "TODO",
-       :raw "Heading (2) with /keyword/",
+       :raw "Headline (2) with /keyword/",
        :children
        [{:type "text",
-         :value "Heading (2) with "}
+         :value "Headline (2) with "}
         {:type "italic",
          :children
          [{:type "text",
@@ -277,55 +277,55 @@ after being parsed to json and converted to edn:
        :level 2,
        :priority "B",
        :keyword "TODO",
-       :raw "Heading 2 with priority",
+       :raw "Headline 2 with priority",
        :children
        [{:type "text",
-         :value "Heading 2 with priority"}]}
+         :value "Headline 2 with priority"}]}
       {:type "headline",
        :level 3,
        :children
        [{:type "title",
          :level 3,
-         :raw "Heading 3",
+         :raw "Headline 3",
          :children
-         [{:type "text", :value "Heading 3"}]}
+         [{:type "text", :value "Headline 3"}]}
         {:type "headline",
          :level 4,
          :children
          [{:type "title",
            :level 4,
-           :raw "Heading 4",
+           :raw "Headline 4",
            :children
            [{:type "text",
-             :value "Heading 4"}]}
+             :value "Headline 4"}]}
           {:type "headline",
            :level 5,
            :children
            [{:type "title",
              :level 5,
-             :raw "Heading 5",
+             :raw "Headline 5",
              :children
              [{:type "text",
-               :value "Heading 5"}]}
+               :value "Headline 5"}]}
             {:type "headline",
              :level 6,
              :children
              [{:type "title",
                :level 6,
-               :raw "Heading 6",
+               :raw "Headline 6",
                :children
                [{:type "text",
-                 :value "Heading 6"}]}
+                 :value "Headline 6"}]}
               {:type "headline",
                :level 7,
                :children
                [{:type "title",
                  :level 7,
-                 :raw "Heading 7",
+                 :raw "Headline 7",
                  :children
                  [{:type "text",
                    :value
-                   "Heading 7"}]}]}]}]}]}]}]}]}
+                   "Headline 7"}]}]}]}]}]}]}]}]}
   {:type "headline",
    :level 1,
    :children
@@ -407,7 +407,6 @@ after being parsed to json and converted to edn:
              [{:type "text",
                :value "bold"}]}]}]}]}]}]}]}
 #+END_SRC
-
 
 An org file with footnotes, looks like this:
 
