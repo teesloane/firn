@@ -148,9 +148,10 @@
       (reset! file-watcher nil))))
 
 (defn serve
-  [opts]
-  (mount/start-with-args opts)
-  (promise)) ; NOTE: The promise prevents the System/exit of CLI-matic.
+  ([]
+   (serve {}))
+  ([opts]
+   (mount/start-with-args opts)))
 
 ;; -- Repl Land --
 
