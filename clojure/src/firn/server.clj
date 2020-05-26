@@ -120,15 +120,14 @@
 
 (defstate server
   :start
-  (let [args         (mount/args)
-        dir-files    (get args :dir-files (u/get-cwd))
-        path-to-site (str dir-files "/_firn/_site")
-        ;; build all files and prepare a mutable config (for reloading)
+  (let [{:keys [dir-files port]
+         :or   {dir-files (u/get-cwd)
+                port 3333}}           (mount/args)
+        path-to-site                  (str dir-files "/_firn/_site")
         ;; NOTE: consider making this global, and so available to a sci repl?
-        config!      (atom (-> dir-files config/prepare build/setup file/process-all))
-        {:keys       [dir-layouts dir-partials dir-static dir-data]} @config!
-        watch-list   (map io/file [dir-layouts dir-partials dir-static dir-data])
-        port         3333]
+        config!                       (atom (-> dir-files config/prepare build/setup file/process-all))
+        {:keys [dir-layouts dir-partials dir-static dir-data]} @config!
+        watch-list                    (map io/file [dir-layouts dir-partials dir-static dir-data])]
 
     ;; start watchers
     (reset! file-watcher (apply watch-dir (partial handle-watcher config!) watch-list))
@@ -151,8 +150,7 @@
   ([]
    (serve {}))
   ([opts]
-   (mount/start-with-args opts)
-   (promise))) ;; keep the cli from exiting.
+   (mount/start-with-args opts)))
 
 ;; -- Repl Land --
 

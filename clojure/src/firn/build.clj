@@ -38,7 +38,7 @@
 
   NOTE: should slurp/mkdir/copy-dir be wrapped in try-catches? if-err handling?"
   [{:keys [dir-site   dir-files       dir-site-data
-           dir-data dir-site-static dir-static] :as config}]
+           dir-data   dir-site-static dir-static] :as config}]
   (when-not (fs/exists? (config :dir-firn)) (new-site config))
   (fs/mkdir dir-site) ;; make _site
 
