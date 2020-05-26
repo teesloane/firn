@@ -120,15 +120,14 @@
 
 (defstate server
   :start
-  (let [args         (mount/args)
-        dir-files    (get args :dir-files (u/get-cwd))
-        path-to-site (str dir-files "/_firn/_site")
-        ;; build all files and prepare a mutable config (for reloading)
+  (let [{:keys [dir port]
+         :or   {dir (u/get-cwd)
+                port 3333}}           (mount/args)
+        path-to-site                  (str dir "/_firn/_site")
         ;; NOTE: consider making this global, and so available to a sci repl?
-        config!      (atom (-> dir-files config/prepare build/setup file/process-all))
-        {:keys       [dir-layouts dir-partials dir-static dir-data]} @config!
-        watch-list   (map io/file [dir-layouts dir-partials dir-static dir-data])
-        port         3333]
+        config!                       (atom (-> dir config/prepare build/setup file/process-all))
+        {:keys [dir-layouts dir-partials dir-static dir-data]} @config!
+        watch-list                    (map io/file [dir-layouts dir-partials dir-static dir-data])]
 
     ;; start watchers
     (reset! file-watcher (apply watch-dir (partial handle-watcher config!) watch-list))
@@ -136,8 +135,7 @@
     (println "Building site...")
     (if-not (fs/exists? path-to-site)
       (println "Couldn't find a _firn/ folder. Have you run `Firn new` and created a site yet?")
-      (do (println "⚠ The Firn development server is in beta. \n You may need to restart from time to time if you run into issues.")
-          (println "🏔 Starting Firn development server on:" port)
+      (do (println "🏔 Starting Firn development server on:" port)
           (http/run-server (handler config!) {:port port}))))
 
   :stop
@@ -148,14 +146,11 @@
       (reset! file-watcher nil))))
 
 (defn serve
-  [opts]
-  (mount/start-with-args opts)
-  (promise)) ; NOTE: The promise prevents the System/exit of CLI-matic.
+  ([]
+   (serve {}))
+  ([opts]
+   (mount/start-with-args opts)))
 
 ;; -- Repl Land --
 
-;; (build/new-site {:dir-files "/Users/tees/Dropbox/wiki"})
-;; (build/all-files {:dir-files "/Users/tees/Dropbox/wiki"})
-;; (serve {:dir-files "/Users/tees/Projects/firn/firn/clojure/test/firn/demo_org"})
-;; (serve {:dir-files "/Users/tees/Dropbox/wiki"})
 ;; (mount/stop)

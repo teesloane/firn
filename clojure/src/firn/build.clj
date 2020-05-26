@@ -38,7 +38,7 @@
 
   NOTE: should slurp/mkdir/copy-dir be wrapped in try-catches? if-err handling?"
   [{:keys [dir-site   dir-files       dir-site-data
-           dir-data dir-site-static dir-static] :as config}]
+           dir-data   dir-site-static dir-static] :as config}]
   (when-not (fs/exists? (config :dir-firn)) (new-site config))
   (fs/mkdir dir-site) ;; make _site
 
@@ -66,8 +66,8 @@
 
 (defn all-files
   "Processes all files in the org-directory"
-  [{:keys [dir-files]}]
-  (let [config (setup (config/prepare dir-files))]
+  [{:keys [dir]}]
+  (let [config (setup (config/prepare dir))]
     (->> config
          file/process-all
          write-files)))
