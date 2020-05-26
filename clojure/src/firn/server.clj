@@ -154,8 +154,4 @@
 
 ;; -- Repl Land --
 
-;; (build/new-site {:dir-files "/Users/tees/Dropbox/wiki"})
-;; (build/all-files {:dir-files "/Users/tees/Dropbox/wiki"})
-;; (serve {:dir-files "/Users/tees/Projects/firn/firn/clojure/test/firn/demo_org"})
-;; (serve {:dir-files "/Users/tees/Dropbox/wiki"})
 ;; (mount/stop)

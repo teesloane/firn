@@ -39,7 +39,8 @@
   (str "The following errors occurred while parsing your command:\n\n"
        (s/join \newline errors)))
 
-(def cli-options
+(defn cli-options
+  []
   ;; An option with a required argument
   [["-p" "--port PORT" "Port number"
     :default 3333
@@ -55,7 +56,7 @@
   should exit (with a error message, and optional ok status), or a map
   indicating the action the program should take and the options provided."
   [args]
-  (let [{:keys [options arguments errors summary]} (parse-opts args cli-options)]
+  (let [{:keys [options arguments errors summary]} (parse-opts args (cli-options))]
     (cond
       (:help options) ; help => exit OK with usage summary
       {:exit-message (usage summary) :ok? true}
