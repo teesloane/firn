@@ -23,6 +23,28 @@
     (t/testing "It returns the expected value."
       (t/is (= (-> res :children first :type) "section")))))
 
+(t/deftest get-headline-helper
+  (t/testing "expected output"
+    (let [sample-data
+          {:type "headline",
+           :level 1,
+           :children
+           [{:type "title", :level 1, :tags ["ATTACH"], :raw "Image Tests", :children [{:type "text", :value "Image Tests"}]}]}
+
+          sample-data-with-multiple-children
+          {:type "headline",
+           :level 1,
+           :children
+           [{:type "title", :level 1, :raw "Headlines <2020-03-27 Fri>", :properties {:foo "bar"},
+             :children [{:type "text", :value "Headlines "} {:type "timestamp", :timestamp_type "active", :start {:year 2020, :month 3, :day 27, :dayname "Fri"}}]}]}
+
+          res1 (sut/get-headline-helper sample-data)
+          res2 (sut/get-headline-helper sample-data-with-multiple-children)]
+
+      (t/is (= res1 "Image Tests"))
+      (t/is (= res2 "Headlines")))))
+
+
 (t/deftest parsed-org-date->unix-time
   (t/testing "returns the expected value."
     (t/is (= 1585683360000
