@@ -1,7 +1,8 @@
 (ns firn.markup
   "Namespace responsible for converted org-edn into html."
   (:require [clojure.string :as s]
-            [firn.util :as u]))
+            [firn.util :as u]
+            [firn.org :as org]))
 
 (declare to-html)
 
@@ -32,6 +33,25 @@
      [:span.firn-img-caption desc]]
     [:img {:src path}]))
 
+(defn- clean-anchor
+  "converts `::*My Heading` => #my-heading"
+  [anchor]
+  (str "#" (-> anchor
+              (s/replace #"::\*" "")
+              (s/replace #" " "-")
+              (s/lower-case))))
+
+(defn internal-link-handler
+  "Takes an org link and converts it into an html path."
+  [org-link]
+  (let [regex       #"(file:)(.*)\.(org)(\:\:\*.+)?"
+        res         (re-matches regex org-link)
+        anchor-link (last res)
+        anchor-link (when anchor-link (-> res last clean-anchor))]
+    (if anchor-link
+      (str "./" (nth res 2) anchor-link)
+      (str "./" (nth res 2)))))
+
 (defn link->html
   "Parses links from the org-tree.
   Checks if a link is an HTTP link or File link."
@@ -43,12 +63,11 @@
         img-http-regex  #"(http:\/\/|https:\/\/)(.*)\.(jpg|JPG|gif|GIF|png)"
         img-rel-regex   #"(\.(.*))\.(jpg|JPG|gif|GIF|png)"
         img-make-url    #(->> (re-matches img-file-regex link-href)
-                              (take-last 2)
-                              (s/join "."))
+                            (take-last 2)
+                            (s/join "."))
         ;; file regexs / ctor fns
-        org-file-regex  #"(file:)(.*)\.(org)"
-        http-link-regex #"https?:\/\/(?![^\" ]*(?:jpg|png|gif))[^\" ]+"
-        file-path       #(str "./" (nth %  2))]
+        org-file-regex  #"(file:)(.*)\.(org)(\:\:\*.+)?"
+        http-link-regex #"https?:\/\/(?![^\" ]*(?:jpg|png|gif))[^\" ]+"]
 
     (cond
       ;; Images ---
@@ -66,7 +85,7 @@
 
       ;; org files
       (re-matches org-file-regex link-href)
-      [:a.firn_internal {:href (file-path (re-matches org-file-regex link-href))} link-val]
+      [:a.firn_internal {:href (internal-link-handler link-href)} link-val]
 
       (re-matches http-link-regex link-href)
       [:a.firn_external {:href link-href :target "_blank"} link-val]
@@ -85,15 +104,19 @@
         keywrd           (v :keyword)
         priority         (v :priority)
         value            (v :value)
+        parent           {:type "headline" :level level :children [v]}
         heading-priority (u/str->keywrd "span.firn-headline-priority.firn-headline-priority__" priority)
         heading-keyword  (u/str->keywrd "span.firn-headline-keyword.firn-headline-keyword__" keywrd)
+        heading-anchor   (-> parent org/get-headline-helper  clean-anchor)
+        ;; _ (prn "heading anchor is " heading-anchor)
+        heading-id+class #(u/str->keywrd "h" % heading-anchor ".firn-headline.firn-headline-" %)
         h-level          (case level
-                           1 :h1.firn-headline.firn-headline-1
-                           2 :h2.firn-headline.firn-headline-2
-                           3 :h3.firn-headline.firn-headline-3
-                           4 :h4.firn-headline.firn-headline-4
-                           5 :h5.firn-headline.firn-headline-5
-                           :h6.firn-headline-6)
+                           1 (heading-id+class 1)
+                           2 (heading-id+class 2)
+                           3 (heading-id+class 3)
+                           4 (heading-id+class 4)
+                           5 (heading-id+class 5)
+                           (heading-id+class 6))
         make-child       #(into [%] (map title->html children))]
     (case typ
       "headline"  (make-child :div)
@@ -114,7 +137,7 @@
 
 (defn- footnote-ref
   [v]
-  [:a.firn_footnote-ref
+  [:a.firn-footnote-ref
    {:id   (str "fn-" (v :label))
     :href (str "#" (v :label))}
    [:sup (v :label)]])
@@ -122,7 +145,7 @@
 (defn- footnote-def
   [v]
   (let [make-child     #(into [%] (map to-html (v :children)))]
-    [:span.firn_footnote-def
+    [:span.firn-footnote-def
      [:span {:id (v :label)
              :style "padding-right: 8px"} (v :label)]
      (make-child :span)
