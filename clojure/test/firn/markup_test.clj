@@ -43,3 +43,10 @@
   (t/testing "internal-link"
     (t/is (= (sut/link->html (sample-links :file-link))
              [:a.firn_internal {:href "./file2"} "File 2"]))))
+
+(t/deftest internal-link-handler
+  (t/testing "Expected results."
+    (let [res1 (sut/internal-link-handler "file:foo.org")
+          res2 (sut/internal-link-handler "file:foo.org::*my headline link")]
+      (t/is (= res1 "./foo"))
+      (t/is (= res2 "./foo#my-headline-link")))))

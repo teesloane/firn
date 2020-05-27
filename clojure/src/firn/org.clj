@@ -22,7 +22,7 @@
         (prn "Orgize failed to parse file." stripped res)
         (res :out)))))
 
-(defn- get-headline-helper
+(defn get-headline-helper
   "Sanitizes a heading of links and just returns text.
   Necessary because org leafs of :type `link` have a `:desc` and not a `:value`
 
@@ -48,15 +48,16 @@
                        (case (:type child)
                          "text" (get-trimmed-val child :value)
                          "link" (get-trimmed-val child :desc)
+                         "code" (get-trimmed-val child :value)
                          "")))))))
 
 (defn get-headline
   "Fetches a headline from an org-mode tree."
   [tree name]
   (->> (tree-seq map? :children tree)
-       (filter #(and (= "headline" (:type %))
-                     (= name (get-headline-helper %))))
-       (first)))
+     (filter #(and (= "headline" (:type %))
+                   (= name (get-headline-helper %))))
+     (first)))
 
 (defn get-headline-content
   "Same as get-headline, but removes the first child :title)."
@@ -100,7 +101,6 @@
         :log-sum   log-sum
         :hour-sum  (u/timestr->hour-float log-sum)}))))
 
-
 (defn logbook-year-stats
   "Takes a logbook and pushes it's data into a year calendar.
   Returns a map that looks like:
@@ -133,21 +133,18 @@
      :as   opts}]
    [:div
     (for [[year year-of-logs] (logbook-year-stats logbook)
-          :let [
-                max-log     (apply max-key :hour-sum year-of-logs) ;; Don't need this yet.
+          :let [max-log     (apply max-key :hour-sum year-of-logs) ;; Don't need this yet.
                 ;; This should be measured against the height and whatever the max-log is.
                 g-multiplier (/ height 8) ;; 8 - max hours we expect someone to log in a day
                 fmt-points  #(str %1 "," (* g-multiplier (%2 :hour-sum)))
                 points      (s/join " " (->> year-of-logs (map-indexed fmt-points)))]]
 
-
       [:div
        [:h5.firn-headline.firn-headline-5 year]
-       [:svg {:viewbox (format "0 0 %s %s" width height),
+       [:svg {:viewbox (format "0 0 %s %s" width height)
               :class   "chart"}
         [:g {:transform (format "translate(0, %s) scale(1, -1)", (- height (* stroke-width 1.25)))}
-         [:polyline {:fill         "none",
-                     :stroke       stroke,
-                     :stroke-width "1",
+         [:polyline {:fill         "none"
+                     :stroke       stroke
+                     :stroke-width "1"
                      :points points}]]]])]))
-
