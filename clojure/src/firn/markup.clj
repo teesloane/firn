@@ -144,8 +144,8 @@
 
 (defn- footnote-def
   [v]
-  (let [make-child     #(into [%] (map to-html) (v :children))]
-    [:span.firn_footnote-def
+  (let [make-child     #(into [%] (map to-html (v :children)))]
+    [:span.firn-footnote-def
      [:span {:id (v :label)
              :style "padding-right: 8px"} (v :label)]
      (make-child :span)
