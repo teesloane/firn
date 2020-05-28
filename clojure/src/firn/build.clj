@@ -65,7 +65,8 @@
     (let [out-file-name (str (config :dir-site) (f :path-web) ".html")]
       (when-not (file/is-private? config f)
         (io/make-parents out-file-name)
-        (spit out-file-name (f :as-html))))))
+        (spit out-file-name (f :as-html)))))
+  config)
 
 (defn all-files
   "Processes all files in the org-directory"

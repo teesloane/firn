@@ -125,7 +125,7 @@
                 port 3333}}           (mount/args)
         path-to-site                  (str dir "/_firn/_site")
         ;; NOTE: consider making this global, and so available to a sci repl?
-        config!                       (atom (-> dir config/prepare build/setup file/process-all))
+        config!                       (atom (-> (mount/args) build/all-files))
         {:keys [dir-layouts dir-partials dir-static dir-data]} @config!
         watch-list                    (map io/file [dir-layouts dir-partials dir-static dir-data])]
 
