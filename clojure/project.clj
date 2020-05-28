@@ -5,6 +5,7 @@
             :url "https://www.eclipse.org/legal/epl-2.0/"}
   :dependencies [[borkdude/sci "0.0.13-alpha.19"]
                  [cheshire "5.10.0"]
+                 [clj-rss "0.2.5"]
                  [hiccup "1.0.5"]
                  [http-kit "2.3.0"]
                  ;; [juxt/dirwatch "0.2.5"] ;; vendored

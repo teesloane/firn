@@ -5,8 +5,6 @@
   (:import (java.lang Integer)
            (java.time LocalDate)))
 
-
-
 (set! *warn-on-reflection* true)
 
 ;; Some of these are borrowed from me.raynes.fs because I need to add ;; type hints for GraalVM
@@ -84,6 +82,10 @@
     (s/replace #" " "-")
     (keyword))))
 
+(defn prepend-vec
+  [item vector]
+  (vec (cons item vector)))
+
 (defn io-file->keyword
   "Turn a filename into a keyword."
   [io-file]
@@ -108,7 +110,6 @@
   (let [file-path (.getPath ^java.io.File io-file)
         eval-file (-> file-path slurp sci/eval-string)]
     eval-file))
-
 
 (defn load-fns-into-map
   "Takes a list of files and returns a map of filenames as :keywords -> file
@@ -157,6 +158,23 @@
 ;; For interception thread macros and enabling printing the passed in value.
 (def spy #(do (println "DEBUG:" %) %))
 
+(defn java-date->unix-ts
+  [date]
+  (int (/ (.getTime ^java.util.Date date) 1000)))
+
+(defn org-date->java-date
+  "Converts <2020-02-25 05:51> -> java..."
+  [org-date]
+  (let [parse-fmt (java.text.SimpleDateFormat. "yyyy-MM-dd")
+        parse-fn  (fn [s] (.parse ^java.text.SimpleDateFormat parse-fmt s))]
+    (-> org-date
+       (s/replace #"<" "")
+       (s/replace #">" "")
+       (parse-fn))))
+      
+
+;; =>
+
 
 (defn native-image?
   "Check if we are in the native-image or REPL."
@@ -168,7 +186,6 @@
   "Converts a string to a keyword"
   [& args]
   (keyword (apply str args)))
-
 
 ;; Time ------------------------------------------------------------------------
 ;; NOTE: timestr->hours-min + timevec->time-str could use better input testing?
@@ -198,7 +215,6 @@
   (double
    (/ (int (* 100 (/ (timestr->minutes tstr) 60))) 100)))
 
-
 (defn timevec->time-str
   "Converts a vector of hours and minutes into readable time string.
   `[3 94]` > `4:34`"
@@ -222,7 +238,6 @@
 (defn date-str
   [date]
   (.toString ^java.time.LocalDate date))
-
 
 (defn date-range
   "Creates a range of dates between date A and date B.

@@ -35,7 +35,7 @@
 (defn link->html
   "Parses links from the org-tree.
   Checks if a link is an HTTP link or File link."
-  [v]
+  [config v]
   (let [link-val        (get v :desc)
         link-href       (get v :path "Missing HREF attribute.")
         ;; img regexs / ctor fns.
@@ -120,8 +120,8 @@
    [:sup (v :label)]])
 
 (defn- footnote-def
-  [v]
-  (let [make-child     #(into [%] (map to-html (v :children)))]
+  [cfg v]
+  (let [make-child     #(into [%] (map (partial to-html cfg) (v :children)))]
     [:span.firn_footnote-def
      [:span {:id (v :label)
              :style "padding-right: 8px"} (v :label)]
@@ -132,8 +132,8 @@
 (defn to-html
   "Recursively Parses the org-edn into hiccup.
   Some values don't get parsed (drawers) - yet. They return empty strings.
-  Don't destructure! - it can create uneven maps from possible nil vals on `V`"
-  [v]
+  Don't destructure! - with recursion, it can create uneven maps from possible nil vals on `v`"
+  [config v]
   (let [type           (get v :type)
         children       (get v :children)
         value          (get v :value)
@@ -141,7 +141,7 @@
         val            (if value (s/trim-newline value) value)
         headline-level (get v :level)
         headline-el    (u/str->keywrd "div.firn_headline-section.firn_headline-section-" headline-level)
-        make-child     #(into [%] (map to-html children))]
+        make-child     #(into [%] (map (partial to-html config) children))]
     (case type
       "document"      (make-child :div)
       "headline"      (make-child headline-el)
@@ -158,9 +158,9 @@
       "table-row"     (make-child :tr)
       "table-cell"    (make-child :td)
       "source-block"  (src-block->html v)
-      "link"          (link->html v)
+      "link"          (link->html config v)
       "fn-ref"        (footnote-ref v)
-      "fn-def"        (footnote-def v)
+      "fn-def"        (footnote-def config v)
       "code"          [:code val]
       "verbatim"      [:code val]
       "rule"          [:hr]

@@ -31,14 +31,16 @@
             (io/make-parents (:out-name f))
             (spit (:out-name f) (:contents f)))))))
 
-
-
 (defn setup
   "Creates folders for output, slurps in layouts and partials.
 
   NOTE: should slurp/mkdir/copy-dir be wrapped in try-catches? if-err handling?"
-  [{:keys [dir-site   dir-files       dir-site-data
-           dir-data   dir-site-static dir-static] :as config}]
+  [{:keys [dir-site
+           dir-files
+           dir-site-data
+           dir-data
+           dir-site-static
+           dir-static] :as config}]
   (when-not (fs/exists? (config :dir-firn)) (new-site config))
   (fs/mkdir dir-site) ;; make _site
 
@@ -49,10 +51,11 @@
   (fs/delete-dir dir-site-static)
   (fs/copy-dir dir-static dir-site-static)
 
-  (assoc config
-         :org-files (u/find-files-by-ext dir-files "org")
-         :layouts  (file/read-clj :layouts config)
-         :partials (file/read-clj :partials config)))
+  (let [org-files (u/find-files-by-ext dir-files "org")
+        layouts   (file/read-clj :layouts config)
+        partials  (file/read-clj :partials config)]
+
+    (assoc config :org-files org-files :layouts layouts :partials partials)))
 
 (defn write-files
   "Takes a config, of which we can presume has :processed-files.
@@ -67,7 +70,9 @@
 (defn all-files
   "Processes all files in the org-directory"
   [{:keys [dir]}]
-  (let [config (setup (config/prepare dir))]
-    (->> config
-         file/process-all
-         write-files)))
+  (let [config (setup (config/prepare dir))
+        {:keys [enable-rss?] } config]
+    (cond->> config
+      true        file/process-all
+      enable-rss? file/write-rss-file!
+      true        write-files)))
