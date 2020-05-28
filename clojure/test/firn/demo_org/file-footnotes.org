@@ -16,7 +16,6 @@ what about some context [fn:foo]
 * Footnotes
 
 [fn:1]
-
 This test might not parse with the local bin.
 
 [fn:foo]
