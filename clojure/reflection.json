@@ -1,5 +1,11 @@
 [
   {
     "name" : "java.nio.file.StandardWatchEventKinds$StdWatchEventKind[]"
+  },
+  {
+    "name": "com.sun.xml.internal.stream.XMLOutputFactoryImpl",
+    "allPublicConstructors": true,
+    "allPublicFields": true,
+    "allPublicMethods": true
   }
 ]

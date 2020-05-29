@@ -5,6 +5,7 @@
 
   You can view the file data-structure as it is made by the `make` function."
   (:require [cheshire.core :as json]
+            [clj-rss.core :as rss]
             [clojure.java.io :as io]
             [clojure.string :as s]
             [firn.layout :as layout]
@@ -119,17 +120,17 @@
                               new-res    [(+ acc-hours hour) (+ acc-minutes min)]]
                           new-res))]
     (->> logbook
-       (reduce reduce-fn hours-minutes)
-       (u/timevec->time-str))))
+         (reduce reduce-fn hours-minutes)
+         (u/timevec->time-str))))
 
 (defn- sort-logbook
   "Loops over all logbooks, adds start and end unix timestamps."
   [logbook file]
   (let [mf #(org/parsed-org-date->unix-time %1 file)]
     (->> logbook
-         ;; Filter out timestamps if they don't have a start or end.
+       ;; Filter out timestamps if they don't have a start or end.
          (filter #(and (% :start) (% :end) (% :duration)))
-         ;; adds a unix timestamp for the :start and :end time so that's sortable.
+       ;; adds a unix timestamp for the :start and :end time so that's sortable.
          (map #(assoc % :start-ts (mf (:start %)) :end-ts (mf (:end %))))
          (sort-by :start-ts #(> %1 %2)))))
 
@@ -223,20 +224,46 @@
               final            (assoc config-with-data :processed-files with-html)]
           final)
 
+        ;; Otherwise continue...
         (let [next-file      (first org-files)
               processed-file (process-one config next-file)
+              is-private     (is-private? config processed-file)
               org-files      (rest org-files)
-              output         (assoc output (processed-file :path-web) processed-file)
+              output         (if is-private
+                               output
+                               (assoc output (processed-file :path-web) processed-file))
               keyword-map    (keywords->map processed-file)
               new-site-map   (merge keyword-map {:path (processed-file :path-web)})]
 
           ;; add to sitemap when file is not private.
-          (when-not (is-private? config processed-file)
+          (when-not is-private
             (swap! site-map conj new-site-map)
             (swap! site-links concat @site-links (-> processed-file :meta :links))
             (swap! site-logs concat @site-logs (-> processed-file :meta :links)))
           ;; add links and logs to site wide data.
           (recur org-files output))))))
+
+(defn write-rss-file!
+  "Build an rss file. It sorts files by file:meta:date-created, writes to feed.xml"
+  [{:keys [processed-files site-url site-title dir-site site-desc] :as config}]
+  (println "Building rss file...")
+  (let [feed-file   (str dir-site "feed.xml")
+        first-entry {:title site-title :link site-url :description site-desc}
+        make-rss    (fn [[_ f]]
+                      (hash-map :title   (-> f :meta :title)
+                                :link    (str site-url "/" (-> f :path-web))
+                                :pubDate (u/org-date->java-date  (-> f :meta :date-created))
+                                :description (str (f :as-html))))]
+    (io/make-parents feed-file)
+    (->> processed-files
+         (filter (fn [[_ f]] (-> f :meta :date-created)))
+         (map make-rss)
+         (sort-by :pubDate)
+         (reverse)
+         (u/prepend-vec first-entry) ; first entry must be about the site
+         (apply rss/channel-xml)
+         (spit feed-file)))
+  config)
 
 (defn reload-requested-file
   "Take a request to a file, pulls the file out of memory
@@ -245,3 +272,4 @@
   (let [re-slurped (-> file :path io/file)
         re-processed (process-one config re-slurped)]
     re-processed))
+

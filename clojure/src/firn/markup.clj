@@ -37,9 +37,9 @@
   "converts `::*My Heading` => #my-heading"
   [anchor]
   (str "#" (-> anchor
-              (s/replace #"::\*" "")
-              (s/replace #" " "-")
-              (s/lower-case))))
+               (s/replace #"::\*" "")
+               (s/replace #" " "-")
+               (s/lower-case))))
 
 (defn internal-link-handler
   "Takes an org link and converts it into an html path."
@@ -63,8 +63,8 @@
         img-http-regex  #"(http:\/\/|https:\/\/)(.*)\.(jpg|JPG|gif|GIF|png)"
         img-rel-regex   #"(\.(.*))\.(jpg|JPG|gif|GIF|png)"
         img-make-url    #(->> (re-matches img-file-regex link-href)
-                            (take-last 2)
-                            (s/join "."))
+                              (take-last 2)
+                              (s/join "."))
         ;; file regexs / ctor fns
         org-file-regex  #"(file:)(.*)\.(org)(\:\:\*.+)?"
         http-link-regex #"https?:\/\/(?![^\" ]*(?:jpg|png|gif))[^\" ]+"]
@@ -107,8 +107,7 @@
         parent           {:type "headline" :level level :children [v]}
         heading-priority (u/str->keywrd "span.firn-headline-priority.firn-headline-priority__" priority)
         heading-keyword  (u/str->keywrd "span.firn-headline-keyword.firn-headline-keyword__" keywrd)
-        heading-anchor   (-> parent org/get-headline-helper  clean-anchor)
-        ;; _ (prn "heading anchor is " heading-anchor)
+        heading-anchor   (-> parent org/get-headline-helper clean-anchor)
         heading-id+class #(u/str->keywrd "h" % heading-anchor ".firn-headline.firn-headline-" %)
         h-level          (case level
                            1 (heading-id+class 1)
@@ -155,7 +154,7 @@
 (defn to-html
   "Recursively Parses the org-edn into hiccup.
   Some values don't get parsed (drawers) - yet. They return empty strings.
-  Don't destructure! - it can create uneven maps from possible nil vals on `V`"
+  Don't destructure! - with recursion, it can create uneven maps from possible nil vals on `v`"
   [v]
   (let [type           (get v :type)
         children       (get v :children)
