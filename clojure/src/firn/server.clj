@@ -87,7 +87,7 @@
                 dir-site-static dir-data
                 dir-site-data]} @config!]
 
-    (prn "Reloading files..." file-path)
+    (println "Reloading files..." file-path)
 
     (cond
       (match-dir-and-action dir-partials :modxcreate)

@@ -246,7 +246,7 @@
 (defn write-rss-file!
   "Build an rss file. It sorts files by file:meta:date-created, writes to feed.xml"
   [{:keys [processed-files site-url site-title dir-site site-desc] :as config}]
-  (prn "Building rss file...")
+  (println "Building rss file...")
   (let [feed-file   (str dir-site "feed.xml")
         first-entry {:title site-title :link site-url :description site-desc}
         make-rss    (fn [[_ f]]

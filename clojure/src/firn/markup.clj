@@ -107,8 +107,7 @@
         parent           {:type "headline" :level level :children [v]}
         heading-priority (u/str->keywrd "span.firn-headline-priority.firn-headline-priority__" priority)
         heading-keyword  (u/str->keywrd "span.firn-headline-keyword.firn-headline-keyword__" keywrd)
-        heading-anchor   (-> parent org/get-headline-helper  clean-anchor)
-        ;; _ (prn "heading anchor is " heading-anchor)
+        heading-anchor   (-> parent org/get-headline-helper clean-anchor)
         heading-id+class #(u/str->keywrd "h" % heading-anchor ".firn-headline.firn-headline-" %)
         h-level          (case level
                            1 (heading-id+class 1)
