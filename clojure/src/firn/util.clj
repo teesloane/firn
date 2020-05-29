@@ -173,9 +173,6 @@
        (parse-fn))))
       
 
-;; =>
-
-
 (defn native-image?
   "Check if we are in the native-image or REPL."
   []

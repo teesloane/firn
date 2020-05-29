@@ -122,7 +122,7 @@
   :start
   (let [{:keys [dir port]
          :or   {dir (u/get-cwd)
-                port 3333}}           (mount/args)
+                port 4000}}           (mount/args)
         path-to-site                  (str dir "/_firn/_site")
         ;; NOTE: consider making this global, and so available to a sci repl?
         config!                       (atom (-> (mount/args) build/all-files))
@@ -135,7 +135,7 @@
     (println "Building site...")
     (if-not (fs/exists? path-to-site)
       (println "Couldn't find a _firn/ folder. Have you run `Firn new` and created a site yet?")
-      (do (println "🏔 Starting Firn development server on:" port)
+      (do (println "\n🏔  Starting Firn development server on:" (str "http://localhost:" port))
           (http/run-server (handler config!) {:port port}))))
 
   :stop
