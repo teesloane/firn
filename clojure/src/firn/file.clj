@@ -256,6 +256,7 @@
                                 :description (str (f :as-html))))]
     (io/make-parents feed-file)
     (->> processed-files
+       (filter (fn [[_ f]] (-> f :meta :date-created)))
        (map make-rss)
        (sort-by :pubDate)
        (reverse)
