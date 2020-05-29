@@ -10,10 +10,10 @@
 (set! *warn-on-reflection* true)
 
 (def default-files
-   ["layouts/default.clj"
-    "partials/head.clj"
-    "config.edn"
-    "static/css/main.css"])
+  ["layouts/default.clj"
+   "partials/head.clj"
+   "config.edn"
+   "static/css/main.css"])
 
 (defn new-site
   "Creates the folders needed for a new site in your wiki directory.
@@ -72,7 +72,7 @@
   "Processes all files in the org-directory"
   [{:keys [dir]}]
   (let [config (setup (config/prepare dir))
-        {:keys [enable-rss?] } config]
+        {:keys [enable-rss?]} config]
     (cond->> config
       true        file/process-all
       enable-rss? file/write-rss-file!

@@ -120,8 +120,8 @@
                               new-res    [(+ acc-hours hour) (+ acc-minutes min)]]
                           new-res))]
     (->> logbook
-       (reduce reduce-fn hours-minutes)
-       (u/timevec->time-str))))
+         (reduce reduce-fn hours-minutes)
+         (u/timevec->time-str))))
 
 (defn- sort-logbook
   "Loops over all logbooks, adds start and end unix timestamps."
@@ -129,10 +129,10 @@
   (let [mf #(org/parsed-org-date->unix-time %1 file)]
     (->> logbook
        ;; Filter out timestamps if they don't have a start or end.
-       (filter #(and (% :start) (% :end) (% :duration)))
+         (filter #(and (% :start) (% :end) (% :duration)))
        ;; adds a unix timestamp for the :start and :end time so that's sortable.
-       (map #(assoc % :start-ts (mf (:start %)) :end-ts (mf (:end %))))
-       (sort-by :start-ts #(> %1 %2)))))
+         (map #(assoc % :start-ts (mf (:start %)) :end-ts (mf (:end %))))
+         (sort-by :start-ts #(> %1 %2)))))
 
 (defn extract-metadata-logbook-helper
   "Extracts the logbook and associates the parent headline's metadata with it.
@@ -256,13 +256,13 @@
                                 :description (str (f :as-html))))]
     (io/make-parents feed-file)
     (->> processed-files
-       (filter (fn [[_ f]] (-> f :meta :date-created)))
-       (map make-rss)
-       (sort-by :pubDate)
-       (reverse)
-       (u/prepend-vec first-entry) ; first entry must be about the site
-       (apply rss/channel-xml)
-       (spit feed-file)))
+         (filter (fn [[_ f]] (-> f :meta :date-created)))
+         (map make-rss)
+         (sort-by :pubDate)
+         (reverse)
+         (u/prepend-vec first-entry) ; first entry must be about the site
+         (apply rss/channel-xml)
+         (spit feed-file)))
   config)
 
 (defn reload-requested-file

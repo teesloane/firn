@@ -37,9 +37,9 @@
   "converts `::*My Heading` => #my-heading"
   [anchor]
   (str "#" (-> anchor
-              (s/replace #"::\*" "")
-              (s/replace #" " "-")
-              (s/lower-case))))
+               (s/replace #"::\*" "")
+               (s/replace #" " "-")
+               (s/lower-case))))
 
 (defn internal-link-handler
   "Takes an org link and converts it into an html path."
@@ -63,8 +63,8 @@
         img-http-regex  #"(http:\/\/|https:\/\/)(.*)\.(jpg|JPG|gif|GIF|png)"
         img-rel-regex   #"(\.(.*))\.(jpg|JPG|gif|GIF|png)"
         img-make-url    #(->> (re-matches img-file-regex link-href)
-                            (take-last 2)
-                            (s/join "."))
+                              (take-last 2)
+                              (s/join "."))
         ;; file regexs / ctor fns
         org-file-regex  #"(file:)(.*)\.(org)(\:\:\*.+)?"
         http-link-regex #"https?:\/\/(?![^\" ]*(?:jpg|png|gif))[^\" ]+"]

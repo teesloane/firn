@@ -12,7 +12,7 @@
 (ns ^{:doc "Directory watcher"
       :author "Malcolm Sparks"
       :requires "JDK7"}
-  firn.dirwatch
+ firn.dirwatch
   (:import (java.io File)
            (java.nio.file FileSystems Path StandardWatchEventKinds WatchEvent WatchKey WatchService)
            (java.util.concurrent Executors ThreadFactory TimeUnit)))
@@ -23,11 +23,11 @@
 
 (defonce pool
   (Executors/newCachedThreadPool
-    (reify ThreadFactory
-      (newThread [_ runnable]
-        (doto (Thread. runnable)
-          (.setName (str "dirwatch-pool-" (swap! pool-counter inc)))
-          (.setDaemon true))))))
+   (reify ThreadFactory
+     (newThread [_ runnable]
+       (doto (Thread. runnable)
+         (.setName (str "dirwatch-pool-" (swap! pool-counter inc)))
+         (.setDaemon true))))))
 
 (defn ^:private register-path
   "Register a watch service with a filesystem path.
@@ -41,9 +41,9 @@
                StandardWatchEventKinds/ENTRY_MODIFY]))
   (doseq [^File dir (.. path toAbsolutePath toFile listFiles)]
     (when (. dir isDirectory)
-          (register-path ws (. dir toPath) event-atom))
+      (register-path ws (. dir toPath) event-atom))
     (when event-atom
-          (swap! event-atom conj {:file dir, :count 1, :action :create}))))
+      (swap! event-atom conj {:file dir, :count 1, :action :create}))))
 
 (defn ^:private wait-for-events [^WatchService ws f]
   (when ws ;; nil when this watcher is closed
@@ -53,7 +53,7 @@
     after the watcher is closed."))]
       (when (and k (.isValid k))
         (doseq [^WatchEvent ev (.pollEvents k) :when (not= (.kind ev)
-                                               StandardWatchEventKinds/OVERFLOW)]
+                                                           StandardWatchEventKinds/OVERFLOW)]
           (let [file (.toFile (.resolve ^Path (cast Path (.watchable k)) ^Path (cast Path (.context ev))))]
             (f {:file file
                 :count (.count ev)
@@ -110,5 +110,5 @@
   [watcher]
   {:pre [(::watcher (meta watcher))]}
   (send-via pool watcher (fn [^WatchService w]
-                             (when w (.close w))
-                             nil)))
+                           (when w (.close w))
+                           nil)))

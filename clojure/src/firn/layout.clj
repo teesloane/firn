@@ -53,6 +53,8 @@
 
 
        ;; render a headline title.
+
+
        (and is-headline? (= opts :title))
        (let [hl (org/get-headline org-tree action)]
          (-> hl :children first  markup/to-html))
@@ -103,7 +105,6 @@
    :logbook-total (-> file :meta :logbook-total)
    :date-updated  (-> file :meta :date-updated)
    :date-created  (-> file :meta :date-created)})
-
 
 (defn apply-layout
   "If a file has a template, render the file with it, or use the default layout"

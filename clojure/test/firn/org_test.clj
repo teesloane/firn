@@ -44,7 +44,6 @@
       (t/is (= res1 "Image Tests"))
       (t/is (= res2 "Headlines")))))
 
-
 (t/deftest parsed-org-date->unix-time
   (t/testing "returns the expected value."
     (t/is (= 1585683360000

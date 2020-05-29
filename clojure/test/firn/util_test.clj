@@ -64,7 +64,7 @@
 
 (t/deftest find-index-of
   (t/testing "returns expected output."
-    (let [test-seq1 [ 1 2 3 4 5 6 7]
+    (let [test-seq1 [1 2 3 4 5 6 7]
           res1      (sut/find-index-of #(= % 3) test-seq1)
           test-seq2 [{:foo "bar" :baz 30} {:foo "non" :baz 10 :x "30"} {:baz 60}]
           res2 (sut/find-index-of #(> (% :baz) 20) test-seq2)]

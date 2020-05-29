@@ -78,9 +78,9 @@
    (s/replace s #"_" "-"))
   ([s key-it?]
    (-> s
-    (s/replace #"_" "-")
-    (s/replace #" " "-")
-    (keyword))))
+       (s/replace #"_" "-")
+       (s/replace #" " "-")
+       (keyword))))
 
 (defn prepend-vec
   [item vector]
@@ -168,10 +168,9 @@
   (let [parse-fmt (java.text.SimpleDateFormat. "yyyy-MM-dd")
         parse-fn  (fn [s] (.parse ^java.text.SimpleDateFormat parse-fmt s))]
     (-> org-date
-       (s/replace #"<" "")
-       (s/replace #">" "")
-       (parse-fn))))
-      
+        (s/replace #"<" "")
+        (s/replace #">" "")
+        (parse-fn))))
 
 (defn native-image?
   "Check if we are in the native-image or REPL."
@@ -240,8 +239,8 @@
   "Creates a range of dates between date A and date B.
   (date-range [])"
   [[sy sm sd] [ey em ed]]
-  (let [ s-date (date-make  sy sm sd)
-         e-date (date-make ey em ed)]
+  (let [s-date (date-make  sy sm sd)
+        e-date (date-make ey em ed)]
     (loop [curr-day s-date
            range    [s-date]]
       (if (= curr-day e-date)
