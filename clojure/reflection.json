@@ -1,5 +1,9 @@
 [
   {
     "name" : "java.nio.file.StandardWatchEventKinds$StdWatchEventKind[]"
+  },
+  {
+    "name":"com.sun.xml.internal.stream.XMLInputFactoryImpl",
+    "methods":[{"name":"<init>","parameterTypes":[] }]
   }
 ]
