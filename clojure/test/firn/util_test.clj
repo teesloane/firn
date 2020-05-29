@@ -78,11 +78,6 @@
       (t/is (= res1 "foo-bar"))
       (t/is (= res2 :foo-bar-foo)))))
 
-(t/deftest java-date->unix-ts
-  (t/testing "expected output"
-    (let [x (sut/java-date->unix-ts (java.util.Date. 120 0 1))]
-      (t/is (= x  1577854800)))))
-
 (t/deftest prepend-vec
   (t/testing "expected output."
     (let [res (sut/prepend-vec 1 [2 3])]
