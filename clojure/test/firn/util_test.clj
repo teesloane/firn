@@ -2,7 +2,8 @@
   (:require [firn.util :as sut]
             [firn.stubs :as stub]
             [clojure.test :as t]
-            [me.raynes.fs :as fs]))
+            [me.raynes.fs :as fs])
+  (:import (java.time LocalDate)))
 
 (def num-testing-files 9)
 
@@ -77,6 +78,16 @@
           res2 (sut/snake->kebab "foo_bar foo" :key-it)]
       (t/is (= res1 "foo-bar"))
       (t/is (= res2 :foo-bar-foo)))))
+
+(t/deftest java-date->unix-ts
+  (t/testing "expected output"
+    (let [x #p(sut/java-date->unix-ts (java.util.Date. 120 0 1))]
+      (t/is (= x  1577854800)))))
+
+(t/deftest prepend-vec
+  (t/testing "expected output."
+    (let [res (sut/prepend-vec 1 [2 3])]
+      (t/is (= res [1 2 3])))))
 
 ;; -- Time / Date Tests --------------------------------------------------------
 
