@@ -55,9 +55,9 @@
   "Fetches a headline from an org-mode tree."
   [tree name]
   (->> (tree-seq map? :children tree)
-     (filter #(and (= "headline" (:type %))
-                   (= name (get-headline-helper %))))
-     (first)))
+       (filter #(and (= "headline" (:type %))
+                     (= name (get-headline-helper %))))
+       (first)))
 
 (defn get-headline-content
   "Same as get-headline, but removes the first child :title)."

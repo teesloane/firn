@@ -5,20 +5,20 @@
             [sci.core :as sci]))
 
 (def starting-config
-  {:dir-data    "data"    ; org attachments/files to get copied into _site.
-   :dir-files     nil       ; where org content lives.
-   :dir-layouts   ""        ; where layouts are stored.
-   :dir-partials  ""        ; where partials are stored.
-   :dir-site      ""        ; the root dir of the compiled firn site.
-   :dirname-files nil       ; the name of directory where firn is run.
-   :ignored-dirs  ["priv"]  ; Directories to ignore org files in.
-   :layouts       {}        ; layouts loaded into memory
-   :partials      {}        ; partials loaded into memory
+  {:dir-data      "data"   ; org attachments/files to get copied into _site.
+   :dir-files     nil      ; where org content lives.
+   :dir-layouts   ""       ; where layouts are stored.
+   :dir-partials  ""       ; where partials are stored.
+   :dir-site      ""       ; the root dir of the compiled firn site.
+   :dirname-files nil      ; the name of directory where firn is run.
+   :site-url      ""       ; Root level url
+   :site-title    ""       ; Used for RSS.
+   :site-desc     ""       ; Used for RSS.
+   :enable-rss?   true     ; If true, creates a feed.xml in _site.
+   :ignored-dirs  ["priv"] ; Directories to ignore org files in.
+   :layouts       {}       ; layouts loaded into memory
+   :partials      {}       ; partials loaded into memory
    :org-files     []})      ; a list of org files, fetched when running setup.
-
-
-;; -- Default Config -----------------------------------------------------------
-
 
 (defn make-dir-firn
   "make the _firn directory path."
@@ -32,7 +32,7 @@
 
   ([dir-files external-config]
    (let [base-config (merge starting-config external-config)]
-     (merge starting-config
+     (merge base-config
             {:dir-firn        (make-dir-firn dir-files)
              :dir-data      (str dir-files "/" (base-config :dir-data))
              :dir-files       dir-files
