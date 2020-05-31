@@ -238,8 +238,8 @@
           ;; add to sitemap when file is not private.
           (when-not is-private
             (swap! site-map conj new-site-map)
-            (swap! site-links concat @site-links (-> processed-file :meta :links))
-            (swap! site-logs concat @site-logs (-> processed-file :meta :links)))
+            (swap! site-links concat (-> processed-file :meta :links))
+            (swap! site-logs concat  (-> processed-file :meta :logbook)))
           ;; add links and logs to site wide data.
           (recur org-files output))))))
 
