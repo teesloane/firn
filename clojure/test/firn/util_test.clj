@@ -128,7 +128,7 @@
           res2 (sut/org-date->java-date "[2019-12-04 19:11]")]
       (t/is (= java.util.Date (type res)))
       (t/is (= res #inst "2020-05-14T04:00:00.000-00:00"))
-      (t/is (= res2 #inst "2019-12-04T05:00:00.000-00:00"))
+      (t/is (= res2 #inst "2019-12-04T00:00:00.000-00:00"))
       (t/is (= java.util.Date (type res2))))))
 
 (t/deftest org-date->ts
