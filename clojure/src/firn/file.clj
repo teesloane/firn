@@ -89,9 +89,9 @@
 (defn keywords->map
   "Converts an org-file's keywords into a map.
    [{:type keyword, :key TITLE, :value Firn, :post_blank 0}
-    {:type keyword, :key DATE_CREATED, :value 2020-03-01--09-53, :post_blank 0}]
+    {:type keyword, :key DATE_CREATED, :value <2020-03-01--09-53>, :post_blank 0}]
                                Becomes 
-   {:title Firn, :date-created 2020-03-01--09-53, :status active, :firn-layout project}"
+   {:title Firn, :date-created <2020-03-01--09-53>, :status active, :firn-layout project}"
   [f]
   (let [kw            (get-keywords f)
         lower-case-it #(when % (s/lower-case %))
@@ -168,15 +168,20 @@
         logbook        (extract-metadata-logbook-helper tree-data)
         logbook-aug    (map #(merge % file-metadata) logbook)
         logbook-sorted (sort-logbook logbook-aug file)
-        links-aug      (map #(merge % file-metadata) links)]
-    {:links         links-aug
-     :logbook       logbook-sorted
-     :logbook-total (sum-logbook logbook-sorted)
-     :keywords      (get-keywords file)
-     :title         (get-keyword file "TITLE")
-     :firn-under    (get-keyword file "FIRN_UNDER")
-     :date-updated  (get-keyword file "DATE_UPDATED")
-     :date-created  (get-keyword file "DATE_CREATED")}))
+        links-aug      (map #(merge % file-metadata) links)
+        date-updated   (get-keyword file "DATE_UPDATED")
+        date-created   (get-keyword file "DATE_CREATED")]
+
+    {:links           links-aug
+     :logbook         logbook-sorted
+     :logbook-total   (sum-logbook logbook-sorted)
+     :keywords        (get-keywords file)
+     :title           (get-keyword file "TITLE")
+     :firn-under      (get-keyword file "FIRN_UNDER")
+     :date-updated    (when date-updated (u/strip-org-date date-updated))
+     :date-created    (when date-created (u/strip-org-date date-created))
+     :date-updated-ts (when date-updated (u/org-date->ts date-updated))
+     :date-created-ts (when date-created (u/org-date->ts date-created))}))
 
 (defn htmlify
   "Renders files according to their `layout` keyword."
@@ -191,13 +196,13 @@
   "Munge the 'file' datastructure; slowly filling it up, using let-shadowing.
   Essentially, converts `org-mode file string` -> json, edn, logbook, keywords"
   [config f]
-  (let [new-file      (make config f)
-        as-json       (->> f slurp org/parse!)
-        as-edn        (-> as-json (json/parse-string true))
-        new-file      (change new-file {:as-json as-json :as-edn as-edn})
-        file-metadata (extract-metadata new-file)
-        new-file      (change new-file {:meta file-metadata})
-        final-file    (htmlify config new-file)]
+  (let [new-file      (make config f)                                     ; make an empty "file" map.
+        as-json       (->> f slurp org/parse!)                            ; slurp the contents of a file and parse it to json.
+        as-edn        (-> as-json (json/parse-string true))               ; convert the json to edn.
+        new-file      (change new-file {:as-json as-json :as-edn as-edn}) ; shadow the new-file to add the json and edn.
+        file-metadata (extract-metadata new-file)                         ; collect the file-metadata from the edn tree.
+        new-file      (change new-file {:meta file-metadata})             ; shadow hte file and add the metadata
+        final-file    (htmlify config new-file)]                          ; parses the edn tree -> html.
 
     final-file))
 
@@ -225,19 +230,23 @@
           final)
 
         ;; Otherwise continue...
-        (let [next-file      (first org-files)
-              processed-file (process-one config next-file)
-              is-private     (is-private? config processed-file)
-              org-files      (rest org-files)
-              output         (if is-private
-                               output
-                               (assoc output (processed-file :path-web) processed-file))
-              keyword-map    (keywords->map processed-file)
-              new-site-map   (merge keyword-map {:path (processed-file :path-web)})]
+        (let [next-file         (first org-files)
+              processed-file    (process-one config next-file)
+              is-private        (is-private? config processed-file)
+              org-files         (rest org-files)
+              output            (if is-private
+                                  output
+                                  (assoc output (processed-file :path-web) processed-file))
+              ;; keyword-map       (keywords->map processed-file)
+              new-site-map-item (merge
+                                 (dissoc (processed-file :meta) :logbook :links :keywords)
+                                 {:path (str "/" (processed-file :path-web))})]
+
+                                                   
 
           ;; add to sitemap when file is not private.
           (when-not is-private
-            (swap! site-map conj new-site-map)
+            (swap! site-map conj new-site-map-item)
             (swap! site-links concat (-> processed-file :meta :links))
             (swap! site-logs concat  (-> processed-file :meta :logbook)))
           ;; add links and logs to site wide data.
@@ -256,13 +265,13 @@
                                 :description (str (f :as-html))))]
     (io/make-parents feed-file)
     (->> processed-files
-         (filter (fn [[_ f]] (-> f :meta :date-created)))
-         (map make-rss)
-         (sort-by :pubDate)
-         (reverse)
-         (u/prepend-vec first-entry) ; first entry must be about the site
-         (apply rss/channel-xml)
-         (spit feed-file)))
+       (filter (fn [[_ f]] (-> f :meta :date-created)))
+       (map make-rss)
+       (sort-by :pubDate)
+       (reverse)
+       (u/prepend-vec first-entry) ; first entry must be about the site
+       (apply rss/channel-xml)
+       (spit feed-file)))
   config)
 
 (defn reload-requested-file

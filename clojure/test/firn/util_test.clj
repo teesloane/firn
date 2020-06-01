@@ -122,6 +122,23 @@
       (t/is (= res1 "10:04"))
       (t/is (= res2 "17:25")))))
 
+(t/deftest org-date->java-date
+  (t/testing "It returns expected output"
+    (let [res (sut/org-date->java-date "<2020-05-14 19:11>")
+          res2 (sut/org-date->java-date "[2019-12-04 19:11]")]
+      (t/is (= java.util.Date (type res)))
+      (t/is (= res #inst "2020-05-14T04:00:00.000-00:00"))
+      (t/is (= res2 #inst "2019-12-04T05:00:00.000-00:00"))
+      (t/is (= java.util.Date (type res2))))))
+
+(t/deftest org-date->ts
+  (t/testing "It returns expected output"
+    (let [res (sut/org-date->ts "<2020-05-14 19:11>")
+          res2 (sut/org-date->ts "[2019-12-04 19:11]")]
+      (t/is (= Integer (type res)))
+      (t/is (= res 1589428800))
+      (t/is (= res2 1575435600)))))
+
 (t/deftest build-year
   (let [year-2020    (sut/build-year 2020)
         year-2019    (sut/build-year 2019)

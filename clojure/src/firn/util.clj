@@ -162,15 +162,30 @@
   [date]
   (int (/ (.getTime ^java.util.Date date) 1000)))
 
+(defn strip-org-date
+  "<2020-05-14 19:11> -> 2020-05-14 19:11"
+  [org-date]
+  (-> org-date
+     (s/replace #"\]" "")
+     (s/replace #"\[" "")
+     (s/replace #"<" "")
+     (s/replace #">" "")))
+
 (defn org-date->java-date
   "Converts <2020-02-25 05:51> -> java..."
   [org-date]
   (let [parse-fmt (java.text.SimpleDateFormat. "yyyy-MM-dd")
         parse-fn  (fn [s] (.parse ^java.text.SimpleDateFormat parse-fmt s))]
     (-> org-date
-        (s/replace #"<" "")
-        (s/replace #">" "")
-        (parse-fn))))
+        strip-org-date
+        parse-fn)))
+
+(defn org-date->ts
+  [org-date]
+  (-> org-date
+     strip-org-date
+     (org-date->java-date)
+     java-date->unix-ts))
 
 (defn native-image?
   "Check if we are in the native-image or REPL."
