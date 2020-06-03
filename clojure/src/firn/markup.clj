@@ -33,11 +33,16 @@
      [:span.firn-img-caption desc]]
     [:img {:src path}]))
 
-(defn- clean-anchor
-  "converts `::*My Heading` => #my-heading"
+(defn clean-anchor
+  "converts `::*My Heading` => #my-heading
+  NOTE: This could be a future problem area; ex: forwars slashes have to be
+  replaces, otherwise they break the html rendering, thus
+  'my heading / example -> my-heading--example
+  Future chars to watch out for: `>` `<` `&` `!`"
   [anchor]
   (str "#" (-> anchor
                (s/replace #"::\*" "")
+               (s/replace #"\/" "")
                (s/replace #" " "-")
                (s/lower-case))))
 
