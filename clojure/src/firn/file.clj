@@ -179,29 +179,25 @@
       ;; Do the work.
       (let [x  (first tree-data)
             xs (rest tree-data)]
-
         (case (:type x)
-          ;; if a headline, collect headline data, push into the table of contents,
-          ;; and set it as the "last-headline"
-          "headline"
+          "headline" ; if headline, collect data, push into toc, and set as "last-headline"
           (let [toc-item {:level (x :level)
                           :raw  (-> x :children first :raw)}
                 new-toc  (conj out-toc toc-item)]
             (recur xs out-logs out-links new-toc x))
 
-          ;; if a clock, merge in headline data (so we know what headline it belongs too)
-          ;; and push it into the out-toc
-          "clock"
+          "clock" ; if cllock, merge headline-data into it, and push/recurse new-logs.
           (let [headline-meta {:from-headline (-> last-headline :children first :raw)}
                 log-augmented (merge headline-meta file-metadata x)
                 new-logs      (conj out-logs log-augmented)]
             (recur xs new-logs out-links out-toc last-headline))
 
-          "link"
-          (let [link-item (merge x file-metadata x)
+          "link" ; if link, also merge file metadata and push into new-links and recurse.
+          (let [link-item (merge x file-metadata)
                 new-links (conj out-links link-item)]
             (recur xs out-logs new-links out-toc last-headline))
 
+          ;; default case, recur.
           (recur xs out-logs out-links out-toc last-headline))))))
 
 
