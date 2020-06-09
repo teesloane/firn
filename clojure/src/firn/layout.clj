@@ -51,10 +51,7 @@
        (= action :file)
        (markup/to-html (file :as-edn))
 
-
        ;; render a headline title.
-
-
        (and is-headline? (= opts :title))
        (let [hl (org/get-headline org-tree action)]
          (-> hl :children first  markup/to-html))
@@ -77,11 +74,22 @@
        (= action :logbook-polyline)
        (org/poly-line (-> file :meta :logbook) opts)
 
-       :else
-       (str "DEBUG: Incorrect use of `render` function in template:
-             <br> action: => " action " <code> << is this a valid value? </code>
-             <br> opts:  => " opts " <code> << is this a valid value? </code>"
-            "<br> ")))))
+       ;; render a headline for an entire file.
+       (and (= action :toc) (empty? opts))
+       (markup/toc (-> file :meta :toc))
+
+       (and (= action :toc) (not (empty? opts))) ;; better way to check for an empty map ?
+       (markup/toc (-> file :meta :toc) opts)
+
+
+       :else ; error message to indicate incorrect use of render.
+       (str "<div style='position: fixed; background: antiquewhite; z-index: 999; padding: 24px; left: 33%; top: 33%; border: 13px solid lightcoral; box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);'>"
+            "<div style='text-align: center'>Render Error.</div>"
+            "<div>Incorrect use of `render` function in template:
+                <br> action: => " action " <code> << is this a valid value? </code>
+                <br> opts:  => " opts " <code> << is this a valid value? </code>"
+            "<br></div> "
+            "</div>")))))
 
 (defn prepare
   "Prepare functions and data to be available in layout functions.

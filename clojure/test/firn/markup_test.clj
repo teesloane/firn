@@ -50,13 +50,3 @@
       (t/is (= res1 "./foo"))
       (t/is (= res2 "./foo#my-headline-link")))))
 
-(t/deftest clean-anchor
-  (t/testing "Expected results."
-    (let [res1 (sut/clean-anchor "foo bar")
-          res2 (sut/clean-anchor "foo bar baz")
-          res3 (sut/clean-anchor "foo / bar")
-          res4 (sut/clean-anchor "foo        bar")]
-      (t/is (= res1 "#foo-bar"))
-      (t/is (= res2 "#foo-bar-baz"))
-      (t/is (= res3 "#foo--bar"))
-      (t/is (= res4 "#foo--------bar")))))

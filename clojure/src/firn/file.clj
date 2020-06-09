@@ -182,11 +182,12 @@
         (case (:type x)
           "headline" ; if headline, collect data, push into toc, and set as "last-headline"
           (let [toc-item {:level (x :level)
-                          :raw  (-> x :children first :raw)}
+                          :raw  (-> x :children first :raw)
+                          :anchor (org/make-headline-anchor x)}
                 new-toc  (conj out-toc toc-item)]
             (recur xs out-logs out-links new-toc x))
 
-          "clock" ; if cllock, merge headline-data into it, and push/recurse new-logs.
+          "clock" ; if clock, merge headline-data into it, and push/recurse new-logs.
           (let [headline-meta {:from-headline (-> last-headline :children first :raw)}
                 log-augmented (merge headline-meta file-metadata x)
                 new-logs      (conj out-logs log-augmented)]
@@ -208,24 +209,20 @@
   (let [org-tree       (file :as-edn)
         tree-data      (tree-seq map? :children org-tree)
         file-metadata  {:from-file (file :name) :from-file-path (file :path-web)}
-        links          (filter #(= "link"  (:type %)) tree-data) ;; TODO remove
-        logbook        (extract-metadata-logbook-helper tree-data) ;; TODO remove
-        logbook-aug    (map #(merge % file-metadata) logbook) ;; TODO remove
-        logbook-sorted (sort-logbook logbook-aug file) ;; TODO remove
-        links-aug      (map #(merge % file-metadata) links) ;; TODO remove
         date-updated   (get-keyword file "DATE_UPDATED")
         date-created   (get-keyword file "DATE_CREATED")
-        metadata       (extract-metadata-helper tree-data file-metadata)]
+        metadata       (extract-metadata-helper tree-data file-metadata)
+        logbook-sorted (sort-logbook (metadata :logbook) file)]
 
-    (spit (str "/tmp/foo/" (file :name) ".edn") (str metadata)) ;; for debugging
+    ;; (spit (str "/tmp/foo/" (file :name) ".edn") (str (:toc metadata))) ;; for debugging
 
-    {:links           links-aug
+    {:links           (metadata :links)
      :logbook         logbook-sorted
      :logbook-total   (sum-logbook logbook-sorted)
      :keywords        (get-keywords file)
      :title           (get-keyword file "TITLE")
      :firn-under      (get-keyword file "FIRN_UNDER")
-     ;; :toc             (extract-metadata-helper tree-data file-metadata)
+     :toc             (metadata :toc)
      :date-updated    (when date-updated (u/strip-org-date date-updated))
      :date-created    (when date-created (u/strip-org-date date-created))
      :date-updated-ts (when date-updated (u/org-date->ts date-updated))

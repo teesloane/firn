@@ -198,6 +198,20 @@
   [& args]
   (keyword (apply str args)))
 
+(defn clean-anchor
+  "converts `::*My Heading` => #my-heading
+  NOTE: This could be a future problem area; ex: forwards slashes have to be
+  replaced, otherwise they break the html rendering, thus
+  'my heading / example -> my-heading--example
+  Future chars to watch out for: `>` `<` `&` `!`"
+  [anchor]
+  (str "#" (-> anchor
+               (s/replace #"::\*" "")
+               (s/replace #"\/" "")
+               (s/replace #" " "-")
+               (s/lower-case))))
+
+
 ;; Time ------------------------------------------------------------------------
 ;; NOTE: timestr->hours-min + timevec->time-str could use better input testing?
 ;; At the very least, `Integer.` is an opportunity for errors when parsing.

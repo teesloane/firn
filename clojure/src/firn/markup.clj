@@ -8,6 +8,25 @@
 
 ;; Renderers
 
+(defn toc
+  ([toc]
+   [:ul
+    (for [h toc
+          :let [pl (* (h :level) 12)]]
+      [:li {:style (str "margin-left: " pl "px")} ; HACK
+       [:a {:href (h :anchor)} (h :raw)]])])
+  ;; if options are passed in:
+  ([toc {:keys [start-at]}]
+   ;; LEAVING OFF -
+   ;; - remove "start-at" and just use "select-heading"
+   ;; - drop until you meet "heading", then drop while level is more than 1.
+
+   (for [h toc
+         :let [pl (* (h :level) 12)]
+         :when (and (= (h :raw) start-at))]
+      [:li {:style (str "margin-left: " pl "px")} ; HACK
+       [:a {:href (h :anchor)} (h :raw)]])))
+
 (defn date->html
   [v]
   (let [{:keys [year month day hour minute]} (v :start)]
@@ -33,26 +52,13 @@
      [:span.firn-img-caption desc]]
     [:img {:src path}]))
 
-(defn clean-anchor
-  "converts `::*My Heading` => #my-heading
-  NOTE: This could be a future problem area; ex: forwars slashes have to be
-  replaces, otherwise they break the html rendering, thus
-  'my heading / example -> my-heading--example
-  Future chars to watch out for: `>` `<` `&` `!`"
-  [anchor]
-  (str "#" (-> anchor
-               (s/replace #"::\*" "")
-               (s/replace #"\/" "")
-               (s/replace #" " "-")
-               (s/lower-case))))
-
 (defn internal-link-handler
   "Takes an org link and converts it into an html path."
   [org-link]
   (let [regex       #"(file:)(.*)\.(org)(\:\:\*.+)?"
         res         (re-matches regex org-link)
         anchor-link (last res)
-        anchor-link (when anchor-link (-> res last clean-anchor))]
+        anchor-link (when anchor-link (-> res last u/clean-anchor))]
     (if anchor-link
       (str "./" (nth res 2) anchor-link)
       (str "./" (nth res 2)))))
@@ -109,10 +115,10 @@
         keywrd           (v :keyword)
         priority         (v :priority)
         value            (v :value)
-        parent           {:type "headline" :level level :children [v]}
+        parent           {:type "headline" :level level :children [v]} ; reconstruct the parent so we can pull out the content.
         heading-priority (u/str->keywrd "span.firn-headline-priority.firn-headline-priority__" priority)
         heading-keyword  (u/str->keywrd "span.firn-headline-keyword.firn-headline-keyword__" keywrd)
-        heading-anchor   (-> parent org/get-headline-helper clean-anchor)
+        heading-anchor   (org/make-headline-anchor parent) #_(-> parent org/get-headline-helper u/clean-anchor)
         heading-id+class #(u/str->keywrd "h" % heading-anchor ".firn-headline.firn-headline-" %)
         h-level          (case level
                            1 (heading-id+class 1)

@@ -1,6 +1,6 @@
 #+TITLE: Layout
 #+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-05-25 21:05>
+#+DATE_UPDATED: <2020-06-09 10:35>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: docs
 
@@ -135,10 +135,10 @@ file-specific meta-data. Example meta-data:
 | file          | The file as a data structure.                          | map       |
 | logbook       | A list of logbooks entries per file.                   | list      |
 | partials      | a list of invokable partials in your =partials= folder   | list      |
-| render        | Enables rendering parts or entirety of an org file.    | function  |
-| site-links    | A list of all links across all documents               | list      |
-| site-logs     | A list of ALL logbook entries.                         | list      |
-| site-map      | A list of all files on the wiki                        | list      |
+| render        | Enables rendering parts or entirety of an org file.    | function         |
+| site-links    | A list of all links across all documents               | vector    |
+| site-logs     | A list of ALL logbook entries.                         | vector    |
+| site-map      | A list of all files on the wiki                        | vector    |
 | title         | The org mode file.                                     | string    |
 | meta          | A map of metadata about the file (logbook, links, etc) | map       |
 | title         | The #+TITLE value of the file.                         | string    |
@@ -146,6 +146,7 @@ file-specific meta-data. Example meta-data:
 | date-updated  | The #+DATE_UPDATED value of the file                   | string    |
 | date-created  | The #+DATE_CREATED value of the file                   | string    |
 | logbook-total | The sum of all the logbook entries                     | string    |
+| toc           | Table of contents                                      | vector    |
 
 This may seem like a lot of information to make available to a layout template. And that's because it is. But thanks to destructuring in Clojure, you can make your templates only ask for what they need:
 
@@ -238,6 +239,41 @@ Graphs all logbook entries for the current file in a polyline, generating a char
      [:body
        [:div (render :logbook-polyline {:width 365})]])))
 #+END_SRC
+
+* Table of Contents
+When a file is processed, Firn collects *all* of it's headlines, whether you're
+choosing to render the entire file, or just one headline.
+
+There are several ways you can create table of contents in your files, from simple to more complex use cases.
+
+1. Render a table of contents for an entire file.
+
+#+BEGIN_SRC clojure
+(defn default
+  [{:keys [render partials]}]
+  (let [{:keys [head]} partials]
+
+    (head
+     [:body
+       [:div (render :toc)]
+       [:div (render :file)]])))
+#+END_SRC
+
+2. Render a table of contents for everything within a specific headline.
+
+#+BEGIN_SRC clojure
+(defn default
+  [{:keys [render partials]}]
+  (let [{:keys [head]} partials]
+    (head
+     [:body
+       ;; only renders a table of contents for a single headline's children.
+       [:div (render :toc {:heading "Notes"
+                           :until 4
+                           :})]
+       [:div (render "Notes")]])))
+#+END_SRC
+
 
 * Styling Layouts
 
