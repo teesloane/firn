@@ -64,7 +64,7 @@
      :keywords  nil      ; list of keywords at top of org file: #+TITLE:, #+CATEGORY, etc.
      :name      name     ; the file name
      :path      path-abs ; dir path to the file.
-     :meta      {}       ; is filled when process-file / extract-metadata is run.
+     :meta      {}       ; is filled when process-file / extract-metadata is run. ;; TODO - spec out the default meta map.
      :path-web  path-web ; path to file from cwd.
      :original  nil}))   ; the file as as javaFile object.
 
@@ -140,8 +140,8 @@
   items to keep track of headline values that precede a logbook.
   This is easier and more performant than searching an entire edn-tree of
   headings to see if they have a logbook to associate with.  ┬──┬◡ﾉ(° -°ﾉ)"
-  [tree-seq]
-  (loop [tree-items    tree-seq
+  [tree-data]
+  (loop [tree-items    tree-data
          output        []
          last-headline nil]
     (if (empty? tree-items)
@@ -157,6 +157,54 @@
                                  output)]
         (recur remaining-items new-output headline-val)))))
 
+(defn extract-metadata-helper
+  "There are lots of things we want to extract when iterating over the AST.
+  Rather than filter/loop/map over it several times, it all happens here.
+  Collects:
+  - Logbooks
+  - Links
+  - Headings for TOC.
+  - eventually... a plugin for custom file collection?"
+  [tree-data file-metadata]
+  (loop [tree-data     tree-data
+         out-logs      []
+         out-links     []
+         out-toc       []
+         last-headline nil]  ; the most recent headline we've encountered.
+    (if (empty? tree-data)
+      ;; All done! return the collected stuff.
+      {:logbook out-logs
+       :toc     out-toc
+       :links   out-links}
+      ;; Do the work.
+      (let [x  (first tree-data)
+            xs (rest tree-data)]
+
+        (case (:type x)
+          ;; if a headline, collect headline data, push into the table of contents,
+          ;; and set it as the "last-headline"
+          "headline"
+          (let [toc-item {:level (x :level)
+                          :raw  (-> x :children first :raw)}
+                new-toc  (conj out-toc toc-item)]
+            (recur xs out-logs out-links new-toc x))
+
+          ;; if a clock, merge in headline data (so we know what headline it belongs too)
+          ;; and push it into the out-toc
+          "clock"
+          (let [headline-meta {:from-headline (-> last-headline :children first :raw)}
+                log-augmented (merge headline-meta file-metadata x)
+                new-logs      (conj out-logs log-augmented)]
+            (recur xs new-logs out-links out-toc last-headline))
+
+          "link"
+          (let [link-item (merge x file-metadata x)
+                new-links (conj out-links link-item)]
+            (recur xs out-logs new-links out-toc last-headline))
+
+          (recur xs out-logs out-links out-toc last-headline))))))
+
+
 (defn extract-metadata
   "Iterates over a tree, and returns metadata for site-wide usage such as
   links (for graphing between documents, tbd) and logbook entries."
@@ -164,13 +212,16 @@
   (let [org-tree       (file :as-edn)
         tree-data      (tree-seq map? :children org-tree)
         file-metadata  {:from-file (file :name) :from-file-path (file :path-web)}
-        links          (filter #(= "link"  (:type %)) tree-data)
-        logbook        (extract-metadata-logbook-helper tree-data)
-        logbook-aug    (map #(merge % file-metadata) logbook)
-        logbook-sorted (sort-logbook logbook-aug file)
-        links-aug      (map #(merge % file-metadata) links)
+        links          (filter #(= "link"  (:type %)) tree-data) ;; TODO remove
+        logbook        (extract-metadata-logbook-helper tree-data) ;; TODO remove
+        logbook-aug    (map #(merge % file-metadata) logbook) ;; TODO remove
+        logbook-sorted (sort-logbook logbook-aug file) ;; TODO remove
+        links-aug      (map #(merge % file-metadata) links) ;; TODO remove
         date-updated   (get-keyword file "DATE_UPDATED")
-        date-created   (get-keyword file "DATE_CREATED")]
+        date-created   (get-keyword file "DATE_CREATED")
+        metadata       (extract-metadata-helper tree-data file-metadata)]
+
+    (spit (str "/tmp/foo/" (file :name) ".edn") (str metadata)) ;; for debugging
 
     {:links           links-aug
      :logbook         logbook-sorted
@@ -178,6 +229,7 @@
      :keywords        (get-keywords file)
      :title           (get-keyword file "TITLE")
      :firn-under      (get-keyword file "FIRN_UNDER")
+     ;; :toc             (extract-metadata-helper tree-data file-metadata)
      :date-updated    (when date-updated (u/strip-org-date date-updated))
      :date-created    (when date-created (u/strip-org-date date-created))
      :date-updated-ts (when date-updated (u/org-date->ts date-updated))
@@ -201,7 +253,7 @@
         as-edn        (-> as-json (json/parse-string true))               ; convert the json to edn.
         new-file      (change new-file {:as-json as-json :as-edn as-edn}) ; shadow the new-file to add the json and edn.
         file-metadata (extract-metadata new-file)                         ; collect the file-metadata from the edn tree.
-        new-file      (change new-file {:meta file-metadata})             ; shadow hte file and add the metadata
+        new-file      (change new-file {:meta file-metadata})             ; shadow the file and add the metadata
         final-file    (htmlify config new-file)]                          ; parses the edn tree -> html.
 
     final-file))

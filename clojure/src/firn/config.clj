@@ -18,6 +18,7 @@
    :ignored-dirs  ["priv"] ; Directories to ignore org files in.
    :layouts       {}       ; layouts loaded into memory
    :partials      {}       ; partials loaded into memory
+   :toc?          false    ; create a table of contents for every file.
    :org-files     []})      ; a list of org files, fetched when running setup.
 
 (defn make-dir-firn

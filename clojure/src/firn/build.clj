@@ -66,7 +66,8 @@
       (when-not (file/is-private? config f)
         (io/make-parents out-file-name)
         (spit out-file-name (f :as-html)))))
-  config)
+  (if u/dev? nil config)) ; NOTE only return config in prod, which could hook into a plugin system later down the road.
+
 
 (defn all-files
   "Processes all files in the org-directory"

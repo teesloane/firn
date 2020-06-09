@@ -92,3 +92,5 @@
           "build"  (build/all-files options)
           "new"    (build/new-site  {}))))))
 
+
+(-main "build" "-d" "/Users/tees/Dropbox/wiki")
