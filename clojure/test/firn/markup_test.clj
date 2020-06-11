@@ -50,18 +50,3 @@
       (t/is (= res1 "./foo"))
       (t/is (= res2 "./foo#my-headline-link")))))
 
-
-(t/deftest the-evil-one
-  (t/testing "it works"
-    (let [input [{:level 1 :raw "foo"} {:level 1 :raw "bar"} {:level 2 :raw "yoa"} {:level 2 :raw "yyyoa"} {:level 3 :raw "foobarra"} {:level 2 :raw "foobarra"} {:level 1 :raw "job"} {:level 1 :raw "job2"}]
-          res #p(sut/make-toc-helper input)
-
-          expected [:ul
-                    [:li "foo"]
-                    [:li "bar"]
-                    [:li [:ul [:li "yoa"] [:li "yyyoa"]]]
-                    [:li [:ul [:li [:ul [:li "foobarra"]]]]]
-                    [:li [:ul [:li "foobarra"]]]
-                    [:li "job"]
-                    [:li "job2"]]]
-      (t/is (= res expected)))))

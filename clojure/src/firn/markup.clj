@@ -9,42 +9,30 @@
 ;; Renderers
 ;;
 (defn make-toc-helper
-  "I don't want to talk about it."
+  ""
   [input]
-  (let [split-up (partition-by #(identity (% :level)) input)
-        ;; yep this sucks
-        ;; 100 pts to whomever fixes it.
-        half-way-there-toc (into [:ul]
-                                 (for [x split-up
-                                       :let [level (:level (first x))
-                                             x-vec (vec x)
-                                             li-d  (map (fn [y] [:li (y :raw)]) x-vec)]]
-                                   (loop [cnt 0
-                                          out  li-d]
-                                     (if (= cnt level)
-                                       (if (= (first out) :ul) [:li out] out)
-                                       (cond
-                                         (= 0 cnt)
-                                         (recur (inc cnt) out)
-
-                                         (odd? cnt)
-                                         (recur (inc cnt) (into [:ul] out))
-
-                                         (even? cnt)
-                                         (recur (inc cnt) [:li [:ul [:li out]]]))))))]
-    (loop [items half-way-there-toc
-           out []]
-      (if (empty? items)
-        #p out ;; remove any empty :li's from beginning in case a toc starts above :level 1.
-        (let [x (first items)
-              xs (rest items)]
-          (if (= clojure.lang.LazySeq (type x))
-            (recur xs (into out x))
-            (recur xs (conj out x))))))))
+  (let [min-level   (:level (apply min-key :level input))             ; get the minimum level present in the table of contents.
+        floor-input (map #(update % :level - (dec min-level))  input) ; if the lowest level is "4", iterate and minus everything to 1 (so as not to start with nested ul's)
+        split-up    (partition-by #(identity (% :level)) floor-input) ; input looks like ({:anchor "#le-présent-progressif-(the-present-tense)", :level 3, :raw "Le présent progressif (The /very/ present tense)"} {:anchor "#le-passé-récent-(the-tense)", :level 3, :raw "Le passé récent (The /just happened/ tense)"}))
+        make-html   #(vector :li [:a {:href (% :anchor)} (% :raw)])   ; map fn for converting the input toc into html.
+        toc         (into [:ul]                                       ; here we loop through the split up items,
+                          (for [x    split-up
+                                :let [level (:level (first x))      ; get the current level
+                                      li-d  (map make-html x)]]     ; convert the toc map into html.
+                            ;; now, we nest nest nest nest nest nest.
+                            (case level
+                              1 li-d
+                              2 [:li (into [:ul] li-d)]
+                              3 [:li [:ul [:li (into [:ul] li-d)]]]
+                              4 [:li [:ul [:li [:ul [:li (into [:ul] li-d)]]]]]
+                              5 [:li [:ul [:li [:ul [:li [:ul [:li (into [:ul] li-d)]]]]]]]
+                              [:li [:ul [:li [:ul [:li [:ul [:li [:ul [:li (into [:ul] li-d)]]]]]]]]])))]
+    toc))
 
 (defn make-toc
-  "toc: a flattened list of headlines with a :level value of 1-> N
-  ex: [{:level 1, :raw 'Process', :anchor '#process'}  {:level 2, :raw 'Relevance', :anchor '#relevance'}]
+  "toc: a flattened list of headlines with a :level value of 1-> N:
+  [{:level 1, :raw 'Process', :anchor '#process'}  {:level 2, :raw 'Relevance', :anchor '#relevance'}]
+
   We conditonally thread the heading, passing in configured values, such as
   where to start the table of contents (at a specific headline?)
   or unto what depth we want the headings to render."
@@ -65,7 +53,6 @@
                               just-depth           (filter #(< (% :level) depth)))]
      (if (empty? toc-cleaned) nil
          (make-toc-helper toc-cleaned)))))
-
 
 (defn date->html
   [v]

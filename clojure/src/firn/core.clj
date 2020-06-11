@@ -94,5 +94,5 @@
           "new"    (build/new-site  {}))))))
 
 
-(mount/stop)
-(-main "serve" "-d" "/Users/tees/Dropbox/wiki/")
+;; (mount/stop)
+;; (-main "serve" "-d" "/Users/tees/Dropbox/wiki/")
