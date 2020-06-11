@@ -7,25 +7,65 @@
 (declare to-html)
 
 ;; Renderers
+;;
+(defn make-toc-helper
+  "I don't want to talk about it."
+  [input]
+  (let [split-up (partition-by #(identity (% :level)) input)
+        ;; yep this sucks
+        ;; 100 pts to whomever fixes it.
+        half-way-there-toc (into [:ul]
+                                 (for [x split-up
+                                       :let [level (:level (first x))
+                                             x-vec (vec x)
+                                             li-d  (map (fn [y] [:li (y :raw)]) x-vec)]]
+                                   (loop [cnt 0
+                                          out  li-d]
+                                     (if (= cnt level)
+                                       (if (= (first out) :ul) [:li out] out)
+                                       (cond
+                                         (= 0 cnt)
+                                         (recur (inc cnt) out)
 
-(defn toc
+                                         (odd? cnt)
+                                         (recur (inc cnt) (into [:ul] out))
+
+                                         (even? cnt)
+                                         (recur (inc cnt) [:li [:ul [:li out]]]))))))]
+    (loop [items half-way-there-toc
+           out []]
+      (if (empty? items)
+        #p out ;; remove any empty :li's from beginning in case a toc starts above :level 1.
+        (let [x (first items)
+              xs (rest items)]
+          (if (= clojure.lang.LazySeq (type x))
+            (recur xs (into out x))
+            (recur xs (conj out x))))))))
+
+(defn make-toc
+  "toc: a flattened list of headlines with a :level value of 1-> N
+  ex: [{:level 1, :raw 'Process', :anchor '#process'}  {:level 2, :raw 'Relevance', :anchor '#relevance'}]
+  We conditonally thread the heading, passing in configured values, such as
+  where to start the table of contents (at a specific headline?)
+  or unto what depth we want the headings to render."
   ([toc]
-   [:ul
-    (for [h toc
-          :let [pl (* (h :level) 12)]]
-      [:li {:style (str "margin-left: " pl "px")} ; HACK
-       [:a {:href (h :anchor)} (h :raw)]])])
-  ;; if options are passed in:
-  ([toc {:keys [start-at]}]
-   ;; LEAVING OFF -
-   ;; - remove "start-at" and just use "select-heading"
-   ;; - drop until you meet "heading", then drop while level is more than 1.
+   (make-toc toc {}))
+  ([toc {:keys [headline depth]
+         :or   {depth nil}}]
 
-   (for [h toc
-         :let [pl (* (h :level) 12)]
-         :when (and (= (h :raw) start-at))]
-      [:li {:style (str "margin-left: " pl "px")} ; HACK
-       [:a {:href (h :anchor)} (h :raw)]])))
+   (let [starting-heading   (u/find-first #(= (% :raw) headline) toc)
+         h>starting-heading #(> (% :level) (starting-heading :level))
+         h<depth            #(< (% :level) depth)
+         just-depth         (and depth (nil? headline))
+         toc-cleaned        (cond->> toc
+                              ;; if we pass in a heading...
+                              headline             (drop-while #(not= starting-heading %)) ; drop all headings till matching the starting-heading
+                              headline             (rest)                                  ; Don't count the first heading
+                              (and headline depth) (take-while #(and (h>starting-heading %) (h<depth %)))
+                              just-depth           (filter #(< (% :level) depth)))]
+     (if (empty? toc-cleaned) nil
+         (make-toc-helper toc-cleaned)))))
+
 
 (defn date->html
   [v]
