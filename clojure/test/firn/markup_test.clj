@@ -50,3 +50,19 @@
       (t/is (= res1 "./foo"))
       (t/is (= res2 "./foo#my-headline-link")))))
 
+
+(t/deftest the-evil-one
+  (t/testing "it works"
+    (let [input    [{:anchor "#genset-(generator)", :level 1, :raw "Genset (Generator)"}
+                    {:anchor "#head", :level 2, :raw "Head"}
+                    {:anchor "#tail", :level 2, :raw "Tail"}]
+          res      (sut/make-toc input)
+          expected [:ol
+                    [:li
+                     [:a {:href "#genset-(generator)"} "Genset (Generator)"]
+                     [:ol
+                      '([:li [:a {:href "#head"} "Head"]]
+                        [:li [:a {:href "#tail"} "Tail"]])]]]]
+
+
+      (t/is (= res expected)))))

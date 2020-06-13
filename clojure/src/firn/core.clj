@@ -6,7 +6,8 @@
             [firn.server :as server]
             [clojure.string :as s]
             [firn.util :as u]
-            [mount.core :as mount]))
+            [mount.core :as mount]
+            [hiccup.core :as h]))
 
 (defn init!
   "When firn is run as a native image, move the dependencies (the parser bin)
@@ -94,5 +95,5 @@
           "new"    (build/new-site  {}))))))
 
 
-;; (mount/stop)
-;; (-main "serve" "-d" "/Users/tees/Dropbox/wiki/")
+(mount/stop)
+(-main "build" "-d" "/Users/tees/Dropbox/wiki/")
