@@ -7,6 +7,6 @@
 
 This is the index file of documentation for Firn, a static-site-generator for org-mode.
 
-[[file:layout.org][Layout]] - Regarding the layout and formatting of org-mode files, when converted to html.
-[[file:org-tree.org][Org-tree]] - What an org mode file looks like when parsed and converted to edn.
-[[file:setup.org][Setup]] - Setting up emacs / wiki dir, etc.
+- [[file:layout.org][Layout]] - Regarding the layout and formatting of org-mode files, when converted to html.
+- [[file:org-tree.org][Org-tree]] - What an org mode file looks like when parsed and converted to edn.
+- [[file:setup.org][Setup]] - Setting up emacs / wiki dir, etc.
