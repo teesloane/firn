@@ -2,8 +2,7 @@
   "Namespace responsible for converted org-edn into html."
   (:require [clojure.string :as s]
             [firn.util :as u]
-            [firn.org :as org]
-            [hiccup.core :as h]))
+            [firn.org :as org]))
 
 (declare to-html)
 
@@ -16,46 +15,6 @@
         {:level 4, :raw "fourth 22", :anchor "#fouth-level"}
         {:level 4, :raw "fourth 22", :anchor "#fouth-level"}
         {:level 2, :raw "back to 2", :anchor "#back-to-2-level"}])
-        ;; {:level 4, :raw "Notes", :anchor "#notes"}])
-
-(def y [{:level 1, :raw "Meta", :anchor "#meta"}
-        {:level 1, :raw "Assimil", :anchor "#assimil"}
-        {:level 1, :raw "Resources", :anchor "#resources"}
-        {:level 1, :raw "Current readings", :anchor "#current-readings"}
-        {:level 2, :raw "Around the world in 80 days", :anchor "#around-the-world-in-80-days"}
-        {:level 1, :raw "Notes", :anchor "#notes"}
-        {:level 2, :raw "Preface", :anchor "#preface"}
-        {:level 2, :raw "Current Tools", :anchor "#current-tools"}
-        {:level 2, :raw "Nouns", :anchor "#nouns"}
-        {:level 2, :raw "Adjectives", :anchor "#adjectives"}
-        {:level 2, :raw "Adverbs", :anchor "#adverbs"}
-        {:level 2, :raw "Verbs (families)", :anchor "#verbs-(families)"}
-        {:level 2, :raw "Prepositions", :anchor "#prepositions"}
-        {:level 2, :raw "Verb Tenses and Moods [0/5]", :anchor "#verb-tenses-and-moods"}
-        {:level 3, :raw "Présent (The present tense) [0/0]", :anchor "#présent-(the-present-tense)"}
-        {:level 3, :raw "Le présent progressif (The /very/ present tense)", :anchor "#le-présent-progressif-(the-present-tense)"}
-        {:level 3, :raw "Le passé récent (The /just happened/ tense)", :anchor "#le-passé-récent-(the-tense)"}
-        {:level 3, :raw "The Passé Composé (The \"Composed Past\")", :anchor "#the-passé-composé-(the-\"composed-past\")"}
-        {:level 4, :raw "With Avoir", :anchor "#with-avoir"}
-        {:level 4, :raw "With Être", :anchor "#with-être"}
-        {:level 4, :raw "Exceptions and Irregularities", :anchor "#exceptions-and-irregularities"}
-        {:level 3, :raw "L'imparfait (The Imperfect Tense )", :anchor "#l'imparfait-(the-imperfect-tense-)"}
-        {:level 3, :raw "The Present Participle (Gerund - \"=ing\"=)", :anchor "#the-present-participle-(gerund---\"-)"}
-        {:level 3, :raw "Futur Proche (The /Near/ Future - =aller= auxilliary)", :anchor "#futur-proche-(the-future---auxilliary)"}
-        {:level 3, :raw "Futur Simple (The Simple Future)", :anchor "#futur-simple-(the-simple-future)"}
-        {:level 3, :raw "Verb Moods [0/4]", :anchor "#verb-moods"}
-        {:level 4, :raw "Conditionnel (The Conditional)", :anchor "#conditionnel-(the-conditional)"}
-        {:level 4, :raw "Subjonctif (The Subjunctive)", :anchor "#subjonctif-(the-subjunctive)"}
-        {:level 4, :raw "L'impératif (Imperative)", :anchor "#l'impératif-(imperative)"}
-        {:level 4, :raw "Indicatif (Indicative - most common?)", :anchor "#indicatif-(indicative---most-common?)"}
-        {:level 4, :raw "Participe (Participle)", :anchor "#participe-(participle)"}
-        {:level 4, :raw "Infinitif (Infinitive)", :anchor "#infinitif-(infinitive)"}
-        {:level 2, :raw "Idioms, Slang, and Expressions", :anchor "#idioms,-slang,-and-expressions"}
-        {:level 3, :raw "Idioms", :anchor "#idioms"}
-        {:level 3, :raw "Slang", :anchor "#slang"}
-        {:level 3, :raw "Expressions", :anchor "#expressions"}
-        {:level 2, :raw "\"False Friends\"", :anchor "#\"false-friends\""}
-        {:level 2, :raw "Uncategorized Notes", :anchor "#uncategorized-notes"} {:level 3, :raw "~Ce~ vs. ~cette~", :anchor "#ce-vs.-cette"} {:level 3, :raw "Difference Between ~c'est~ and ~il est~", :anchor "#difference-between-c'est-and-il-est"} {:level 3, :raw "Meaning of ~en~ (assimil definition)", :anchor "#meaning-of-en-(assimil-definition)"} {:level 3, :raw "Reflective verbs (me, se, te)", :anchor "#reflective-verbs-(me,-se,-te)"} {:level 3, :raw "Use of ~y~, such as ~il y a~", :anchor "#use-of-y-,-such-as-il-y-a"} {:level 3, :raw "\"Not have that\" vs \"only have\":", :anchor "#\"not-have-that\"-vs-\"only-have\":"} {:level 3, :raw "S'agir de", :anchor "#s'agir-de"} {:level 3, :raw "Falloir (To Have To)", :anchor "#falloir-(to-have-to)"} {:level 3, :raw "Usage of =tout= and =tous=", :anchor "#usage-of-and"} {:level 2, :raw "Footnotes", :anchor "#footnotes"}])
 
 ;; Feature: Table of Contents --------------------------------------------------
 
@@ -64,8 +23,6 @@
   Basically, this is a bit of a nightmare. This turns a flat list into a tree
   So that we can property create nested table of contents."
   [{:keys [out prev min-level] :as acc} curr]
-  (prn "curr is ")(clojure.pprint/pprint curr)
-  (prn "prev is: ")(clojure.pprint/pprint prev)
   (cond
     ;; top level / root headings.
     (or (empty? out) (= min-level (curr :level)))
@@ -94,27 +51,23 @@
          (update-in (prev :next-sibling) conj with-meta)
          (assoc :prev with-meta)))
 
-    ;; TODO - not yet handling climbing back out of multiple children buckets into the parent.
     (< (curr :level) (prev :level))
     (let [
-          difference   (- (prev :level) (curr :level))                 ; if we are on level 5, and the next is level 3...
-          diff-to-take (* difference 2)                                ; we need to take (5 - 3 ) * 2 = 4 items off the last :next-sibling
-          ;; HACK: we can use the prev-elements :next-sibling path and chop N elements off the ending based on our heading; which gives us the path to conj onto.
+          difference   (- (prev :level) (curr :level)) ; if we are on level 5, and the next is level 3...
+          diff-to-take (* difference 2)                ; we need to take (5 - 3 ) * 2 = 4 items off the last :next-sibling
+          ;; HACK: we can use the prev-elements :next-sibling path and chop N
+          ;; elements off the ending based on our heading's leve; which gives us
+          ;; the path to conj onto.
           path         (vec (drop-last diff-to-take (prev :next-sibling)))
           parent-path  (count (get-in acc path))
           with-meta    (assoc curr :next-sibling path) ;; if more, add children, if equal, conj onto children.
           with-meta    (assoc with-meta :next-child (conj path parent-path :children))]
-
-      ;; (prn "WE ARE HERE IT IS HAPPENING" (curr :level) (prev :level) "path is " path "before it was " (prev :next-sibling))
-      ;; LEAVING OFF - this doesn't reliably put things back into parent.
       (-> acc
          (update-in path conj with-meta)
          (assoc :prev with-meta)))
-    ;; TODO - still need to re-add the with-meta.
+
     :else
-    (do
-      (println "Something has gone wrong.")
-      acc)))
+    (do (println "Something has gone wrong. ") acc)))
 
 (defn toc->html
   [toc kind]
@@ -139,30 +92,21 @@
   ([toc {:keys [headline depth list-type]
          :or   {depth nil list-type :ol}
          :as   opts}]
-   ;; (prn "toc" toc)
-   (let [starting-heading   (u/find-first #(= (% :raw) headline) toc)
-         h>starting-heading #(> (% :level) (starting-heading :level))
-         h<depth            #(< (% :level) depth)
-         just-depth         (and depth (nil? headline))
-         toc-cleaned        (cond->> toc
-                              ;; if we pass in a heading...
-                              headline             (drop-while #(not= starting-heading %)) ; drop all headings till matching the starting-heading
-                              headline             (rest)                                  ; Don't count the first heading
-                              (and headline depth) (take-while #(and (h>starting-heading %) (h<depth %)))
-                              just-depth           (filter #(< (% :level) depth))
-                              true                 (map #(assoc % :children [])) ;; create a "children" key on every item.
-                              true                 (reduce make-toc-helper-reduce {:out [] :prev nil :min-level 1}) ;; TODO - min level here needs to be calculated with min-key
-                              true                 :out)]
+   (let [s-h         (u/find-first #(= (% :raw) headline) toc)      ; if user specified a heading to start at, go find it.
+         toc         (cond->> toc                                   ; apply some filtering to the toc, if params are passed in.
+                       depth    (filter #(<= (% :level) depth))     ; if depth; keep everything under that depth.
+                       headline (drop-while #(not= s-h %))          ; drop everything up till the selected heading we want.
+                       headline (drop 1))                           ; don't include selected heading; just it's children.
+         min-level   (if (seq toc) (:level (apply min-key :level toc)) 1)
+         toc-cleaned (->> toc
+                        (map #(assoc % :children []))  ; create a "children" key on every item.)
+                        (reduce make-toc-helper-reduce {:out [] :prev nil :min-level min-level}) ; TODO I don't think I need min-level anymore.
+                        :out)]
 
 
      (if (empty? toc-cleaned) nil
-         ;; toc-cleaned
          (into [list-type] (toc->html toc-cleaned list-type))))))
 
-;; (spit "/Users/tees/Desktop/blab.html" (h/html (make-toc y)))
-;; (make-toc y)
-
-;;
 ;; General Renderers -----------------------------------------------------------
 
 (defn date->html
@@ -176,8 +120,8 @@
   NOTE: Has additional :keys `language` and `arguments`
   that could be used for syntax highlighting"
   [{:keys [contents _language _arguments] :as _src-block}]
-  [:pre]
-  [:code contents])
+  [:pre
+   [:code contents]])
 
 (defn img-link->figure
   "Renders an image with a figure if the link has a :desc, otherwise, :img"

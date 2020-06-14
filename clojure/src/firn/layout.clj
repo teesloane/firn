@@ -76,10 +76,14 @@
 
        ;; render a headline for an entire file.
        (and (= action :toc) (empty? opts))
-       (markup/make-toc (-> file :meta :toc))
+       (let [toc (-> file :meta :toc)]
+         (when (not (empty? toc))
+           (markup/make-toc toc)))
 
        (and (= action :toc) (not (empty? opts))) ;; better way to check for an empty map ?
-       (markup/make-toc (-> file :meta :toc) opts)
+       (when-let [toc (-> file :meta :toc)]
+         (when (not (empty? toc))
+           (markup/make-toc toc opts)))
 
 
        :else ; error message to indicate incorrect use of render.
