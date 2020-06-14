@@ -45,19 +45,6 @@
       (t/is (= (new-file :path)    (.getPath ^java.io.File test-file)))
       (t/is (= (new-file :path-web) "file1")))))
 
-(t/deftest get-keywords
-  (t/testing "A file with keywords returns a vector where each item is a map with a key of :type 'keyword'"
-    (let [file-1 (stub/gtf :tf-1 :processed)
-          res    (sut/get-keywords file-1)]
-      (doseq [keywrd res]
-        (t/is (= "keyword" (:type keywrd)))))))
-
-(t/deftest get-keyword
-  (t/testing "It returns a keyword"
-    (let [file-1 (stub/gtf :tf-1 :processed)
-          res    (sut/get-keyword file-1 "FIRN_LAYOUT")]
-      (t/is (= "default" res)))))
-
 (t/deftest keywords->map
   (t/testing "A list of keywords gets converted into a map. "
     (let [file-1 (stub/gtf :tf-1 :processed)

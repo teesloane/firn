@@ -73,19 +73,6 @@
   [f m]
   (merge f m))
 
-(defn get-keywords
-  "Returns a list of org-keywords from a file. All files must have keywords."
-  [f]
-  (let [expected-keywords (get-in f [:as-edn :children 0 :children])]
-    (if (= "keyword" (:type (first expected-keywords)))
-      expected-keywords
-      (u/print-err! :error "The org file <<" (f :name) ">> does not have 'front-matter' Please set at least the #+TITLE keyword for your file."))))
-
-(defn get-keyword
-  "Fetches a(n org) #+keyword from a file, if it exists."
-  [f keywrd]
-  (->> f get-keywords (u/find-first #(= keywrd (:key %))) :value))
-
 (defn keywords->map
   "Converts an org-file's keywords into a map.
    [{:type keyword, :key TITLE, :value Firn, :post_blank 0}
@@ -93,7 +80,7 @@
                                Becomes 
    {:title Firn, :date-created <2020-03-01--09-53>, :status active, :firn-layout project}"
   [f]
-  (let [kw            (get-keywords f)
+  (let [kw            (org/get-keywords f)
         lower-case-it #(when % (s/lower-case %))
         dash-it       #(when % (s/replace % #"_" "-"))
         key->keyword  (fn [k] (-> k :key lower-case-it dash-it keyword))]
@@ -103,7 +90,7 @@
   "Returns true if a file meets the conditions of being 'private'
   Assumes the files has been read into memory and parsed to edn."
   [config f]
-  (let [is-private?     (get-keyword f "FIRN_PRIVATE")
+  (let [is-private?     (org/get-keyword f "FIRN_PRIVATE")
         file-path       (-> f :path (s/split #"/"))
         in-priv-folder? (some (set file-path) (config :ignored-dirs))]
     (or
@@ -182,8 +169,7 @@
         (case (:type x)
           "headline" ; if headline, collect data, push into toc, and set as "last-headline"
           (let [toc-item {:level (x :level)
-                          :raw  (-> x :children first :raw)
-                          :cleaned-text (org/get-headline-helper x)
+                          :text (org/get-headline-helper x)
                           :anchor (org/make-headline-anchor x)}
                 new-toc  (conj out-toc toc-item)]
             (recur xs out-logs out-links new-toc x))
@@ -202,6 +188,15 @@
           ;; default case, recur.
           (recur xs out-logs out-links out-toc last-headline))))))
 
+(defn htmlify
+  "Renders files according to their `layout` keyword."
+  [config f]
+  (let [layout   (keyword (org/get-keyword f "FIRN_LAYOUT"))
+        as-html  (when-not (is-private? config f)
+                   (layout/apply-layout config f layout))]
+    ;; as-html
+    (change f {:as-html as-html})))
+
 
 (defn extract-metadata
   "Iterates over a tree, and returns metadata for site-wide usage such as
@@ -210,17 +205,17 @@
   (let [org-tree       (file :as-edn)
         tree-data      (tree-seq map? :children org-tree)
         file-metadata  {:from-file (file :name) :from-file-path (file :path-web)}
-        date-updated   (get-keyword file "DATE_UPDATED")
-        date-created   (get-keyword file "DATE_CREATED")
+        date-updated   (org/get-keyword file "DATE_UPDATED")
+        date-created   (org/get-keyword file "DATE_CREATED")
         metadata       (extract-metadata-helper tree-data file-metadata)
         logbook-sorted (sort-logbook (metadata :logbook) file)]
 
     {:links           (metadata :links)
      :logbook         logbook-sorted
      :logbook-total   (sum-logbook logbook-sorted)
-     :keywords        (get-keywords file)
-     :title           (get-keyword file "TITLE")
-     :firn-under      (get-keyword file "FIRN_UNDER")
+     :keywords        (org/get-keywords file)
+     :title           (org/get-keyword file "TITLE")
+     :firn-under      (org/get-keyword file "FIRN_UNDER")
      :toc             (metadata :toc)
      :date-updated    (when date-updated (u/strip-org-date date-updated))
      :date-created    (when date-created (u/strip-org-date date-created))
@@ -242,7 +237,7 @@
         ;; TODO PERF: htmlify happening as well in `process-all`.
         ;; this is due to the dev server. There should be a conditional
         ;; that checks if we are running in server.
-        final-file    (layout/htmlify config new-file)]                   ; parses the edn tree -> html.
+        final-file    (htmlify config new-file)]                   ; parses the edn tree -> html.
 
     final-file))
 
@@ -266,7 +261,7 @@
                                       :site-links      @site-links
                                       :site-logs       @site-logs)
               ;; FIXME: I think we are rendering html twice here, should prob only happen here?
-              with-html        (into {} (for [[k pf] output] [k (layout/htmlify config-with-data pf)]))
+              with-html        (into {} (for [[k pf] output] [k (htmlify config-with-data pf)]))
               final            (assoc config-with-data :processed-files with-html)]
           final)
 

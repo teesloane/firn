@@ -155,6 +155,12 @@
   [f coll]
   (first (filter f coll)))
 
+(defn take-while-after-first
+  [pred lst]
+  (let [head (first lst)
+        tail (take-while pred (rest lst))]
+    (concat [head] tail)))
+
 ;; For interception thread macros and enabling printing the passed in value.
 (def spy #(do (println "DEBUG:" %) %))
 

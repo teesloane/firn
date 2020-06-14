@@ -65,14 +65,14 @@
       (map (fn [x]
             (if (empty? (x :children))
               [:li
-                [:a {:href (x :anchor)} (x :cleaned-text)]]
+                [:a {:href (x :anchor)} (x :text)]]
               [:li
-                [:a {:href (x :anchor)} (x :cleaned-text)]
+                [:a {:href (x :anchor)} (x :text)]
                 [kind (toc->html (x :children) kind)]])))))
 
 (defn make-toc
   "toc: a flattened list of headlines with a :level value of 1-> N:
-  [{:level 1, :raw 'Process', :anchor '#process'}  {:level 2, :raw 'Relevance', :anchor '#relevance'}]
+  [{:level 1, :text 'Process', :anchor '#process'}  {:level 2, :text 'Relevance', :anchor '#relevance'}]
 
   We conditonally thread the heading, passing in configured values, such as
   where to start the table of contents (at a specific headline?)
@@ -82,11 +82,14 @@
   ([toc {:keys [headline depth list-type exclusive?]
          :or   {depth nil list-type :ol}
          :as   opts}]
-   (let [s-h         (u/find-first #(= (% :cleaned-text) headline) toc)   ; if user specified a heading to start at, go find it.
-         toc         (cond->> toc                                         ; apply some filtering to the toc, if params are passed in.
-                       depth      (filter #(<= (% :level) depth))         ; if depth; keep everything under that depth.
-                       headline   (drop-while #(not= s-h %))              ; drop everything up till the selected heading we want.
-                       exclusive? (drop 1))                               ; don't include selected heading; just it's children.
+   (let [s-h         (u/find-first #(= (% :text) headline) toc)     ; if user specified a heading to start at, go find it.
+         toc         (cond->> toc                                   ; apply some filtering to the toc, if params are passed in.
+                       depth      (filter #(<= (% :level) depth))   ; if depth; keep everything under that depth.
+                       headline   (drop-while #(not= s-h %))        ; drop everything up till the selected heading we want.
+                       headline   (u/take-while-after-first         ; remove everything that's not a child of the selected heading.
+                                   #(> (% :level) (s-h :level)))
+                       exclusive? (drop 1))                         ; don't include selected heading; just it's children.)
+
          min-level   (if (seq toc) (:level (apply min-key :level toc)) 1) ; get the min level for calibrating the reduce.
          toc-cleaned (->> toc
                         (map #(assoc % :children []))  ; create a "children" key on every item.)

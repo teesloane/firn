@@ -7,7 +7,6 @@
   (:require [firn.markup :as markup]
             [firn.org :as org]
             [hiccup.core :as h]
-            [firn.file :as file]
             [sci.core :as sci]))
 
 (defn- internal-default-layout
@@ -79,7 +78,7 @@
        ;; render a table of contents
        (= action :toc)
        (let [toc      (-> file :meta :toc) ; get the toc for hte file.
-             firn_toc (sci/eval-string (file/get-keyword file "FIRN_TOC")) ; read in keyword for overrides
+             firn_toc (sci/eval-string (org/get-keyword file "FIRN_TOC")) ; read in keyword for overrides
              opts     (or firn_toc opts {})] ; apply most pertinent options.
          (when (seq toc)
             (markup/make-toc toc opts)))
@@ -122,12 +121,3 @@
   (let [selected-layout (get-layout config file layout)]
     (h/html (selected-layout (prepare config file)))))
 
-
-(defn htmlify
-  "Renders files according to their `layout` keyword."
-  [config f]
-  (let [layout   (keyword (file/get-keyword f "FIRN_LAYOUT"))
-        as-html  (when-not (file/is-private? config f)
-                   (apply-layout config f layout))]
-    ;; as-html
-    (file/change f {:as-html as-html})))
