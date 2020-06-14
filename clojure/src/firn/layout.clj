@@ -6,7 +6,9 @@
 
   (:require [firn.markup :as markup]
             [firn.org :as org]
-            [hiccup.core :as h]))
+            [hiccup.core :as h]
+            [firn.file :as file]
+            [sci.core :as sci]))
 
 (defn- internal-default-layout
   "The default template if no `layout` key is specified.
@@ -74,17 +76,13 @@
        (= action :logbook-polyline)
        (org/poly-line (-> file :meta :logbook) opts)
 
-       ;; render a headline for an entire file.
-       (and (= action :toc) (empty? opts))
-       (let [toc (-> file :meta :toc)]
-         (when (not (empty? toc))
-           (markup/make-toc toc)))
-
-       (and (= action :toc) (not (empty? opts))) ;; better way to check for an empty map ?
-       (when-let [toc (-> file :meta :toc)]
-         (when (not (empty? toc))
-           (markup/make-toc toc opts)))
-
+       ;; render a table of contents
+       (= action :toc)
+       (let [toc      (-> file :meta :toc) ; get the toc for hte file.
+             firn_toc (sci/eval-string (file/get-keyword file "FIRN_TOC")) ; read in keyword for overrides
+             opts     (or firn_toc opts {})] ; apply most pertinent options.
+         (when (seq toc)
+            (markup/make-toc toc opts)))
 
        :else ; error message to indicate incorrect use of render.
        (str "<div style='position: fixed; background: antiquewhite; z-index: 999; padding: 24px; left: 33%; top: 33%; border: 13px solid lightcoral; box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);'>"
@@ -123,3 +121,13 @@
   [config file layout]
   (let [selected-layout (get-layout config file layout)]
     (h/html (selected-layout (prepare config file)))))
+
+
+(defn htmlify
+  "Renders files according to their `layout` keyword."
+  [config f]
+  (let [layout   (keyword (file/get-keyword f "FIRN_LAYOUT"))
+        as-html  (when-not (file/is-private? config f)
+                   (apply-layout config f layout))]
+    ;; as-html
+    (file/change f {:as-html as-html})))

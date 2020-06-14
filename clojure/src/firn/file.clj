@@ -229,26 +229,22 @@
      :date-updated-ts (when date-updated (u/org-date->ts date-updated))
      :date-created-ts (when date-created (u/org-date->ts date-created))}))
 
-(defn htmlify
-  "Renders files according to their `layout` keyword."
-  [config f]
-  (let [layout   (keyword (get-keyword f "FIRN_LAYOUT"))
-        as-html  (when-not (is-private? config f)
-                   (layout/apply-layout config f layout))]
-    ;; as-html
-    (change f {:as-html as-html})))
 
 (defn process-one
   "Munge the 'file' datastructure; slowly filling it up, using let-shadowing.
   Essentially, converts `org-mode file string` -> json, edn, logbook, keywords"
   [config f]
+
   (let [new-file      (make config f)                                     ; make an empty "file" map.
         as-json       (->> f slurp org/parse!)                            ; slurp the contents of a file and parse it to json.
         as-edn        (-> as-json (json/parse-string true))               ; convert the json to edn.
         new-file      (change new-file {:as-json as-json :as-edn as-edn}) ; shadow the new-file to add the json and edn.
         file-metadata (extract-metadata new-file)                         ; collect the file-metadata from the edn tree.
         new-file      (change new-file {:meta file-metadata})             ; shadow the file and add the metadata
-        final-file    (htmlify config new-file)]                          ; parses the edn tree -> html.
+        ;; TODO PERF: htmlify happening as well in `process-all`.
+        ;; this is due to the dev server. There should be a conditional
+        ;; that checks if we are running in server.
+        final-file    (layout/htmlify config new-file)]                   ; parses the edn tree -> html.
 
     final-file))
 
@@ -271,7 +267,8 @@
                                       :site-map        @site-map
                                       :site-links      @site-links
                                       :site-logs       @site-logs)
-              with-html        (into {} (for [[k pf] output] [k (htmlify config-with-data pf)]))
+              ;; FIXME: I think we are rendering html twice here, should prob only happen here?
+              with-html        (into {} (for [[k pf] output] [k (layout/htmlify config-with-data pf)]))
               final            (assoc config-with-data :processed-files with-html)]
           final)
 

@@ -89,20 +89,19 @@
   or unto what depth we want the headings to render."
   ([toc]
    (make-toc toc {}))
-  ([toc {:keys [headline depth list-type]
+  ([toc {:keys [headline depth list-type exclusive?]
          :or   {depth nil list-type :ol}
          :as   opts}]
-   (let [s-h         (u/find-first #(= (% :raw) headline) toc)      ; if user specified a heading to start at, go find it.
-         toc         (cond->> toc                                   ; apply some filtering to the toc, if params are passed in.
-                       depth    (filter #(<= (% :level) depth))     ; if depth; keep everything under that depth.
-                       headline (drop-while #(not= s-h %))          ; drop everything up till the selected heading we want.
-                       headline (drop 1))                           ; don't include selected heading; just it's children.
-         min-level   (if (seq toc) (:level (apply min-key :level toc)) 1)
+   (let [s-h         (u/find-first #(= (% :cleaned-text) headline) toc)   ; if user specified a heading to start at, go find it.
+         toc         (cond->> toc                                         ; apply some filtering to the toc, if params are passed in.
+                       depth      (filter #(<= (% :level) depth))         ; if depth; keep everything under that depth.
+                       headline   (drop-while #(not= s-h %))              ; drop everything up till the selected heading we want.
+                       exclusive? (drop 1))                               ; don't include selected heading; just it's children.
+         min-level   (if (seq toc) (:level (apply min-key :level toc)) 1) ; get the min level for calibrating the reduce.
          toc-cleaned (->> toc
                         (map #(assoc % :children []))  ; create a "children" key on every item.)
-                        (reduce make-toc-helper-reduce {:out [] :prev nil :min-level min-level}) ; TODO I don't think I need min-level anymore.
+                        (reduce make-toc-helper-reduce {:out [] :prev nil :min-level min-level})
                         :out)]
-
 
      (if (empty? toc-cleaned) nil
          (into [list-type] (toc->html toc-cleaned list-type))))))
