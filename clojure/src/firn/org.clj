@@ -47,9 +47,10 @@
                     (for [child title-children]
                       (s/trim
                        (case (:type child)
-                         "text" (get-trimmed-val child :value)
-                         "link" (get-trimmed-val child :desc)
-                         "code" (get-trimmed-val child :value)
+                         "text"     (get-trimmed-val child :value)
+                         "link"     (get-trimmed-val child :desc)
+                         "code"     (get-trimmed-val child :value)
+                         "verbatim" (get-trimmed-val child :value)
                          "")))))))
 
 (defn get-headline

@@ -72,13 +72,13 @@
 (defn toc->html
   [toc kind]
   (->> toc
-     (map (fn [x]
+      (map (fn [x]
             (if (empty? (x :children))
               [:li
-               [:a {:href (x :anchor)} (x :raw)]]
+                [:a {:href (x :anchor)} (x :cleaned-text)]]
               [:li
-               [:a {:href (x :anchor)} (x :raw)]
-               [kind (toc->html (x :children) kind)]])))))
+                [:a {:href (x :anchor)} (x :cleaned-text)]
+                [kind (toc->html (x :children) kind)]])))))
 
 (defn make-toc
   "toc: a flattened list of headlines with a :level value of 1-> N:
@@ -200,7 +200,7 @@
         parent           {:type "headline" :level level :children [v]} ; reconstruct the parent so we can pull out the content.
         heading-priority (u/str->keywrd "span.firn-headline-priority.firn-headline-priority__" priority)
         heading-keyword  (u/str->keywrd "span.firn-headline-keyword.firn-headline-keyword__" keywrd)
-        heading-anchor   (org/make-headline-anchor parent) #_(-> parent org/get-headline-helper u/clean-anchor)
+        heading-anchor   (org/make-headline-anchor parent)
         heading-id+class #(u/str->keywrd "h" % heading-anchor ".firn-headline.firn-headline-" %)
         h-level          (case level
                            1 (heading-id+class 1)

@@ -183,6 +183,7 @@
           "headline" ; if headline, collect data, push into toc, and set as "last-headline"
           (let [toc-item {:level (x :level)
                           :raw  (-> x :children first :raw)
+                          :cleaned-text (org/get-headline-helper x)
                           :anchor (org/make-headline-anchor x)}
                 new-toc  (conj out-toc toc-item)]
             (recur xs out-logs out-links new-toc x))
