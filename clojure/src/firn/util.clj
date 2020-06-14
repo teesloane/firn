@@ -208,6 +208,7 @@
   (str "#" (-> anchor
                (s/replace #"::\*" "")
                (s/replace #"\/" "")
+               (s/replace #"\." "")
                (s/replace #" " "-")
                (s/lower-case))))
 
