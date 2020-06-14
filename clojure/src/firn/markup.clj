@@ -6,16 +6,6 @@
 
 (declare to-html)
 
-(def x [{:level 1, :raw "Meta", :anchor "#meta"}
-        {:level 2, :raw "Resources", :anchor "#resources"}
-        {:level 3, :raw "Third level", :anchor "#third-level"}
-        {:level 4, :raw "fourth", :anchor "#fouth-level"}
-        {:level 4, :raw "fourth 22", :anchor "#fouth-level"}
-        {:level 4, :raw "fourth 22", :anchor "#fouth-level"}
-        {:level 4, :raw "fourth 22", :anchor "#fouth-level"}
-        {:level 4, :raw "fourth 22", :anchor "#fouth-level"}
-        {:level 2, :raw "back to 2", :anchor "#back-to-2-level"}])
-
 ;; Feature: Table of Contents --------------------------------------------------
 
 (defn make-toc-helper-reduce

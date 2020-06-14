@@ -68,7 +68,6 @@
         (spit out-file-name (f :as-html)))))
   config)
 
-
 (defn all-files
   "Processes all files in the org-directory"
   [{:keys [dir]}]

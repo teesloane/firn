@@ -5,9 +5,7 @@
             [clojure.tools.cli :refer [parse-opts]]
             [firn.server :as server]
             [clojure.string :as s]
-            [firn.util :as u]
-            [mount.core :as mount]
-            [hiccup.core :as h]))
+            [firn.util :as u]))
 
 (defn init!
   "When firn is run as a native image, move the dependencies (the parser bin)
@@ -94,6 +92,3 @@
           "build"  (build/all-files options)
           "new"    (build/new-site  {}))))))
 
-
-(mount/stop)
-(-main "build" "-d" "/Users/tees/Dropbox/wiki/")

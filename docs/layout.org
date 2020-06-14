@@ -1,6 +1,6 @@
 #+TITLE: Layout
 #+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-06-09 15:14>
+#+DATE_UPDATED: <2020-06-14 09:29>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: docs
 
@@ -268,8 +268,10 @@ There are several ways you can create table of contents in your files, from simp
     (head
      [:body
        ;; only renders a table of contents for a single headline's children.
+       ;; `:eclusive?` means we don't render "Notes"; just headlines that fall under it.
        [:div (render :toc {:headline "Notes"
-                           :depth 4})]
+                           :depth 4
+                           :exclusive? true})]
        [:div (render "Notes")]])))
 #+END_SRC
 

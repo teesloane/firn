@@ -64,7 +64,7 @@
      :keywords  nil      ; list of keywords at top of org file: #+TITLE:, #+CATEGORY, etc.
      :name      name     ; the file name
      :path      path-abs ; dir path to the file.
-     :meta      {}       ; is filled when process-file / extract-metadata is run. ;; TODO - spec out the default meta map.
+     :meta      {}       ; is filled when process-file / extract-metadata is run.
      :path-web  path-web ; path to file from cwd.
      :original  nil}))   ; the file as as javaFile object.
 
@@ -214,8 +214,6 @@
         date-created   (get-keyword file "DATE_CREATED")
         metadata       (extract-metadata-helper tree-data file-metadata)
         logbook-sorted (sort-logbook (metadata :logbook) file)]
-
-    ;; (spit (str "/tmp/foo/" (file :name) ".edn") (str (:toc metadata))) ;; for debugging
 
     {:links           (metadata :links)
      :logbook         logbook-sorted
