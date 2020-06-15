@@ -1,6 +1,6 @@
 #+TITLE: Layout
 #+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-06-14 09:29>
+#+DATE_UPDATED: <2020-06-14 20:46>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: docs
 
@@ -275,6 +275,12 @@ There are several ways you can create table of contents in your files, from simp
        [:div (render "Notes")]])))
 #+END_SRC
 
+3. From within a file, you can set the keyword ~#+FIRN_TOC~ and pass it a map with
+   the properties above to enable a table of contents specific to a single file:
+
+#+BEGIN_SRC
+#+FIRN_TOC: {:depth 4}
+#+END_SRC
 
 * Styling Layouts
 
