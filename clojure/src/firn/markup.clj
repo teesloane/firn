@@ -19,8 +19,8 @@
     (let [with-meta (assoc curr :next-sibling [:out (count out)])
           with-meta (assoc with-meta :next-child [:out (count out) :children])]
       (-> acc
-         (update :out conj with-meta)
-         (assoc :prev with-meta)))
+          (update :out conj with-meta)
+          (assoc :prev with-meta)))
 
     ;; if the new items level >= prev item, go to the last item in out
     ;; iterate through children, and try and find `prev`, when you do, collect "path to prev"
@@ -30,20 +30,19 @@
           with-meta   (assoc curr :next-sibling (prev :next-child))
           with-meta   (assoc with-meta :next-child (conj (prev :next-child) parent-path :children))]
       (-> acc
-         (update-in (prev :next-child) conj with-meta)
-         (assoc :prev with-meta)))
+          (update-in (prev :next-child) conj with-meta)
+          (assoc :prev with-meta)))
 
     (= (curr :level) (prev :level))
     (let [parent-path (count (get-in acc (prev :next-sibling)))
           with-meta   (assoc curr :next-sibling (prev :next-sibling)) ;; if more, add children, if equal, conj onto children.
           with-meta   (assoc with-meta :next-child (conj (prev :next-sibling) parent-path :children))] ;; if more, add children, if equal, conj onto children.
       (-> acc
-         (update-in (prev :next-sibling) conj with-meta)
-         (assoc :prev with-meta)))
+          (update-in (prev :next-sibling) conj with-meta)
+          (assoc :prev with-meta)))
 
     (< (curr :level) (prev :level))
-    (let [
-          difference   (- (prev :level) (curr :level)) ; if we are on level 5, and the next is level 3...
+    (let [difference   (- (prev :level) (curr :level)) ; if we are on level 5, and the next is level 3...
           diff-to-take (* difference 2)                ; we need to take (5 - 3 ) * 2 = 4 items off the last :next-sibling
           ;; HACK: we can use the prev-elements :next-sibling path and chop N
           ;; elements off the ending based on our heading's leve; which gives us
@@ -53,8 +52,8 @@
           with-meta    (assoc curr :next-sibling path) ;; if more, add children, if equal, conj onto children.
           with-meta    (assoc with-meta :next-child (conj path parent-path :children))]
       (-> acc
-         (update-in path conj with-meta)
-         (assoc :prev with-meta)))
+          (update-in path conj with-meta)
+          (assoc :prev with-meta)))
 
     :else
     (do (println "Something has gone wrong. ") acc)))
@@ -62,13 +61,13 @@
 (defn toc->html
   [toc kind]
   (->> toc
-      (map (fn [x]
-            (if (empty? (x :children))
-              [:li
-                [:a {:href (x :anchor)} (x :text)]]
-              [:li
-                [:a {:href (x :anchor)} (x :text)]
-                [kind (toc->html (x :children) kind)]])))))
+       (map (fn [x]
+              (if (empty? (x :children))
+                [:li
+                 [:a {:href (x :anchor)} (x :text)]]
+                [:li
+                 [:a {:href (x :anchor)} (x :text)]
+                 [kind (toc->html (x :children) kind)]])))))
 
 (defn make-toc
   "toc: a flattened list of headlines with a :level value of 1-> N:
@@ -92,9 +91,9 @@
 
          min-level   (if (seq toc) (:level (apply min-key :level toc)) 1) ; get the min level for calibrating the reduce.
          toc-cleaned (->> toc
-                        (map #(assoc % :children []))  ; create a "children" key on every item.)
-                        (reduce make-toc-helper-reduce {:out [] :prev nil :min-level min-level})
-                        :out)]
+                          (map #(assoc % :children []))  ; create a "children" key on every item.)
+                          (reduce make-toc-helper-reduce {:out [] :prev nil :min-level min-level})
+                          :out)]
 
      (if (empty? toc-cleaned) nil
          (into [list-type] (toc->html toc-cleaned list-type))))))

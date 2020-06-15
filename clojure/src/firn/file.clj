@@ -197,7 +197,6 @@
     ;; as-html
     (change f {:as-html as-html})))
 
-
 (defn extract-metadata
   "Iterates over a tree, and returns metadata for site-wide usage such as
   links (for graphing between documents, tbd) and logbook entries."
@@ -221,7 +220,6 @@
      :date-created    (when date-created (u/strip-org-date date-created))
      :date-updated-ts (when date-updated (u/org-date->ts date-updated))
      :date-created-ts (when date-created (u/org-date->ts date-created))}))
-
 
 (defn process-one
   "Munge the 'file' datastructure; slowly filling it up, using let-shadowing.
@@ -278,9 +276,11 @@
                                  (dissoc (processed-file :meta) :logbook :links :keywords)
                                  {:path (str "/" (processed-file :path-web))})]
 
-                                                   
+
 
           ;; add to sitemap when file is not private.
+
+
           (when-not is-private
             (swap! site-map conj new-site-map-item)
             (swap! site-links concat (-> processed-file :meta :links))
@@ -301,13 +301,13 @@
                                 :description (str (f :as-html))))]
     (io/make-parents feed-file)
     (->> processed-files
-       (filter (fn [[_ f]] (-> f :meta :date-created)))
-       (map make-rss)
-       (sort-by :pubDate)
-       (reverse)
-       (u/prepend-vec first-entry) ; first entry must be about the site
-       (apply rss/channel-xml)
-       (spit feed-file)))
+         (filter (fn [[_ f]] (-> f :meta :date-created)))
+         (map make-rss)
+         (sort-by :pubDate)
+         (reverse)
+         (u/prepend-vec first-entry) ; first entry must be about the site
+         (apply rss/channel-xml)
+         (spit feed-file)))
   config)
 
 (defn reload-requested-file

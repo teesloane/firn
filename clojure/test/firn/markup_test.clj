@@ -50,7 +50,6 @@
       (t/is (= res1 "./foo"))
       (t/is (= res2 "./foo#my-headline-link")))))
 
-
 (t/deftest make-toc
   (let [ex1     [{:level 1, :text "Process" :anchor "#process"}
                  {:level 2, :text "Relevance" :anchor "#relevance"}]

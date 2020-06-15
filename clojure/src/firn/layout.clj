@@ -81,7 +81,7 @@
              firn_toc (sci/eval-string (org/get-keyword file "FIRN_TOC")) ; read in keyword for overrides
              opts     (or firn_toc opts {})] ; apply most pertinent options.
          (when (seq toc)
-            (markup/make-toc toc opts)))
+           (markup/make-toc toc opts)))
 
        :else ; error message to indicate incorrect use of render.
        (str "<div style='position: fixed; background: antiquewhite; z-index: 999; padding: 24px; left: 33%; top: 33%; border: 13px solid lightcoral; box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);'>"

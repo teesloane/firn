@@ -172,10 +172,10 @@
   "<2020-05-14 19:11> -> 2020-05-14 19:11"
   [org-date]
   (-> org-date
-     (s/replace #"\]" "")
-     (s/replace #"\[" "")
-     (s/replace #"<" "")
-     (s/replace #">" "")))
+      (s/replace #"\]" "")
+      (s/replace #"\[" "")
+      (s/replace #"<" "")
+      (s/replace #">" "")))
 
 (defn org-date->java-date
   "Converts <2020-02-25 05:51> -> java..."
@@ -189,9 +189,9 @@
 (defn org-date->ts
   [org-date]
   (-> org-date
-     strip-org-date
-     (org-date->java-date)
-     java-date->unix-ts))
+      strip-org-date
+      (org-date->java-date)
+      java-date->unix-ts))
 
 (defn native-image?
   "Check if we are in the native-image or REPL."
@@ -222,6 +222,7 @@
 ;; Time ------------------------------------------------------------------------
 ;; NOTE: timestr->hours-min + timevec->time-str could use better input testing?
 ;; At the very least, `Integer.` is an opportunity for errors when parsing.
+
 
 (defn parse-int [number-string]
   (try (Integer/parseInt number-string)
