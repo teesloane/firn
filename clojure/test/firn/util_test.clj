@@ -83,6 +83,17 @@
     (let [res (sut/prepend-vec 1 [2 3])]
       (t/is (= res [1 2 3])))))
 
+(t/deftest clean-anchor
+  (t/testing "Expected results."
+    (let [res1 (sut/clean-anchor "foo bar")
+          res2 (sut/clean-anchor "foo bar baz")
+          res3 (sut/clean-anchor "foo / bar")
+          res4 (sut/clean-anchor "foo        bar")]
+      (t/is (= res1 "#foo-bar"))
+      (t/is (= res2 "#foo-bar-baz"))
+      (t/is (= res3 "#foo--bar"))
+      (t/is (= res4 "#foo--------bar")))))
+
 ;; -- Time / Date Tests --------------------------------------------------------
 
 (t/deftest timestr->hours-min

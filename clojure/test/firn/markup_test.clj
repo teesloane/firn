@@ -50,13 +50,51 @@
       (t/is (= res1 "./foo"))
       (t/is (= res2 "./foo#my-headline-link")))))
 
-(t/deftest clean-anchor
-  (t/testing "Expected results."
-    (let [res1 (sut/clean-anchor "foo bar")
-          res2 (sut/clean-anchor "foo bar baz")
-          res3 (sut/clean-anchor "foo / bar")
-          res4 (sut/clean-anchor "foo        bar")]
-      (t/is (= res1 "#foo-bar"))
-      (t/is (= res2 "#foo-bar-baz"))
-      (t/is (= res3 "#foo--bar"))
-      (t/is (= res4 "#foo--------bar")))))
+(t/deftest make-toc
+  (let [ex1     [{:level 1, :text "Process" :anchor "#process"}
+                 {:level 2, :text "Relevance" :anchor "#relevance"}]
+        ex1-res [:ol [:li
+                      [:a {:href "#process"} "Process"]
+                      [:ol [[:li [:a {:href "#relevance"} "Relevance"]]]]]]
+
+        ex2     [{:level 1, :text "Process" :anchor "#process"}
+                 {:level 2, :text "Relevance" :anchor "#relevance"}
+                 {:level 3, :text "Level3" :anchor "#level3"}
+                 {:level 2, :text "Level2-again" :anchor "#level2-again"}
+                 {:level 4, :text "Foo" :anchor "#foo"}]
+
+        ex2-res [:ol
+                 [:li
+                  [:a {:href "#process"} "Process"]
+                  [:ol
+                   '([:li
+                      [:a {:href "#relevance"} "Relevance"]
+                      [:ol ([:li [:a {:href "#level3"} "Level3"]])]]
+                     [:li
+                      [:a {:href "#level2-again"} "Level2-again"]
+                      [:ol ([:li [:a {:href "#foo"} "Foo"]])]])]]]]
+
+    (t/testing "expected results, no options."
+      (let [res  (sut/make-toc ex1)
+            res2 (sut/make-toc ex2)]
+        (t/is (= res ex1-res))
+        (t/is (= res2 ex2-res))))
+    (t/testing "Depth limits work."
+      (let [res-d1      (sut/make-toc ex2 {:depth 1})
+            res-d2      (sut/make-toc ex2 {:depth 2})
+            expected-d1 [:ol [:li [:a {:href "#process"} "Process"]]]
+            expected-d2 [:ol
+                         [:li [:a {:href "#process"} "Process"]
+                          [:ol
+                           '([:li [:a {:href "#relevance"} "Relevance"]]
+                             [:li [:a {:href "#level2-again"} "Level2-again"]])]]]]
+        (t/is (= res-d1 expected-d1))
+        (t/is (= res-d2 expected-d2))))
+
+    (t/testing "headline select works"
+      (let [res-1 (sut/make-toc ex2 {:headline "Relevance"})
+            expected [:ol
+                      [:li
+                       [:a {:href "#relevance"} "Relevance"]
+                       [:ol '([:li [:a {:href "#level3"} "Level3"]])]]]]
+        (t/is (= res-1 expected))))))

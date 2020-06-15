@@ -155,6 +155,12 @@
   [f coll]
   (first (filter f coll)))
 
+(defn take-while-after-first
+  [pred lst]
+  (let [head (first lst)
+        tail (take-while pred (rest lst))]
+    (concat [head] tail)))
+
 ;; For interception thread macros and enabling printing the passed in value.
 (def spy #(do (println "DEBUG:" %) %))
 
@@ -166,10 +172,10 @@
   "<2020-05-14 19:11> -> 2020-05-14 19:11"
   [org-date]
   (-> org-date
-     (s/replace #"\]" "")
-     (s/replace #"\[" "")
-     (s/replace #"<" "")
-     (s/replace #">" "")))
+      (s/replace #"\]" "")
+      (s/replace #"\[" "")
+      (s/replace #"<" "")
+      (s/replace #">" "")))
 
 (defn org-date->java-date
   "Converts <2020-02-25 05:51> -> java..."
@@ -183,9 +189,9 @@
 (defn org-date->ts
   [org-date]
   (-> org-date
-     strip-org-date
-     (org-date->java-date)
-     java-date->unix-ts))
+      strip-org-date
+      (org-date->java-date)
+      java-date->unix-ts))
 
 (defn native-image?
   "Check if we are in the native-image or REPL."
@@ -198,9 +204,25 @@
   [& args]
   (keyword (apply str args)))
 
+(defn clean-anchor
+  "converts `::*My Heading` => #my-heading
+  NOTE: This could be a future problem area; ex: forwards slashes have to be
+  replaced, otherwise they break the html rendering, thus
+  'my heading / example -> my-heading--example
+  Future chars to watch out for: `>` `<` `&` `!`"
+  [anchor]
+  (str "#" (-> anchor
+               (s/replace #"::\*" "")
+               (s/replace #"\/" "")
+               (s/replace #"\." "")
+               (s/replace #" " "-")
+               (s/lower-case))))
+
+
 ;; Time ------------------------------------------------------------------------
 ;; NOTE: timestr->hours-min + timevec->time-str could use better input testing?
 ;; At the very least, `Integer.` is an opportunity for errors when parsing.
+
 
 (defn parse-int [number-string]
   (try (Integer/parseInt number-string)

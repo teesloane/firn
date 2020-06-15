@@ -6,7 +6,99 @@
 
 (declare to-html)
 
-;; Renderers
+;; Feature: Table of Contents --------------------------------------------------
+
+(defn make-toc-helper-reduce
+  "(ಥ﹏ಥ) Yeah. So. See the docstring for make-toc.
+  Basically, this is a bit of a nightmare. This turns a flat list into a tree
+  So that we can property create nested table of contents."
+  [{:keys [out prev min-level] :as acc} curr]
+  (cond
+    ;; top level / root headings.
+    (or (empty? out) (= min-level (curr :level)))
+    (let [with-meta (assoc curr :next-sibling [:out (count out)])
+          with-meta (assoc with-meta :next-child [:out (count out) :children])]
+      (-> acc
+          (update :out conj with-meta)
+          (assoc :prev with-meta)))
+
+    ;; if the new items level >= prev item, go to the last item in out
+    ;; iterate through children, and try and find `prev`, when you do, collect "path to prev"
+    ;; if/when you do update the child list.
+    (> (curr :level) (prev :level))
+    (let [parent-path (count (get-in acc (prev :next-child)))
+          with-meta   (assoc curr :next-sibling (prev :next-child))
+          with-meta   (assoc with-meta :next-child (conj (prev :next-child) parent-path :children))]
+      (-> acc
+          (update-in (prev :next-child) conj with-meta)
+          (assoc :prev with-meta)))
+
+    (= (curr :level) (prev :level))
+    (let [parent-path (count (get-in acc (prev :next-sibling)))
+          with-meta   (assoc curr :next-sibling (prev :next-sibling)) ;; if more, add children, if equal, conj onto children.
+          with-meta   (assoc with-meta :next-child (conj (prev :next-sibling) parent-path :children))] ;; if more, add children, if equal, conj onto children.
+      (-> acc
+          (update-in (prev :next-sibling) conj with-meta)
+          (assoc :prev with-meta)))
+
+    (< (curr :level) (prev :level))
+    (let [difference   (- (prev :level) (curr :level)) ; if we are on level 5, and the next is level 3...
+          diff-to-take (* difference 2)                ; we need to take (5 - 3 ) * 2 = 4 items off the last :next-sibling
+          ;; HACK: we can use the prev-elements :next-sibling path and chop N
+          ;; elements off the ending based on our heading's leve; which gives us
+          ;; the path to conj onto.
+          path         (vec (drop-last diff-to-take (prev :next-sibling)))
+          parent-path  (count (get-in acc path))
+          with-meta    (assoc curr :next-sibling path) ;; if more, add children, if equal, conj onto children.
+          with-meta    (assoc with-meta :next-child (conj path parent-path :children))]
+      (-> acc
+          (update-in path conj with-meta)
+          (assoc :prev with-meta)))
+
+    :else
+    (do (println "Something has gone wrong. ") acc)))
+
+(defn toc->html
+  [toc kind]
+  (->> toc
+       (map (fn [x]
+              (if (empty? (x :children))
+                [:li
+                 [:a {:href (x :anchor)} (x :text)]]
+                [:li
+                 [:a {:href (x :anchor)} (x :text)]
+                 [kind (toc->html (x :children) kind)]])))))
+
+(defn make-toc
+  "toc: a flattened list of headlines with a :level value of 1-> N:
+  [{:level 1, :text 'Process', :anchor '#process'}  {:level 2, :text 'Relevance', :anchor '#relevance'}]
+
+  We conditonally thread the heading, passing in configured values, such as
+  where to start the table of contents (at a specific headline?)
+  or unto what depth we want the headings to render."
+  ([toc]
+   (make-toc toc {}))
+  ([toc {:keys [headline depth list-type exclusive?]
+         :or   {depth nil list-type :ol}
+         :as   opts}]
+   (let [s-h         (u/find-first #(= (% :text) headline) toc)     ; if user specified a heading to start at, go find it.
+         toc         (cond->> toc                                   ; apply some filtering to the toc, if params are passed in.
+                       depth      (filter #(<= (% :level) depth))   ; if depth; keep everything under that depth.
+                       headline   (drop-while #(not= s-h %))        ; drop everything up till the selected heading we want.
+                       headline   (u/take-while-after-first         ; remove everything that's not a child of the selected heading.
+                                   #(> (% :level) (s-h :level)))
+                       exclusive? (drop 1))                         ; don't include selected heading; just it's children.)
+
+         min-level   (if (seq toc) (:level (apply min-key :level toc)) 1) ; get the min level for calibrating the reduce.
+         toc-cleaned (->> toc
+                          (map #(assoc % :children []))  ; create a "children" key on every item.)
+                          (reduce make-toc-helper-reduce {:out [] :prev nil :min-level min-level})
+                          :out)]
+
+     (if (empty? toc-cleaned) nil
+         (into [list-type] (toc->html toc-cleaned list-type))))))
+
+;; General Renderers -----------------------------------------------------------
 
 (defn date->html
   [v]
@@ -33,26 +125,13 @@
      [:span.firn-img-caption desc]]
     [:img {:src path}]))
 
-(defn clean-anchor
-  "converts `::*My Heading` => #my-heading
-  NOTE: This could be a future problem area; ex: forwars slashes have to be
-  replaces, otherwise they break the html rendering, thus
-  'my heading / example -> my-heading--example
-  Future chars to watch out for: `>` `<` `&` `!`"
-  [anchor]
-  (str "#" (-> anchor
-               (s/replace #"::\*" "")
-               (s/replace #"\/" "")
-               (s/replace #" " "-")
-               (s/lower-case))))
-
 (defn internal-link-handler
   "Takes an org link and converts it into an html path."
   [org-link]
   (let [regex       #"(file:)(.*)\.(org)(\:\:\*.+)?"
         res         (re-matches regex org-link)
         anchor-link (last res)
-        anchor-link (when anchor-link (-> res last clean-anchor))]
+        anchor-link (when anchor-link (-> res last u/clean-anchor))]
     (if anchor-link
       (str "./" (nth res 2) anchor-link)
       (str "./" (nth res 2)))))
@@ -109,10 +188,10 @@
         keywrd           (v :keyword)
         priority         (v :priority)
         value            (v :value)
-        parent           {:type "headline" :level level :children [v]}
+        parent           {:type "headline" :level level :children [v]} ; reconstruct the parent so we can pull out the content.
         heading-priority (u/str->keywrd "span.firn-headline-priority.firn-headline-priority__" priority)
         heading-keyword  (u/str->keywrd "span.firn-headline-keyword.firn-headline-keyword__" keywrd)
-        heading-anchor   (-> parent org/get-headline-helper clean-anchor)
+        heading-anchor   (org/make-headline-anchor parent)
         heading-id+class #(u/str->keywrd "h" % heading-anchor ".firn-headline.firn-headline-" %)
         h-level          (case level
                            1 (heading-id+class 1)

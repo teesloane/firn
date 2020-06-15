@@ -6,7 +6,8 @@
 
   (:require [firn.markup :as markup]
             [firn.org :as org]
-            [hiccup.core :as h]))
+            [hiccup.core :as h]
+            [sci.core :as sci]))
 
 (defn- internal-default-layout
   "The default template if no `layout` key is specified.
@@ -51,10 +52,7 @@
        (= action :file)
        (markup/to-html (file :as-edn))
 
-
        ;; render a headline title.
-
-
        (and is-headline? (= opts :title))
        (let [hl (org/get-headline org-tree action)]
          (-> hl :children first  markup/to-html))
@@ -77,11 +75,22 @@
        (= action :logbook-polyline)
        (org/poly-line (-> file :meta :logbook) opts)
 
-       :else
-       (str "DEBUG: Incorrect use of `render` function in template:
-             <br> action: => " action " <code> << is this a valid value? </code>
-             <br> opts:  => " opts " <code> << is this a valid value? </code>"
-            "<br> ")))))
+       ;; render a table of contents
+       (= action :toc)
+       (let [toc      (-> file :meta :toc) ; get the toc for hte file.
+             firn_toc (sci/eval-string (org/get-keyword file "FIRN_TOC")) ; read in keyword for overrides
+             opts     (or firn_toc opts {})] ; apply most pertinent options.
+         (when (seq toc)
+           (markup/make-toc toc opts)))
+
+       :else ; error message to indicate incorrect use of render.
+       (str "<div style='position: fixed; background: antiquewhite; z-index: 999; padding: 24px; left: 33%; top: 33%; border: 13px solid lightcoral; box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);'>"
+            "<div style='text-align: center'>Render Error.</div>"
+            "<div>Incorrect use of `render` function in template:
+                <br> action: => " action " <code> << is this a valid value? </code>
+                <br> opts:  => " opts " <code> << is this a valid value? </code>"
+            "<br></div> "
+            "</div>")))))
 
 (defn prepare
   "Prepare functions and data to be available in layout functions.
@@ -111,3 +120,4 @@
   [config file layout]
   (let [selected-layout (get-layout config file layout)]
     (h/html (selected-layout (prepare config file)))))
+

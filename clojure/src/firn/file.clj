@@ -73,19 +73,6 @@
   [f m]
   (merge f m))
 
-(defn get-keywords
-  "Returns a list of org-keywords from a file. All files must have keywords."
-  [f]
-  (let [expected-keywords (get-in f [:as-edn :children 0 :children])]
-    (if (= "keyword" (:type (first expected-keywords)))
-      expected-keywords
-      (u/print-err! :error "The org file <<" (f :name) ">> does not have 'front-matter' Please set at least the #+TITLE keyword for your file."))))
-
-(defn get-keyword
-  "Fetches a(n org) #+keyword from a file, if it exists."
-  [f keywrd]
-  (->> f get-keywords (u/find-first #(= keywrd (:key %))) :value))
-
 (defn keywords->map
   "Converts an org-file's keywords into a map.
    [{:type keyword, :key TITLE, :value Firn, :post_blank 0}
@@ -93,7 +80,7 @@
                                Becomes 
    {:title Firn, :date-created <2020-03-01--09-53>, :status active, :firn-layout project}"
   [f]
-  (let [kw            (get-keywords f)
+  (let [kw            (org/get-keywords f)
         lower-case-it #(when % (s/lower-case %))
         dash-it       #(when % (s/replace % #"_" "-"))
         key->keyword  (fn [k] (-> k :key lower-case-it dash-it keyword))]
@@ -103,7 +90,7 @@
   "Returns true if a file meets the conditions of being 'private'
   Assumes the files has been read into memory and parsed to edn."
   [config f]
-  (let [is-private?     (get-keyword f "FIRN_PRIVATE")
+  (let [is-private?     (org/get-keyword f "FIRN_PRIVATE")
         file-path       (-> f :path (s/split #"/"))
         in-priv-folder? (some (set file-path) (config :ignored-dirs))]
     (or
@@ -140,8 +127,8 @@
   items to keep track of headline values that precede a logbook.
   This is easier and more performant than searching an entire edn-tree of
   headings to see if they have a logbook to associate with.  ┬──┬◡ﾉ(° -°ﾉ)"
-  [tree-seq]
-  (loop [tree-items    tree-seq
+  [tree-data]
+  (loop [tree-items    tree-data
          output        []
          last-headline nil]
     (if (empty? tree-items)
@@ -157,6 +144,59 @@
                                  output)]
         (recur remaining-items new-output headline-val)))))
 
+(defn extract-metadata-helper
+  "There are lots of things we want to extract when iterating over the AST.
+  Rather than filter/loop/map over it several times, it all happens here.
+  Collects:
+  - Logbooks
+  - Links
+  - Headings for TOC.
+  - eventually... a plugin for custom file collection?"
+  [tree-data file-metadata]
+  (loop [tree-data     tree-data
+         out-logs      []
+         out-links     []
+         out-toc       []
+         last-headline nil]  ; the most recent headline we've encountered.
+    (if (empty? tree-data)
+      ;; All done! return the collected stuff.
+      {:logbook out-logs
+       :toc     out-toc
+       :links   out-links}
+      ;; Do the work.
+      (let [x  (first tree-data)
+            xs (rest tree-data)]
+        (case (:type x)
+          "headline" ; if headline, collect data, push into toc, and set as "last-headline"
+          (let [toc-item {:level (x :level)
+                          :text (org/get-headline-helper x)
+                          :anchor (org/make-headline-anchor x)}
+                new-toc  (conj out-toc toc-item)]
+            (recur xs out-logs out-links new-toc x))
+
+          "clock" ; if clock, merge headline-data into it, and push/recurse new-logs.
+          (let [headline-meta {:from-headline (-> last-headline :children first :raw)}
+                log-augmented (merge headline-meta file-metadata x)
+                new-logs      (conj out-logs log-augmented)]
+            (recur xs new-logs out-links out-toc last-headline))
+
+          "link" ; if link, also merge file metadata and push into new-links and recurse.
+          (let [link-item (merge x file-metadata)
+                new-links (conj out-links link-item)]
+            (recur xs out-logs new-links out-toc last-headline))
+
+          ;; default case, recur.
+          (recur xs out-logs out-links out-toc last-headline))))))
+
+(defn htmlify
+  "Renders files according to their `layout` keyword."
+  [config f]
+  (let [layout   (keyword (org/get-keyword f "FIRN_LAYOUT"))
+        as-html  (when-not (is-private? config f)
+                   (layout/apply-layout config f layout))]
+    ;; as-html
+    (change f {:as-html as-html})))
+
 (defn extract-metadata
   "Iterates over a tree, and returns metadata for site-wide usage such as
   links (for graphing between documents, tbd) and logbook entries."
@@ -164,45 +204,38 @@
   (let [org-tree       (file :as-edn)
         tree-data      (tree-seq map? :children org-tree)
         file-metadata  {:from-file (file :name) :from-file-path (file :path-web)}
-        links          (filter #(= "link"  (:type %)) tree-data)
-        logbook        (extract-metadata-logbook-helper tree-data)
-        logbook-aug    (map #(merge % file-metadata) logbook)
-        logbook-sorted (sort-logbook logbook-aug file)
-        links-aug      (map #(merge % file-metadata) links)
-        date-updated   (get-keyword file "DATE_UPDATED")
-        date-created   (get-keyword file "DATE_CREATED")]
+        date-updated   (org/get-keyword file "DATE_UPDATED")
+        date-created   (org/get-keyword file "DATE_CREATED")
+        metadata       (extract-metadata-helper tree-data file-metadata)
+        logbook-sorted (sort-logbook (metadata :logbook) file)]
 
-    {:links           links-aug
+    {:links           (metadata :links)
      :logbook         logbook-sorted
      :logbook-total   (sum-logbook logbook-sorted)
-     :keywords        (get-keywords file)
-     :title           (get-keyword file "TITLE")
-     :firn-under      (get-keyword file "FIRN_UNDER")
+     :keywords        (org/get-keywords file)
+     :title           (org/get-keyword file "TITLE")
+     :firn-under      (org/get-keyword file "FIRN_UNDER")
+     :toc             (metadata :toc)
      :date-updated    (when date-updated (u/strip-org-date date-updated))
      :date-created    (when date-created (u/strip-org-date date-created))
      :date-updated-ts (when date-updated (u/org-date->ts date-updated))
      :date-created-ts (when date-created (u/org-date->ts date-created))}))
 
-(defn htmlify
-  "Renders files according to their `layout` keyword."
-  [config f]
-  (let [layout   (keyword (get-keyword f "FIRN_LAYOUT"))
-        as-html  (when-not (is-private? config f)
-                   (layout/apply-layout config f layout))]
-    ;; as-html
-    (change f {:as-html as-html})))
-
 (defn process-one
   "Munge the 'file' datastructure; slowly filling it up, using let-shadowing.
   Essentially, converts `org-mode file string` -> json, edn, logbook, keywords"
   [config f]
+
   (let [new-file      (make config f)                                     ; make an empty "file" map.
         as-json       (->> f slurp org/parse!)                            ; slurp the contents of a file and parse it to json.
         as-edn        (-> as-json (json/parse-string true))               ; convert the json to edn.
         new-file      (change new-file {:as-json as-json :as-edn as-edn}) ; shadow the new-file to add the json and edn.
         file-metadata (extract-metadata new-file)                         ; collect the file-metadata from the edn tree.
-        new-file      (change new-file {:meta file-metadata})             ; shadow hte file and add the metadata
-        final-file    (htmlify config new-file)]                          ; parses the edn tree -> html.
+        new-file      (change new-file {:meta file-metadata})             ; shadow the file and add the metadata
+        ;; TODO PERF: htmlify happening as well in `process-all`.
+        ;; this is due to the dev server. There should be a conditional
+        ;; that checks if we are running in server.
+        final-file    (htmlify config new-file)]                   ; parses the edn tree -> html.
 
     final-file))
 
@@ -225,6 +258,7 @@
                                       :site-map        @site-map
                                       :site-links      @site-links
                                       :site-logs       @site-logs)
+              ;; FIXME: I think we are rendering html twice here, should prob only happen here?
               with-html        (into {} (for [[k pf] output] [k (htmlify config-with-data pf)]))
               final            (assoc config-with-data :processed-files with-html)]
           final)
@@ -242,9 +276,11 @@
                                  (dissoc (processed-file :meta) :logbook :links :keywords)
                                  {:path (str "/" (processed-file :path-web))})]
 
-                                                   
+
 
           ;; add to sitemap when file is not private.
+
+
           (when-not is-private
             (swap! site-map conj new-site-map-item)
             (swap! site-links concat (-> processed-file :meta :links))
@@ -265,13 +301,13 @@
                                 :description (str (f :as-html))))]
     (io/make-parents feed-file)
     (->> processed-files
-       (filter (fn [[_ f]] (-> f :meta :date-created)))
-       (map make-rss)
-       (sort-by :pubDate)
-       (reverse)
-       (u/prepend-vec first-entry) ; first entry must be about the site
-       (apply rss/channel-xml)
-       (spit feed-file)))
+         (filter (fn [[_ f]] (-> f :meta :date-created)))
+         (map make-rss)
+         (sort-by :pubDate)
+         (reverse)
+         (u/prepend-vec first-entry) ; first entry must be about the site
+         (apply rss/channel-xml)
+         (spit feed-file)))
   config)
 
 (defn reload-requested-file
