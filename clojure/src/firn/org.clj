@@ -4,7 +4,8 @@
   Which are created by the rust binary."
   (:require [clojure.java.shell :as sh]
             [clojure.string :as s]
-            [firn.util :as u])
+            [firn.util :as u]
+            [firn.org :as org])
   (:import iceshelf.clojure.rust.ClojureRust)
   (:import (java.time LocalDate)))
 
@@ -46,9 +47,10 @@
                     (for [child title-children]
                       (s/trim
                        (case (:type child)
-                         "text" (get-trimmed-val child :value)
-                         "link" (get-trimmed-val child :desc)
-                         "code" (get-trimmed-val child :value)
+                         "text"     (get-trimmed-val child :value)
+                         "link"     (get-trimmed-val child :desc)
+                         "code"     (get-trimmed-val child :value)
+                         "verbatim" (get-trimmed-val child :value)
                          "")))))))
 
 (defn get-headline
@@ -65,6 +67,12 @@
   (let [headline (get-headline tree name)]
     (update headline :children (fn [d] (filter #(not= (:type %) "title") d)))))
 
+(defn make-headline-anchor
+  "Takes a headline data structure and returns the id 'anchored' for slugifying
+  TODO: test me."
+  [node]
+  (-> node get-headline-helper u/clean-anchor))
+
 (defn parsed-org-date->unix-time
   "Converts the parsed org date (ex: [2020-04-27 Mon 15:39] -> 1588003740000)
   and turns it into a unix timestamp."
@@ -78,8 +86,25 @@
         (u/print-err! :warning  (str "Failed to parse the logbook for file:" "<<" name ">>" "\nThe logbook may be incorrectly formatted.\nError value:" e))
         "???"))))
 
-;; -- stats --
+;; NOTE: These should be in File.clj, but they are not due to a circular dependency.
+;; --
 
+(defn get-keywords
+  "Returns a list of org-keywords from a file. All files must have keywords."
+  [f]
+  (let [expected-keywords (get-in f [:as-edn :children 0 :children])]
+    (if (= "keyword" (:type (first expected-keywords)))
+      expected-keywords
+      (u/print-err! :error "The org file <<" (f :name) ">> does not have 'front-matter' Please set at least the #+TITLE keyword for your file."))))
+
+(defn get-keyword
+  "Fetches a(n org) #+keyword from a file, if it exists."
+  [f keywrd]
+  (->> f get-keywords (u/find-first #(= keywrd (:key %))) :value))
+
+;; --
+
+;; -- stats --
 
 (defn- find-day-to-update
   [calendar-year log-entry]
@@ -90,7 +115,7 @@
 (defn- update-logbook-day
   "Updates a day in a calander from build-year with logbook data."
   [{:keys [duration] :as log-entry}]
-  (fn [{:keys [log-count logs-raw log-sum day] :as cal-day}]
+  (fn [{:keys [log-count logs-raw log-sum] :as cal-day}]
     (let [log-count (inc log-count)
           logs-raw  (conj logs-raw log-entry)
           log-sum   (u/timestr->add-time log-sum duration)]
@@ -123,17 +148,17 @@
 
 ;; Rendered charts:
 
+;; TODO This should be in markup, as it's spitting out html
 (defn poly-line
   "Takes a logbook, formats it so that it can be plotted along a polyline."
   ([logbook]
    (poly-line logbook {}))
   ([logbook
     {:keys [width height stroke stroke-width]
-     :or   {width 365 height 100 stroke "#0074d9" stroke-width 1}
-     :as   opts}]
+     :or   {width 365 height 100 stroke "#0074d9" stroke-width 1}}]
    [:div
     (for [[year year-of-logs] (logbook-year-stats logbook)
-          :let [max-log     (apply max-key :hour-sum year-of-logs) ;; Don't need this yet.
+          :let [; max-log     (apply max-key :hour-sum year-of-logs) ;; Don't need this yet.
                 ;; This should be measured against the height and whatever the max-log is.
                 g-multiplier (/ height 8) ;; 8 - max hours we expect someone to log in a day
                 fmt-points  #(str %1 "," (* g-multiplier (%2 :hour-sum)))
