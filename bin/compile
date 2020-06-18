@@ -34,7 +34,7 @@ cd ../clojure
 lein do clean, uberjar
 
 # build the GraalVM compiled executable
-args=( -jar target/firn-0.1.0-SNAPSHOT-standalone.jar \
+args=( -jar target/firn-0.0.5-SNAPSHOT-standalone.jar \
             "-H:Name=firn" \
             "-H:+ReportExceptionStackTraces" \
             "-J-Dclojure.spec.skip-macros=true" \

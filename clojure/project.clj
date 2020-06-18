@@ -1,4 +1,4 @@
-(defproject firn "0.1.0-SNAPSHOT"
+(defproject firn "0.0.5-SNAPSHOT"
   :description "Static Site Generator for Org Mode"
   :url "https://github.com/theiceshelf/firn"
   :license {:name "EPL-2.0 OR GPL-2.0-or-later WITH Classpath-exception-2.0"

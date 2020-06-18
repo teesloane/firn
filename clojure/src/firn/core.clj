@@ -7,6 +7,8 @@
             [clojure.string :as s]
             [firn.util :as u]))
 
+(def FIRN-VERSION "0.0.5")
+
 (defn init!
   "When firn is run as a native image, move the dependencies (the parser bin)
   to the home directory. Not ideal, but this is the best we can do for now!"
@@ -48,6 +50,7 @@
     :validate [#(< 0 % 0x10000) "Must be a number between 0 and 65536"]]
    ;; A boolean option defaulting to nil
    ["-h" "--help"]
+   ["-v" "--version"]
    ["-d" "--dir PATH" "Directory to build/serve"
     :default (u/get-cwd)]])
 
@@ -60,6 +63,9 @@
     (cond
       (:help options) ; help => exit OK with usage summary
       {:exit-message (usage summary) :ok? true}
+
+      (:version options)
+      {:exit-message (str "Firn " FIRN-VERSION)}
 
       errors ; errors => exit with description of errors
       {:exit-message (error-msg errors)}
