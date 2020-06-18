@@ -128,9 +128,6 @@ img {
   color: lightblue;
 }
 
-.firn-headline-keyword > div {
-}
-
 .firn-headline-keyword__DONE {
   margin-right: 4px;
   color: lightgrey;
@@ -142,8 +139,13 @@ img {
 }
 
 .firn-headline-timestamp {}
-.firn-headline-cookie {}
+.firn-cookie {}
 
-/* Other "Components" */
+/* Org Footnotes */
 .firn-footnote-ref {}
 .firn-footnote-def {}
+
+/* Org Property Drawers */
+.firn-properties {}
+.firn-property-key {}
+.firn-property-value {}

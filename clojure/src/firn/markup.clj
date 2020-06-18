@@ -106,6 +106,15 @@
     [:span (str year "/" month "/" day
                 (when (and hour minute) hour ":" minute))]))
 
+(defn props->html
+  "Renders heading properties to html."
+  [{:keys [properties] :as v}]
+  [:div.firn-properties
+   (for [[k v] properties]
+     [:div
+      [:span.firn-property-key k ": "]
+      [:span.firn-property-value v]])])
+
 (defn- src-block->html
   "Formats a org-mode src block.
   NOTE: Has additional :keys `language` and `arguments`
@@ -147,8 +156,8 @@
         img-http-regex  #"(http:\/\/|https:\/\/)(.*)\.(jpg|JPG|gif|GIF|png)"
         img-rel-regex   #"(\.(.*))\.(jpg|JPG|gif|GIF|png)"
         img-make-url    #(->> (re-matches img-file-regex link-href)
-                              (take-last 2)
-                              (s/join "."))
+                            (take-last 2)
+                            (s/join "."))
         ;; file regexs / ctor fns
         org-file-regex  #"(file:)(.*)\.(org)(\:\:\*.+)?"
         http-link-regex #"https?:\/\/(?![^\" ]*(?:jpg|png|gif))[^\" ]+"]
@@ -183,11 +192,10 @@
   That aren't found in the `children` values and so need special parsing."
   [v]
   (let [level            (v :level)
-        typ              (v :type)
         children         (v :children)
         keywrd           (v :keyword)
         priority         (v :priority)
-        value            (v :value)
+        properties       (v :properties)
         parent           {:type "headline" :level level :children [v]} ; reconstruct the parent so we can pull out the content.
         heading-priority (u/str->keywrd "span.firn-headline-priority.firn-headline-priority__" priority)
         heading-keyword  (u/str->keywrd "span.firn-headline-keyword.firn-headline-keyword__" keywrd)
@@ -200,23 +208,20 @@
                            4 (heading-id+class 4)
                            5 (heading-id+class 5)
                            (heading-id+class 6))
-        make-child       #(into [%] (map title->html children))]
-    (case typ
-      "headline"  (make-child :div)
-      "title"     [h-level
-                   (when keywrd [heading-keyword (str keywrd " ")])
-                   (when priority [heading-priority (str priority " ")])
-                   (make-child :span)]
-      "text"      [:span value]
-      "cookie"    [:span.firn-headline-cookie value]
-      "timestamp" [:span.firn-headline-timestamp (date->html v)]
-      "code"      [:code value]
-      "verbatim"  [:code value]
-      "link"      (link->html v)
-      "underline" (make-child :i)
-      "italic"    (make-child :em)
-      "bold"      (make-child :strong)
-      "")))
+        make-child       #(into [%] (map to-html children))]
+    (if properties
+      [:div
+       [h-level
+        (when keywrd [heading-keyword (str keywrd " ")])
+        (when priority [heading-priority (str priority " ")])
+        (make-child :span)]
+       (props->html v)]
+
+      [h-level
+       (when keywrd [heading-keyword (str keywrd " ")])
+       (when priority [heading-priority (str priority " ")])
+       (make-child :span)])))
+
 
 (defn- footnote-ref
   [v]
@@ -243,8 +248,8 @@
   (let [type           (get v :type)
         children       (get v :children)
         value          (get v :value)
-        ordered        (get v :ordered)                               ;; for lists
-        val            (if value (s/trim-newline value) value)
+        value          (if value (s/trim-newline value) value)
+        ordered        (get v :ordered) ;; for lists
         headline-level (get v :level)
         headline-el    (u/str->keywrd "div.firn_headline-section.firn_headline-section-" headline-level)
         make-child     #(into [%] (map to-html children))]
@@ -267,11 +272,11 @@
       "link"          (link->html v)
       "fn-ref"        (footnote-ref v)
       "fn-def"        (footnote-def v)
-      "code"          [:code val]
-      "verbatim"      [:code val]
+      "code"          [:code value]
+      "verbatim"      [:code value]
       "rule"          [:hr]
-      "cookie"        [:span.cookie val]
-      "text"          [:span val]
+      "cookie"        [:span.firn-cookie value]
+      "text"          [:span value]
       "timestamp"     (date->html v)
       "keyword"       "" ;; Don't parse
       "comment-block" "" ;; Don't parse
