@@ -101,7 +101,7 @@
   [config f]
   (let [is-private?     (get-keyword f "FIRN_PRIVATE")
         file-path       (-> f :path (s/split #"/"))
-        in-priv-folder? (some (set file-path) (config :ignored-dirs))]
+        in-priv-folder? (some (set file-path) (-> config :user-config :ignored-dirs))]
     (or
      (some? in-priv-folder?)
      (some? is-private?))))

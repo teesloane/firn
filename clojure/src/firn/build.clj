@@ -134,9 +134,10 @@
 
 (defn write-rss-file!
   "Build an rss file. It sorts files by file:meta:date-created, writes to feed.xml"
-  [{:keys [processed-files site-url site-title dir-site site-desc] :as config}]
+  [{:keys [processed-files dir-site user-config] :as config}]
   (println "Building rss file...")
-  (let [feed-file   (str dir-site "feed.xml")
+  (let [{:keys [site-title site-url site-desc]} user-config
+        feed-file   (str dir-site "feed.xml")
         first-entry {:title site-title :link site-url :description site-desc}
         make-rss    (fn [[_ f]]
                       (hash-map :title   (-> f :meta :title)
@@ -169,11 +170,11 @@
   "Processes all files in the org-directory"
   [{:keys [dir]}]
   (let [config (setup (config/prepare dir))
-        {:keys [enable-rss?]} config]
+        rss?   (-> config :user-config :enable-rss?)]
     (cond->> config
-      true        process-all
-      enable-rss? write-rss-file!
-      true        write-files)))
+      true process-all
+      rss? write-rss-file!
+      true write-files)))
 
 (defn reload-requested-file
   "Take a request to a file, pulls the file out of memory

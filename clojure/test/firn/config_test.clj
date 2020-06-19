@@ -2,6 +2,7 @@
   (:require [firn.config :as sut]
             [clojure.test :as t]))
 
+;; TODO remove me.
 (t/deftest clean-config
   (t/testing "Permanent keys are not written over."
     (let [valid-ucfg   {:dir-data "data" :ignored-dirs ["priv"]}
