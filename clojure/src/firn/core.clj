@@ -97,5 +97,5 @@
         (case action
           "serve"  (server/serve    options)
           "build"  (build/all-files options)
-          "new"    (build/new-site  {}))))))
+          "new"    (build/new-site  options))))))
 

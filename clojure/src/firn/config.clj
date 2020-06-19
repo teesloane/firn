@@ -4,17 +4,8 @@
             [me.raynes.fs :as fs]
             [sci.core :as sci]))
 
-;; TODO: this gets written to resources starter config.
 (def starting-external-config
-  {:dir-data        "data"   ; org-attachments/files to get copied into _site.
-   :enable-rss?     true     ; If true, creates a feed.xml in _site.
-   :firn-properties false    ; whether to render properties under headings
-   ;; :firn-toc     ...      ; TODO
-   ;; :firn-fold    ...      ; TODO
-   :ignored-dirs    ["priv"] ; Directories to ignore org files in.
-   :site-desc       ""       ; Used for RSS.
-   :site-title      ""       ; Used for RSS.
-   :site-url        ""})
+  (read-string (slurp "resources/firn/_firn_starter/config.edn")))
 
 (defn make-dir-firn
   "make the _firn directory path."
@@ -35,7 +26,7 @@
      :dir-site        (mdp "/_site/")           ; the root dir of the compiled firn site.
      :dir-site-data   dir-site-data             ; _site data folder output.
      :dir-site-static (mdp "/_site/static/")    ; _site static output for dir-static.
-     :dir-static      (mdp "/static/")    ; static folder for css/js
+     :dir-static      (mdp "/static/")          ; static folder for css/js
      :dirname-files   parent-dir-name           ; the name of directory where firn is run.
      :layouts         {}                        ; layouts loaded into memory
      :org-files       []                        ; a list of org files, fetched when running setup.
