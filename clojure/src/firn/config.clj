@@ -27,7 +27,8 @@
   (let [mdp             #(str dir-files "/_firn" %)
         parent-dir-name (-> dir-files (s/split #"/") last)
         dir-site-data   (mdp (str "/_site/" (ext-config :dir-data)))] ; make-dir-path
-    {:dir-files       dir-files                 ; where org content lives.
+    {:dir-data        (str dir-files "/" (ext-config :dir-data))
+     :dir-files       dir-files                 ; where org content lives.
      :dir-firn        (make-dir-firn dir-files) ; the _firn root folder.
      :dir-layouts     (mdp "/layouts/")         ; where layouts are stored.
      :dir-partials    (mdp "/partials/")        ; where partials are stored.

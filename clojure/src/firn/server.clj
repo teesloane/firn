@@ -2,7 +2,6 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as s]
             [firn.build :as build]
-            [firn.config :as config]
             [firn.util :as u]
             [firn.dirwatch :refer [close-watcher watch-dir]]
             [me.raynes.fs :as fs]

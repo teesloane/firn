@@ -1,6 +1,7 @@
 (ns firn.build-test
   (:require [firn.build :as sut]
             [firn.stubs :as stub]
+            [firn.file-test :as file-test]
             [me.raynes.fs :as fs]
             [clojure.test :as t]))
 
@@ -44,3 +45,19 @@
       (t/is (= true (fs/exists? (setup-config :dir-site))))))
 
   (stub/delete-firn-dir))
+
+
+(t/deftest htmlify
+  (let [sample-file   (dissoc file-test/sample-file :as-html)
+        sample-config (stub/sample-config)
+        htmlified     (sut/htmlify sample-config sample-file)]
+    (t/testing "has :as-html config"
+      (t/is (contains? htmlified :as-html)))))
+
+(t/deftest process-one
+  (let [test-file     (stub/gtf :tf-1 :io)
+        sample-config (stub/sample-config)
+        processed     (sut/process-one sample-config test-file)]
+    (t/is (every? #(contains? processed %)
+                  [:path :as-json  :meta     :as-html
+                   :name :original :path-web :keywords  :as-edn]))))

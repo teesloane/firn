@@ -157,14 +157,15 @@
 
 (defn write-files
   "Takes a config, of which we can presume has :processed-files.
-  Iterates on these files, and writes them to html using layouts."
+  Iterates on these files, and writes them to html using layouts. Must return
+  the config for the defstate server to be able to store config in an atom."
   [config]
   (doseq [[_ f] (config :processed-files)]
     (let [out-file-name (str (config :dir-site) (f :path-web) ".html")]
       (when-not (file/is-private? config f)
         (io/make-parents out-file-name)
         (spit out-file-name (f :as-html)))))
-  nil #_config)
+  config)
 
 (defn all-files
   "Processes all files in the org-directory"
@@ -183,3 +184,4 @@
   (let [re-slurped (-> file :path io/file)
         re-processed (process-one config re-slurped)]
     re-processed))
+

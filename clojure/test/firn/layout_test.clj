@@ -3,6 +3,7 @@
             [firn.stubs :as stub]
             [clojure.test :as t]
             [firn.org :as org]
+            [firn.file :as file]
             [firn.build :as build]))
 
 (t/deftest prepare
