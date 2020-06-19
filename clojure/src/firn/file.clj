@@ -4,11 +4,7 @@
   If the input is is a java io file, it should be called `file-io`
 
   You can view the file data-structure as it is made by the `make` function."
-  (:require [cheshire.core :as json]
-            [clj-rss.core :as rss]
-            [clojure.java.io :as io]
-            [clojure.string :as s]
-            [firn.layout :as layout]
+  (:require [clojure.string :as s]
             [firn.org :as org]
             [firn.util :as u]))
 
@@ -73,6 +69,19 @@
   [f m]
   (merge f m))
 
+(defn get-keywords
+  "Returns a list of org-keywords from a file. All files must have keywords."
+  [f]
+  (let [expected-keywords (get-in f [:as-edn :children 0 :children])]
+    (if (= "keyword" (:type (first expected-keywords)))
+      expected-keywords
+      (u/print-err! :error "The org file <<" (f :name) ">> does not have 'front-matter' Please set at least the #+TITLE keyword for your file."))))
+
+(defn get-keyword
+  "Fetches a(n org) #+keyword from a file, if it exists."
+  [f keywrd]
+  (->> f get-keywords (u/find-first #(= keywrd (:key %))) :value))
+
 (defn keywords->map
   "Converts an org-file's keywords into a map.
    [{:type keyword, :key TITLE, :value Firn, :post_blank 0}
@@ -80,7 +89,7 @@
                                Becomes 
    {:title Firn, :date-created <2020-03-01--09-53>, :status active, :firn-layout project}"
   [f]
-  (let [kw            (org/get-keywords f)
+  (let [kw            (get-keywords f)
         lower-case-it #(when % (s/lower-case %))
         dash-it       #(when % (s/replace % #"_" "-"))
         key->keyword  (fn [k] (-> k :key lower-case-it dash-it keyword))]
@@ -90,7 +99,7 @@
   "Returns true if a file meets the conditions of being 'private'
   Assumes the files has been read into memory and parsed to edn."
   [config f]
-  (let [is-private?     (org/get-keyword f "FIRN_PRIVATE")
+  (let [is-private?     (get-keyword f "FIRN_PRIVATE")
         file-path       (-> f :path (s/split #"/"))
         in-priv-folder? (some (set file-path) (config :ignored-dirs))]
     (or
@@ -165,15 +174,6 @@
           ;; default case, recur.
           (recur xs out-logs out-links out-toc last-headline))))))
 
-(defn htmlify
-  "Renders files according to their `layout` keyword."
-  [config f]
-  (let [layout   (keyword (org/get-keyword f "FIRN_LAYOUT"))
-        as-html  (when-not (is-private? config f)
-                   (layout/apply-layout config f layout))]
-    ;; as-html
-    (change f {:as-html as-html})))
-
 (defn extract-metadata
   "Iterates over a tree, and returns metadata for site-wide usage such as
   links (for graphing between documents, tbd) and logbook entries."
@@ -181,117 +181,19 @@
   (let [org-tree       (file :as-edn)
         tree-data      (tree-seq map? :children org-tree)
         file-metadata  {:from-file (file :name) :from-file-path (file :path-web)}
-        date-updated   (org/get-keyword file "DATE_UPDATED")
-        date-created   (org/get-keyword file "DATE_CREATED")
+        date-updated   (get-keyword file "DATE_UPDATED")
+        date-created   (get-keyword file "DATE_CREATED")
         metadata       (extract-metadata-helper tree-data file-metadata)
         logbook-sorted (sort-logbook (metadata :logbook) file)]
 
     {:links           (metadata :links)
      :logbook         logbook-sorted
      :logbook-total   (sum-logbook logbook-sorted)
-     :keywords        (org/get-keywords file)
-     :title           (org/get-keyword file "TITLE")
-     :firn-under      (org/get-keyword file "FIRN_UNDER")
+     :keywords        (get-keywords file) ;; TODO - leaving off; this should eval the arguments with sci.
+     :title           (get-keyword file "TITLE")
+     :firn-under      (get-keyword file "FIRN_UNDER")
      :toc             (metadata :toc)
      :date-updated    (when date-updated (u/strip-org-date date-updated))
      :date-created    (when date-created (u/strip-org-date date-created))
      :date-updated-ts (when date-updated (u/org-date->ts date-updated))
      :date-created-ts (when date-created (u/org-date->ts date-created))}))
-
-(defn process-one
-  "Munge the 'file' datastructure; slowly filling it up, using let-shadowing.
-  Essentially, converts `org-mode file string` -> json, edn, logbook, keywords"
-  [config f]
-
-  (let [new-file      (make config f)                                     ; make an empty "file" map.
-        as-json       (->> f slurp org/parse!)                            ; slurp the contents of a file and parse it to json.
-        as-edn        (-> as-json (json/parse-string true))               ; convert the json to edn.
-        new-file      (change new-file {:as-json as-json :as-edn as-edn}) ; shadow the new-file to add the json and edn.
-        file-metadata (extract-metadata new-file)                         ; collect the file-metadata from the edn tree.
-        new-file      (change new-file {:meta file-metadata})             ; shadow the file and add the metadata
-        ;; TODO PERF: htmlify happening as well in `process-all`.
-        ;; this is due to the dev server. There should be a conditional
-        ;; that checks if we are running in server.
-        final-file    (htmlify config new-file)]                   ; parses the edn tree -> html.
-
-    final-file))
-
-(defn process-all
-  "Receives config, processes all files and builds up site-data
-  logbooks, site-map, link-map, etc."
-  [config]
-  (let [site-links (atom [])
-        site-logs  (atom [])
-        site-map   (atom [])]
-    ;; recurse over the org-files, gradually processing them and
-    ;; pulling out links, logs, and other useful data.
-    (loop [org-files (config :org-files)
-           output    {}]
-      (if (empty? org-files)
-        ;; LOOP/RECUR: run one more loop on all files, and create their html,
-        ;; now that we have processed everything.
-        (let [config-with-data (assoc config
-                                      :processed-files output
-                                      :site-map        @site-map
-                                      :site-links      @site-links
-                                      :site-logs       @site-logs)
-              ;; FIXME: I think we are rendering html twice here, should prob only happen here?
-              with-html        (into {} (for [[k pf] output] [k (htmlify config-with-data pf)]))
-              final            (assoc config-with-data :processed-files with-html)]
-          final)
-
-        ;; Otherwise continue...
-        (let [next-file         (first org-files)
-              processed-file    (process-one config next-file)
-              is-private        (is-private? config processed-file)
-              org-files         (rest org-files)
-              output            (if is-private
-                                  output
-                                  (assoc output (processed-file :path-web) processed-file))
-              ;; keyword-map       (keywords->map processed-file)
-              new-site-map-item (merge
-                                 (dissoc (processed-file :meta) :logbook :links :keywords)
-                                 {:path (str "/" (processed-file :path-web))})]
-
-
-
-          ;; add to sitemap when file is not private.
-
-
-          (when-not is-private
-            (swap! site-map conj new-site-map-item)
-            (swap! site-links concat (-> processed-file :meta :links))
-            (swap! site-logs concat  (-> processed-file :meta :logbook)))
-          ;; add links and logs to site wide data.
-          (recur org-files output))))))
-
-(defn write-rss-file!
-  "Build an rss file. It sorts files by file:meta:date-created, writes to feed.xml"
-  [{:keys [processed-files site-url site-title dir-site site-desc] :as config}]
-  (println "Building rss file...")
-  (let [feed-file   (str dir-site "feed.xml")
-        first-entry {:title site-title :link site-url :description site-desc}
-        make-rss    (fn [[_ f]]
-                      (hash-map :title   (-> f :meta :title)
-                                :link    (str site-url "/" (-> f :path-web))
-                                :pubDate (u/org-date->java-date  (-> f :meta :date-created))
-                                :description (str (f :as-html))))]
-    (io/make-parents feed-file)
-    (->> processed-files
-         (filter (fn [[_ f]] (-> f :meta :date-created)))
-         (map make-rss)
-         (sort-by :pubDate)
-         (reverse)
-         (u/prepend-vec first-entry) ; first entry must be about the site
-         (apply rss/channel-xml)
-         (spit feed-file)))
-  config)
-
-(defn reload-requested-file
-  "Take a request to a file, pulls the file out of memory
-  grabs the path of the original file, reslurps it and reprocesses"
-  [file config]
-  (let [re-slurped (-> file :path io/file)
-        re-processed (process-one config re-slurped)]
-    re-processed))
-

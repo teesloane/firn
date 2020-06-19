@@ -7,14 +7,16 @@
   (:require [firn.markup :as markup]
             [firn.org :as org]
             [hiccup.core :as h]
+            [firn.file :as file]
             [sci.core :as sci]))
+
 
 (defn- internal-default-layout
   "The default template if no `layout` key is specified.
   This lets users know they need to build a `_layouts/default.clj`"
   [{:keys [curr-file]}]
   [:main
-   [:div (markup/to-html (:as-edn curr-file))]])
+   [:div (markup/to-html (:as-edn curr-file) {})]])
 
 (defn get-layout
   "Checks if a layout for a project exists in the config map
@@ -42,34 +44,41 @@
   "Renders something from your org-mode file.
   This would be a nice multi-method if we could find a way
   to partially apply the file map to it."
-  ([file action]
-   (render file action {}))
-  ([file action opts]
-   (let [org-tree     (file :as-edn)
-         is-headline? (string? action)]
+  ([partial-map action]
+   (render partial-map action {}))
+  ([partial-map action opts]
+   (let [{:keys [file config]} partial-map
+         org-tree              (file :as-edn)
+         config-settings       (config :file-settings)
+         file-settings         (file/keywords->map file)
+         merged-options        (merge config-settings file-settings)
+         is-headline?          (string? action)]
+
      (cond
        ;; render the whole file.
        (= action :file)
-       (markup/to-html (file :as-edn))
+       (markup/to-html (file :as-edn) merged-options)
 
        ;; render a headline title.
+       ;; TODO - I think this can be removed.
        (and is-headline? (= opts :title))
        (let [hl (org/get-headline org-tree action)]
-         (-> hl :children first  markup/to-html))
+         (-> hl :children first  (markup/to-html {})))
 
        ;; render the headline raw.
-       (and is-headline? (= opts :title-raw))
-       (let [hl (org/get-headline org-tree action)]
-         (-> hl :children first :raw))
+       ;; TODO - I think this can be removed.
+       ;; (and is-headline? (= opts :title-raw))
+       ;; (let [hl (org/get-headline org-tree action)]
+       ;;   (-> hl :children first :raw))
 
        ;; render just the content of a headline.
        (and is-headline? (= opts :content))
        (let [headline-content (org/get-headline-content org-tree action)]
-         (markup/to-html headline-content))
+         (markup/to-html headline-content merged-options))
 
-       ;; render a heading (title and contnet).
+       ;; render a heading (title and content).
        (and is-headline? (= nil action))
-       (markup/to-html (org/get-headline org-tree action))
+       (markup/to-html (org/get-headline org-tree action) merged-options)
 
        ;; render a polyline graph of the logbook of the file.
        (= action :logbook-polyline)
@@ -77,8 +86,8 @@
 
        ;; render a table of contents
        (= action :toc)
-       (let [toc      (-> file :meta :toc) ; get the toc for hte file.
-             firn_toc (sci/eval-string (org/get-keyword file "FIRN_TOC")) ; read in keyword for overrides
+       (let [toc      (-> file :meta :toc)                                  ; get the toc for hte file.
+             firn_toc (sci/eval-string (file/get-keyword file "FIRN_TOC")) ; read in keyword for overrides
              opts     (or firn_toc opts {})] ; apply most pertinent options.
          (when (seq toc)
            (markup/make-toc toc opts)))
@@ -92,12 +101,15 @@
             "<br></div> "
             "</div>")))))
 
+
 (defn prepare
   "Prepare functions and data to be available in layout functions.
-  NOTE: pretty sure this being called twice as well. Do PERF work."
+  This is a 'public api' that a user would 'invoke' for common rendering tasks
+  made available in user layouts.
+  NOTE | PERF:  This might be being called twice."
   [config file]
   {;; Layout stuff --
-   :render        (partial render file)
+   :render        (partial render {:file file :config config})
    :partials      (config :partials)
    ;; Site-side stuff --
    :site-map      (config :site-map)

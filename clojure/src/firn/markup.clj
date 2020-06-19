@@ -222,7 +222,6 @@
        (when priority [heading-priority (str priority " ")])
        (make-child :span)])))
 
-
 (defn- footnote-ref
   [v]
   [:a.firn-footnote-ref
@@ -244,42 +243,43 @@
   "Recursively Parses the org-edn into hiccup.
   Some values don't get parsed (drawers) - yet. They return empty strings.
   Don't destructure! - with recursion, it can create uneven maps from possible nil vals on `v`"
-  [v]
-  (let [type           (get v :type)
-        children       (get v :children)
-        value          (get v :value)
-        value          (if value (s/trim-newline value) value)
-        ordered        (get v :ordered) ;; for lists
-        headline-level (get v :level)
-        headline-el    (u/str->keywrd "div.firn_headline-section.firn_headline-section-" headline-level)
-        make-child     #(into [%] (map to-html children))]
-    (case type
-      "document"      (make-child :div)
-      "headline"      (make-child headline-el)
-      "title"         (title->html v)
-      "section"       (make-child :section)
-      "paragraph"     (make-child :p)
-      "underline"     (make-child :u)
-      "italic"        (make-child :em)
-      "bold"          (make-child :strong)
-      "list"          (make-child (if ordered :ol :ul))
-      "list-item"     (make-child :li)
-      "quote-block"   (make-child :blockquote)
-      "table"         (make-child :table)
-      "table-row"     (make-child :tr)
-      "table-cell"    (make-child :td)
-      "source-block"  (src-block->html v)
-      "link"          (link->html v)
-      "fn-ref"        (footnote-ref v)
-      "fn-def"        (footnote-def v)
-      "code"          [:code value]
-      "verbatim"      [:code value]
-      "rule"          [:hr]
-      "cookie"        [:span.firn-cookie value]
-      "text"          [:span value]
-      "timestamp"     (date->html v)
-      "keyword"       "" ;; Don't parse
-      "comment-block" "" ;; Don't parse
-      "drawer"        "" ;; Don't parse
-      ;; default value. NOTE: Might be ideal to have a "if dev-mode -> show unparsed block"
-      "")))
+  ([v] (to-html v {}))
+  ([v opts]
+   (let [type           (get v :type)
+         children       (get v :children)
+         value          (get v :value)
+         value          (if value (s/trim-newline value) value)
+         ordered        (get v :ordered) ;; for lists
+         headline-level (get v :level)
+         headline-el    (u/str->keywrd "div.firn_headline-section.firn_headline-section-" headline-level)
+         make-child     #(into [%] (map (fn [c] (to-html c opts)) children))]
+     (case type
+       "document"      (make-child :div)
+       "headline"      (make-child headline-el)
+       "title"         (title->html v)
+       "section"       (make-child :section)
+       "paragraph"     (make-child :p)
+       "underline"     (make-child :u)
+       "italic"        (make-child :em)
+       "bold"          (make-child :strong)
+       "list"          (make-child (if ordered :ol :ul))
+       "list-item"     (make-child :li)
+       "quote-block"   (make-child :blockquote)
+       "table"         (make-child :table)
+       "table-row"     (make-child :tr)
+       "table-cell"    (make-child :td)
+       "source-block"  (src-block->html v)
+       "link"          (link->html v)
+       "fn-ref"        (footnote-ref v)
+       "fn-def"        (footnote-def v)
+       "code"          [:code value]
+       "verbatim"      [:code value]
+       "rule"          [:hr]
+       "cookie"        [:span.firn-cookie value]
+       "text"          [:span value]
+       "timestamp"     (date->html v)
+       "keyword"       "" ;; Don't parse
+       "comment-block" "" ;; Don't parse
+       "drawer"        "" ;; Don't parse
+       ;; default value. NOTE: Might be ideal to have a "if dev-mode -> show unparsed block"
+       ""))))

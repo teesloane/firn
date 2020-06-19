@@ -12,10 +12,11 @@
 (ns ^{:doc "Directory watcher"
       :author "Malcolm Sparks"
       :requires "JDK7"}
- firn.dirwatch
+    firn.dirwatch
   (:import (java.io File)
            (java.nio.file FileSystems Path StandardWatchEventKinds WatchEvent WatchKey WatchService)
-           (java.util.concurrent Executors ThreadFactory TimeUnit)))
+           (java.util.concurrent Executors ThreadFactory TimeUnit))
+  (:require [clojure.java.io :as io]))
 
 (set! *warn-on-reflection* true)
 

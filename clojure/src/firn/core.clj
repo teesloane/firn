@@ -5,7 +5,8 @@
             [clojure.tools.cli :refer [parse-opts]]
             [firn.server :as server]
             [clojure.string :as s]
-            [firn.util :as u]))
+            [firn.util :as u]
+            [mount.core :as mount]))
 
 (def FIRN-VERSION "0.0.5")
 
@@ -98,3 +99,6 @@
           "build"  (build/all-files options)
           "new"    (build/new-site  {}))))))
 
+
+(mount/stop)
+(-main "serve" "-d" "/Users/tees/Dropbox/wiki")
