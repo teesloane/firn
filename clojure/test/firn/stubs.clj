@@ -27,7 +27,7 @@
 (defn sample-config
   []
   (delete-firn-dir)
-  (build/new-site {:dir-files test-dir})
+  (build/new-site {:dir test-dir})
   (config/prepare test-dir))
 
 

@@ -12,7 +12,7 @@
   (t/testing "The _firn site shouldn't exist yet"
     (t/is (= false (fs/exists? stub/firn-dir))))
 
-  (sut/new-site {:dir-files stub/test-dir})
+  (sut/new-site {:dir stub/test-dir})
 
   (t/testing "Creates a new site with the proper structure."
     (doseq [file-path sut/default-files
@@ -28,7 +28,7 @@
 
 (t/deftest setup
   ;; setup requires that you have the _firn site in place; so:
-  (sut/new-site {:dir-files stub/test-dir})
+  (sut/new-site {:dir stub/test-dir})
 
   (let [config      (stub/sample-config)
         setup-config (sut/setup config)]
