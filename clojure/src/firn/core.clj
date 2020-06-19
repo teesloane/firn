@@ -52,7 +52,7 @@
    ;; A boolean option defaulting to nil
    ["-h" "--help"]
    ["-v" "--version"]
-   ["-d" "--dir PATH" "Directory to build/serve"
+   ["-d" "--dir PATH" "Absolute path of directory to build/serve"
     :default (u/get-cwd)]])
 
 (defn validate-args
