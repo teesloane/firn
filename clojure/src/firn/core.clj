@@ -5,8 +5,8 @@
             [clojure.tools.cli :refer [parse-opts]]
             [firn.server :as server]
             [clojure.string :as s]
-            [firn.util :as u]
-            [mount.core :as mount]))
+            [firn.util :as u]))
+
 
 (def FIRN-VERSION "0.0.5")
 
