@@ -99,6 +99,3 @@
           "build"  (build/all-files options)
           "new"    (build/new-site  {}))))))
 
-
-(mount/stop)
-(-main "serve" "-d" "/Users/tees/Dropbox/wiki")
