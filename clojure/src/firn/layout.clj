@@ -85,7 +85,7 @@
              opts (merge (config-settings :firn-toc)
                          layout-settings
                          (file-settings :firn-toc))]
-         (when (and (seq toc) (seq opts))
+         (when (seq toc)
            (markup/make-toc toc opts)))
 
        :else ; error message to indicate incorrect use of render.
