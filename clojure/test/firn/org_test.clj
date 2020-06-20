@@ -72,15 +72,11 @@
     (t/is (= (second-of-2020 :hour-sum) 0.18))
     (t/is (= (-> second-of-2020 :logs-raw count) 1))))
 
-(t/deftest get-keywords
-  (t/testing "A file with keywords returns a vector where each item is a map with a key of :type 'keyword'"
-    (let [file-1 (stub/gtf :tf-1 :processed)
-          res    (sut/get-keywords file-1)]
-      (doseq [keywrd res]
-        (t/is (= "keyword" (:type keywrd)))))))
-
-(t/deftest get-keyword
-  (t/testing "It returns a keyword"
-    (let [file-1 (stub/gtf :tf-1 :processed)
-          res    (sut/get-keyword file-1 "FIRN_LAYOUT")]
-      (t/is (= "default" res)))))
+(t/deftest make-headline-anchor
+  (t/testing "expected output"
+    (let [sample-headline
+          {:type "headline",
+           :level 1,
+           :children [{:type "title", :level 1, :raw "My Headline.", :children [{:type "text", :value "My Headline."}]}]}
+          res (sut/make-headline-anchor sample-headline)]
+      (t/is (= res "#my-headline")))))

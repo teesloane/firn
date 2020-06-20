@@ -1,0 +1,66 @@
+#+TITLE: Config
+
+* Overview
+
+Like many other static site generators, Firn can be configured. Configuration happens in the =config.edn= file at the root of the Firn site that is generated when you run =firn new= from the command line.
+
+When you build or serve your site using the Firn CLI, this file is read into memory and its values are made available to the functions that compile your site.
+
+The following table is a high-level view of each key an what it does.
+
+| Key               | Type    | Purpose                                                |
+|-------------------+---------+--------------------------------------------------------|
+| :dir-data         | string  | org-attachments/files to get copied into _site.        |
+| :enable-rss?      | boolean | If true, creates a feed.xml in _site.                  |
+| :firn-properties? | boolean | Files: whether to render properties under all headings |
+| :firn-toc         | map     | Files: settings for any rendered table of contents.    |
+| :ignored-dirs     | vector  | Dirs of org files to ignore at build time.             |
+| :site-desc        | string  | The description of your site, used for RSS.            |
+| :site-title       | string  | The title of your site, used for RSS.                  |
+| :site-url         | string  | The root url of your site.                             |
+
+
+* Overriding configuration
+
+Any property that begins with =:firn-*= is a field that will /impact the rendering of your files/. Specifically, these values correspond to what are known as [[https://orgmode.org/manual/In_002dbuffer-Settings.html][in-buffer settings]] in org-mode. Any of these fields in your configuration can be overridden in a single file's in-buffer settings. For example, in your config, you might turn off property rendering:
+
+#+BEGIN_SRC clojure
+{;...
+ :firn-properties? false
+ ;...
+ }
+#+END_SRC
+
+This ensures that no property-drawers are rendered under their respective headlines. However, you may have a single file that you want to render the property drawers for, when relevant. At the top of the file in question, you would override this setting by adding this in-buffer setting:
+
+#+BEGIN_SRC
+#+FIRN_PROPERTIES?: true
+#+END_SRC
+
+*NOTE:* In buffer settings for Firn must be at the top of the file, must be in all capitals, use underscores where hyphens are used in your config, and the values must properly map to a Clojure value. The following in buffer settings are incorrect:
+
+#+BEGIN_SRC
+#+FIRN-PROPERTIES?: true
+
+#+FIRN_PROPERTIES?: True
+
+#+FIRN_PROPERTIES?: t
+
+#+firn_properties?: t
+#+END_SRC
+
+
+* Usage
+
+Most values in =config.edn= are simple, scalar values - integers, strings, etc. For the sake of clarity, this section will go over settings that have compound values and the usage of which are not immediately clear.
+
+** Table of Contents
+
+The firn table of contents is rendered in a layout. If you use the default layout in Firn, it will be at the top of the file. See [[file:layout.org][layouts]] for more information. =:firn-toc= is configured as a map with possible values of =depth=, =headline=, and =exclusive?=
+
+#+BEGIN_SRC clojure
+{:depth 3          ; render only headlines that are of level 3 and below in the table of contents.
+ :headline "Notes" ; The table of contents will begin at the headline "Notes"
+ :exclusive? true  ; Do not render the headline "Notes", just its children.
+}
+#+END_SRC

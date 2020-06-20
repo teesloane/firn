@@ -12,7 +12,6 @@
             [me.raynes.fs :as fs]
             [firn.config :as config]
             [clojure.test]
-            [firn.file :as file]
             [firn.build :as build]))
 
 (def test-dir    "test/firn/demo_org")
@@ -28,7 +27,7 @@
 (defn sample-config
   []
   (delete-firn-dir)
-  (build/new-site {:dir-files test-dir})
+  (build/new-site {:dir test-dir})
   (config/prepare test-dir))
 
 
@@ -53,7 +52,7 @@
     (case res-form
       :path      file-path
       :io        (io/file file-path)
-      :processed (->> file-path io/file (file/process-one prep-config)))))
+      :processed (->> file-path io/file (build/process-one prep-config)))))
 
 ;; fixtures
 
