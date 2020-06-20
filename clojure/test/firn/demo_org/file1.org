@@ -1,5 +1,6 @@
 #+TITLE: Sample File!
 #+FIRN_LAYOUT: default
+#+FIRN_TOC: {:depth 5 :headline "Notes"}
 
 
 * Meta

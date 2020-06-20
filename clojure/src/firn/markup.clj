@@ -190,7 +190,7 @@
   "Constructs a headline title - with possible additional values
   (keywords, priorities, timestamps -> can all be found in a headline.)
   That aren't found in the `children` values and so need special parsing."
-  [v]
+  [v opts]
   (let [level            (v :level)
         children         (v :children)
         keywrd           (v :keyword)
@@ -209,7 +209,7 @@
                            5 (heading-id+class 5)
                            (heading-id+class 6))
         make-child       #(into [%] (map to-html children))]
-    (if properties
+    (if (and properties (opts :firn-properties?))
       [:div
        [h-level
         (when keywrd [heading-keyword (str keywrd " ")])
@@ -256,7 +256,7 @@
      (case type
        "document"      (make-child :div)
        "headline"      (make-child headline-el)
-       "title"         (title->html v)
+       "title"         (title->html v opts)
        "section"       (make-child :section)
        "paragraph"     (make-child :p)
        "underline"     (make-child :u)

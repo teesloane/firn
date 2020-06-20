@@ -4,7 +4,8 @@
   required contents for testing."
   (:require [firn.file :as sut]
             [firn.stubs :as stub]
-            [clojure.test :as t]))
+            [clojure.test :as t]
+            [sci.core :as sci]))
 
 
 ;; This represents the file "object" - a map of value that accumulate from
@@ -49,8 +50,7 @@
   (t/testing "A list of keywords gets converted into a map. "
     (let [file-1 (stub/gtf :tf-1 :processed)
           res    (sut/keywords->map file-1)]
-      (t/is (= res {:title "Sample File!" :firn-layout "default"}))
-      res)))
+      (t/is (= res {:title "Sample File!" :firn-layout "default" :firn-toc {:headline "Notes", :depth 5}})))))
 
 (t/deftest is-private?
   (t/testing "Returns true when a file has a private keywords"

@@ -10,7 +10,6 @@
             [firn.file :as file]
             [sci.core :as sci]))
 
-
 (defn- internal-default-layout
   "The default template if no `layout` key is specified.
   This lets users know they need to build a `_layouts/default.clj`"
@@ -49,10 +48,12 @@
   ([partial-map action opts]
    (let [{:keys [file config]} partial-map
          org-tree              (file :as-edn)
-         config-settings       (config :file-settings)
-         file-settings         (file/keywords->map file)
-         merged-options        (merge config-settings file-settings)
+         config-settings       (config :user-config) ; site-wide config: 0 precedence
+         file-settings         (file/keywords->map file) ; file-setting config: 2 precedence
+         layout-settings       (if (map? opts) opts {})
+         merged-options        (merge config-settings layout-settings  file-settings)
          is-headline?          (string? action)]
+
 
      (cond
        ;; render the whole file.
@@ -86,9 +87,13 @@
 
        ;; render a table of contents
        (= action :toc)
-       (let [toc      (-> file :meta :toc)                                  ; get the toc for hte file.
-             firn_toc (sci/eval-string (file/get-keyword file "FIRN_TOC")) ; read in keyword for overrides
-             opts     (or firn_toc opts {})] ; apply most pertinent options.
+       (let [toc      (-> file :meta :toc)                                  ; get the toc for the file.
+             ;; firn_toc (sci/eval-string (file/get-keyword file "FIRN_TOC")) ; read in keyword for overrides
+             opts (merge (config-settings :firn-toc) layout-settings (file-settings :firn-toc))]
+            ;  opts     (or firn_toc opts {})]
+         (prn (:firn-toc file-settings) "<>" (:firn-toc config-settings) "<>" (:firn-toc layout-settings))
+         (prn "opts is " opts)
+              ; apply most pertinent options.
          (when (seq toc)
            (markup/make-toc toc opts)))
 

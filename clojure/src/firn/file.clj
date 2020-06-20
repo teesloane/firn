@@ -6,7 +6,11 @@
   You can view the file data-structure as it is made by the `make` function."
   (:require [clojure.string :as s]
             [firn.org :as org]
-            [firn.util :as u]))
+            [firn.util :as u]
+            [sci.core :as sci]))
+
+;; #+ORG_KEYWORDS that we want to evaluate into real clojure values.
+(def keywords-to-eval [:firn-toc :firn-properties?])
 
 ;; -- Getters
 
@@ -89,11 +93,16 @@
                                Becomes 
    {:title Firn, :date-created <2020-03-01--09-53>, :status active, :firn-layout project}"
   [f]
-  (let [kw            (get-keywords f)
-        lower-case-it #(when % (s/lower-case %))
-        dash-it       #(when % (s/replace % #"_" "-"))
-        key->keyword  (fn [k] (-> k :key lower-case-it dash-it keyword))]
-    (into {} (map #(hash-map (key->keyword %) (% :value)) kw))))
+  (let [kw               (get-keywords f)
+        lower-case-it    #(when % (s/lower-case %))
+        dash-it          #(when % (s/replace % #"_" "-"))
+        key->keyword     (fn [k] (-> k :key lower-case-it dash-it keyword))
+        eval-it          (fn [kw]
+                           (let [k (key->keyword kw) v (kw :value)]
+                             (if (u/in? keywords-to-eval k)
+                               {k (sci/eval-string v)}
+                               {k v})))]
+    (->> kw (map eval-it) (into {}))))
 
 (defn is-private?
   "Returns true if a file meets the conditions of being 'private'
