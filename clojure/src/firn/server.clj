@@ -2,8 +2,6 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as s]
             [firn.build :as build]
-            [firn.config :as config]
-            [firn.file :as file]
             [firn.util :as u]
             [firn.dirwatch :refer [close-watcher watch-dir]]
             [me.raynes.fs :as fs]
@@ -36,12 +34,12 @@
       (cond
         ;; Handle reloading of the index / no uri
         (and (= req-uri-file "") (some? index-file))
-        (let [reloaded-file (file/reload-requested-file index-file @config!)] ; reslurp in case it has changed.
+        (let [reloaded-file (build/reload-requested-file index-file @config!)] ; reslurp in case it has changed.
           (response (reloaded-file :as-html)))
 
         ;; Handle when the route matches a file in memory
         (some? memory-file)                    ; If req-uri finds the file in the config's memory...
-        (let [reloaded-file (file/reload-requested-file memory-file @config!)] ; reslurp in case it has changed.
+        (let [reloaded-file (build/reload-requested-file memory-file @config!)] ; reslurp in case it has changed.
           (response (reloaded-file :as-html)))
 
         ;; Handle loading from file system if nothign else found.

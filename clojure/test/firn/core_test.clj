@@ -11,8 +11,8 @@
   (defn build-test-files
     [dir-to-build]
     (fs/delete-dir (config/make-dir-firn dir-to-build))
-    (build/new-site {:dir-files dir-to-build})
-    (build/all-files {:dir-files dir-to-build}))
+    (build/new-site {:dir dir-to-build})
+    (build/all-files {:dir dir-to-build}))
 
   (build-test-files test-dir)
   (build-test-files wiki-dir))

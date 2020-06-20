@@ -4,7 +4,8 @@
   required contents for testing."
   (:require [firn.file :as sut]
             [firn.stubs :as stub]
-            [clojure.test :as t]))
+            [clojure.test :as t]
+            [sci.core :as sci]))
 
 
 ;; This represents the file "object" - a map of value that accumulate from
@@ -49,8 +50,7 @@
   (t/testing "A list of keywords gets converted into a map. "
     (let [file-1 (stub/gtf :tf-1 :processed)
           res    (sut/keywords->map file-1)]
-      (t/is (= res {:title "Sample File!" :firn-layout "default"}))
-      res)))
+      (t/is (= res {:title "Sample File!" :firn-layout "default" :firn-toc {:headline "Notes", :depth 5}})))))
 
 (t/deftest is-private?
   (t/testing "Returns true when a file has a private keywords"
@@ -80,20 +80,6 @@
       ;; a clever way (I borrowed) to check if vals in a list are sorted.
       (t/is (apply >= start-times)))))
 
-(t/deftest htmlify
-  (let [sample-file   (dissoc sample-file :as-html)
-        sample-config (stub/sample-config)
-        htmlified     (sut/htmlify sample-config sample-file)]
-    (t/testing "has :as-html config"
-      (t/is (contains? htmlified :as-html)))))
-
-(t/deftest process-one
-  (let [test-file     (stub/gtf :tf-1 :io)
-        sample-config (stub/sample-config)
-        processed     (sut/process-one sample-config test-file)]
-    (t/is (every? #(contains? processed %)
-                  [:path :as-json  :meta     :as-html
-                   :name :original :path-web :keywords  :as-edn]))))
 
 (t/deftest sum-logbook
   (t/testing "It returns the expected output"
@@ -102,3 +88,16 @@
       (t/is (= res "4:44"))
       (t/is (= (type res) java.lang.String)))))
 
+
+(t/deftest get-keywords
+  (t/testing "A file with keywords returns a vector where each item is a map with a key of :type 'keyword'"
+    (let [file-1 (stub/gtf :tf-1 :processed)
+          res    (sut/get-keywords file-1)]
+      (doseq [keywrd res]
+        (t/is (= "keyword" (:type keywrd)))))))
+
+(t/deftest get-keyword
+  (t/testing "It returns a keyword"
+    (let [file-1 (stub/gtf :tf-1 :processed)
+          res    (sut/get-keyword file-1 "FIRN_LAYOUT")]
+      (t/is (= "default" res)))))

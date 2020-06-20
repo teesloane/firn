@@ -1,7 +1,8 @@
-{
- :dir-data     "data"   ; org attachments/files to get copied into _site.
- :ignored-dirs ["priv"] ; Directories to ignore org files in.
- :site-url     ""       ; Root level url
- :site-title   ""       ; Used for RSS.
- :site-desc    ""       ; Used for RSS.
- :enable-rss?  true}    ; defaults to true; creating feed.xml in your _site.
+{:dir-data         "data"   ; org-attachments/files to get copied into _site.
+ :enable-rss?      true     ; If true, creates a feed.xml in _site.
+ :firn-properties? false    ; global: whether to render properties under all headings
+  :firn-toc        nil      ; global: settings for any rendered table of contents
+ :ignored-dirs     ["priv"] ; Directories to ignore org files in.
+ :site-desc        ""       ; Used for RSS.
+ :site-title       ""       ; Used for RSS.
+ :site-url         ""}

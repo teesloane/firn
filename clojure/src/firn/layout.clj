@@ -7,14 +7,20 @@
   (:require [firn.markup :as markup]
             [firn.org :as org]
             [hiccup.core :as h]
-            [sci.core :as sci]))
+            [firn.file :as file]))
 
-(defn- internal-default-layout
-  "The default template if no `layout` key is specified.
-  This lets users know they need to build a `_layouts/default.clj`"
-  [{:keys [curr-file]}]
-  [:main
-   [:div (markup/to-html (:as-edn curr-file))]])
+(defn internal-default-layout
+  "The default template if no `layout` key and no default.clj layout is specified."
+  [{:keys [render] :as data}]
+  [:html
+   [:head
+    [:meta {:charset "UTF-8"}]
+    [:link {:rel "stylesheet" :href "/static/css/main.css"}]]
+   [:main
+    [:div (render :toc)]
+    [:div (render :file)]]])
+
+
 
 (defn get-layout
   "Checks if a layout for a project exists in the config map
@@ -42,34 +48,31 @@
   "Renders something from your org-mode file.
   This would be a nice multi-method if we could find a way
   to partially apply the file map to it."
-  ([file action]
-   (render file action {}))
-  ([file action opts]
-   (let [org-tree     (file :as-edn)
-         is-headline? (string? action)]
+  ([partial-map action]
+   (render partial-map action {}))
+  ([partial-map action opts]
+   (let [{:keys [file config]} partial-map
+         org-tree              (file :as-edn)
+         config-settings       (config :user-config) ; site-wide config: 0 precedence
+         file-settings         (file/keywords->map file) ; file-setting config: 2 precedence
+         layout-settings       (if (map? opts) opts {})
+         merged-options        (merge config-settings layout-settings  file-settings)
+         is-headline?          (string? action)]
+
+
      (cond
        ;; render the whole file.
        (= action :file)
-       (markup/to-html (file :as-edn))
-
-       ;; render a headline title.
-       (and is-headline? (= opts :title))
-       (let [hl (org/get-headline org-tree action)]
-         (-> hl :children first  markup/to-html))
-
-       ;; render the headline raw.
-       (and is-headline? (= opts :title-raw))
-       (let [hl (org/get-headline org-tree action)]
-         (-> hl :children first :raw))
+       (markup/to-html (file :as-edn) merged-options)
 
        ;; render just the content of a headline.
        (and is-headline? (= opts :content))
        (let [headline-content (org/get-headline-content org-tree action)]
-         (markup/to-html headline-content))
+         (markup/to-html headline-content merged-options))
 
-       ;; render a heading (title and contnet).
-       (and is-headline? (= nil action))
-       (markup/to-html (org/get-headline org-tree action))
+       ;; render a heading (title and content).
+       (and is-headline?)
+       (markup/to-html (org/get-headline org-tree action) merged-options)
 
        ;; render a polyline graph of the logbook of the file.
        (= action :logbook-polyline)
@@ -77,9 +80,11 @@
 
        ;; render a table of contents
        (= action :toc)
-       (let [toc      (-> file :meta :toc) ; get the toc for hte file.
-             firn_toc (sci/eval-string (org/get-keyword file "FIRN_TOC")) ; read in keyword for overrides
-             opts     (or firn_toc opts {})] ; apply most pertinent options.
+       (let [toc      (-> file :meta :toc) ; get the toc for the file.
+             ;; get configuration for toc in order of precedence
+             opts (merge (config-settings :firn-toc)
+                         layout-settings
+                         (file-settings :firn-toc))]
          (when (seq toc)
            (markup/make-toc toc opts)))
 
@@ -92,12 +97,15 @@
             "<br></div> "
             "</div>")))))
 
+
 (defn prepare
   "Prepare functions and data to be available in layout functions.
-  NOTE: pretty sure this being called twice as well. Do PERF work."
+  This is a 'public api' that a user would 'invoke' for common rendering tasks
+  made available in user layouts.
+  NOTE | PERF:  This might be being called twice."
   [config file]
   {;; Layout stuff --
-   :render        (partial render file)
+   :render        (partial render {:file file :config config})
    :partials      (config :partials)
    ;; Site-side stuff --
    :site-map      (config :site-map)

@@ -155,6 +155,11 @@
   [f coll]
   (first (filter f coll)))
 
+(defn in?
+  "true if coll contains elm"
+  [coll elm]
+  (some #(= elm %) coll))
+
 (defn take-while-after-first
   [pred lst]
   (let [head (first lst)

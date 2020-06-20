@@ -3,6 +3,7 @@
             [firn.stubs :as stub]
             [clojure.test :as t]
             [firn.org :as org]
+            [firn.file :as file]
             [firn.build :as build]))
 
 (t/deftest prepare
@@ -15,6 +16,6 @@
   (t/testing "The tf-layout file returns a sci function.")
   (let [test-file     (stub/gtf :tf-layout :processed)
         sample-config (build/setup (stub/sample-config))
-        layout        (keyword (org/get-keyword test-file "FIRN_LAYOUT"))
+        layout        (keyword (file/get-keyword test-file "FIRN_LAYOUT"))
         res           (sut/get-layout sample-config test-file layout)]
     (t/is (= sci.impl.vars.SciVar (type res)))))

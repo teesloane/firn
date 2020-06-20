@@ -1,6 +1,6 @@
 #+TITLE: Firn Setup
 #+DATE_CREATED: <2020-03-27 Fri>
-#+DATE_UPDATED: <2020-05-10 15:16>
+#+DATE_UPDATED: <2020-06-20 08:24>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: docs
 
@@ -9,10 +9,10 @@ site.
 
 * Folder Structure
 
-Firn was originally intended to build sites from a flat wiki structure but this
-is not mandatory. This works well with [[https://github.com/jethrokuan/org-roam][Org-Roam]], which I use in this setup
-currently. Not required, but useful. You can have nested folders, which /will/
-translate into nested url paths.
+Firn was originally intended to build sites from a flat wiki structure, although
+this is not mandatory. Firn works well with [[https://github.com/jethrokuan/org-roam][Org-Roam]], which is also not
+required, but useful. You can have nested folders, which /will/ translate into
+nested url paths.
 
 An example directory:
 

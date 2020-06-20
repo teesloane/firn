@@ -6,6 +6,7 @@
      [:body default-styles
       [:main
        [:article
+        [:div (render :toc)]
         [:div (render :file)]]
        [:aside
         [:div ""]
