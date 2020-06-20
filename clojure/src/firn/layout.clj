@@ -87,15 +87,12 @@
 
        ;; render a table of contents
        (= action :toc)
-       (let [toc      (-> file :meta :toc)                                  ; get the toc for the file.
-             ;; firn_toc (sci/eval-string (file/get-keyword file "FIRN_TOC")) ; read in keyword for overrides
-             opts (merge (config-settings :firn-toc) layout-settings (file-settings :firn-toc))]
-            ;  opts     (or firn_toc opts {})]
-         (prn (:firn-toc file-settings) "<>" (:firn-toc config-settings) "<>" (:firn-toc layout-settings))
-         (prn "opts is " opts)
-              ; apply most pertinent options.
-         (when (seq toc)
-           (markup/make-toc toc opts)))
+       (let [toc      (-> file :meta :toc) ; get the toc for the file.
+             ;; get configuration for toc in order of precedence
+             opts (merge (config-settings :firn-toc)
+                         layout-settings
+                         (file-settings :firn-toc))]
+         (when (seq toc) (markup/make-toc toc opts)))
 
        :else ; error message to indicate incorrect use of render.
        (str "<div style='position: fixed; background: antiquewhite; z-index: 999; padding: 24px; left: 33%; top: 33%; border: 13px solid lightcoral; box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);'>"
