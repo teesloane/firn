@@ -71,3 +71,12 @@
     (t/is (= (second-of-2020 :log-count) 1))
     (t/is (= (second-of-2020 :hour-sum) 0.18))
     (t/is (= (-> second-of-2020 :logs-raw count) 1))))
+
+(t/deftest make-headline-anchor
+  (t/testing "expected output"
+    (let [sample-headline
+          {:type "headline",
+           :level 1,
+           :children [{:type "title", :level 1, :raw "My Headline.", :children [{:type "text", :value "My Headline."}]}]}
+          res (sut/make-headline-anchor sample-headline)]
+      (t/is (= res "#my-headline")))))

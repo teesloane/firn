@@ -68,8 +68,7 @@
     (update headline :children (fn [d] (filter #(not= (:type %) "title") d)))))
 
 (defn make-headline-anchor
-  "Takes a headline data structure and returns the id 'anchored' for slugifying
-  TODO: test me."
+  "Takes a headline data structure and returns the id 'anchored' for slugifying"
   [node]
   (-> node get-headline-helper u/clean-anchor))
 

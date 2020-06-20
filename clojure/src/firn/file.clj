@@ -87,7 +87,7 @@
   (->> f get-keywords (u/find-first #(= keywrd (:key %))) :value))
 
 (defn keywords->map
-  "Converts an org-file's keywords into a map.
+  "Converts an org-file's keywords into a map, evaling values as necessary.
    [{:type keyword, :key TITLE, :value Firn, :post_blank 0}
     {:type keyword, :key DATE_CREATED, :value <2020-03-01--09-53>, :post_blank 0}]
                                Becomes 
@@ -198,7 +198,7 @@
     {:links           (metadata :links)
      :logbook         logbook-sorted
      :logbook-total   (sum-logbook logbook-sorted)
-     :keywords        (get-keywords file) ;; TODO - leaving off; this should eval the arguments with sci.
+     :keywords        (get-keywords file)
      :title           (get-keyword file "TITLE")
      :firn-under      (get-keyword file "FIRN_UNDER")
      :toc             (metadata :toc)
