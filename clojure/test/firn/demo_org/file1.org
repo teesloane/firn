@@ -1,5 +1,6 @@
 #+TITLE: Sample File!
 #+FIRN_LAYOUT: default
+#+FIRN_TOC: {:depth 5 :headline "Notes"}
 
 
 * Meta
@@ -38,7 +39,7 @@ CLOCK: [2020-03-28 Sat 15:45]--[2020-03-28 Sat 18:29] =>  2:44
   [dir-to-build]
   (let [config (build/prepare-config dir-to-build)]
     (fs/delete-dir (config :dir-firn))
-    (build/all-files {:dir-files dir-to-build})))
+    (build/all-files {:dir dir-to-build})))
 
 (build-test-files wiki-dir)
 (build-test-files test-dir)

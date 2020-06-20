@@ -68,8 +68,7 @@
     (update headline :children (fn [d] (filter #(not= (:type %) "title") d)))))
 
 (defn make-headline-anchor
-  "Takes a headline data structure and returns the id 'anchored' for slugifying
-  TODO: test me."
+  "Takes a headline data structure and returns the id 'anchored' for slugifying"
   [node]
   (-> node get-headline-helper u/clean-anchor))
 
@@ -85,24 +84,6 @@
       (catch Exception e
         (u/print-err! :warning  (str "Failed to parse the logbook for file:" "<<" name ">>" "\nThe logbook may be incorrectly formatted.\nError value:" e))
         "???"))))
-
-;; NOTE: These should be in File.clj, but they are not due to a circular dependency.
-;; --
-
-(defn get-keywords
-  "Returns a list of org-keywords from a file. All files must have keywords."
-  [f]
-  (let [expected-keywords (get-in f [:as-edn :children 0 :children])]
-    (if (= "keyword" (:type (first expected-keywords)))
-      expected-keywords
-      (u/print-err! :error "The org file <<" (f :name) ">> does not have 'front-matter' Please set at least the #+TITLE keyword for your file."))))
-
-(defn get-keyword
-  "Fetches a(n org) #+keyword from a file, if it exists."
-  [f keywrd]
-  (->> f get-keywords (u/find-first #(= keywrd (:key %))) :value))
-
-;; --
 
 ;; -- stats --
 

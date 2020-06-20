@@ -47,7 +47,7 @@
     (let [files (sut/find-files-by-ext stub/test-dir "org")]
       (t/is (= num-testing-files (count files))) ; not the best test, but only has to be updated when number of org sample files change.
       (doseq [f files]
-        (t/is (= ".org" (fs/extension (.getPath f)))))))
+        (t/is (= ".org" (fs/extension (.getPath ^java.io.File f)))))))
   (t/testing "It returns an empty list when nothing is found"
     (let [no-files (sut/find-files-by-ext stub/test-dir "foo")]
       (t/is (= (count no-files) 0)))))

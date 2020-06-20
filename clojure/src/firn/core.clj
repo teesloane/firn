@@ -7,6 +7,7 @@
             [clojure.string :as s]
             [firn.util :as u]))
 
+
 (def FIRN-VERSION "0.0.5")
 
 (defn init!
@@ -51,7 +52,7 @@
    ;; A boolean option defaulting to nil
    ["-h" "--help"]
    ["-v" "--version"]
-   ["-d" "--dir PATH" "Directory to build/serve"
+   ["-d" "--dir PATH" "Absolute path of directory to build/serve"
     :default (u/get-cwd)]])
 
 (defn validate-args
@@ -96,5 +97,5 @@
         (case action
           "serve"  (server/serve    options)
           "build"  (build/all-files options)
-          "new"    (build/new-site  {}))))))
+          "new"    (build/new-site  options))))))
 
