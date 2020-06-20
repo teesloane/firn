@@ -7,15 +7,20 @@
   (:require [firn.markup :as markup]
             [firn.org :as org]
             [hiccup.core :as h]
-            [firn.file :as file]
-            [sci.core :as sci]))
+            [firn.file :as file]))
 
-(defn- internal-default-layout
-  "The default template if no `layout` key is specified.
-  This lets users know they need to build a `_layouts/default.clj`"
-  [{:keys [curr-file]}]
-  [:main
-   [:div (markup/to-html (:as-edn curr-file) {})]])
+(defn internal-default-layout
+  "The default template if no `layout` key and no default.clj layout is specified."
+  [{:keys [render] :as data}]
+  [:html
+   [:head
+    [:meta {:charset "UTF-8"}]
+    [:link {:rel "stylesheet" :href "/static/css/main.css"}]]
+   [:main
+    [:div (render :toc)]
+    [:div (render :file)]]])
+
+
 
 (defn get-layout
   "Checks if a layout for a project exists in the config map
@@ -60,18 +65,6 @@
        (= action :file)
        (markup/to-html (file :as-edn) merged-options)
 
-       ;; render a headline title.
-       ;; TODO - I think this can be removed.
-       (and is-headline? (= opts :title))
-       (let [hl (org/get-headline org-tree action)]
-         (-> hl :children first  (markup/to-html {})))
-
-       ;; render the headline raw.
-       ;; TODO - I think this can be removed.
-       ;; (and is-headline? (= opts :title-raw))
-       ;; (let [hl (org/get-headline org-tree action)]
-       ;;   (-> hl :children first :raw))
-
        ;; render just the content of a headline.
        (and is-headline? (= opts :content))
        (let [headline-content (org/get-headline-content org-tree action)]
@@ -92,7 +85,8 @@
              opts (merge (config-settings :firn-toc)
                          layout-settings
                          (file-settings :firn-toc))]
-         (when (seq toc) (markup/make-toc toc opts)))
+         (when (and (seq toc) (seq opts))
+           (markup/make-toc toc opts)))
 
        :else ; error message to indicate incorrect use of render.
        (str "<div style='position: fixed; background: antiquewhite; z-index: 999; padding: 24px; left: 33%; top: 33%; border: 13px solid lightcoral; box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);'>"
