@@ -21,7 +21,7 @@
 (t/deftest link->html
   (t/testing "http-link"
     (t/is (= (sut/link->html (sample-links :http-link))
-             [:a.firn_external
+             [:a.firn-external
               {:href "https://docs.cider.mx/cider/usage/misc_features.html" :target "_blank"}
               "Miscellaneous Features :: CIDER Docs"])))
 
@@ -41,7 +41,7 @@
 
   (t/testing "internal-link"
     (t/is (= (sut/link->html (sample-links :file-link))
-             [:a.firn_internal {:href "./file2"} "File 2"]))))
+             [:a.firn-internal {:href "./file2"} "File 2"]))))
 
 (t/deftest internal-link-handler
   (t/testing "Expected results."

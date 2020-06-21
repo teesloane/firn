@@ -1,13 +1,9 @@
 (defn default
   [{:keys [render partials]}]
-  (let [{:keys [head]} partials
-        default-styles {:style "max-width: 700px; padding: 32px; margin: 0 auto"}]
+  (let [{:keys [head]} partials]
     (head
-     [:body default-styles
+     [:body
       [:main
        [:article
-        [:div (render :toc)]
-        [:div (render :file)]]
-       [:aside
-        [:div ""]
-        [:div ""]]]])))
+        ;; [:div (render :toc)] ;; Optional; add a table of contents
+        [:div (render :file)]]]])))

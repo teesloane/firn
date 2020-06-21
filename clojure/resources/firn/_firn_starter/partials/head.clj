@@ -3,5 +3,5 @@
   [:html
    [:head
     [:meta {:charset "UTF-8"}]
-    [:link {:rel "stylesheet" :href "/static/css/main.css"}]]
+    [:link {:rel "stylesheet" :href "/static/css/firn_base.css"}]]
    body])

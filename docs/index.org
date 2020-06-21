@@ -1,13 +1,64 @@
-#+TITLE: INDEX
+#+TITLE: Index
 #+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-06-20 08:23>
+#+DATE_UPDATED: <2020-06-24 16:22>
 #+FILE_UNDER: docs
-#+FIRN_LAYOUT: docs
+#+FIRN_LAYOUT: index
+#+FIRN_ORDER: 1000
 
 
-This is the index file of documentation for Firn, a static-site-generator for org-mode.
+* Details
+** Quickstart
+1. Download the [[https://github.com/theiceshelf/firn/releases][latest release]] (only Mac and Linux currently supported)
+2. Move the Firn binary into your path: =mv ~/Downloads/firn /usr/local/bin=
+3. Navigate to your directory of org files
+4. Run =firn new=
+5. Run =firn serve=
+6. Run =firn build= when ready to put your site online!
 
-- [[file:layout.org][Layout]] - Regarding the layout and formatting of org-mode files, when converted to html.
-- [[file:config.org][Configuration]] - Site/File wide configuration to apply while building your site.
-- [[file:org-tree.org][Org-tree]] - What an org mode file looks like when parsed and converted to edn.
-- [[file:setup.org][Setup]] - Setting up emacs / wiki dir, etc.
+-----
+
+** Overview
+
+Firn is a static site generator that aims to be a drop-in solution for creating
+web-sites from existing directories of org-mode files. Firn is a little
+different than some static site generators in that it is exclusively for
+rendering org-mode content; it is tailored to convert org-files into data
+structures, from which data and meta-data can be collected when processing a
+file.
+
+When you create and build a Firn site, the following happens:
+
+- Org files are read from a directory and parsed into a data structure
+  (internally called /the org-tree/).
+- Functions collect data (logbook entries, links, headlines) from the org-tree
+  across individual and collective files.
+- A user creates a "layout" file, using Hiccup and Clojure functions to render
+  the collected data:
+  - The entire file can simply be rendered to HTML.
+  - Specific headlines, their content, or org-data can be processed in a [[file:layout.org][layout]]
+    through the available ~render~ function.
+  - The org-tree and as a data-structure is also available to layouts if a user
+    need more fine-grained control.
+
+-----
+
+** FAQ
+
+*** Will Windows be supported?
+
+Unknown. GraalVM is capable of compiling to [[https://www.graalvm.org/docs/reference-manual/native-image/][native images]] for Windows. It may be
+possible to compile it but the core developer is only capable of supporting Mac
+and Linux at this time.
+
+*** Where can I see the feature roadmap?
+
+Keep an eye on the Github repository's [[https://github.com/theiceshelf/firn/issues][issues]] and [[https://github.com/theiceshelf/firn/projects/1][projects board]].
+*** Do I have to use Clojure in my layouts?
+For now, yes.
+*** How can I easily learn about E-macs and Org-mode?
+
+An opinionated response: try [[https://github.com/hlissner/doom-emacs][Doom Emacs]], including [[https://www.youtube.com/watch?v=rCMh7srOqvw&list=PLhXZp00uXBk4np17N39WvB80zgxlZfVwj][Zaiste's tutorials]] (which
+also cover org-mode).
+*** At what point, if I chew gum enough, will it go from having flavour, to having no flavour to having flavour again?
+
+That's a puzzler. I'm going to have to think about it.
