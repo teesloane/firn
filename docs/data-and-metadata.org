@@ -1,0 +1,252 @@
+#+TITLE: Data and Metadata
+#+DATE_CREATED: <2020-03-25 Wed>
+#+DATE_UPDATED: <2020-06-24 15:59>
+#+FILE_UNDER: docs
+#+FIRN_LAYOUT: docs
+#+FIRN_ORDER: 10
+
+🚧 This document is in flux as Firn's API shifts and changes. 🚧
+
+This document describe the data and metadata made available in Firn when it
+comes time to customize the rendering of your content in your [[file:layout.org][layouts]]. This is a
+more advanced topic that may require a bit of comfort with Clojure.
+
+Because Firn transforms org files into a data structure, it is possible to group
+content available to user's who want more advanced control and flexibility with
+their data. The two main sections in the document provide the following:
+
+*Metadata* - a description of the opinionated choices Firn makes to organize data
+for end-users.
+
+*Data* - the raw data available when a file is parsed - and how to access it if
+you need more fine grained control of your data.
+
+-----
+
+* Metadata
+
+Currently, *links*, *logbook entries*, a *table of contents*, are made available to
+users. Using the =render= function in layouts you can output pre-made html for
+certain metadata. Refer to the [[file:layout.org][layout]] file to learn more about the =render=
+function.
+
+If you would like to access the raw data in your layouts, destructure the "file"
+value into your layout. The =file= value is a Clojure map with quite a bit of
+content in it - the raw file contents, the contents as EDN, JSON, etc - too much
+so to describe in it's entirety here. Currently, the =file= map has a sub-map
+called =:meta= that provides all sorts of metadata available in your file.
+
+#+BEGIN_SRC clojure
+(defn my-layout
+  [{:keys [render file] :as data}]
+  ; ...
+  ; access meta (-> file :meta ...)
+  )
+#+END_SRC
+
+As the API for accessing file data changes, you can keep an eye on the [[https://github.com/theiceshelf/firn/blob/master/clojure/src/firn/file.clj#L55][file.clj]],
+source code to see what content is made available at "layout-time".
+
+** Logbook
+
+The logbook is collected and sorted by timestamp. The available data looks like so:
+
+#+BEGIN_SRC clojure
+[{:duration "1:04",
+  :end {:day 23, :dayname "Tue", :hour 15, :minute 39, :month 6, :year 2020},
+  :end-ts 1592926740000,
+  :from-file "Test File",
+  :from-file-path "Test File",
+  :from-headline "Sample Heading",
+  :post_blank 0,
+  :start {:day 23, :dayname "Tue", :hour 14, :minute 35, :month 6, :year 2020},
+  :start-ts 1592922900000,
+  :type "clock"}
+ ;....
+ ]
+#+END_SRC
+
+* Data
+
+Org files are parsed using a parser library called [[https://github.com/PoiScript/orgize][Orgize]]. When processing or
+serving your site, Firn sends your org-file as a string into Orgize, and gets
+back a data structure representing the contents of your file.
+
+Currently, the raw parsed output of Orgize is stored in in the =file= map under
+=:as-edn=. As per using your layouts as described in the Metadata section above,
+you can access the file map in your layouts.
+
+A simple file with a few headings, tasks, logbook, etc, looks like this
+after being parsed to JSON and converted to EDN:
+
+<details>
+<summary> Click to view code sample</summary>
+#+BEGIN_SRC clojure
+{:type "document",
+ :children
+ [{:type "section",
+   :children
+   [{:type "keyword",
+     :key "TITLE",
+     :value "Sample File!"}
+    {:type "keyword",
+     :key "FIRN_LAYOUT",
+     :value "default"}]}
+  {:type "headline",
+   :level 1,
+   :children
+   [{:type "title",
+     :level 1,
+     :raw "Meta",
+     :properties
+     {:file_under "Projects",
+      :state "active",
+      :date_completed "?",
+      :links "?",
+      :intent "Wiki",
+      :date_started "<2020-03-01 Sun>",
+      :slug "firn"},
+     :children [{:type "text", :value "Meta"}]}
+    {:type "section",
+     :children
+     [{:type "drawer",
+       :name "LOGBOOK",
+       :children
+       [{:type "clock",
+         :start {:year 2020, :month 3, :day 28, :dayname "Sat", :hour 15, :minute 45},
+         :end {:year 2020, :month 3, :day 28, :dayname "Sat", :hour 18, :minute 29},
+         :duration "2:44"}]}]}]}
+  {:type "headline",
+   :level 1,
+   :children
+   [{:type "title",
+     :level 1,
+     :raw "Headlines <2020-03-27 Fri>",
+     :properties {:foo "bar"},
+     :children
+     [{:type "text", :value "Headlines "}
+      {:type "timestamp",
+       :timestamp_type "active",
+       :start
+       {:year 2020,
+        :month 3,
+        :day 27,
+        :dayname "Fri"}}]}
+    {:type "section",
+     :children
+     [{:type "paragraph",
+       :children
+       [{:type "text",
+         :value "and some stuff with a date: "}
+        {:type "timestamp",
+         :timestamp_type "active",
+         :start
+         {:year 2020,
+          :month 3,
+          :day 27,
+          :dayname "Fri"}}
+        {:type "text", :value "\r"}]}]}
+    {:type "headline",
+     :level 2,
+     :children
+     [{:type "title",
+       :level 2,
+       :keyword "TODO",
+       :raw "Headline (2) with /keyword/",
+       :children
+       [{:type "text",
+         :value "Headline (2) with "}
+        {:type "italic",
+         :children
+         [{:type "text",
+           :value "keyword"}]}]}]}
+    {:type "headline",
+     :level 2,
+     :children
+     [{:type "title",
+       :level 2,
+       :priority "B",
+       :keyword "TODO",
+       :raw "Headline 2 with priority",
+       :children
+       [{:type "text",
+         :value "Headline 2 with priority"}]}]}]}
+  {:type "headline",
+   :level 1,
+   :children
+   [{:type "title",
+     :level 1,
+     :raw "Some Links",
+     :children
+     [{:type "text", :value "Some Links"}]}
+    {:type "section",
+     :children
+     [{:type "paragraph",
+       :children
+       [{:type "text", :value "A "}
+        {:type "verbatim", :value "file:"}
+        {:type "text", :value " link "}
+        {:type "link",
+         :path "file:file2.org",
+         :desc "File 2"}
+        {:type "text", :value "\r"}]}]}]}
+  {:type "headline",
+   :level 1,
+   :children
+   [{:type "title",
+     :level 1,
+     :raw "Tables",
+     :children
+     [{:type "text", :value "Tables"}]}
+    {:type "section",
+     :children
+     [{:type "paragraph",
+       :children
+       [{:type "text",
+         :value
+         "Some tables with texte markup in them\r"}]}
+      {:type "table",
+       :table_type "org",
+       :tblfm nil,
+       :children
+       [{:type "table-row", :table_row_type "standard",
+         :children
+         [{:type "table-cell", :children [{:type "text", :value "1"}]}
+          {:type "table-cell", :children [{:type "text", :value "2"}]}
+          {:type "table-cell", :children [{:type "text", :value "3"}]}
+          {:type "table-cell", :children [{:type "text", :value "4"}]}
+          {:type "table-cell", :children [{:type "text", :value "5"}]}]}
+        {:type "table-row",
+         :table_row_type "rule"}
+        {:type "table-row",
+         :table_row_type "standard",
+         :children
+         [{:type "table-cell",
+           :children
+           [{:type "text", :value "foo"}]}
+          {:type "table-cell",
+           :children
+           [{:type "verbatim", :value "foo"}]}
+          {:type "table-cell",
+           :children
+           [{:type "italic",
+             :children
+             [{:type "text",
+               :value "italic"}]}]}
+          {:type "table-cell"}
+          {:type "table-cell",
+           :children
+           [{:type "bold",
+             :children
+             [{:type "text",
+               :value "bold"}]}]}]}]}]}]}]}
+#+END_SRC
+</details>
+
+** Interacting with data                                        :revisit:
+
+As you can see, lots of data. Currently, Firn is not capable of interacting with
+this data very easily while you develop your Layouts. There are tentative plans
+to include a repl, or at least the ability to =println debug= in future releases.
+For now, it is possible to independently use the [[https://orgize.herokuapp.com][Orgize parser online]] to see
+test results as JSON.

@@ -1,0 +1,158 @@
+figure {
+  margin: 0;
+}
+
+figcaption {
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  padding: 4px 0px;
+  margin: 8px 0 4px;
+  font-family: Arial, sans-serif;
+}
+
+
+a {
+  text-decoration: none;
+  color: #357EDD;
+}
+
+a:visited {
+  color: #00449E;
+}
+
+pre {
+  max-width: 100%;
+  overflow-x: scroll;
+  font-size: 0.8rem;
+  background: #efefef;
+}
+
+pre code {
+  margin: 0;
+  padding: 32px;
+  font-size: 1em;
+  background: none;
+  font-size: 0.9em;
+  line-height: 1.8;
+}
+
+ul, ol {
+  padding-left: 16px;
+  padding-top: 0px;
+  margin-top: 0px;
+}
+
+ul ul {
+  list-style-type: circle;
+}
+
+li > p {
+  margin: 8px 0;
+}
+
+
+/* Tables */
+
+table {
+  /* Remove spacing between table cells (from Normalize.css) */
+  border-collapse: collapse;
+  border-spacing: 0;
+  empty-cells: show;
+  border: 1px solid #cbcbcb;
+  margin: 32px 0 ;
+  width: 100%;
+}
+
+table caption {
+  color: #000;
+  font: italic 85%/1 arial, sans-serif;
+  padding: 1em 0;
+  text-align: center;
+}
+
+table td,
+table th {
+  border-left: 1px solid #cbcbcb;
+  border-width: 0 0 0 1px;
+  font-size: inherit;
+  margin: 0;
+  overflow: visible;
+  padding: 0.5em 1em;
+}
+
+table tr:first-child {
+  background-color: #e0e0e0;
+  color: #000;
+  text-align: left;
+  vertical-align: bottom;
+}
+
+
+code {
+  background: #efefef;
+  font-size: 0.95em;
+  padding: 4px 6px;
+  margin: 0 4px;
+}
+
+
+blockquote {
+  margin: 32px 0;
+  background: #fafafa;
+  padding: 12px 24px;
+  border-left: 4px solid lightgrey;
+}
+
+
+hr {
+  margin: 32px 0;
+  height: 2px;
+  background-color: #afafaf;
+  border: none;
+}
+
+img {
+  width: 100%;
+}
+
+/* Heading Keywords and Priority */
+
+.firn_heading-priority {
+  margin: -22px 8px 0 -6px;
+  font-size: 8px;
+  min-width: 12px;
+  min-height: 12px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  /* border: 1px solid salmon; */
+}
+
+
+.firn_heading-priority__A {
+  color: salmon;
+}
+
+.firn_heading-priority__B {
+  color: mediumseagreen;
+}
+
+.firn_heading-priority__C {
+  color: lightblue;
+}
+
+.firn_heading-keyword > div {
+}
+
+.firn_heading-keyword__DONE {
+  margin-right: 4px;
+  color: lightgrey;
+}
+
+.firn_heading-keyword__TODO {
+  margin-right: 4px;
+  color: seagreen;
+}
+
+.firn_heading-timestamp {}
+.firn_heading-cookie {}

@@ -1,11 +1,13 @@
-#+TITLE: Firn Setup
+#+TITLE: Firn Setup (with Emacs)
 #+DATE_CREATED: <2020-03-27 Fri>
-#+DATE_UPDATED: <2020-06-20 08:24>
+#+DATE_UPDATED: <2020-06-24 16:19>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: docs
+#+FIRN_ORDER: 3
 
-The following are notes on how to best setup your editor and folder for a Firn
-site.
+
+The following are notes on how to best setup Emacs and your folder of org-files
+for a Firn site.
 
 * Folder Structure
 
@@ -35,6 +37,7 @@ An example directory:
 
 #+END_SRC
 * Links
+
 ** Linking between files
 
 All links should be relative.
@@ -57,8 +60,8 @@ When it comes to attachments:
 - You can configure which directory this is via the =:dir-data= key in your
   config.
 
-* Other Things
-** How To get auto timestamp on =DATE_UPDATED= on every file in emacs.
+* Miscellaneous
+** How to auto timestamp =DATE_UPDATED= on every file
 
 - Ensure that you have a =#+DATE_UPDATED= keyword in your org-files:
 
@@ -81,7 +84,7 @@ When it comes to attachments:
 #+BEGIN_SRC elisp
 (add-hook 'write-file-hooks 'time-stamp) ; update timestamp, if it exists, when saving
 #+END_SRC
-** Ignoring certain files or directories.
+** Ignoring certain files or directories
 
 Setting the keyword ~#+FIRN_PRIVATE: true~ in an org-mode file will cause the file
 not to be rendered. Similarly, you can set an entire directory to be ignored in

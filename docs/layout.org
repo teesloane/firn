@@ -1,32 +1,31 @@
 #+TITLE: Layout
 #+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-06-14 20:46>
+#+DATE_UPDATED: <2020-06-24 16:23>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: docs
+#+FIRN_ORDER: 1
 
 * Overview
 
-When you create a new Firn site for the first time, it will create a folder in
-=_firn/layouts=.
+When you create a new Firn site for the first time, it will create a folder:
+=_firn/layouts=. The layout folder stores Clojure files (=.clj=) that are
+responsible for how your org-file is rendered to-html; The act of "applying" a
+template means to pass the content of the org-file through a specific [[https://github.com/weavejester/hiccup][clojure
+hiccup]] template that organizes how the content is displayed.
 
-When an org-mode file is processed by Firn it looks at the file's =keywords= to
-see if it uses a Layout. If none are specified, the _default template_ is used.
-
-The act of "applying" a template means to pass the content of the org-file
-through a specific clojure hiccup template that organizes how the content is displayed.
+When an org-mode file is processed by Firn it looks for the in-buffer-setting
+~#+FIRN_LAYOUT:~ to see if it uses a Layout. If none are specified, the _default
+template_ is used.
 
 * Usage
 
-Let's walk through an example.
+Let's walk through an example of how to use layouts.
 
-#+BEGIN_SRC  sh
-mkdir firn_example
-cd firn_example; touch foo.org
-#+END_SRC
+Create a sample org file; we will call it =foo.org=. Edit it to include the
+following:
 
-Navigate to =foo.org= and open the file. Edit it to include the following:
-
-*NOTE*: Because the snippet below is org-mode code, you will need to remove the =\=  preceding the =*= Headlines.
+*NOTE*: Because the snippet below is org-mode code, you will need to remove the =\=
+preceding the =*= Headlines.
 
 #+BEGIN_SRC org
 
@@ -38,15 +37,15 @@ Navigate to =foo.org= and open the file. Edit it to include the following:
 
 \* My project
 
- This is my project
+ This is my project.
 
-\* Tasks
+\* Notes
 
  - [ ] Figure out how layouts work.
 #+END_SRC
 
 Now we have a file that is going to look for a layout called "docs" in the
-layouts folder. Return to the terminal
+layouts folder. Return to the terminal.
 
 #+BEGIN_SRC sh
 cd layouts
@@ -67,92 +66,161 @@ Inside docs.clj place the following clojure code.
         [:div (render "Notes")]]]]))) ;; Renders The notes section.
 #+END_SRC
 
+*NOTE:* Layouts can have multiple Clojure functions in them, however only the last
+function of the file will be applied as the layout.
+
 * Do I have to use layouts?
 
-Not really. If you don't have any .clj files in the =_firn/layouts/= directory,
-Firn will default to using the internal default template. This provides a very
-basic out of the box formatting and will render the entirety of your org mode file.
+Not exactly. When you create a new Firn site, it will have a =default.clj= file in
+the =layouts= directory. This provides a very basic out of the box formatting and
+will render the entirety of your org mode file. If you want to add any kinds of
+customization - even css, you'll need to work with layouts.
 
 * How do I customize the styling of my layouts?
 
-As with normal HTML, you'll need to add a =head= tag with a =link= and linking
-to a css file. It'll probably be most likely to create a partial for your =<head></head>=
-content that can then be shared across layouts:
+As with normal HTML, you'll need to add a =head= tag with a =link= that references
+to a css file. It might make sense for you to create a partial for defining your
+html =head= tag, allowing it to be shared across layouts:
 
 #+BEGIN_SRC clojure
 (defn head
   [body]
   [:html
    [:head
-    [:link {:rel "stylesheet" :href "/static/css/main.css"}]]
+    [:link {:rel "stylesheet" :href "/static/css/firn_base.css"}]]
    body])
 #+END_SRC
 
-* How do I drill down into the content of a headline?
+* The Render function
 
-First, a =headline= refers to a bullet headline in org-mode (the kind that are
-toggle-able with the =tab key)=. A =headline= can have =sub-headlines=, =drawers=
-(properties, logbooks, etc) and general text content (tables, lists, prose, etc.)
+Render is used to render content from your org file. It's an important one - if
+you don't use it, you won't see any org-mode content.
 
-Because a headline can contain so much data, the =render= function, made
-available to your layouts, aims to make getting content out of a headline easier.
+Quite a bit of data and functions are made available in your layouts. The =render=
+function you to decide what parts of your org-file you would like to display. Firn
+makes some "pre-made" content available for rendering - logbook graphs, table of
+contents, etc. It can render multiple kinds of content"
 
-View the code block below to see the multiple ways of using the =render= function
+| Render type       | Paramaters      | Example                                                              |
+|-------------------+-----------------+----------------------------------------------------------------------|
+| Entire file       | keyword         | ~(render :file)~                                                       |
+| Specific headline | string          | ~(render "Notes")~                                                     |
+| Specific content  | string, keyword | ~(render "Notes" :content)~                                            |
+| Table of contents | keyword, map    | ~(render :toc {:depth int :exclusive? bool :headline "Notes"})~        |
+| Logbook Polyline  | keyword, map    | ~(render :logbook-polyline {:stroke "#45698A" :height 60 :width 365})~ |
+|                   |                 |                                                                      |
+
+
+** Render an entire file
 
 #+BEGIN_SRC clojure
-;; In it's simplest form you can render a headline in it's entirety.
-;; This will search through the headlines for a headline with that name specifically
-;; and then render it to HTML.
-[:div (render "My Headline")]]
+(defn default
+  [{:keys [render partials]}]
+  (let [{:keys [head]} partials]
 
-;; Next, you can ask to just render the headline's title:
-[:div (render "My Headline" :title)]] ; => "My Headline"
+    (head
+     [:body
+       [:div (render :file)]])))
+#+END_SRC
+** Rendering specific headlines and content
 
-;; You can also ask to get the "raw" text, which will just return the
-;; plain-text of the title -- you're just getting <string> rather than
-;; a hiccup data structure; so you won't be getting an H1/H2/H3 etc.
-[:div (render "My Tasks" :title-raw)]] ; => "My Tasks".
+#+BEGIN_SRC clojure
+(defn default
+  [{:keys [render partials]}]
+  (let [{:keys [head]} partials]
+    (head
+     [:body
+       [:div (render "Notes")] ; render everything in "Notes" (including the heading "Notes")
+       [:div (render "Notes")] ; render the content in "Notes", excluding the heading.
+      ])))
 
-;; Render the contents of the headline - ie, everything but the title "My Tasks".
-[:div (render "My Tasks" :content)]]
 #+END_SRC
 
-* How can I access data in my layouts?
-** Overview
-Currently, you can also access some site-wide meta-data in your layouts, as well as
-file-specific meta-data. Example meta-data:
+** Render a Logbook SVG Polyline
 
-- All logbooks across all files.
-- All links across all files (which might be ideal for say... setting up a link graph.)
-- Here's a full list of data/functions you can use in your layouts.
+Graphs all logbook entries for the current file in a polyline, generating a chart for each year.
 
-** All Data/Function
+#+BEGIN_SRC clojure
+(defn default
+  [{:keys [render partials]}]
+  (let [{:keys [head]} partials]
+    (head
+     [:body
+       [:div (render :logbook-polyline {:stroke "#45698A" :height 60 :width 365})]])))
+#+END_SRC
 
-| Function/Data | Intent                                                 | Data-type |
-|---------------+--------------------------------------------------------+-----------|
-| config        | The site wide config.                                  | map       |
-| file-links    | A list of links per file                               | list      |
-| file          | The file as a data structure.                          | map       |
-| logbook       | A list of logbooks entries per file.                   | list      |
-| partials      | a list of invokable partials in your =partials= folder   | list      |
-| render        | Enables rendering parts or entirety of an org file.    | function  |
-| site-links    | A list of all links across all documents               | vector    |
-| site-logs     | A list of ALL logbook entries.                         | vector    |
-| site-map      | A list of all files on the wiki                        | vector    |
-| title         | The org mode file.                                     | string    |
-| meta          | A map of metadata about the file (logbook, links, etc) | map       |
-| title         | The #+TITLE value of the file.                         | string    |
-| firn-under    | The #+FIRN_UNDER value of the file                     | string    |
-| date-updated  | The #+DATE_UPDATED value of the file                   | string    |
-| date-created  | The #+DATE_CREATED value of the file                   | string    |
-| logbook-total | The sum of all the logbook entries                     | string    |
-| toc           | Table of contents                                      | vector    |
+** Rendering a Table of Contents
+When a file is processed, Firn collects *all* of it's headlines, whether you're
+choosing to render the entire file, or just one headline.
 
-This may seem like a lot of information to make available to a layout template. And that's because it is. But thanks to destructuring in Clojure, you can make your templates only ask for what they need:
+There are several ways you can create table of contents in your files, from simple to more complex use cases.
+
+1. Render a table of contents for an entire file.
+
+  #+BEGIN_SRC clojure
+  (defn default
+    [{:keys [render partials]}]
+    (let [{:keys [head]} partials]
+
+      (head
+       [:body
+         [:div (render :toc)]
+         [:div (render :file)]])))
+  #+END_SRC
+
+2. Render a table of contents for everything within a specific headline.
+
+  #+BEGIN_SRC clojure
+  (defn default
+    [{:keys [render partials]}]
+    (let [{:keys [head]} partials]
+      (head
+       [:body
+         ;; only renders a table of contents for a single headline's children.
+         ;; `:eclusive?` means we don't render "Notes"; just headlines that fall under it dflakdjflksadjf lksadjf lkasdjf lkasdjf .
+         [:div (render :toc {:headline "Notes"
+                             :depth 4
+                             :exclusive? true})]
+         [:div (render "Notes")]])))
+  #+END_SRC
+
+3. From within a file, you can set the keyword ~#+FIRN_TOC~ and pass it a map with
+   the properties above to enable a table of contents specific to a single file:
+
+  #+BEGIN_SRC
+  #+FIRN_TOC: {:depth 4}
+  #+END_SRC
+
+
+* Data and Functions available to layouts
+
+The following keys are made available in your layouts.
+
+| Function/Data | Intent                                               | Data-type |
+|---------------+------------------------------------------------------+-----------|
+| config        | The site wide config.                                | map       |
+| date-created  | The #+DATE_CREATED value of the file                 | string    |
+| date-updated  | The #+DATE_UPDATED value of the file                 | string    |
+| file          | The file as a data structure.                        | map       |
+| file-links    | A list of links per file                             | list      |
+| firn-under    | The #+FIRN_UNDER value of the file                   | string    |
+| logbook       | A list of logbooks entries per file.                 | list      |
+| logbook-total | The sum of all the logbook entries per file          | string    |
+| meta          | A map of metadata per file (logbook, links, etc)     | map       |
+| partials      | a list of invokable partials in your =partials= folder | list      |
+| render        | Enables rendering parts or entirety of an org file.  | function  |
+| site-links    | A list of all links across all documents             | vector    |
+| site-logs     | A list of aLL logbook entries.                       | vector    |
+| site-map      | A list of all files on the wiki                      | vector    |
+| title         | The #+TITLE value of the file.                       | string    |
+
+This may seem like a lot of information to make available to a layout template.
+And that's because it is. But thanks to destructuring in Clojure, you can make
+your templates only ask for what they need:
 
 #+BEGIN_SRC clojure
 (defn project
-  [{:keys [ render partials logbook] :as data}]
+  [{:keys [ render partials logbook] :as data}] ; < destructuring to make available only what you need.
   (let [{:keys [head nav]} partials]
     (head
      [:body
@@ -179,118 +247,21 @@ The above template only needs access to =render=, =partials= and the =logbook=. 
       (rndr date-created "Published: ")
       (rndr date-updated "Last Updated: ")
       (rndr firn-under "File Under: ")
-      (when-not (= logbook-total "0:0")
+      (when-not (= logbook-total "0:00")
         (rndr logbook-total "Time Logged: "))]]))
 
 #+END_SRC
 
-** The ~Render~ function.
-
-Render is used to render content from your org file. It's an important one - if you don't use it, you won't see any org-mode content. It can render multiple kinds of content:
-
-*Render an entire file:*
-
-#+BEGIN_SRC clojure
-(defn default
-  [{:keys [render partials]}]
-  (let [{:keys [head]} partials]
-
-    (head
-     [:body
-       [:div (render :file)]])))
-#+END_SRC
-
-*Render a headline and it's contents*
-
-#+BEGIN_SRC clojure
-(defn default
-  [{:keys [render partials]}]
-  (let [{:keys [head]} partials]
-    (head
-     [:body
-       [:div (render "Notes")]])))
-#+END_SRC
-
-*Render just a headline title*, or the raw title.
-
-#+BEGIN_SRC clojure
-(defn default
-  [{:keys [render partials]}]
-  (let [{:keys [head]} partials]
-    (head
-     [:body
-       ; render the headline title in "raw" plain text.
-       [:div (render "Notes" :title-raw)]
-       ; render the headline title in "rich" text (can be bold, have italic, etc.)
-       [:div (render "Notes" :title)]])))
-#+END_SRC
-
-*Render a Logbook as a polyline SVG:*
-
-Graphs all logbook entries for the current file in a polyline, generating a chart for each year.
-
-[[file:data/polyline.png][Polyline example chart]]
-
-#+BEGIN_SRC clojure
-(defn default
-  [{:keys [render partials]}]
-  (let [{:keys [head]} partials]
-    (head
-     [:body
-       [:div (render :logbook-polyline {:width 365})]])))
-#+END_SRC
-
-* Table of Contents
-When a file is processed, Firn collects *all* of it's headlines, whether you're
-choosing to render the entire file, or just one headline.
-
-There are several ways you can create table of contents in your files, from simple to more complex use cases.
-
-1. Render a table of contents for an entire file.
-
-#+BEGIN_SRC clojure
-(defn default
-  [{:keys [render partials]}]
-  (let [{:keys [head]} partials]
-
-    (head
-     [:body
-       [:div (render :toc)]
-       [:div (render :file)]])))
-#+END_SRC
-
-2. Render a table of contents for everything within a specific headline.
-
-#+BEGIN_SRC clojure
-(defn default
-  [{:keys [render partials]}]
-  (let [{:keys [head]} partials]
-    (head
-     [:body
-       ;; only renders a table of contents for a single headline's children.
-       ;; `:eclusive?` means we don't render "Notes"; just headlines that fall under it.
-       [:div (render :toc {:headline "Notes"
-                           :depth 4
-                           :exclusive? true})]
-       [:div (render "Notes")]])))
-#+END_SRC
-
-3. From within a file, you can set the keyword ~#+FIRN_TOC~ and pass it a map with
-   the properties above to enable a table of contents specific to a single file:
-
-#+BEGIN_SRC
-#+FIRN_TOC: {:depth 4}
-#+END_SRC
 
 * Styling Layouts
 
-You can write css as you normally would by placing css files in the =_firn/static/css=
-folder and then having =firn=  move them into your =_site= folder when run.
-Styling is applied through [[https://github.com/weavejester/hiccup#syntax][hiccup]].
+You can write css as you normally would by placing css files in the
+=_firn/static/css= folder and then having =firn= move them into your =_site= folder
+when run. Styling is applied through [[https://github.com/weavejester/hiccup#syntax][hiccup]].
 
 There are some internal styles that are applied when org-mode text is
-transformed into data. These styles are all prefaced with the keyword =firn_=,
-(ie =firn_title-prirority= or =firn_title-keyword=).
+transformed into data. These styles are all prefaced with the keyword =firn_=, (ie
+=firn_title-prirority= or =firn_title-keyword=).
 
 The following are the css classes and their rerspective org-mode structure they
 augment, as they come hard-coded into firn:
@@ -306,6 +277,6 @@ augment, as they come hard-coded into firn:
 | .firn_title-keyword__DONE       | Targets =DONE=                                |
 | .firn-headline-timestamp        | Headline Timestamps*                        |
 | .firn-headline-cookie           | Targets headline todo-count (ex =[7/10]=)     |
-| .firn_headline-section          | A "*" container and it's contents           |
-| .firn_headline-section-${level} | Target specific headline+container by level |
+| .firn-headline-section          | A "*" container and it's contents           |
+| .firn-headline-section-${level} | Target specific headline+container by level |
 | .firn-headline-${1-6}           | Target h1-h6                                |
