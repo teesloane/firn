@@ -10,7 +10,7 @@
             [sci.core :as sci]))
 
 ;; #+ORG_KEYWORDS that we want to evaluate into real clojure values.
-(def keywords-to-eval [:firn-toc :firn-properties?])
+(def keywords-to-eval [:firn-toc :firn-properties? :firn-order])
 
 ;; -- Getters
 
@@ -28,10 +28,10 @@
   (if (u/dupe-name-in-dir-path? file-path-abs dirname-files)
     (u/print-err! :error "\nWell, well, well. You've stumbled into one of weird edge cases of using Firn. \nCongrats on getting here! Let's look at what's happening. \n\nThe directory of your org files appears twice in it's path:\n\n<<" file-path-abs ">>\n\nIn order to properly build web-paths for your files, Firn needs to know where your 'web-root' is. \nWe cannot currently detect which folder is your file root. \nTo solve this, either rename your directory of org files: \n\n<<" dirname-files ">>\n\nor rename the earlier instance in the path of the same name.")
     (->> (s/split file-path-abs #"/")
-         (drop-while #(not (= % dirname-files)))
-         rest
-         (s/join "/")
-         (u/remove-ext))))
+       (drop-while #(not (= % dirname-files)))
+       rest
+       (s/join "/")
+       (u/remove-ext))))
 
 (defn get-io-name
   "Returns the name of a file from the Java ioFile object w/o an extension."
@@ -190,17 +190,18 @@
   (let [org-tree       (file :as-edn)
         tree-data      (tree-seq map? :children org-tree)
         file-metadata  {:from-file (file :name) :from-file-path (file :path-web)}
-        date-updated   (get-keyword file "DATE_UPDATED")
-        date-created   (get-keyword file "DATE_CREATED")
+        keywords       (keywords->map file)
         metadata       (extract-metadata-helper tree-data file-metadata)
-        logbook-sorted (sort-logbook (metadata :logbook) file)]
+        logbook-sorted (sort-logbook (metadata :logbook) file) ;; TODO - I think sorting this in extract-metadata helper makes more sense. Better internal API.
+        {:keys [date-updated date-created title firn-under firn-order]} keywords]
 
     {:links           (metadata :links)
      :logbook         logbook-sorted
      :logbook-total   (sum-logbook logbook-sorted)
-     :keywords        (get-keywords file)
-     :title           (get-keyword file "TITLE")
-     :firn-under      (get-keyword file "FIRN_UNDER")
+     :keywords        keywords
+     :title           title
+     :firn-under      firn-under
+     :firn-order      firn-order
      :toc             (metadata :toc)
      :date-updated    (when date-updated (u/strip-org-date date-updated))
      :date-created    (when date-created (u/strip-org-date date-created))

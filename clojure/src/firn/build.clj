@@ -17,7 +17,7 @@
   ["layouts/default.clj"
    "partials/head.clj"
    "config.edn"
-   "static/css/main.css"])
+   "static/css/firn_base.css"])
 
 (defn new-site
   "Creates the folders needed for a new site in your wiki directory.
@@ -119,9 +119,8 @@
               output            (if is-private
                                   output
                                   (assoc output (processed-file :path-web) processed-file))
-              ;; keyword-map       (keywords->map processed-file)
               new-site-map-item (merge
-                                 (dissoc (processed-file :meta) :logbook :links :keywords)
+                                 (dissoc (processed-file :meta) :logbook :links :keywords :toc)
                                  {:path (str "/" (processed-file :path-web))})]
 
           ;; add to sitemap when file is not private.

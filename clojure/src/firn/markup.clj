@@ -103,8 +103,8 @@
 (defn date->html
   [v]
   (let [{:keys [year month day hour minute]} (v :start)]
-    [:span (str year "/" month "/" day
-                (when (and hour minute) hour ":" minute))]))
+    [:span.firn-timestamp (str year "/" month "/" day
+                               (when (and hour minute) hour ":" minute))]))
 
 (defn props->html
   "Renders heading properties to html."
@@ -178,13 +178,15 @@
 
       ;; org files
       (re-matches org-file-regex link-href)
-      [:a.firn_internal {:href (internal-link-handler link-href)} link-val]
+      [:a.firn-internal {:href (internal-link-handler link-href)} link-val]
 
       (re-matches http-link-regex link-href)
-      [:a.firn_external {:href link-href :target "_blank"} link-val]
+      [:a.firn-external {:href link-href :target "_blank"} link-val]
 
+      ;; Otherwise, assume it's an internal anchor link.
       :else
-      [:a {:href link-href}])))
+      [:a {:href (u/clean-anchor link-href)} link-val])))
+
 
 (defn- title->html
   "Constructs a headline title - with possible additional values
@@ -251,7 +253,7 @@
          value          (if value (s/trim-newline value) value)
          ordered        (get v :ordered) ;; for lists
          headline-level (get v :level)
-         headline-el    (u/str->keywrd "div.firn_headline-section.firn_headline-section-" headline-level)
+         headline-el    (u/str->keywrd "div.firn-headline-section.firn-headline-section-" headline-level)
          make-child     #(into [%] (map (fn [c] (to-html c opts)) children))]
      (case type
        "document"      (make-child :div)

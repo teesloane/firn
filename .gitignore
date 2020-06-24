@@ -34,3 +34,4 @@ clojure/firn
 clojure/resources/libmylib.dylib
 rust/target
 target
+docs/_firn/_site

@@ -1,10 +1,21 @@
 #+TITLE: Limitations
+#+DATE_CREATED: <2020-03-27 Fri>
+#+DATE_UPDATED: <2020-06-24 15:58>
+#+FIRN_ORDER: 11
 
 * Development Server
 
 The file watcher (reloading of files on change) is a bit slow.
 
+* Attachments
+
+- Currently, Firn copies the _entirety of this folder into your build output_. This means that if you have attachments which are private or simply unlinked to from org-files, they will be included in your build output.
+- Org-attach links are not supported.
+
 * Footnotes
+
+This does not affect user's who are using the Firn binary - only those using the
+repl within the repo.
 
 Currently it seems that *in dev-mode* - ie. when in the repl and using the
 pre-compiled rust parser, footnotes definitions that have children on the same
@@ -13,5 +24,4 @@ line are not parse-able:
 =[fn:1] Content here < fails the parser.=
 
 Whereas, if you add a newline and add the content below, it works.
-
 So, far this seems to be fine using the final compiled Firn binary.

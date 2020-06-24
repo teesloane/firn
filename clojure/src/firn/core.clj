@@ -8,6 +8,7 @@
             [firn.util :as u]))
 
 
+
 (def FIRN-VERSION "0.0.5")
 
 (defn init!
@@ -98,4 +99,3 @@
           "serve"  (server/serve    options)
           "build"  (build/all-files options)
           "new"    (build/new-site  options))))))
-
