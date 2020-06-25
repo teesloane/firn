@@ -8,8 +8,7 @@
             [firn.util :as u]))
 
 
-
-(def FIRN-VERSION "0.0.5")
+(def FIRN-VERSION "0.0.6")
 
 (defn init!
   "When firn is run as a native image, move the dependencies (the parser bin)
