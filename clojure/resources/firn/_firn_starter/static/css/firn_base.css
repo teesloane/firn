@@ -1,4 +1,3 @@
-
 /*
  * Firn's default style sheet uses a modified version of:
  * MVP.css v1.6.2 - https://github.com/andybrewer/mvp
@@ -6,198 +5,207 @@
  */
 
 
+/* Reset / Overrides */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+
 :root {
-    --border-radius: 5px;
-    --box-shadow: 2px 2px 10px;
-    --color-primary: #3498db;
-    --color-primary-accent: #3498db0b;
-    --color-bg: #fff;
-    --color-bg-secondary: #e9e9e9;
-    --color-secondary: #3498db;
-    --color-secondary-accent: #3498db0b;
-    --color-shadow: #f4f4f4;
-    --color-text: #000;
-    --color-text-secondary: #999;
-    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-    --hover-brightness: 1.2;
-    --justify-important: center;
-    --justify-normal: left;
-    --line-height: 1.5;
-    --width-card: 285px;
-    --width-card-medium: 460px;
-    --width-card-wide: 800px;
-    --width-content: 768px;
-    /* Currently, Firn only supports 'todo | done' keywords. */
-    --keyword-active: #2ecc71; /* For "active" Todo keywords. */
-    --keyword-done: #bdc3c7;   /* For "done type keywords" */
+  --border-radius: 4px;
+  --box-shadow: 2px 2px 10px;
+  --color-primary: #3498db;
+  --color-primary-accent: #3498db14;
+  --color-bg: #fff;
+  --color-bg-secondary: #e9e9e9;
+  --color-secondary: #3498db;
+  --color-secondary-accent: #3498db0b;
+  --color-shadow: #f4f4f4;
+  --color-text: #444;
+  --color-text-secondary: #999;
+  --font-family: "IBM Plex Serif", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  --hover-brightness: 1.2;
+  --justify-important: center;
+  --justify-normal: left;
+  --line-height: 1.5;
+  --width-card: 285px;
+  --width-card-medium: 460px;
+  --width-card-wide: 800px;
+  --width-content: 960px;
+  /* Currently, Firn only supports 'todo | done' keywords. */
+  --keyword-active: #2ecc71; /* For "active" Todo keywords. */
+  --keyword-done: #bdc3c7;   /* For "done type keywords" */
+  --keyword-size: xx-small;
+
+  --priority-a-bg: #c0392b;
+  --priority-b-bg: #3498db;
+  --priority-c-bg: #2ecc71;
+  --priority-size: xx-small;
 }
 
 
 @media (prefers-color-scheme: dark) {
-    :root {
-        --color: #0097fc;
-        --color-primary-accent: #555;
-        --color-bg: #333;
-        --color-bg-secondary: #555;
-        --color-secondary: #3498db;
-        --color-secondary-accent: #3498db0b;
-        --color-shadow: #bbbbbb20;
-        --color-text: #f7f7f7;
-        --color-text-secondary: #aaa;
-    }
+  :root {
+    --color: #0097fc;
+    --color-primary-accent: #555;
+    --color-bg: #333;
+    --color-bg-secondary: #555;
+    --color-secondary: #EB9563;
+    --color-secondary-accent: #EB95630b;
+    --color-shadow: #bbbbbb20;
+    --color-text: #f7f7f7;
+    --color-text-secondary: #aaa;
+  }
 }
 
 /* Layout */
-article aside {
-    background: var(--color-secondary-accent);
-    border-left: 4px solid var(--color-secondary);
-    padding: 0.01rem 0.8rem;
-}
 
 body {
-    background: var(--color-bg);
-    color: var(--color-text);
-    font-family: var(--font-family);
-    line-height: var(--line-height);
-    margin: 0;
-    overflow-x: hidden;
-    padding: 1rem 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-family);
+  line-height: var(--line-height);
+  margin: 0;
+  overflow-x: hidden;
 }
 
 footer,
-header,
 main {
-    margin: 0 auto;
-    max-width: var(--width-content);
-    padding: 2rem 1rem;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.content {
+  max-width: var(--width-content);
 }
 
 hr {
-    background-color: var(--color-bg-secondary);
-    border: none;
-    height: 1px;
-    margin: 4rem 0;
+  background-color: var(--color-bg-secondary);
+  border: none;
+  height: 1px;
+  margin: 4rem 0;
 }
 
 section {
-    /* display: flex; */
-    /* flex-wrap: wrap; */
+  /* display: flex; */
+  /* flex-wrap: wrap; */
 }
 
 section aside {
-    border: 1px solid var(--color-bg-secondary);
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow) var(--color-shadow);
-    margin: 1rem;
-    padding: 1.25rem;
-    width: var(--width-card);
+  border: 1px solid var(--color-bg-secondary);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow) var(--color-shadow);
+  margin: 1rem;
+  padding: 1.25rem;
+  width: var(--width-card);
 }
 
 section aside:hover {
-    box-shadow: var(--box-shadow) var(--color-bg-secondary);
+  box-shadow: var(--box-shadow) var(--color-bg-secondary);
 }
 
 section aside img {
-    max-width: 100%;
+  max-width: 100%;
 }
 
->>>>>>> Start: default site styles (use mvp.css)
 [hidden] {
-    display: none;
+  display: none;
 }
 
 /* Headers */
 article header,
 div header,
 main header {
-    padding-top: 0;
+  padding-top: 0;
 }
 
 header {
-    text-align: var(--justify-important);
+  text-align: var(--justify-important);
 }
 
 header a b,
 header a em,
 header a i,
 header a strong {
-    margin-left: 0.5rem;
-    margin-right: 0.5rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
 }
 
 header nav img {
-    margin: 1rem 0;
+  margin: 1rem 0;
 }
 
 section header {
-    padding-top: 0;
-    width: 100%;
+  padding-top: 0;
+  width: 100%;
 }
 
 /* Nav */
 nav {
-    align-items: center;
-    display: flex;
-    font-weight: bold;
-    justify-content: space-between;
-    margin-bottom: 7rem;
+  align-items: center;
+  display: flex;
+  font-weight: bold;
+  justify-content: space-between;
+  margin-bottom: 7rem;
 }
 
 nav ul {
-    list-style: none;
-    padding: 0;
+  list-style: none;
+  padding: 0;
 }
 
 nav ul li {
-    display: inline-block;
-    margin: 0 0.5rem;
-    position: relative;
-    text-align: left;
+  display: inline-block;
+  margin: 0 0.5rem;
+  position: relative;
+  text-align: left;
 }
 
 /* Nav Dropdown */
 nav ul li:hover ul {
-    display: block;
+  display: block;
 }
 
 nav ul li ul {
-    background: var(--color-bg);
-    border: 1px solid var(--color-bg-secondary);
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow) var(--color-shadow);
-    display: none;
-    height: auto;
-    left: -2px;
-    padding: .5rem 1rem;
-    position: absolute;
-    top: 1.7rem;
-    white-space: nowrap;
-    width: auto;
+  background: var(--color-bg);
+  border: 1px solid var(--color-bg-secondary);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow) var(--color-shadow);
+  display: none;
+  height: auto;
+  left: -2px;
+  padding: .5rem 1rem;
+  position: absolute;
+  top: 1.7rem;
+  white-space: nowrap;
+  width: auto;
 }
 
 nav ul li ul li,
 nav ul li ul li a {
-    display: block;
+  display: block;
 }
 
 /* Typography */
 code,
 samp {
-    background-color: var(--color-primary-accent);
-    border-radius: var(--border-radius);
-    color: var(--color-text);
-    display: inline-block;
-    margin: 0 0.1rem;
-    padding: 0 0.5rem;
+  background-color: var(--color-primary-accent);
+  border-radius: var(--border-radius);
+  color: var(--color-text);
+  display: inline-block;
+  margin: 0 0.1rem;
+  padding: 0 0.5rem;
+  font-family: "IBM Plex Mono";
+  font-size: small;
 }
 
 details {
-    margin: 1.3rem 0;
+  margin: 1.3rem 0;
 }
 
 details summary {
-    font-weight: bold;
-    cursor: pointer;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 h1,
@@ -206,64 +214,68 @@ h3,
 h4,
 h5,
 h6 {
-    line-height: var(--line-height);
+  line-height: var(--line-height);
 }
 
 mark {
-    padding: 0.1rem;
+  padding: 0.1rem;
+}
+
+ol, ul {
+  margin: 0.125rem 0;
 }
 
 ol li,
 ul li {
-    padding: 0.2rem 0;
+  padding: 0.125rem 0;
 }
 
 p {
-    margin: 1rem 0;
-    padding: 0;
+  margin: 1rem 0;
+  padding: 0;
 }
 
 pre {
-    margin: 1rem 0;
-    max-width: var(--width-card-wide);
-    padding: 1rem 0;
+  margin: 1rem 0;
+  max-width: var(--width-card-wide);
+  padding: 1rem 0;
 }
 
 pre code,
 pre samp {
-    display: block;
-    max-width: var(--width-card-wide);
-    padding: 0.5rem 1rem;
-    overflow-x: auto;
+  display: block;
+  max-width: var(--width-card-wide);
+  padding: 0.5rem 1rem;
+  overflow-x: auto;
 }
 
 small {
-    color: var(--color-text-secondary);
+  color: var(--color-text-secondary);
 }
 
 sup {
-    background-color: var(--color-secondary);
-    border-radius: var(--border-radius);
-    color: var(--color-bg);
-    font-size: xx-small;
-    font-weight: bold;
-    margin: 0.2rem;
-    padding: 0.2rem 0.3rem;
-    position: relative;
-    top: -2px;
+  background-color: var(--color-secondary);
+  border-radius: var(--border-radius);
+  color: var(--color-bg);
+  font-size: xx-small;
+  font-weight: bold;
+  margin: 0.2rem;
+  padding: 0.2rem 0.3rem;
+  position: relative;
+  top: -2px;
 }
 
 /* Links */
 a {
-    color: var(--color-secondary);
-    display: inline-block;
-    font-weight: bold;
-    text-decoration: none;
+  color: var(--color-secondary);
+  display: inline-block;
+  font-weight: bold;
+  text-decoration: none;
 }
 
 a:hover {
-    filter: brightness(var(--hover-brightness));
-    text-decoration: underline;
+  filter: brightness(var(--hover-brightness));
+  text-decoration: underline;
 }
 
 a b,
@@ -271,190 +283,191 @@ a em,
 a i,
 a strong,
 button {
-    border-radius: var(--border-radius);
-    display: inline-block;
-    font-size: medium;
-    font-weight: bold;
-    line-height: var(--line-height);
-    margin: 0.5rem 0;
-    padding: 1rem 2rem;
+  border-radius: var(--border-radius);
+  display: inline-block;
+  font-size: medium;
+  font-weight: bold;
+  line-height: var(--line-height);
+  margin: 0.5rem 0;
+  cursor: pointer;
+  padding: 0.5rem 0.75rem;
 }
 
 button {
-    font-family: var(--font-family);
+  font-family: var(--font-family);
 }
 
 button:hover {
-    cursor: pointer;
-    filter: brightness(var(--hover-brightness));
+  cursor: pointer;
+  filter: brightness(var(--hover-brightness));
 }
 
 a b,
 a strong,
 button {
-    background-color: var(--color-primary);
-    border: 2px solid var(--color-primary);
-    color: var(--color-bg);
+  background-color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+  color: var(--color-bg);
 }
 
 a em,
 a i {
-    border: 2px solid var(--color-primary);
-    border-radius: var(--border-radius);
-    color: var(--color-primary);
-    display: inline-block;
-    padding: 1rem 2rem;
+  border: 2px solid var(--color-primary);
+  border-radius: var(--border-radius);
+  color: var(--color-primary);
+  display: inline-block;
+  padding: 1rem 2rem;
 }
 
 /* Images */
 figure {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 figure img {
-    max-width: 100%;
+  max-width: 100%;
 }
 
 figure figcaption {
-    color: var(--color-text-secondary);
+  color: var(--color-text-secondary);
 }
 
 /* Forms */
 
 button:disabled,
 input:disabled {
-    background: var(--color-bg-secondary);
-    border-color: var(--color-bg-secondary);
-    color: var(--color-text-secondary);
-    cursor: not-allowed;
+  background: var(--color-bg-secondary);
+  border-color: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+  cursor: not-allowed;
 }
 
 button[disabled]:hover {
-    filter: none;
+  filter: none;
 }
 
 form {
-    border: 1px solid var(--color-bg-secondary);
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow) var(--color-shadow);
-    display: block;
-    max-width: var(--width-card-wide);
-    min-width: var(--width-card);
-    padding: 1.5rem;
-    text-align: var(--justify-normal);
+  border: 1px solid var(--color-bg-secondary);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow) var(--color-shadow);
+  display: block;
+  max-width: var(--width-card-wide);
+  min-width: var(--width-card);
+  padding: 1.5rem;
+  text-align: var(--justify-normal);
 }
 
 form header {
-    margin: 1.5rem 0;
-    padding: 1.5rem 0;
+  margin: 1.5rem 0;
+  padding: 1.5rem 0;
 }
 
 input,
 label,
 select,
 textarea {
-    display: block;
-    font-size: inherit;
-    max-width: var(--width-card-wide);
+  display: block;
+  font-size: inherit;
+  max-width: var(--width-card-wide);
 }
 
 input[type="checkbox"],
 input[type="radio"] {
-    display: inline-block;
+  display: inline-block;
 }
 
 input[type="checkbox"]+label,
 input[type="radio"]+label {
-    display: inline-block;
-    font-weight: normal;
-    position: relative;
-    top: 1px;
+  display: inline-block;
+  font-weight: normal;
+  position: relative;
+  top: 1px;
 }
 
 input,
 select,
 textarea {
-    border: 1px solid var(--color-bg-secondary);
-    border-radius: var(--border-radius);
-    margin-bottom: 1rem;
-    padding: 0.4rem 0.8rem;
+  border: 1px solid var(--color-bg-secondary);
+  border-radius: var(--border-radius);
+  margin-bottom: 1rem;
+  padding: 0.4rem 0.8rem;
 }
 
 input[readonly],
 textarea[readonly] {
-    background-color: var(--color-bg-secondary);
+  background-color: var(--color-bg-secondary);
 }
 
 label {
-    font-weight: bold;
-    margin-bottom: 0.2rem;
+  font-weight: bold;
+  margin-bottom: 0.2rem;
 }
 
 /* Tables */
 table {
-    border: 1px solid var(--color-bg-secondary);
-    border-radius: var(--border-radius);
-    border-spacing: 0;
-    display: inline-block;
-    max-width: 100%;
-    overflow-x: auto;
-    padding: 0;
-    white-space: nowrap;
+  border: 1px solid var(--color-bg-secondary);
+  border-radius: var(--border-radius);
+  border-spacing: 0;
+  display: inline-block;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 0;
+  white-space: nowrap;
 }
 
 table td,
 table th,
 table tr {
-    padding: 0.4rem 0.8rem;
-    /* text-align: var(--justify-important); */
+  padding: 0.4rem 0.8rem;
+  /* text-align: var(--justify-important); */
 }
 
 /* Firn currently can't discern if a table has a <th>,*/
 /* so we style the first element.*/
 table tr:first-child {
-    background-color: var(--color-primary);
-    border-collapse: collapse;
-    border-radius: var(--border-radius);
-    color: var(--color-bg);
-    margin: 0;
-    padding: 0;
+  background-color: var(--color-primary);
+  border-collapse: collapse;
+  border-radius: var(--border-radius);
+  color: var(--color-bg);
+  margin: 0;
+  padding: 0;
 }
 
 table thead th:first-child {
-    border-top-left-radius: var(--border-radius);
+  border-top-left-radius: var(--border-radius);
 }
 
 table thead th:last-child {
-    border-top-right-radius: var(--border-radius);
+  border-top-right-radius: var(--border-radius);
 }
 
 table thead th:first-child,
 table tr td:first-child {
-    text-align: var(--justify-normal);
+  text-align: var(--justify-normal);
 }
 
 table tr:nth-child(even) {
-    background-color: var(--color-primary-accent);
+  background-color: var(--color-primary-accent);
 }
 
 /* Quotes */
 blockquote {
-    display: block;
-    font-size: x-large;
-    line-height: var(--line-height);
-    margin: 1rem auto;
-    max-width: var(--width-card-medium);
-    padding: 1.5rem 1rem;
-    text-align: var(--justify-important);
+  display: block;
+  font-size: x-large;
+  line-height: var(--line-height);
+  margin: 1rem auto;
+  max-width: var(--width-card-medium);
+  padding: 1.5rem 1rem;
+  text-align: var(--justify-important);
 }
 
 blockquote footer {
-    color: var(--color-text-secondary);
-    display: block;
-    font-size: small;
-    line-height: var(--line-height);
-    padding: 1.5rem 0;
+  color: var(--color-text-secondary);
+  display: block;
+  font-size: small;
+  line-height: var(--line-height);
+  padding: 1.5rem 0;
 }
 
 
@@ -467,8 +480,8 @@ blockquote footer {
    elements to get the spacing you like.*/
 
 li > p {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
 }
 
 
@@ -477,73 +490,83 @@ li > p {
 
 /* Images */
 .firn-img-with-caption {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .firn-img-with-caption img {
-    align-self: flex-start;
+  align-self: flex-start;
 }
 
 .firn-img-caption {
-    font-style: italic;
+  font-style: italic;
 }
 
 /* Headline Keywords and Priority */
 
 /* This applies to ALL h1-h6 */
 .firn-headline {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
 }
 
 .firn-headline-section {
-    margin-bottom: 32px;
+  margin-bottom: 32px;
 }
 
 .firn-headline-priority {
-    margin: -22px 8px 0 -6px;
-    font-size: 8px;
-    min-width: 12px;
-    min-height: 12px;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
+  /* margin: -22px 8px 0 -6px; */
+  /* font-size: 8px; */
+  /* min-width: 12px; */
+  /* min-height: 12px; */
+  /* display: inline-flex; */
+  /* justify-content: center; */
+  /* align-items: center; */
+  background-color: var(--color-secondary);
+  border-radius: var(--border-radius);
+  color: white;
+  font-size: xx-small;
+  font-weight: bold;
+  margin-right: 0.5rem;
+  padding: 0.2rem 0.3rem;
+  font-size: var(--priority-size);
 }
 
 
 .firn-headline-priority__A {
-    color: salmon;
+  background-color: var(--priority-a-bg);
 }
 
 .firn-headline-priority__B {
-    color: mediumseagreen;
+  background-color: var(--priority-b-bg);
+  font-size: var(--priority-size);
 }
 
 .firn-headline-priority__C {
-    color: lightblue;
+  background-color: var(--priority-c-bg);
+  font-size: var(--priority-size);
 }
 
 .firn-headline-keyword__DONE {
-    background-color: var(--keyword-done);
-    border-radius: var(--border-radius);
-    color: var(--color-bg);
-    font-size: xx-small;
-    font-weight: bold;
-    margin-right: 0.5rem;
-    padding: 0.2rem 0.3rem;
-    position: relative;
+  background-color: var(--keyword-done);
+  border-radius: var(--border-radius);
+  color: var(--color-bg);
+  font-size: var(--keyword-size);
+  font-weight: bold;
+  margin-right: 0.5rem;
+  padding: 0.2rem 0.3rem;
+  position: relative;
 }
 
 .firn-headline-keyword__TODO {
-    background-color: var(--keyword-active);
-    border-radius: var(--border-radius);
-    color: var(--color-bg);
-    font-size: xx-small;
-    font-weight: bold;
-    margin-right: 0.5rem;
-    padding: 0.2rem 0.3rem;
-    position: relative;
+  background-color: var(--keyword-active);
+  border-radius: var(--border-radius);
+  color: var(--color-bg);
+  font-size: xx-small;
+  font-weight: bold;
+  margin-right: 0.5rem;
+  padding: 0.2rem 0.3rem;
+  position: relative;
 }
 
 .firn-headline-timestamp {}
@@ -569,3 +592,11 @@ li > p {
 .firn-external {}
 
 .firn-internal {}
+
+/* If you choose to render :PROPERTIES: drawers, you may style them: */
+.firn-properties {
+  background: #efefef;
+  padding: 8px;
+}
+.firn-property-key {}
+.firn-property-value {}
