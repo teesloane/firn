@@ -1,9 +1,21 @@
 #+TITLE: Index
 #+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-06-24 16:22>
+#+DATE_UPDATED: <2020-06-25 09:50>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: index
 #+FIRN_ORDER: 1000
+
+
+* Directory
+
+| Page                | Intent                                             |
+|---------------------+----------------------------------------------------|
+| [[file:getting-started.org][Getting Started]]     | A full tutorial on build a Firn site from scratch  |
+| [[file:configuration.org][Configuration]]       | How a firn site / org-mode files can be configured |
+| [[file:data-and-metadata.org][Data & Metadata]]     | The shape of a parsed and processed org file       |
+| [[file:layout.org][Layout]]              | How to use layouts/partials                        |
+| [[file:limitations.org][Limitations]]         | Current limitations                                |
+| [[file:setup.org][Editor/Folder Setup]] | Practices for setting up emacs/org to use Firn     |
 
 
 * Details

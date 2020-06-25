@@ -12,10 +12,12 @@
 
 (defn index
   [{:keys [render partials] :as data}]
-  (let [{:keys [head]} partials]
+  (let [{:keys [head nav footer]} partials]
     (head
      [:body
+      (nav)
       (header)
       [:main.content
        [:div.py3
-        (render "Details" :content)]]])))
+        (render "Details" :content)]]
+      (footer)])))

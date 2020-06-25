@@ -1,6 +1,6 @@
-#+BEGIN_QUOTE
-Static site generator for org-mode. Status: ⚠️ Alpha.
-#+END_QUOTE
+#+html: <h2 align="center">Firn</h2>
+#+html: <p align="center">A Static Site Generator for Org Mode</p>
+#+html: <p align="center"><a href="https://github.com/theiceshelf/firn/releases"><img alt="GitHub release (latest by date including pre-releases)" src="https://img.shields.io/github/v/release/theiceshelf/firn?color=%2316a085&include_prereleases&style=flat-square"><a/>&nbsp;<img src="https://img.shields.io/badge/Status-Alpha-%23f39c12?style=flat-square">&nbsp;<a href="https://discord.gg/TbgKxYb"><img alt="Discord" src="https://img.shields.io/discord/707754224871669770?color=%233498db&label=Discord%20Chat%20&style=flat-square"></a></p>
 
 * Overview
 
@@ -9,7 +9,7 @@ other static site generators, in that it intends to be a drop in solution for
 creating sites from already existing folders of org-files. Further, because
 org-mode has great capacity for collecting and displaying different kinds of
 data (links, logbooks, drawers, task keywords, tags) we can make this data
-available when org-content is parsed into a data structure (read more [[file:docs/org-tree.org][here]]).
+available when org-content is parsed into a data structure.
 
 Currently, running the =firn= binary on a directory of org files performs the
 following:
@@ -27,38 +27,9 @@ Firn is currently being developed; many things are subject to change, or may be
 simply broken. Currently, only binaries for MacOS and Linux are being successfully
 compiled.
 
-** Building a static site
-*** With Binary
+------
 
-1. Download the [[https://github.com/theiceshelf/firn/releases][Firn Binary]].
-2. Move the binary into your path (you may need to run =chmod + x firn= to make it executable).
-3. Navigate to the directory of your org-mode files.
-4. Run =firn new=. This will create a =_firn= directory.
-5. Run =firn build=, still in the directory of your org-mode files.
-6. Navigate to =_firn/_site= to see your built site.
-
-*** With the Repo
-
-You also clone this repo and start a repl and run the build commands from the
-codebase yourself, take a look at =build.clj= or =server.clj= for a starting point.
-
-** Development server
-
-It's possible to run a server that will live-reload your files a you make
-changes to templates and partials. Navigate to your directory of files and run
-=firn serve=.
-
-** Configuration and Recommendations
-
-- When you run =firn new= you create a folder with a =config.edn= file that allows
-  you to customize some elements of how Firn runs. The possible customization
-  options are currently limited and are described in the =config.edn= file
-- In order for files to link to each other, org-mode links should be set to
-  *relative*. You can probably do this with dir-locals and setting
-  [[https://emacs.stackexchange.com/questions/32601/how-can-i-get-with-org-store-link-relative-path-instead-of-absolute][org-link-file-path-type]]
-  to =relative=. Read [[file:docs/setup.org][setup]] for more details
-- Firn was built to be used alongside the suggested structure of
-  [[https://github.com/org-roam/org-roam][Org Roam]]
+The Firn documentation is available [[https://firn.theiceshelf.com/][here]] and is mirrored and built from the [[file:docs/index.org][docs/]] folder in this repo.
 
 * Developing
 ** Prerequisites:
