@@ -90,7 +90,20 @@
 
     final-file))
 
-(defn process-all
+(defn process-site-map-with-pages!
+  "If a user has 'pages/*.clj' files - and their config enables it,
+  Add these to the site map."
+  [site-map! config]
+  (when (-> config :user-config :site-map-pages?)
+    (doseq [[k _] (config :pages)]
+      (swap! site-map! conj {:path       (u/keyword->web-path k)
+                             :title      (u/keyword->normal-text k)
+                             :firn-order 9999
+                             :firn-under "Page"})))
+  @site-map!)
+
+
+(defn process-all ; org-files
   "Receives config, processes all files and builds up site-data
   logbooks, site-map, link-map, etc."
   [config]
@@ -102,13 +115,13 @@
     (loop [org-files (config :org-files)
            output    {}]
       (if (empty? org-files)
-        ;; LOOP/RECUR: run one more loop on all files, and create their html,
+        ;; run one more loop on all files, and create their html,
         ;; now that we have processed everything.
-        (let [config-with-data (assoc config
-                                      :processed-files output
-                                      :site-map        @site-map
-                                      :site-links      @site-links
-                                      :site-logs       @site-logs)
+        (let [config-with-data     (assoc config
+                                          :processed-files output
+                                          :site-map        (process-site-map-with-pages! site-map config)
+                                          :site-links      @site-links
+                                          :site-logs       @site-logs)
               ;; FIXME: I think we are rendering html twice here, should prob only happen here?
               with-html        (into {} (for [[k pf] output] [k (htmlify config-with-data pf)]))
               final            (assoc config-with-data :processed-files with-html)]
@@ -157,14 +170,25 @@
        (spit feed-file)))
   config)
 
+
 (defn write-pages!
-  "Responsible for publishing html pages from clojure templates found in pages/"
-  [{:keys [dir-site pages] :as config}]
-  (doseq [[k f] pages
-          :let [out-file (str dir-site "/" (name k) ".html")
-                out-str  (h/html (f))]]
-    (io/make-parents out-file)
-    (spit out-file out-str))
+  "Responsible for publishing html pages from clojure templates found in pages/
+  Currently, we can only render a flat file list of .clj files in /pages.
+  FIXME: (In a later release) - do something similar to `file/get-web-path` and
+  enable `load-fns-into-map` to save filenames as :namespaced/keys, allowing
+  make-parent to work on it."
+  [{:keys [dir-site pages partials site-map site-links site-logs site-tags] :as config}]
+  (let [user-api {:partials   partials
+                  :site-map   site-map
+                  :site-links site-links
+                  :site-logs  site-logs
+                  :config     config}]
+
+    (doseq [[k f] pages
+            :let  [out-file (str dir-site "/" (name k) ".html")
+                   out-str  (h/html (f user-api))]]
+      (io/make-parents out-file)
+      (spit out-file out-str)))
   config)
 
 
@@ -199,3 +223,11 @@
         re-processed (process-one config re-slurped)]
     re-processed))
 
+
+(defn reload-requested-page
+  "When user requests a non-org-file page (pages/*.clj), we reslurp the clj files
+  into the config and then re-write them to html."
+  [config!]
+  (let [pages (file/read-clj :pages @config!)]
+    (swap! config! assoc :pages pages)
+    (write-pages! @config!)))
