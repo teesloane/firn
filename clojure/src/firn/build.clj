@@ -182,6 +182,7 @@
                   :site-map   site-map
                   :site-links site-links
                   :site-logs  site-logs
+                  :site-tags  [] ; TODO: collect tags; site-tags
                   :config     config}]
 
     (doseq [[k f] pages

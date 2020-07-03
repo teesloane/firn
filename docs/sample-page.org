@@ -1,7 +1,7 @@
 #+TITLE: Sample Page
 #+FIRN_LAYOUT: sample-page
 #+FIRN_PROPERTIES?: true
-#+FIRN_ORDER: 12
+#+FIRN_ORDER: 7 
 
 * Example content
 

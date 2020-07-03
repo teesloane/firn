@@ -1,5 +1,5 @@
 #+TITLE: Configuration
-#+FIRN_ORDER: 5
+#+FIRN_ORDER: 1
 
 * Overview
 
@@ -63,6 +63,7 @@ The firn table of contents is rendered in a layout. If you use the default layou
 | =:site-desc=        | string  | The description of your site, used for RSS.            |
 | =:site-title=       | string  | The title of your site, used for RSS.                  |
 | =:site-url=         | string  | The root url of your site.                             |
+| =:site-map-pages?=  | boolean | Whether to include custom pages in your site-map       |
 
 ** Per-file configuration
 

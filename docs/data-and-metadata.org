@@ -3,7 +3,7 @@
 #+DATE_UPDATED: <2020-06-24 15:59>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: docs
-#+FIRN_ORDER: 10
+#+FIRN_ORDER: 5 
 
 🚧 This document is in flux as Firn's API shifts and changes. 🚧
 
