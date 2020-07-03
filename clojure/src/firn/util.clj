@@ -91,6 +91,17 @@
   [io-file]
   (-> io-file file-name-no-ext (snake->kebab :key-it)))
 
+(defn keyword->web-path
+  [kw]
+  (str "/" (name kw)))
+
+(defn keyword->normal-text
+  [kw]
+  (-> kw name
+     (s/replace #"-" " ")
+     (s/replace #"_" " ")
+     (s/capitalize)))
+
 ;; File Path fns ----
 ;; Mostly for operating on paths: `file/paths/woo/hoo.org`
 

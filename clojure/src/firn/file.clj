@@ -59,7 +59,7 @@
   "Creates a file; which is to say, a map of data & metadata about an org-file."
   [config io-file]
   (let [name     (get-io-name io-file)
-        path-abs (.getPath ^java.io.File io-file) ; (-> io-file ^java.io.File .getPath)
+        path-abs (.getPath ^java.io.File io-file)
         path-web (get-web-path (config :dirname-files) path-abs)]
     {:as-edn    nil      ; JSON of org file -> converted to a map.
      :as-html   nil      ; the html output

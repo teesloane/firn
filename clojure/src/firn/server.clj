@@ -8,7 +8,8 @@
             [mount.core :as mount :refer [defstate]]
             [org.httpkit.server :as http]
             [ring.middleware.file :as r-file]
-            [ring.util.response :refer [response]]))
+            [ring.util.response :refer [response]]
+            [firn.file :as file]))
 
 (declare server)
 (def file-watcher  (atom nil))
@@ -25,6 +26,7 @@
   [config!]
   (fn [request]
     (let [dir-site        (get @config! :dir-site)
+          dir-pages       (get @config! :dir-pages)
           res-file-system ((r-file/wrap-file request dir-site) request)     ; look for file in FS
           req-uri-file    (prep-uri request)
           memory-file     (get-in @config! [:processed-files req-uri-file]) ; use the uri to pull values out of memory in config
@@ -38,11 +40,19 @@
           (response (reloaded-file :as-html)))
 
         ;; Handle when the route matches a file in memory
-        (some? memory-file)                    ; If req-uri finds the file in the config's memory...
+        (some? memory-file) ; If req-uri finds the file in the config's memory...
         (let [reloaded-file (build/reload-requested-file memory-file @config!)] ; reslurp in case it has changed.
           (response (reloaded-file :as-html)))
 
-        ;; Handle loading from file system if nothign else found.
+        ;; request is a "page" (and not in memory)
+        ;; Looks for a .clj file, then reloads the about page into html
+        ;; then responsds with the html file.
+        (fs/exists? (str dir-pages "/" req-uri-file ".clj"))
+        (let [modded-req (update request :uri #(str % ".html"))]
+          (build/reload-requested-page config!)
+          ((r-file/wrap-file modded-req dir-site) modded-req))
+
+        ;; Handle loading from file system if nothing else found.
         (some? res-file-system)
         res-file-system
 
@@ -81,6 +91,7 @@
 
         ;; The dirs we are moving things to<->from
         {:keys [dir-partials    dir-layouts
+                dir-pages
                 dir-static      dir-site
                 dir-site-static dir-data
                 dir-site-data]} @config!]
@@ -124,8 +135,8 @@
         path-to-site                  (str dir "/_firn/_site")
         ;; NOTE: consider making this global, and so available to a sci repl?
         config!                       (atom (-> (mount/args) build/all-files))
-        {:keys [dir-layouts dir-partials dir-static dir-data]} @config!
-        watch-list                    (map io/file [dir-layouts dir-partials dir-static dir-data])]
+        {:keys [dir-layouts dir-partials dir-static dir-data dir-pages]} @config!
+        watch-list                    (map io/file [dir-layouts dir-partials dir-static dir-data dir-pages])]
 
     ;; start watchers
     (reset! file-watcher (apply watch-dir (partial handle-watcher config!) watch-list))
