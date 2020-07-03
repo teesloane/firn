@@ -9,12 +9,14 @@
             [firn.layout :as layout]
             [cheshire.core :as json]
             [firn.util :as u]
-            [me.raynes.fs :as fs]))
+            [me.raynes.fs :as fs]
+            [hiccup.core :as h]))
 
 (set! *warn-on-reflection* true)
 
 (def default-files
   ["layouts/default.clj"
+   "pages/tags.clj"
    "partials/head.clj"
    "config.edn"
    "static/css/firn_base.css"])
@@ -57,8 +59,9 @@
 
   (let [org-files (u/find-files-by-ext dir-files "org")
         layouts   (file/read-clj :layouts config)
+        pages     (file/read-clj :pages config)
         partials  (file/read-clj :partials config)]
-    (assoc config :org-files org-files :layouts layouts :partials partials)))     
+    (assoc config :org-files org-files :layouts layouts :partials partials :pages pages)))
 
 (defn htmlify
   "Renders files according to their `layout` keyword."
@@ -154,6 +157,17 @@
        (spit feed-file)))
   config)
 
+(defn write-pages!
+  "Responsible for publishing html pages from clojure templates found in pages/"
+  [{:keys [dir-site pages] :as config}]
+  (doseq [[k f] pages
+          :let [out-file (str dir-site "/" (name k) ".html")
+                out-str  (h/html (f))]]
+    (io/make-parents out-file)
+    (spit out-file out-str))
+  config)
+
+
 (defn write-files
   "Takes a config, of which we can presume has :processed-files.
   Iterates on these files, and writes them to html using layouts. Must return
@@ -174,6 +188,7 @@
     (cond->> config
       true process-all
       rss? write-rss-file!
+      true write-pages!
       true write-files)))
 
 (defn reload-requested-file

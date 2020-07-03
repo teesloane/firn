@@ -20,8 +20,6 @@
     [:div (render :toc)]
     [:div (render :file)]]])
 
-
-
 (defn get-layout
   "Checks if a layout for a project exists in the config map
   If it does, return the function value of the layout, otherwise the default template "
@@ -96,7 +94,6 @@
                 <br> opts:  => " opts " <code> << is this a valid value? </code>"
             "<br></div> "
             "</div>")))))
-
 
 (defn prepare
   "Prepare functions and data to be available in layout functions.
