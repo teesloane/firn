@@ -42,13 +42,16 @@
 (defn read-clj
   "Reads a folder full of clj files, such as partials or layouts.
   pass a symbol for dir to request a specific folder."
-  [dir {:keys [dir-partials dir-layouts]}]
+  [dir {:keys [dir-partials dir-layouts dir-pages]}]
   (case dir
     :layouts
     (-> dir-layouts (u/find-files-by-ext "clj") (u/load-fns-into-map))
 
     :partials
     (-> dir-partials (u/find-files-by-ext "clj") (u/load-fns-into-map))
+
+    :pages
+    (-> dir-pages (u/find-files-by-ext "clj") (u/load-fns-into-map))
 
     (throw (Exception. "Ensure you are passing the right possible keywords to read-clj."))))
 
