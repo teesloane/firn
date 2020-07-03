@@ -1,6 +1,6 @@
 #+TITLE: Custom Pages
 #+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-07-03 18:32>
+#+DATE_UPDATED: <2020-07-03 18:35>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: docs
 #+FIRN_ORDER: 3
@@ -28,6 +28,7 @@ Pages have less data available to them at site-generation time. Because there ar
 | site-map      | A list of all files on the wiki            | vector    |
 * Limitations
 
+** Metadata
 Custom pages will not sort in the site-map. Site-map metadata, such as the =firn-order=, or =firn-under= values enable to sort and group your site-map as you like. This data is gathered from org-mode keywords. Because custom pages in the =/pages= directory do not have this metadata available, they are rendered with a pre-configured set of metadata as so:
 
 #+BEGIN_SRC clojure
@@ -36,3 +37,6 @@ Custom pages will not sort in the site-map. Site-map metadata, such as the =firn
  :firn-order 9999               ; pages will auto group at at the end of the site-map
  :firn-under "Page"})))         ; pages are grouped under "Pages"
 #+END_SRC
+** Flat routing
+
+Currently, Firn only supports creating custom pages at the root level of =/pages= - unlike org-mode files, if you have a directory within the =/pages= directory, it will not translate to a nested url. For example, if you have the file =/pages/my-category/my-custom-page-1.clj= - it will be translated into an html file named =my-custom-page-1.html= at the root of your site url.
