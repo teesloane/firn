@@ -1,9 +1,9 @@
 #+TITLE: Layout
 #+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-06-24 16:23>
+#+DATE_UPDATED: <2020-07-03 18:21>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: docs
-#+FIRN_ORDER: 1
+#+FIRN_ORDER: 2
 
 * Overview
 
@@ -196,23 +196,23 @@ There are several ways you can create table of contents in your files, from simp
 
 The following keys are made available in your layouts.
 
-| Function/Data | Intent                                               | Data-type |
-|---------------+------------------------------------------------------+-----------|
-| config        | The site wide config.                                | map       |
-| date-created  | The #+DATE_CREATED value of the file                 | string    |
-| date-updated  | The #+DATE_UPDATED value of the file                 | string    |
-| file          | The file as a data structure.                        | map       |
-| file-links    | A list of links per file                             | list      |
-| firn-under    | The #+FIRN_UNDER value of the file                   | string    |
-| logbook       | A list of logbooks entries per file.                 | list      |
-| logbook-total | The sum of all the logbook entries per file          | string    |
-| meta          | A map of metadata per file (logbook, links, etc)     | map       |
-| partials      | a list of invokable partials in your =partials= folder | list      |
-| render        | Enables rendering parts or entirety of an org file.  | function  |
-| site-links    | A list of all links across all documents             | vector    |
-| site-logs     | A list of aLL logbook entries.                       | vector    |
-| site-map      | A list of all files on the wiki                      | vector    |
-| title         | The #+TITLE value of the file.                       | string    |
+| Function/Data | Intent                                              | Data-type |
+|---------------+-----------------------------------------------------+-----------|
+| config        | The site wide config.                               | map       |
+| date-created  | The #+DATE_CREATED value of the file                | string    |
+| date-updated  | The #+DATE_UPDATED value of the file                | string    |
+| file          | The file as a data structure.                       | map       |
+| file-links    | A list of links per file                            | list      |
+| firn-under    | The #+FIRN_UNDER value of the file                  | string    |
+| logbook       | A list of logbooks entries per file.                | list      |
+| logbook-total | The sum of all the logbook entries per file         | string    |
+| meta          | A map of metadata per file (logbook, links, etc)    | map       |
+| partials      | a list of invokable partials =/partials= dir          | list      |
+| render        | Enables rendering parts or entirety of an org file. | function  |
+| site-links    | A list of all links across all documents            | vector    |
+| site-logs     | A list of aLL logbook entries.                      | vector    |
+| site-map      | A list of all files on the wiki                     | vector    |
+| title         | The #+TITLE value of the file.                      | string    |
 
 This may seem like a lot of information to make available to a layout template.
 And that's because it is. But thanks to destructuring in Clojure, you can make

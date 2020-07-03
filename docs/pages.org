@@ -1,0 +1,28 @@
+#+TITLE: Custom Pages
+#+DATE_CREATED: <2020-03-24 Tue>
+#+DATE_UPDATED: <2020-07-03 18:23>
+#+FILE_UNDER: docs
+#+FIRN_LAYOUT: docs
+#+FIRN_ORDER: 3
+
+* Overview
+
+Similar to [[file:layout.org][layouts]], on creating a Firn site, you will find a folder: =_firn/pages=. This folder enables users to create custom pages that are converted from the template language (hiccup) into HTML. This is useful if you want to create a page that does not render any org-mode content.
+
+* TODO Tags - an out of the box page.
+
+The following will be available in v0.0.7
+
+Creating a new firn site comes with a custom page: =tags.clj=. This file exists to provide an example of a custom page, as well as to give user's an out-of-the-box solution for rendering tags with Firn. When Firn processes your org-mode files, it collects all heading tags, and stores them in a Clojure vector (simply, a list). This list of tags are made available to layouts and pages - in this case, the latter, which uses it to render all the tags your org-mode content has. You can of course delete this file if you do not want to render tags.
+
+* TODO Differences from layouts
+
+Pages have less data available to them at site-generation time. Because there are no org-mode files concerned, there is no =render= function. The following content is available to a page, which like layouts, can be destructured and made available to your Clojure hiccup function.
+
+| Function/Data | Intent                                     | Data-type |
+|---------------+--------------------------------------------+-----------|
+| config        | The site wide config                       | map       |
+| partials      | a list of invokable partials =/partials= dir | list      |
+| site-links    | A list of all links across all documents   | vector    |
+| site-logs     | A list of all logbook entries              | vector    |
+| site-map      | A list of all files on the wiki            | vector    |

@@ -5,5 +5,5 @@
  :ignored-dirs     ["priv"] ; Directories to ignore org files in.
  :site-desc        ""       ; Used for RSS.
  :site-title       ""       ; Used for RSS.
- :site-url         ""
- :site-map-pages?   true}
+ :site-url         ""       ; Used for RSS.
+ :site-map-pages?   true}   ; if true, custom pages in the pages/ dir will show in the site-map.
