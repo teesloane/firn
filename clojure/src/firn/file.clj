@@ -42,7 +42,7 @@
 (defn read-clj
   "Reads a folder full of clj files, such as partials or layouts.
   pass a symbol for dir to request a specific folder."
-  [dir {:keys [dir-partials dir-layouts]}]
+  [dir {:keys [dir-partials dir-layouts dir-pages]}]
   (case dir
     :layouts
     (-> dir-layouts (u/find-files-by-ext "clj") (u/load-fns-into-map))
@@ -50,13 +50,16 @@
     :partials
     (-> dir-partials (u/find-files-by-ext "clj") (u/load-fns-into-map))
 
+    :pages
+    (-> dir-pages (u/find-files-by-ext "clj") (u/load-fns-into-map))
+
     (throw (Exception. "Ensure you are passing the right possible keywords to read-clj."))))
 
 (defn make
   "Creates a file; which is to say, a map of data & metadata about an org-file."
   [config io-file]
   (let [name     (get-io-name io-file)
-        path-abs (.getPath ^java.io.File io-file) ; (-> io-file ^java.io.File .getPath)
+        path-abs (.getPath ^java.io.File io-file)
         path-web (get-web-path (config :dirname-files) path-abs)]
     {:as-edn    nil      ; JSON of org file -> converted to a map.
      :as-html   nil      ; the html output

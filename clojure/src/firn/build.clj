@@ -9,12 +9,14 @@
             [firn.layout :as layout]
             [cheshire.core :as json]
             [firn.util :as u]
-            [me.raynes.fs :as fs]))
+            [me.raynes.fs :as fs]
+            [hiccup.core :as h]))
 
 (set! *warn-on-reflection* true)
 
 (def default-files
   ["layouts/default.clj"
+   "pages/tags.clj"
    "partials/head.clj"
    "config.edn"
    "static/css/firn_base.css"])
@@ -57,8 +59,9 @@
 
   (let [org-files (u/find-files-by-ext dir-files "org")
         layouts   (file/read-clj :layouts config)
+        pages     (file/read-clj :pages config)
         partials  (file/read-clj :partials config)]
-    (assoc config :org-files org-files :layouts layouts :partials partials)))     
+    (assoc config :org-files org-files :layouts layouts :partials partials :pages pages)))
 
 (defn htmlify
   "Renders files according to their `layout` keyword."
@@ -87,7 +90,20 @@
 
     final-file))
 
-(defn process-all
+(defn process-site-map-with-pages!
+  "If a user has 'pages/*.clj' files - and their config enables it,
+  Add these to the site map."
+  [site-map! config]
+  (when (-> config :user-config :site-map-pages?)
+    (doseq [[k _] (config :pages)]
+      (swap! site-map! conj {:path       (u/keyword->web-path k)
+                             :title      (u/keyword->normal-text k)
+                             :firn-order 9999
+                             :firn-under "Page"})))
+  @site-map!)
+
+
+(defn process-all ; org-files
   "Receives config, processes all files and builds up site-data
   logbooks, site-map, link-map, etc."
   [config]
@@ -99,13 +115,13 @@
     (loop [org-files (config :org-files)
            output    {}]
       (if (empty? org-files)
-        ;; LOOP/RECUR: run one more loop on all files, and create their html,
+        ;; run one more loop on all files, and create their html,
         ;; now that we have processed everything.
-        (let [config-with-data (assoc config
-                                      :processed-files output
-                                      :site-map        @site-map
-                                      :site-links      @site-links
-                                      :site-logs       @site-logs)
+        (let [config-with-data     (assoc config
+                                          :processed-files output
+                                          :site-map        (process-site-map-with-pages! site-map config)
+                                          :site-links      @site-links
+                                          :site-logs       @site-logs)
               ;; FIXME: I think we are rendering html twice here, should prob only happen here?
               with-html        (into {} (for [[k pf] output] [k (htmlify config-with-data pf)]))
               final            (assoc config-with-data :processed-files with-html)]
@@ -154,6 +170,29 @@
        (spit feed-file)))
   config)
 
+
+(defn write-pages!
+  "Responsible for publishing html pages from clojure templates found in pages/
+  Currently, we can only render a flat file list of .clj files in /pages.
+  FIXME: (In a later release) - do something similar to `file/get-web-path` and
+  enable `load-fns-into-map` to save filenames as :namespaced/keys, allowing
+  make-parent to work on it."
+  [{:keys [dir-site pages partials site-map site-links site-logs site-tags] :as config}]
+  (let [user-api {:partials   partials
+                  :site-map   site-map
+                  :site-links site-links
+                  :site-logs  site-logs
+                  :site-tags  [] ; TODO: collect tags; site-tags
+                  :config     config}]
+
+    (doseq [[k f] pages
+            :let  [out-file (str dir-site "/" (name k) ".html")
+                   out-str  (h/html (f user-api))]]
+      (io/make-parents out-file)
+      (spit out-file out-str)))
+  config)
+
+
 (defn write-files
   "Takes a config, of which we can presume has :processed-files.
   Iterates on these files, and writes them to html using layouts. Must return
@@ -174,6 +213,7 @@
     (cond->> config
       true process-all
       rss? write-rss-file!
+      true write-pages!
       true write-files)))
 
 (defn reload-requested-file
@@ -184,3 +224,11 @@
         re-processed (process-one config re-slurped)]
     re-processed))
 
+
+(defn reload-requested-page
+  "When user requests a non-org-file page (pages/*.clj), we reslurp the clj files
+  into the config and then re-write them to html."
+  [config!]
+  (let [pages (file/read-clj :pages @config!)]
+    (swap! config! assoc :pages pages)
+    (write-pages! @config!)))
