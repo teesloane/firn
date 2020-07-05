@@ -1,6 +1,6 @@
 #+TITLE: Data and Metadata
 #+DATE_CREATED: <2020-03-25 Wed>
-#+DATE_UPDATED: <2020-07-05 14:49>
+#+DATE_UPDATED: <2020-07-05 17:24>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: docs
 #+FIRN_ORDER: 5 
@@ -71,6 +71,7 @@ Tags are collected and are grouped by tag name. The structure of the data is as 
 #+END_SRC
 
 Out of the box, Firn provides a basic "Tags" page for displayings headline-tags.
+If you do not wish to have a "/tags" page, simply remove it from ~_firn/pages/tags.clj~
 
 ** Logbook
 
