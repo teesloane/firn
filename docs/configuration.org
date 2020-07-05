@@ -50,7 +50,7 @@ The firn table of contents is rendered in a layout. If you use the default layou
  :exclusive? true  ; Do not render the headline "Notes", just its children.
 }
 #+END_SRC
-* Reference
+* Reference                                                      :reference:
 ** config.edn
 
 | Key               | Type    | Purpose                                                |
