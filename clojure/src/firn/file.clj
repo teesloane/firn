@@ -183,7 +183,7 @@
                 tags           (x :tags)
                 tags-with-meta (map #(merge headline-meta file-metadata {:tag-value %}) tags)
                 new-tags       (vec (concat out-tags tags-with-meta))]
-            (recur xs out-logs out-links new-tags out-toc x))
+            (recur xs out-logs out-links new-tags out-toc last-headline))
 
           "clock" ; if clock, merge headline-data into it, and push/recurse new-logs.
           (let [headline-meta {:from-headline (-> last-headline :children first :raw)}
