@@ -222,9 +222,9 @@ Tables are converted into HTML tables:
 | Pacific  | 165,250,000 km2 |
 | Southern | 20, 330,000 km2 |
 
-** TODO Tags                                                    :upcoming:
+** Tags                                                         :example:
 
-Tags are not yet supported, but will be developed soon.
+Headlines with ~:tags:~ will automatically create a tag on the right of the heading that links to a ~/tags~ page. The tags.clj page can be found in ~_firn/pages/tags.clj~ and can be edited.
 
 ** Org Dates
 

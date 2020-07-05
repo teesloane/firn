@@ -156,8 +156,8 @@
         img-http-regex  #"(http:\/\/|https:\/\/)(.*)\.(jpg|JPG|gif|GIF|png)"
         img-rel-regex   #"(\.(.*))\.(jpg|JPG|gif|GIF|png)"
         img-make-url    #(->> (re-matches img-file-regex link-href)
-                            (take-last 2)
-                            (s/join "."))
+                              (take-last 2)
+                              (s/join "."))
         ;; file regexs / ctor fns
         org-file-regex  #"(file:)(.*)\.(org)(\:\:\*.+)?"
         http-link-regex #"https?:\/\/(?![^\" ]*(?:jpg|png|gif))[^\" ]+"]
@@ -187,7 +187,6 @@
       :else
       [:a {:href (u/clean-anchor link-href)} link-val])))
 
-
 (defn- title->html
   "Constructs a headline title - with possible additional values
   (keywords, priorities, timestamps -> can all be found in a headline.)
@@ -196,11 +195,13 @@
   (let [level            (v :level)
         children         (v :children)
         keywrd           (v :keyword)
+        tags             (v :tags)
         priority         (v :priority)
         properties       (v :properties)
         parent           {:type "headline" :level level :children [v]} ; reconstruct the parent so we can pull out the content.
         heading-priority (u/str->keywrd "span.firn-headline-priority.firn-headline-priority__" priority)
         heading-keyword  (u/str->keywrd "span.firn-headline-keyword.firn-headline-keyword__" keywrd)
+        heading-tags     [:span.firn-tags (for [t tags] [:span [:a.firn-tag {:href (str "/tags#" t)} t]])]
         heading-anchor   (org/make-headline-anchor parent)
         heading-id+class #(u/str->keywrd "h" % heading-anchor ".firn-headline.firn-headline-" %)
         h-level          (case level
@@ -210,19 +211,16 @@
                            4 (heading-id+class 4)
                            5 (heading-id+class 5)
                            (heading-id+class 6))
-        make-child       #(into [%] (map to-html children))]
-    (if (and properties (opts :firn-properties?))
-      [:div
-       [h-level
-        (when keywrd [heading-keyword (str keywrd " ")])
-        (when priority [heading-priority (str priority " ")])
-        (make-child :span)]
-       (props->html v)]
+        make-child       #(into [%] (map to-html children))
+        render-headline  [h-level
+                          (when keywrd [heading-keyword (str keywrd " ")])
+                          (when priority [heading-priority (str priority " ")])
+                          (make-child :span.firn-headline-text)
+                          (when tags heading-tags)]]
 
-      [h-level
-       (when keywrd [heading-keyword (str keywrd " ")])
-       (when priority [heading-priority (str priority " ")])
-       (make-child :span)])))
+    (if (and properties (opts :firn-properties?))
+      [:div render-headline (props->html v)]
+      render-headline)))
 
 (defn- footnote-ref
   [v]

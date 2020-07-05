@@ -1,6 +1,6 @@
 #+TITLE: Data and Metadata
 #+DATE_CREATED: <2020-03-25 Wed>
-#+DATE_UPDATED: <2020-06-24 15:59>
+#+DATE_UPDATED: <2020-07-05 14:49>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: docs
 #+FIRN_ORDER: 5 
@@ -46,6 +46,31 @@ called =:meta= that provides all sorts of metadata available in your file.
 
 As the API for accessing file data changes, you can keep an eye on the [[https://github.com/theiceshelf/firn/blob/master/clojure/src/firn/file.clj#L55][file.clj]],
 source code to see what content is made available at "layout-time".
+
+** Site Tags
+
+Tags are collected and are grouped by tag name. The structure of the data is as follows:
+
+#+BEGIN_SRC clojure
+{"FAQ"       [{:from-headline  "Do I have to use layouts?",
+               :headline-link  "/layout#do-i-have-to-use-layouts?",
+               :from-file      "Layout",
+               :from-file-path "layout",
+               :tag-value      "FAQ"
+              {:from-headline  "How do I customize the styling of my layouts?",
+               :headline-link  "/layout#how-do-i-customize-the-styling-of-my-layouts?",
+               :from-file      "Layout",
+               :from-file-path "layout",
+               :tag-value      "FAQ"}]
+ "reference" [{:from-headline  "Data and Functions available to layouts",
+               :headline-link  "/layout#data-and-functions-available-to-layouts",
+               :from-file      "Layout",
+               :from-file-path "layout",
+               :tag-value      "reference"}]}
+
+#+END_SRC
+
+Out of the box, Firn provides a basic "Tags" page for displayings headline-tags.
 
 ** Logbook
 
@@ -243,7 +268,7 @@ after being parsed to JSON and converted to EDN:
 #+END_SRC
 </details>
 
-** Interacting with data                                        :revisit:
+** Interacting with data                                       
 
 As you can see, lots of data. Currently, Firn is not capable of interacting with
 this data very easily while you develop your Layouts. There are tentative plans

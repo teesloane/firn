@@ -1,13 +1,13 @@
 #+TITLE: Limitations
 #+DATE_CREATED: <2020-03-27 Fri>
-#+DATE_UPDATED: <2020-07-03 18:22>
+#+DATE_UPDATED: <2020-07-05 14:53>
 #+FIRN_ORDER: 6 
 
 * Development Server
 
 The file watcher (reloading of files on change) is a bit slow.
 
-* Attachments
+* Attachments                                                    :attachments:
 
 - Currently, Firn copies the _entirety of this folder into your build output_. This means that if you have attachments which are private or simply unlinked to from org-files, they will be included in your build output.
 - Org-attach links are not supported.

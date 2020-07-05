@@ -3,6 +3,7 @@
   --border-col: #dfdfdf;
   --nav-bg: #fbfbfb;
   --nav-bg-inverse: #444;
+  --nav-height: 54px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -11,6 +12,11 @@
     --nav-bg: #444;
     --nav-bg-inverse: #fbfbfb;
   }
+}
+
+html {
+  /*For jumping to heading due to the fixed header:*/
+  scroll-padding-top: calc(var(--nav-height) + 12px);
 }
 
 /* ibm-plex-serif-regular - latin */
@@ -123,9 +129,9 @@ h2 {
   align-items: center;
   background: var(--nav-bg);
   display: flex;
-  display: flex;
   justify-content: flex-end;
   padding: 8px 0px;
+  height: var(--nav-height);
   position: fixed;
   top: 0;
   width: 100%;

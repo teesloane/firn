@@ -1,6 +1,6 @@
 #+TITLE: Index
 #+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-06-25 09:50>
+#+DATE_UPDATED: <2020-07-05 14:59>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: index
 #+FIRN_ORDER: 1000
@@ -54,7 +54,7 @@ When you create and build a Firn site, the following happens:
 
 -----
 
-** FAQ
+** FAQ                                                          :FAQ:
 
 *** Will Windows be supported?
 

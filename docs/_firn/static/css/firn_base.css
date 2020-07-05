@@ -37,10 +37,15 @@
   --keyword-done: #bdc3c7;   /* For "done type keywords" */
   --keyword-size: xx-small;
 
+  /* Headline priorities ([#A] [#B] etc) */
   --priority-a-bg: #c0392b;
   --priority-b-bg: #3498db;
   --priority-c-bg: #2ecc71;
   --priority-size: xx-small;
+  /* Headline Tags (:my-tag: :unfinished: etc)*/
+  --tag-size: small;
+  --tag-bg: #ecf0f1
+
 }
 
 
@@ -50,11 +55,10 @@
     --color-primary-accent: #555;
     --color-bg: #333;
     --color-bg-secondary: #555;
-    /* --color-secondary: #EB9563; */
-    /* --color-secondary-accent: #EB95630b; */
     --color-shadow: #bbbbbb20;
     --color-text: #f7f7f7;
     --color-text-secondary: #aaa;
+    --tag-bg: #95a5a6;
   }
 }
 
@@ -515,13 +519,6 @@ li > p {
 }
 
 .firn-headline-priority {
-  /* margin: -22px 8px 0 -6px; */
-  /* font-size: 8px; */
-  /* min-width: 12px; */
-  /* min-height: 12px; */
-  /* display: inline-flex; */
-  /* justify-content: center; */
-  /* align-items: center; */
   background-color: var(--color-secondary);
   border-radius: var(--border-radius);
   color: white;
@@ -569,6 +566,40 @@ li > p {
   position: relative;
 }
 
+/* TODO: Add to starter */
+.firn-headline-text {
+  display: flex;
+  flex: 1;
+}
+
+
+.firn-tags {
+
+}
+
+.firn-tag-heading {
+  text-transform: capitalize;
+}
+
+.firn-tag {
+  background-color: var(--tag-bg);
+  border-radius: var(--border-radius);
+  color: var(--color-text);
+  font-size: var(--tag-size);
+  font-weight: bold;
+  margin: 0 4px;
+  padding: 0.2rem 0.4rem;
+}
+
+.firn-tag:hover {
+  filter: none;
+}
+
+.firn-tag::before {
+  content: "#";
+}
+
+/* TODO: Remove this; remove from starter */
 .firn-headline-timestamp {}
 
 .firn-cookie {}
