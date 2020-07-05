@@ -4,6 +4,6 @@
     (head
      [:body
       [:main
-       [:article
+       [:article.content
         ;; [:div (render :toc)] ;; Optional; add a table of contents
         [:div (render :file)]]]])))

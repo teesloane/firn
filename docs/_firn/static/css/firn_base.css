@@ -458,12 +458,11 @@ table tr:nth-child(even) {
 /* Quotes */
 blockquote {
   display: block;
-  font-size: x-large;
+  font-size: large;
+  font-style: italic;
   line-height: var(--line-height);
-  margin: 1rem auto;
-  max-width: var(--width-card-medium);
-  padding: 1.5rem 1rem;
-  text-align: var(--justify-important);
+  padding: 1.5rem 0;
+  background: var(--color-primary-accent);
 }
 
 blockquote footer {
@@ -566,10 +565,10 @@ li > p {
   position: relative;
 }
 
-/* TODO: Add to starter */
 .firn-headline-text {
   display: flex;
   flex: 1;
+  align-items: center;
 }
 
 
@@ -598,9 +597,6 @@ li > p {
 .firn-tag::before {
   content: "#";
 }
-
-/* TODO: Remove this; remove from starter */
-.firn-headline-timestamp {}
 
 .firn-cookie {}
 

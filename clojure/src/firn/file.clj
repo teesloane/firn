@@ -205,7 +205,7 @@
   [file]
   (let [org-tree       (file :as-edn)
         tree-data      (tree-seq map? :children org-tree)
-        keywords       (keywords->map file)
+        keywords       (keywords->map file) ; keywords are "in-buffer-settings"
         {:keys [date-updated date-created title firn-under firn-order]} keywords
         file-metadata  {:from-file title :from-file-path (file :path-web)}
         metadata       (extract-metadata-helper tree-data file-metadata)
