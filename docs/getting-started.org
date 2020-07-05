@@ -1,6 +1,6 @@
 #+TITLE: Getting Started
 #+DATE_CREATED: <2020-03-27 Fri>
-#+DATE_UPDATED: <2020-06-23 16:13>
+#+DATE_UPDATED: <2020-07-05 14:52>
 #+FIRN_LAYOUT: docs
 #+FIRN_UNDER: docs
 #+FIRN_ORDER: 0
@@ -10,7 +10,7 @@
 This document describes a step-by-step process to generate a static site with
 Firn. The author assumes the reader has a working familiarity with the command-line.
 
-*A brief note on Emacs*
+** A note on Emacs                                              :emacs:
 
 It is almost a safe assumption that if you are here, then you are are already familiar with Org mode, Emacs, Lisp, or all three combined. But that's an assumption. So, for those that consider themselves quite savvy already, you should skip to the [[file:getting-started.org::*Summary][summary]].
 
@@ -78,6 +78,8 @@ When calling the =firn new= command, a series of folders and files are created:
 │   │   └── default.clj
 │   ├── partials
 │   │   └── head.clj
+│   ├── pages
+│   │   └── tags.clj
 │   └── static
 │       └── css
 │           └── main.css
@@ -135,7 +137,7 @@ Where you will replace ~{My New Heading}~ with the specific headline you have cr
 
 Read more about the render function and layouts in the [[file:layout.org][layout document]].
 
-* Understanding config.edn
+* Understanding config.edn                                       :configuration:
 
 When generating a new site, Firn will create a =config.edn= file in the =_firn= directory. This file covers several different aspects of customization for the building of your site. Making changes to this file will largely affect the build output of Firn, as well as rendering behaviour across all files.
 
@@ -157,7 +159,7 @@ links in org-files, a user can change the =dir-data= key to point to the folder 
 
 The available configuration keys are commented within the file itself, and are more heavily documented in the [[file:configuration.org][configuration documentation]]. Beyond the above example, the functionality of this file is out of scope for the getting started guide.
 
-* Adding attachments
+* Adding attachments                                             :attachments:
 
 The above example largely describes how to use "attachments" (ie, a folder with images etc). Set the name of your folder where images/files are linked to, and it will copy the contents over.
 

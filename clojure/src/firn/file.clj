@@ -154,37 +154,50 @@
   (loop [tree-data     tree-data
          out-logs      []
          out-links     []
+         out-tags      []
          out-toc       []
          last-headline nil]  ; the most recent headline we've encountered.
     (if (empty? tree-data)
       ;; All done! return the collected stuff.
       {:logbook out-logs
        :toc     out-toc
+       :tags    out-tags
        :links   out-links}
       ;; Do the work.
       (let [x  (first tree-data)
             xs (rest tree-data)]
         (case (:type x)
           "headline" ; if headline, collect data, push into toc, and set as "last-headline"
-          (let [toc-item {:level (x :level)
-                          :text (org/get-headline-helper x)
+          (let [toc-item {:level  (x :level)
+                          :text   (org/get-headline-helper x)
                           :anchor (org/make-headline-anchor x)}
                 new-toc  (conj out-toc toc-item)]
-            (recur xs out-logs out-links new-toc x))
+            (recur xs out-logs out-links out-tags new-toc x))
+
+          "title" ; if title, collect tags, map with metadata, push into out-tags
+          (let [headline-link  (str "/"
+                                    (file-metadata :from-file-path)
+                                    (org/make-headline-anchor last-headline))
+                headline-meta  {:from-headline (org/get-headline-helper last-headline)
+                                :headline-link headline-link}
+                tags           (x :tags)
+                tags-with-meta (map #(merge headline-meta file-metadata {:tag-value %}) tags)
+                new-tags       (vec (concat out-tags tags-with-meta))]
+            (recur xs out-logs out-links new-tags out-toc last-headline))
 
           "clock" ; if clock, merge headline-data into it, and push/recurse new-logs.
           (let [headline-meta {:from-headline (-> last-headline :children first :raw)}
                 log-augmented (merge headline-meta file-metadata x)
                 new-logs      (conj out-logs log-augmented)]
-            (recur xs new-logs out-links out-toc last-headline))
+            (recur xs new-logs out-links out-tags out-toc last-headline))
 
           "link" ; if link, also merge file metadata and push into new-links and recurse.
           (let [link-item (merge x file-metadata)
                 new-links (conj out-links link-item)]
-            (recur xs out-logs new-links out-toc last-headline))
+            (recur xs out-logs new-links out-tags out-toc last-headline))
 
           ;; default case, recur.
-          (recur xs out-logs out-links out-toc last-headline))))))
+          (recur xs out-logs out-links out-tags out-toc last-headline))))))
 
 (defn extract-metadata
   "Iterates over a tree, and returns metadata for site-wide usage such as
@@ -192,14 +205,15 @@
   [file]
   (let [org-tree       (file :as-edn)
         tree-data      (tree-seq map? :children org-tree)
-        file-metadata  {:from-file (file :name) :from-file-path (file :path-web)}
-        keywords       (keywords->map file)
+        keywords       (keywords->map file) ; keywords are "in-buffer-settings"
+        {:keys [date-updated date-created title firn-under firn-order]} keywords
+        file-metadata  {:from-file title :from-file-path (file :path-web)}
         metadata       (extract-metadata-helper tree-data file-metadata)
-        logbook-sorted (sort-logbook (metadata :logbook) file) ;; TODO - I think sorting this in extract-metadata helper makes more sense. Better internal API.
-        {:keys [date-updated date-created title firn-under firn-order]} keywords]
+        logbook-sorted (sort-logbook (metadata :logbook) file)] ;; TODO - I think sorting this in extract-metadata helper makes more sense. Better internal API.
 
     {:links           (metadata :links)
      :logbook         logbook-sorted
+     :tags            (metadata :tags)
      :logbook-total   (sum-logbook logbook-sorted)
      :keywords        keywords
      :title           title

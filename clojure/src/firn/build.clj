@@ -78,8 +78,8 @@
   [config f]
 
   (let [new-file      (file/make config f)                                     ; make an empty "file" map.
-        as-json       (->> f slurp org/parse!)                            ; slurp the contents of a file and parse it to json.
-        as-edn        (-> as-json (json/parse-string true))               ; convert the json to edn.
+        as-json       (->> f slurp org/parse!)                                 ; slurp the contents of a file and parse it to json.
+        as-edn        (-> as-json (json/parse-string true))                    ; convert the json to edn.
         new-file      (file/change new-file {:as-json as-json :as-edn as-edn}) ; shadow the new-file to add the json and edn.
         file-metadata (file/extract-metadata new-file)                         ; collect the file-metadata from the edn tree.
         new-file      (file/change new-file {:meta file-metadata})             ; shadow the file and add the metadata
@@ -103,12 +103,14 @@
   @site-map!)
 
 
-(defn process-all ; org-files
-  "Receives config, processes all files and builds up site-data
-  logbooks, site-map, link-map, etc."
+(defn process-all ; (ie, just org-files, not pages)
+  "Receives config, processes all ORG files and builds up site-data logbooks, site-map, link-map, etc.
+  This is where the magic happens for collecting metadata. Follow the chain:
+  process-all -> process-one -> file/extract-metadata -> file/extract-metadata-helper"
   [config]
   (let [site-links (atom [])
         site-logs  (atom [])
+        site-tags  (atom [])
         site-map   (atom [])]
     ;; recurse over the org-files, gradually processing them and
     ;; pulling out links, logs, and other useful data.
@@ -121,6 +123,7 @@
                                           :processed-files output
                                           :site-map        (process-site-map-with-pages! site-map config)
                                           :site-links      @site-links
+                                          :site-tags       (into (sorted-map) (group-by :tag-value @site-tags))
                                           :site-logs       @site-logs)
               ;; FIXME: I think we are rendering html twice here, should prob only happen here?
               with-html        (into {} (for [[k pf] output] [k (htmlify config-with-data pf)]))
@@ -143,7 +146,8 @@
           (when-not is-private
             (swap! site-map conj new-site-map-item)
             (swap! site-links concat (-> processed-file :meta :links))
-            (swap! site-logs concat  (-> processed-file :meta :logbook)))
+            (swap! site-logs concat  (-> processed-file :meta :logbook))
+            (swap! site-tags concat  (-> processed-file :meta :tags)))
           ;; add links and logs to site wide data.
           (recur org-files output))))))
 
@@ -182,7 +186,7 @@
                   :site-map   site-map
                   :site-links site-links
                   :site-logs  site-logs
-                  :site-tags  [] ; TODO: collect tags; site-tags
+                  :site-tags  site-tags
                   :config     config}]
 
     (doseq [[k f] pages

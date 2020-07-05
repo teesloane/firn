@@ -70,11 +70,19 @@
     (t/testing "Pulls links and logbook entries from a file"
       (t/is (seq (get-in file [:meta :links])))
       (t/is (seq (get-in file [:meta :logbook])))
+      (t/is (seq (get-in file [:meta :tags])))
       (t/is (= "File Logbook" (get-in file [:meta :title]))))
 
     (t/testing "The logbook is associated with a heading."
       (let [first-entries (-> file :meta :logbook first)]
         (t/is (= "A headline with a normal log-book." (first-entries :from-headline)))))
+
+    (t/testing "The tag is associated with a heading."
+      (let [first-entries (-> file :meta :tags first)]
+        (t/is (= "A headline with a normal log-book." (first-entries :from-headline)))
+        (t/is (= "/file-metadata#a-headline-with-a-normal-log-book" (first-entries :headline-link)))
+        (t/is (= "File Logbook" (first-entries :from-file)))
+        (t/is (= "tag1" (first-entries :tag-value)))))
 
     (t/testing "check that logbook gets sorted: most-recent -> least-recent by :start-ts"
       ;; a clever way (I borrowed) to check if vals in a list are sorted.

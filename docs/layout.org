@@ -1,6 +1,6 @@
 #+TITLE: Layout
 #+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-07-03 18:21>
+#+DATE_UPDATED: <2020-07-05 14:55>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: docs
 #+FIRN_ORDER: 2
@@ -10,8 +10,7 @@
 When you create a new Firn site for the first time, it will create a folder:
 =_firn/layouts=. The layout folder stores Clojure files (=.clj=) that are
 responsible for how your org-file is rendered to-html; The act of "applying" a
-template means to pass the content of the org-file through a specific [[https://github.com/weavejester/hiccup][clojure
-hiccup]] template that organizes how the content is displayed.
+template means to pass the content of the org-file through a specific [[https://github.com/weavejester/hiccup][clojure hiccup]] template that organizes how the content is displayed.
 
 When an org-mode file is processed by Firn it looks for the in-buffer-setting
 ~#+FIRN_LAYOUT:~ to see if it uses a Layout. If none are specified, the _default
@@ -69,14 +68,14 @@ Inside docs.clj place the following clojure code.
 *NOTE:* Layouts can have multiple Clojure functions in them, however only the last
 function of the file will be applied as the layout.
 
-* Do I have to use layouts?
+* Do I have to use layouts?                                      :FAQ:
 
 Not exactly. When you create a new Firn site, it will have a =default.clj= file in
 the =layouts= directory. This provides a very basic out of the box formatting and
 will render the entirety of your org mode file. If you want to add any kinds of
 customization - even css, you'll need to work with layouts.
 
-* How do I customize the styling of my layouts?
+* How do I customize the styling of my layouts?                  :FAQ:
 
 As with normal HTML, you'll need to add a =head= tag with a =link= that references
 to a css file. It might make sense for you to create a partial for defining your
@@ -191,8 +190,7 @@ There are several ways you can create table of contents in your files, from simp
   #+FIRN_TOC: {:depth 4}
   #+END_SRC
 
-
-* Data and Functions available to layouts
+* Data and Functions available to layouts                        :reference:
 
 The following keys are made available in your layouts.
 
@@ -252,31 +250,14 @@ The above template only needs access to =render=, =partials= and the =logbook=. 
 
 #+END_SRC
 
-
-* Styling Layouts
+* Styling Layouts                                                :styling:
 
 You can write css as you normally would by placing css files in the
 =_firn/static/css= folder and then having =firn= move them into your =_site= folder
 when run. Styling is applied through [[https://github.com/weavejester/hiccup#syntax][hiccup]].
 
 There are some internal styles that are applied when org-mode text is
-transformed into data. These styles are all prefaced with the keyword =firn_=, (ie
-=firn_title-prirority= or =firn_title-keyword=).
+transformed into data. These styles are all prefaced with the keyword ~firn-~, (ie.
+=firn-headline-text= or =firn-tag=).
 
-The following are the css classes and their rerspective org-mode structure they
-augment, as they come hard-coded into firn:
-
-| Css class                       | Element                                     |
-|---------------------------------+---------------------------------------------|
-| .firn_title-priority            | Title Priority (ex: [#A] / [#B] etc)        |
-| .firn_title-priority__A         | Targets =[#A]=                                |
-| .firn_title-priority__B         | Etc.                                        |
-| .firn_title-priority__C         | Etc.                                        |
-| .firn_title-keyword             | Targets all keywords =TODO/DONE= etc.         |
-| .firn_title-keyword__TODO       | Targets =TODO=                                |
-| .firn_title-keyword__DONE       | Targets =DONE=                                |
-| .firn-headline-timestamp        | Headline Timestamps*                        |
-| .firn-headline-cookie           | Targets headline todo-count (ex =[7/10]=)     |
-| .firn-headline-section          | A "*" container and it's contents           |
-| .firn-headline-section-${level} | Target specific headline+container by level |
-| .firn-headline-${1-6}           | Target h1-h6                                |
+Inspect the file ~_firn/static/css/firn_base.css~ to see the configurable elements.
