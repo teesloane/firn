@@ -1,6 +1,6 @@
 #+TITLE: Home
 #+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-07-08 17:01>
+#+DATE_UPDATED: <2020-07-08 17:14>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: index
 #+FIRN_ORDER: 1000
@@ -8,10 +8,10 @@
 * Details
 ** Quickstart
 1. Download the [[https://github.com/theiceshelf/firn/releases][latest release]] (only Mac and Linux currently supported), or use the below code snippet to install:
-   #+BEGIN_SRC sh
-    curl -s https://raw.githubusercontent.com/theiceshelf/firn/master/install -o install-firn
-    chmod +x install-firn && ./install-firn
-   #+END_SRC
+  #+BEGIN_SRC bash
+  curl -s https://raw.githubusercontent.com/theiceshelf/firn/master/install -o install-firn
+  chmod +x install-firn && ./install-firn
+  #+END_SRC
 2. Move the Firn binary into your path: =mv ~/Downloads/firn /usr/local/bin=
 3. Navigate to your directory of org files
 4. Run =firn new=
