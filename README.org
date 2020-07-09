@@ -25,6 +25,8 @@ following:
    #+BEGIN_SRC sh
     curl -s https://raw.githubusercontent.com/theiceshelf/firn/master/install -o install-firn
     chmod +x install-firn && ./install-firn
+    # you may need to run the install script with sudo and/or run it with the absolute PWD path:
+    # sudo ~/<path-to-script>/install-firn
    #+END_SRC
 2. Navigate to your directory of org files
 3. Run =firn new=
