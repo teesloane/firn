@@ -1,14 +1,8 @@
 #!/usr/bin/env bash
-
-# Installation script "borrowed" from Borkdude's babashka installation script.
-# Consider checking out and/or supporting Borkdude's excellent work: https://github.com/borkdude/
-
+#
+# This downloads the firn binary and builds the docs site.
+#
 set -euo pipefail
-
-
-default_install_dir="/usr/local/bin"
-install_dir=$default_install_dir
-download_dir=/tmp
 latest_release="$(curl -sL https://raw.githubusercontent.com/theiceshelf/firn/master/clojure/resources/FIRN_VERSION)"
 
 case "$(uname -s)" in
@@ -18,11 +12,9 @@ esac
 
 download_url="https://github.com/theiceshelf/firn/releases/download/v$latest_release/firn-$platform.zip"
 
-cd "$download_dir"
 echo -e "Downloading Firn from: $download_url."
 curl -o "firn-$latest_release-$platform.zip" -sL $download_url
 unzip -qqo "firn-$latest_release-$platform.zip"
 chmod +x firn
 rm "firn-$latest_release-$platform.zip"
-mv firn /usr/local/bin
-echo "Installed Firn to usr/local/bin"
+./firn build
