@@ -19,17 +19,38 @@ following:
 - Collects all file links and logbooks across all files.
 - Passes files through a template system with Hiccup, and renders to HTML.
 
+* Quickstart
+
+1. Download the [[https://github.com/theiceshelf/firn/releases][latest release]] (only Mac and Linux currently supported), or use the below code snippet to install:
+   #+BEGIN_SRC sh
+    curl -s https://raw.githubusercontent.com/theiceshelf/firn/master/install -o install-firn
+    chmod +x install-firn && ./install-firn
+   #+END_SRC
+2. Navigate to your directory of org files
+3. Run =firn new=
+4. Run =firn serve=
+5. Run =firn build= when ready to put your site online!
+
 * Usage
 
-*Note!*
-
-Firn is currently being developed; many things are subject to change, or may be
-simply broken. Currently, only binaries for MacOS and Linux are being successfully
-compiled.
-
-------
-
 The Firn documentation is available [[https://firn.theiceshelf.com/][here]] and is mirrored and built from the [[file:docs/index.org][docs/]] folder in this repo.
+
+#+BEGIN_SRC sh
+Firn - A static-site generator for org-mode.
+
+Usage: firn [options] action
+
+Options:
+  -p, --port PORT  4000                            Port number
+  -h, --help
+  -v, --version
+  -d, --dir PATH   /Users/tees/Projects/firn/firn  Absolute path of directory to build/serve
+
+Actions:
+  build    Build a static site in a directory with org files.
+  new      Scaffold files and folders needed to start a new site.
+  serve    Runs a development server for processed org files.
+#+END_SRC
 
 * Developing
 ** Prerequisites:
