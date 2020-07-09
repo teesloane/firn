@@ -66,9 +66,9 @@ Actions:
 This creates a single binary called =firn=.
 
 #+BEGIN_SRC sh
-git clone git@github.com:theiceshelf/firn.git cd firn
+git clone git@github.com:theiceshelf/firn.git && cd firn
 # compile Rust, Clojure and the GraalVM Native Image.
-bin/script/compile
+bin/compile
 #+END_SRC
 ** Developing
 - From the directory you run your repl, set an environment variable of: =DEV=TRUE=
