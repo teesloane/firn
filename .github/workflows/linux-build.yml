@@ -1,31 +1,47 @@
 name: Linux build
 
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: setup-graalvm-ce
-      uses: rinx/setup-graalvm-ce@v0.0.1
-      with:
-        graalvm-version: "19.3.0"
-        java-version: "java11"
-    - name: setup-native-image
-      run: |
-        gu install native-image
-    - name: run compile script
-      run: |
-        bin/compile
+      - uses: actions/checkout@v2
+      - name: setup-graalvm-ce
+        uses: rinx/setup-graalvm-ce@v0.0.1
+        with:
+          graalvm-version: "19.3.0"
+          java-version: "java11"
+      - name: setup-native-image
+        run: |
+          gu install native-image
+      - name: run compile script
+        run: |
+          bin/compile
 
-    - uses: actions/upload-artifact@v1
-      with:
-        name: firn-linux
-        path: target/
+      - uses: actions/upload-artifact@v1
+        with:
+          name: firn-linux
+          path: target/
+
+  docs:
+    runs-on: ubuntu-latest
+
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download build artifacts
+        uses: actions/download-artifact@v1
+        with:
+          name: firn-linux
+          path: firn-linux
+      - run: sudo chmod +x firn-linux
+      - run: sudo mv firn-linux /usr/local/bin/firn
+      - run: firn build -d /home/runner/work/firn/firn/docs
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: public
+          path: "docs/_firn/_site"
