@@ -1,0 +1,34 @@
+name: firn
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download firn
+        run: curl -s https://raw.githubusercontent.com/theiceshelf/firn/master/install -o install-firn
+      - name: Install firn
+        run: chmod +x install-firn && sudo ./install-firn
+      - run: firn build -d /home/runner/work/firn/firn/docs
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: public
+          path: "docs/_firn/_site"
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v1
+        with:
+          name: public
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
