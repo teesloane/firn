@@ -1,0 +1,216 @@
+<html><head><meta charset="UTF-8" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><link href="/static/css/hljs-tomorrow.css" rel="stylesheet" /><link href="/static/css/firn_base.css" rel="stylesheet" /><link href="/static/css/basscss.css" rel="stylesheet" /><link href="/static/css/customization.css" rel="stylesheet" /><link href="/data/favico.png" rel="icon" type="image/png" /><script src="/static/js/highlight.pack.js"></script><script>hljs.initHighlightingOnLoad()</script></head><body><nav class="nav"><div class="nav-container"><div class="nav-left"><div id="nav-icon" onClick="toggleMenu()"><span></span><span></span><span></span><span></span></div><img class="nav-logo" src="/data/ico-light.png" width="32" /></div><div class="nav-links"><a class="nav-links-item" href="/"><span>Home</span></a><a class="nav-links-item" href="/getting-started"><span>Docs</span></a><a class="nav-links-item" href="https://github.com/theiceshelf/firn"><span>Github</span></a></div></div></nav><main><article class="def-wrapper"><aside class="def-sidebar" id="sidebar"><div class="pb1"><a href="/getting-started">Getting Started</a></div><div class="pb1"><a href="/configuration">Configuration</a></div><div class="pb1"><a href="/layout">Layout</a></div><div class="pb1"><a href="/pages">Custom Pages</a></div><div class="pb1"><a href="/setup">Firn Setup (with Emacs)</a></div><div class="pb1"><a href="/data-and-metadata">Data and Metadata</a></div><div class="pb1"><a href="/limitations">Limitations</a></div><div class="pb1"><a href="/sample-page">Sample Page</a></div><div class="pb1"><a href="/changelog">Changelog</a></div><div class="pb1"><a href="/index">Home</a></div><div class="pb1"><a href="/tags">Tags</a></div></aside><div class="def-content"><h1>Data and Metadata</h1><div><ol><li><a href="#metadata">Metadata</a><ol><li><a href="#site-tags">Site Tags</a></li><li><a href="#logbook">Logbook</a></li></ol></li><li><a href="#data">Data</a><ol><li><a href="#interacting-with-data">Interacting with data</a></li></ol></li></ol></div><div><section><p><span>🚧 This document is in flux as Firn's API shifts and changes. 🚧</span></p><p><span>This document describe the data and metadata made available in Firn when it
+comes time to customize the rendering of your content in your </span><a class="firn-internal" href="./layout">layouts</a><span>. This is a
+more advanced topic that may require a bit of comfort with Clojure.</span></p><p><span>Because Firn transforms org files into a data structure, it is possible to group
+content available to user's who want more advanced control and flexibility with
+their data. The two main sections in the document provide the following:</span></p><p><strong><span>Metadata</span></strong><span> - a description of the opinionated choices Firn makes to organize data
+for end-users.</span></p><p><strong><span>Data</span></strong><span> - the raw data available when a file is parsed - and how to access it if
+you need more fine grained control of your data.</span></p><hr /></section><div class="firn-headline-section firn-headline-section-1"><h1 class="firn-headline firn-headline-1" id="metadata"><span class="firn-headline-text"><span>Metadata</span></span></h1><section><p><span>Currently, </span><strong><span>links</span></strong><span>, </span><strong><span>logbook entries</span></strong><span>, a </span><strong><span>table of contents</span></strong><span>, are made available to
+users. Using the </span><code>render</code><span> function in layouts you can output pre-made html for
+certain metadata. Refer to the </span><a class="firn-internal" href="./layout">layout</a><span> file to learn more about the </span><code>render</code><span>
+function.</span></p><p><span>If you would like to access the raw data in your layouts, destructure the "file"
+value into your layout. The </span><code>file</code><span> value is a Clojure map with quite a bit of
+content in it - the raw file contents, the contents as EDN, JSON, etc - too much
+so to describe in it's entirety here. Currently, the </span><code>file</code><span> map has a sub-map
+called </span><code>:meta</code><span> that provides all sorts of metadata available in your file.</span></p><pre><code>(defn my-layout
+  [{:keys [render file] :as data}]
+  ; ...
+  ; access meta (-> file :meta ...)
+  )
+</code></pre><p><span>As the API for accessing file data changes, you can keep an eye on the </span><a class="firn-external" href="https://github.com/theiceshelf/firn/blob/master/clojure/src/firn/file.clj#L55" target="_blank">file.clj</a><span>,
+source code to see what content is made available at "layout-time".</span></p></section><div class="firn-headline-section firn-headline-section-2"><h2 class="firn-headline firn-headline-2" id="site-tags"><span class="firn-headline-text"><span>Site Tags</span></span></h2><section><p><span>Tags are collected and are grouped by tag name. The structure of the data is as follows:</span></p><pre><code>{"FAQ"       [{:from-headline  "Do I have to use layouts?",
+               :headline-link  "/layout#do-i-have-to-use-layouts?",
+               :from-file      "Layout",
+               :from-file-path "layout",
+               :tag-value      "FAQ"
+              {:from-headline  "How do I customize the styling of my layouts?",
+               :headline-link  "/layout#how-do-i-customize-the-styling-of-my-layouts?",
+               :from-file      "Layout",
+               :from-file-path "layout",
+               :tag-value      "FAQ"}]
+ "reference" [{:from-headline  "Data and Functions available to layouts",
+               :headline-link  "/layout#data-and-functions-available-to-layouts",
+               :from-file      "Layout",
+               :from-file-path "layout",
+               :tag-value      "reference"}]}
+
+</code></pre><p><span>Out of the box, Firn provides a basic "Tags" page for displayings headline-tags.
+If you do not wish to have a "/tags" page, simply remove it from </span><code>_firn/pages/tags.clj</code></p></section></div><div class="firn-headline-section firn-headline-section-2"><h2 class="firn-headline firn-headline-2" id="logbook"><span class="firn-headline-text"><span>Logbook</span></span></h2><section><p><span>The logbook is collected and sorted by timestamp. The available data looks like so:</span></p><pre><code>[{:duration "1:04",
+  :end {:day 23, :dayname "Tue", :hour 15, :minute 39, :month 6, :year 2020},
+  :end-ts 1592926740000,
+  :from-file "Test File",
+  :from-file-path "Test File",
+  :from-headline "Sample Heading",
+  :post_blank 0,
+  :start {:day 23, :dayname "Tue", :hour 14, :minute 35, :month 6, :year 2020},
+  :start-ts 1592922900000,
+  :type "clock"}
+ ;....
+ ]
+</code></pre></section></div></div><div class="firn-headline-section firn-headline-section-1"><h1 class="firn-headline firn-headline-1" id="data"><span class="firn-headline-text"><span>Data</span></span></h1><section><p><span>Org files are parsed using a parser library called </span><a class="firn-external" href="https://github.com/PoiScript/orgize" target="_blank">Orgize</a><span>. When processing or
+serving your site, Firn sends your org-file as a string into Orgize, and gets
+back a data structure representing the contents of your file.</span></p><p><span>Currently, the raw parsed output of Orgize is stored in in the </span><code>file</code><span> map under</span><code>:as-edn</code><span>. As per using your layouts as described in the Metadata section above,
+you can access the file map in your layouts.</span></p><p><span>A simple file with a few headings, tasks, logbook, etc, looks like this
+after being parsed to JSON and converted to EDN:</span></p><p><span><details>
+<summary> Click to view code sample</summary></span></p><pre><code>{:type "document",
+ :children
+ [{:type "section",
+   :children
+   [{:type "keyword",
+     :key "TITLE",
+     :value "Sample File!"}
+    {:type "keyword",
+     :key "FIRN_LAYOUT",
+     :value "default"}]}
+  {:type "headline",
+   :level 1,
+   :children
+   [{:type "title",
+     :level 1,
+     :raw "Meta",
+     :properties
+     {:file_under "Projects",
+      :state "active",
+      :date_completed "?",
+      :links "?",
+      :intent "Wiki",
+      :date_started "<2020-03-01 Sun>",
+      :slug "firn"},
+     :children [{:type "text", :value "Meta"}]}
+    {:type "section",
+     :children
+     [{:type "drawer",
+       :name "LOGBOOK",
+       :children
+       [{:type "clock",
+         :start {:year 2020, :month 3, :day 28, :dayname "Sat", :hour 15, :minute 45},
+         :end {:year 2020, :month 3, :day 28, :dayname "Sat", :hour 18, :minute 29},
+         :duration "2:44"}]}]}]}
+  {:type "headline",
+   :level 1,
+   :children
+   [{:type "title",
+     :level 1,
+     :raw "Headlines <2020-03-27 Fri>",
+     :properties {:foo "bar"},
+     :children
+     [{:type "text", :value "Headlines "}
+      {:type "timestamp",
+       :timestamp_type "active",
+       :start
+       {:year 2020,
+        :month 3,
+        :day 27,
+        :dayname "Fri"}}]}
+    {:type "section",
+     :children
+     [{:type "paragraph",
+       :children
+       [{:type "text",
+         :value "and some stuff with a date: "}
+        {:type "timestamp",
+         :timestamp_type "active",
+         :start
+         {:year 2020,
+          :month 3,
+          :day 27,
+          :dayname "Fri"}}
+        {:type "text", :value "\r"}]}]}
+    {:type "headline",
+     :level 2,
+     :children
+     [{:type "title",
+       :level 2,
+       :keyword "TODO",
+       :raw "Headline (2) with /keyword/",
+       :children
+       [{:type "text",
+         :value "Headline (2) with "}
+        {:type "italic",
+         :children
+         [{:type "text",
+           :value "keyword"}]}]}]}
+    {:type "headline",
+     :level 2,
+     :children
+     [{:type "title",
+       :level 2,
+       :priority "B",
+       :keyword "TODO",
+       :raw "Headline 2 with priority",
+       :children
+       [{:type "text",
+         :value "Headline 2 with priority"}]}]}]}
+  {:type "headline",
+   :level 1,
+   :children
+   [{:type "title",
+     :level 1,
+     :raw "Some Links",
+     :children
+     [{:type "text", :value "Some Links"}]}
+    {:type "section",
+     :children
+     [{:type "paragraph",
+       :children
+       [{:type "text", :value "A "}
+        {:type "verbatim", :value "file:"}
+        {:type "text", :value " link "}
+        {:type "link",
+         :path "file:file2.org",
+         :desc "File 2"}
+        {:type "text", :value "\r"}]}]}]}
+  {:type "headline",
+   :level 1,
+   :children
+   [{:type "title",
+     :level 1,
+     :raw "Tables",
+     :children
+     [{:type "text", :value "Tables"}]}
+    {:type "section",
+     :children
+     [{:type "paragraph",
+       :children
+       [{:type "text",
+         :value
+         "Some tables with texte markup in them\r"}]}
+      {:type "table",
+       :table_type "org",
+       :tblfm nil,
+       :children
+       [{:type "table-row", :table_row_type "standard",
+         :children
+         [{:type "table-cell", :children [{:type "text", :value "1"}]}
+          {:type "table-cell", :children [{:type "text", :value "2"}]}
+          {:type "table-cell", :children [{:type "text", :value "3"}]}
+          {:type "table-cell", :children [{:type "text", :value "4"}]}
+          {:type "table-cell", :children [{:type "text", :value "5"}]}]}
+        {:type "table-row",
+         :table_row_type "rule"}
+        {:type "table-row",
+         :table_row_type "standard",
+         :children
+         [{:type "table-cell",
+           :children
+           [{:type "text", :value "foo"}]}
+          {:type "table-cell",
+           :children
+           [{:type "verbatim", :value "foo"}]}
+          {:type "table-cell",
+           :children
+           [{:type "italic",
+             :children
+             [{:type "text",
+               :value "italic"}]}]}
+          {:type "table-cell"}
+          {:type "table-cell",
+           :children
+           [{:type "bold",
+             :children
+             [{:type "text",
+               :value "bold"}]}]}]}]}]}]}]}
+</code></pre><p><span></details></span></p></section><div class="firn-headline-section firn-headline-section-2"><h2 class="firn-headline firn-headline-2" id="interacting-with-data"><span class="firn-headline-text"><span>Interacting with data</span></span></h2><section><p><span>As you can see, lots of data. Currently, Firn is not capable of interacting with
+this data very easily while you develop your Layouts. There are tentative plans
+to include a repl, or at least the ability to </span><code>println debug</code><span> in future releases.
+For now, it is possible to independently use the </span><a class="firn-external" href="https://orgize.herokuapp.com" target="_blank">Orgize parser online</a><span> to see
+test results as JSON.</span></p></section></div></div></div><footer><script src="/static/js/main.js"></script></footer></div></article></main></body></html>

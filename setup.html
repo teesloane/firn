@@ -1,0 +1,36 @@
+<html><head><meta charset="UTF-8" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><link href="/static/css/hljs-tomorrow.css" rel="stylesheet" /><link href="/static/css/firn_base.css" rel="stylesheet" /><link href="/static/css/basscss.css" rel="stylesheet" /><link href="/static/css/customization.css" rel="stylesheet" /><link href="/data/favico.png" rel="icon" type="image/png" /><script src="/static/js/highlight.pack.js"></script><script>hljs.initHighlightingOnLoad()</script></head><body><nav class="nav"><div class="nav-container"><div class="nav-left"><div id="nav-icon" onClick="toggleMenu()"><span></span><span></span><span></span><span></span></div><img class="nav-logo" src="/data/ico-light.png" width="32" /></div><div class="nav-links"><a class="nav-links-item" href="/"><span>Home</span></a><a class="nav-links-item" href="/getting-started"><span>Docs</span></a><a class="nav-links-item" href="https://github.com/theiceshelf/firn"><span>Github</span></a></div></div></nav><main><article class="def-wrapper"><aside class="def-sidebar" id="sidebar"><div class="pb1"><a href="/getting-started">Getting Started</a></div><div class="pb1"><a href="/configuration">Configuration</a></div><div class="pb1"><a href="/layout">Layout</a></div><div class="pb1"><a href="/pages">Custom Pages</a></div><div class="pb1"><a href="/setup">Firn Setup (with Emacs)</a></div><div class="pb1"><a href="/data-and-metadata">Data and Metadata</a></div><div class="pb1"><a href="/limitations">Limitations</a></div><div class="pb1"><a href="/sample-page">Sample Page</a></div><div class="pb1"><a href="/changelog">Changelog</a></div><div class="pb1"><a href="/index">Home</a></div><div class="pb1"><a href="/tags">Tags</a></div></aside><div class="def-content"><h1>Firn Setup (with Emacs)</h1><div><ol><li><a href="#folder-structure">Folder Structure</a></li><li><a href="#links">Links</a><ol><li><a href="#linking-between-files">Linking between files</a></li><li><a href="#attachments">Attachments</a></li></ol></li><li><a href="#miscellaneous">Miscellaneous</a><ol><li><a href="#how-to-auto-timestamp-date_updated-on-every-file">How to auto timestamp DATE_UPDATED on every file</a></li><li><a href="#ignoring-certain-files-or-directories">Ignoring certain files or directories</a></li></ol></li></ol></div><div><section><p><span>The following are notes on how to best setup Emacs and your folder of org-files
+for a Firn site.</span></p></section><div class="firn-headline-section firn-headline-section-1"><h1 class="firn-headline firn-headline-1" id="folder-structure"><span class="firn-headline-text"><span>Folder Structure</span></span></h1><section><p><span>Firn was originally intended to build sites from a flat wiki structure, although
+this is not mandatory. Firn works well with </span><a class="firn-external" href="https://github.com/jethrokuan/org-roam" target="_blank">Org-Roam</a><span>, which is also not
+required, but useful. You can have nested folders, which </span><em><span>will</span></em><span> translate into
+nested url paths.</span></p><p><span>An example directory:</span></p><pre><code>❯ tree -L 2
+.
+├── _firn
+│   ├── _site
+│   ├── bin
+│   ├── layouts
+│   ├── partials
+│   └── static
+├── attach
+│   ├── _20200328_190456_an_attachment.jpg
+│   └── test-img.png
+├── file1.org        # => site.com/file1.html
+├── file2.org        # => site.com/file2.html
+└── foo
+    └── level-2.org  # => site.com/foo/file1.html
+
+</code></pre></section></div><div class="firn-headline-section firn-headline-section-1"><h1 class="firn-headline firn-headline-1" id="links"><span class="firn-headline-text"><span>Links</span></span></h1><div class="firn-headline-section firn-headline-section-2"><h2 class="firn-headline firn-headline-2" id="linking-between-files"><span class="firn-headline-text"><span>Linking between files</span></span></h2><section><p><span>All links should be relative.</span></p><p><span>In your wiki directory, add a </span><code>.dir-locals.el</code><span> file with these contents to make
+sure org links are relative (or just change it in your config.el if you don't
+mind having this setting apply across all org files.):</span></p><pre><code>((org-mode
+  (org-link-file-path-type . relative)))
+</code></pre></section></div><div class="firn-headline-section firn-headline-section-2"><h2 class="firn-headline firn-headline-2" id="attachments"><span class="firn-headline-text"><span>Attachments</span></span></h2><section><p><span>When it comes to attachments:</span></p><ul><li><p><span>It's recommended to put all images/attachments in a single folder (your
+  </span><code>:dir-data</code><span>)</span></p></li><li><p><span>You can configure which directory this is via the </span><code>:dir-data</code><span> key in your
+  config.</span></p></li></ul></section></div></div><div class="firn-headline-section firn-headline-section-1"><h1 class="firn-headline firn-headline-1" id="miscellaneous"><span class="firn-headline-text"><span>Miscellaneous</span></span></h1><div class="firn-headline-section firn-headline-section-2"><h2 class="firn-headline firn-headline-2" id="how-to-auto-timestamp-date_updated-on-every-file"><span class="firn-headline-text"><span>How to auto timestamp </span><code>DATE_UPDATED</code><span> on every file</span></span></h2><section><ul><li><p><span>Ensure that you have a </span><code>#+DATE_UPDATED</code><span> keyword in your org-files:</span></p></li></ul><pre><code>#+TITLE: Firn
+#+DATE_CREATED: <2020-03-01 09:53>
+#+DATE_UPDATED: <2020-03-22 13:24>
+</code></pre><ul><li><p><span>In your wiki directory, add a </span><code>.dir-locals</code><span> file with these contents</span></p></li></ul><pre><code>((org-mode
+  (time-stamp-pattern . "8/DATE_UPDATED:[ 	]+\\\\?[\"<]+%:y-%02m-%02d %02H:%02M\\\\?[\">]")
+  ))
+</code></pre><ul><li><p><span>Somewhere in your config, add a hook to run emacs' time-stamp function on save:</span></p></li></ul><pre><code>(add-hook 'write-file-hooks 'time-stamp) ; update timestamp, if it exists, when saving
+</code></pre></section></div><div class="firn-headline-section firn-headline-section-2"><h2 class="firn-headline firn-headline-2" id="ignoring-certain-files-or-directories"><span class="firn-headline-text"><span>Ignoring certain files or directories</span></span></h2><section><p><span>Setting the keyword </span><code>#+FIRN_PRIVATE: true</code><span> in an org-mode file will cause the file
+not to be rendered. Similarly, you can set an entire directory to be ignored in
+your </span><code>config.edn</code></p></section></div></div></div><footer><script src="/static/js/main.js"></script></footer></div></article></main></body></html>

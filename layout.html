@@ -1,0 +1,122 @@
+<html><head><meta charset="UTF-8" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><link href="/static/css/hljs-tomorrow.css" rel="stylesheet" /><link href="/static/css/firn_base.css" rel="stylesheet" /><link href="/static/css/basscss.css" rel="stylesheet" /><link href="/static/css/customization.css" rel="stylesheet" /><link href="/data/favico.png" rel="icon" type="image/png" /><script src="/static/js/highlight.pack.js"></script><script>hljs.initHighlightingOnLoad()</script></head><body><nav class="nav"><div class="nav-container"><div class="nav-left"><div id="nav-icon" onClick="toggleMenu()"><span></span><span></span><span></span><span></span></div><img class="nav-logo" src="/data/ico-light.png" width="32" /></div><div class="nav-links"><a class="nav-links-item" href="/"><span>Home</span></a><a class="nav-links-item" href="/getting-started"><span>Docs</span></a><a class="nav-links-item" href="https://github.com/theiceshelf/firn"><span>Github</span></a></div></div></nav><main><article class="def-wrapper"><aside class="def-sidebar" id="sidebar"><div class="pb1"><a href="/getting-started">Getting Started</a></div><div class="pb1"><a href="/configuration">Configuration</a></div><div class="pb1"><a href="/layout">Layout</a></div><div class="pb1"><a href="/pages">Custom Pages</a></div><div class="pb1"><a href="/setup">Firn Setup (with Emacs)</a></div><div class="pb1"><a href="/data-and-metadata">Data and Metadata</a></div><div class="pb1"><a href="/limitations">Limitations</a></div><div class="pb1"><a href="/sample-page">Sample Page</a></div><div class="pb1"><a href="/changelog">Changelog</a></div><div class="pb1"><a href="/index">Home</a></div><div class="pb1"><a href="/tags">Tags</a></div></aside><div class="def-content"><h1>Layout</h1><div><ol><li><a href="#overview">Overview</a></li><li><a href="#usage">Usage</a></li><li><a href="#do-i-have-to-use-layouts?">Do I have to use layouts?</a></li><li><a href="#how-do-i-customize-the-styling-of-my-layouts?">How do I customize the styling of my layouts?</a></li><li><a href="#the-render-function">The Render function</a><ol><li><a href="#render-an-entire-file">Render an entire file</a></li><li><a href="#rendering-specific-headlines-and-content">Rendering specific headlines and content</a></li><li><a href="#render-a-logbook-svg-polyline">Render a Logbook SVG Polyline</a></li><li><a href="#rendering-a-table-of-contents">Rendering a Table of Contents</a></li></ol></li><li><a href="#data-and-functions-available-to-layouts">Data and Functions available to layouts</a></li><li><a href="#styling-layouts">Styling Layouts</a></li></ol></div><div><section></section><div class="firn-headline-section firn-headline-section-1"><h1 class="firn-headline firn-headline-1" id="overview"><span class="firn-headline-text"><span>Overview</span></span></h1><section><p><span>When you create a new Firn site for the first time, it will create a folder:</span><code>_firn/layouts</code><span>. The layout folder stores Clojure files (</span><code>.clj</code><span>) that are
+responsible for how your org-file is rendered to-html; The act of "applying" a
+template means to pass the content of the org-file through a specific </span><a class="firn-external" href="https://github.com/weavejester/hiccup" target="_blank">clojure hiccup</a><span> template that organizes how the content is displayed.</span></p><p><span>When an org-mode file is processed by Firn it looks for the in-buffer-setting</span><code>#+FIRN_LAYOUT:</code><span> to see if it uses a Layout. If none are specified, the </span><u><span>default
+template</span></u><span> is used.</span></p></section></div><div class="firn-headline-section firn-headline-section-1"><h1 class="firn-headline firn-headline-1" id="usage"><span class="firn-headline-text"><span>Usage</span></span></h1><section><p><span>Let's walk through an example of how to use layouts.</span></p><p><span>Create a sample org file; we will call it </span><code>foo.org</code><span>. Edit it to include the
+following:</span></p><p><strong><span>NOTE</span></strong><span>: Because the snippet below is org-mode code, you will need to remove the </span><code>\</code><span>
+preceding the </span><code>*</code><span> Headlines.</span></p><pre><code>
+#+TITLE: Layout
+#+DATE_CREATED: <2020-03-24 Tue>
+#+DATE_UPDATED: <2020-03-24 14:20>
+#+FILE_UNDER: docs
+#+FIRN_LAYOUT: docs
+
+\* My project
+
+ This is my project.
+
+\* Notes
+
+ - [ ] Figure out how layouts work.
+</code></pre><p><span>Now we have a file that is going to look for a layout called "docs" in the
+layouts folder. Return to the terminal.</span></p><pre><code>cd layouts
+touch docs.clj
+</code></pre><p><span>Inside docs.clj place the following clojure code.</span></p><pre><code>(defn project
+  [{:keys [render title partials]}]
+  (let [{:keys [head nav]} partials]
+    (head
+     [:body
+      (nav)
+      [:main
+       [:article
+        [:div (render "Notes")]]]]))) ;; Renders The notes section.
+</code></pre><p><strong><span>NOTE:</span></strong><span> Layouts can have multiple Clojure functions in them, however only the last
+function of the file will be applied as the layout.</span></p></section></div><div class="firn-headline-section firn-headline-section-1"><h1 class="firn-headline firn-headline-1" id="do-i-have-to-use-layouts?"><span class="firn-headline-text"><span>Do I have to use layouts?</span></span><span class="firn-tags"><span><a class="firn-tag" href="/tags#FAQ">FAQ</a></span></span></h1><section><p><span>Not exactly. When you create a new Firn site, it will have a </span><code>default.clj</code><span> file in
+the </span><code>layouts</code><span> directory. This provides a very basic out of the box formatting and
+will render the entirety of your org mode file. If you want to add any kinds of
+customization - even css, you'll need to work with layouts.</span></p></section></div><div class="firn-headline-section firn-headline-section-1"><h1 class="firn-headline firn-headline-1" id="how-do-i-customize-the-styling-of-my-layouts?"><span class="firn-headline-text"><span>How do I customize the styling of my layouts?</span></span><span class="firn-tags"><span><a class="firn-tag" href="/tags#FAQ">FAQ</a></span></span></h1><section><p><span>As with normal HTML, you'll need to add a </span><code>head</code><span> tag with a </span><code>link</code><span> that references
+to a css file. It might make sense for you to create a partial for defining your
+html </span><code>head</code><span> tag, allowing it to be shared across layouts:</span></p><pre><code>(defn head
+  [body]
+  [:html
+   [:head
+    [:link {:rel "stylesheet" :href "/static/css/firn_base.css"}]]
+   body])
+</code></pre></section></div><div class="firn-headline-section firn-headline-section-1"><h1 class="firn-headline firn-headline-1" id="the-render-function"><span class="firn-headline-text"><span>The Render function</span></span></h1><section><p><span>Render is used to render content from your org file. It's an important one - if
+you don't use it, you won't see any org-mode content.</span></p><p><span>Quite a bit of data and functions are made available in your layouts. The </span><code>render</code><span>
+function you to decide what parts of your org-file you would like to display. Firn
+makes some "pre-made" content available for rendering - logbook graphs, table of
+contents, etc. It can render multiple kinds of content"</span></p><table><tr><td><span>Render type</span></td><td><span>Paramaters</span></td><td><span>Example</span></td></tr><tr></tr><tr><td><span>Entire file</span></td><td><span>keyword</span></td><td><code>(render :file)</code></td></tr><tr><td><span>Specific headline</span></td><td><span>string</span></td><td><code>(render "Notes")</code></td></tr><tr><td><span>Specific content</span></td><td><span>string, keyword</span></td><td><code>(render "Notes" :content)</code></td></tr><tr><td><span>Table of contents</span></td><td><span>keyword, map</span></td><td><code>(render :toc {:depth int :exclusive? bool :headline "Notes"})</code></td></tr><tr><td><span>Logbook Polyline</span></td><td><span>keyword, map</span></td><td><code>(render :logbook-polyline {:stroke "#45698A" :height 60 :width 365})</code></td></tr><tr><td></td><td></td><td></td></tr></table></section><div class="firn-headline-section firn-headline-section-2"><h2 class="firn-headline firn-headline-2" id="render-an-entire-file"><span class="firn-headline-text"><span>Render an entire file</span></span></h2><section><pre><code>(defn default
+  [{:keys [render partials]}]
+  (let [{:keys [head]} partials]
+
+    (head
+     [:body
+       [:div (render :file)]])))
+</code></pre></section></div><div class="firn-headline-section firn-headline-section-2"><h2 class="firn-headline firn-headline-2" id="rendering-specific-headlines-and-content"><span class="firn-headline-text"><span>Rendering specific headlines and content</span></span></h2><section><pre><code>(defn default
+  [{:keys [render partials]}]
+  (let [{:keys [head]} partials]
+    (head
+     [:body
+       [:div (render "Notes")] ; render everything in "Notes" (including the heading "Notes")
+       [:div (render "Notes")] ; render the content in "Notes", excluding the heading.
+      ])))
+
+</code></pre></section></div><div class="firn-headline-section firn-headline-section-2"><h2 class="firn-headline firn-headline-2" id="render-a-logbook-svg-polyline"><span class="firn-headline-text"><span>Render a Logbook SVG Polyline</span></span></h2><section><p><span>Graphs all logbook entries for the current file in a polyline, generating a chart for each year.</span></p><pre><code>(defn default
+  [{:keys [render partials]}]
+  (let [{:keys [head]} partials]
+    (head
+     [:body
+       [:div (render :logbook-polyline {:stroke "#45698A" :height 60 :width 365})]])))
+</code></pre></section></div><div class="firn-headline-section firn-headline-section-2"><h2 class="firn-headline firn-headline-2" id="rendering-a-table-of-contents"><span class="firn-headline-text"><span>Rendering a Table of Contents</span></span></h2><section><p><span>When a file is processed, Firn collects </span><strong><span>all</span></strong><span> of it's headlines, whether you're
+choosing to render the entire file, or just one headline.</span></p><p><span>There are several ways you can create table of contents in your files, from simple to more complex use cases.</span></p><ol><li><p><span>Render a table of contents for an entire file.</span></p><pre><code>  (defn default
+    [{:keys [render partials]}]
+    (let [{:keys [head]} partials]
+
+      (head
+       [:body
+         [:div (render :toc)]
+         [:div (render :file)]])))
+</code></pre></li><li><p><span>Render a table of contents for everything within a specific headline.</span></p><pre><code>  (defn default
+    [{:keys [render partials]}]
+    (let [{:keys [head]} partials]
+      (head
+       [:body
+         ;; only renders a table of contents for a single headline's children.
+         ;; `:eclusive?` means we don't render "Notes"; just headlines that fall under it dflakdjflksadjf lksadjf lkasdjf lkasdjf .
+         [:div (render :toc {:headline "Notes"
+                             :depth 4
+                             :exclusive? true})]
+         [:div (render "Notes")]])))
+</code></pre></li><li><p><span>From within a file, you can set the keyword </span><code>#+FIRN_TOC</code><span> and pass it a map with
+   the properties above to enable a table of contents specific to a single file:</span></p><pre><code>  #+FIRN_TOC: {:depth 4}
+</code></pre></li></ol></section></div></div><div class="firn-headline-section firn-headline-section-1"><h1 class="firn-headline firn-headline-1" id="data-and-functions-available-to-layouts"><span class="firn-headline-text"><span>Data and Functions available to layouts</span></span><span class="firn-tags"><span><a class="firn-tag" href="/tags#reference">reference</a></span></span></h1><section><p><span>The following keys are made available in your layouts.</span></p><table><tr><td><span>Function/Data</span></td><td><span>Intent</span></td><td><span>Data-type</span></td></tr><tr></tr><tr><td><span>config</span></td><td><span>The site wide config.</span></td><td><span>map</span></td></tr><tr><td><span>date-created</span></td><td><span>The #+DATE_CREATED value of the file</span></td><td><span>string</span></td></tr><tr><td><span>date-updated</span></td><td><span>The #+DATE_UPDATED value of the file</span></td><td><span>string</span></td></tr><tr><td><span>file</span></td><td><span>The file as a data structure.</span></td><td><span>map</span></td></tr><tr><td><span>file-links</span></td><td><span>A list of links per file</span></td><td><span>list</span></td></tr><tr><td><span>firn-under</span></td><td><span>The #+FIRN_UNDER value of the file</span></td><td><span>string</span></td></tr><tr><td><span>logbook</span></td><td><span>A list of logbooks entries per file.</span></td><td><span>list</span></td></tr><tr><td><span>logbook-total</span></td><td><span>The sum of all the logbook entries per file</span></td><td><span>string</span></td></tr><tr><td><span>meta</span></td><td><span>A map of metadata per file (logbook, links, etc)</span></td><td><span>map</span></td></tr><tr><td><span>partials</span></td><td><span>a list of invokable partials </span><code>/partials</code><span> dir</span></td><td><span>list</span></td></tr><tr><td><span>render</span></td><td><span>Enables rendering parts or entirety of an org file.</span></td><td><span>function</span></td></tr><tr><td><span>site-links</span></td><td><span>A list of all links across all documents</span></td><td><span>vector</span></td></tr><tr><td><span>site-logs</span></td><td><span>A list of aLL logbook entries.</span></td><td><span>vector</span></td></tr><tr><td><span>site-map</span></td><td><span>A list of all files on the wiki</span></td><td><span>vector</span></td></tr><tr><td><span>title</span></td><td><span>The #+TITLE value of the file.</span></td><td><span>string</span></td></tr></table><p><span>This may seem like a lot of information to make available to a layout template.
+And that's because it is. But thanks to destructuring in Clojure, you can make
+your templates only ask for what they need:</span></p><pre><code>(defn project
+  [{:keys [ render partials logbook] :as data}] ; < destructuring to make available only what you need.
+  (let [{:keys [head nav]} partials]
+    (head
+     [:body
+      (nav)
+      [:main.main-container
+       (page-header data)
+       [:div.container
+        (main-section render)
+        (sidebar render logbook)]]])))
+</code></pre><p><span>The above template only needs access to </span><code>render</code><span>, </span><code>partials</code><span> and the </span><code>logbook</code><span>. Then functions, such as </span><code>page-header</code><span> can simply take the data map and destructure what </span><em><span>it</span></em><span> needs again:</span></p><pre><code>(defn page-header
+  [{:keys [title logbook-total date-updated date-created firn-under]}]
+  (let [rndr (fn [i s]
+               (when i [:span.flex.pr2
+                        [:h4.italic.bold.pr1 s " "]
+                        [:h4.italic.thin i]]))]
+    [:div.page_meta
+     [:h1.page_meta_title title]
+     [:div.flex
+      (rndr date-created "Published: ")
+      (rndr date-updated "Last Updated: ")
+      (rndr firn-under "File Under: ")
+      (when-not (= logbook-total "0:00")
+        (rndr logbook-total "Time Logged: "))]]))
+
+</code></pre></section></div><div class="firn-headline-section firn-headline-section-1"><h1 class="firn-headline firn-headline-1" id="styling-layouts"><span class="firn-headline-text"><span>Styling Layouts</span></span><span class="firn-tags"><span><a class="firn-tag" href="/tags#styling">styling</a></span></span></h1><section><p><span>You can write css as you normally would by placing css files in the</span><code>_firn/static/css</code><span> folder and then having </span><code>firn</code><span> move them into your </span><code>_site</code><span> folder
+when run. Styling is applied through </span><a class="firn-external" href="https://github.com/weavejester/hiccup#syntax" target="_blank">hiccup</a><span>.</span></p><p><span>There are some internal styles that are applied when org-mode text is
+transformed into data. These styles are all prefaced with the keyword </span><code>firn-</code><span>, (ie.</span><code>firn-headline-text</code><span> or </span><code>firn-tag</code><span>).</span></p><p><span>Inspect the file </span><code>_firn/static/css/firn_base.css</code><span> to see the configurable elements.</span></p></section></div></div><footer><script src="/static/js/main.js"></script></footer></div></article></main></body></html>

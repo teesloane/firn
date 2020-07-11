@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><atom:link href="" rel="self" type="application/rss+xml"/><title></title><link></link><description></description><generator>clj-rss</generator><item><description>&lt;html&gt;&lt;head&gt;&lt;meta charset="UTF-8" /&gt;&lt;meta content="width=device-width, initial-scale=1.0" name="viewport" /&gt;&lt;link href="/static/css/hljs-tomorrow.css" rel="stylesheet" /&gt;&lt;link href="/static/css/firn_base.css" rel="stylesheet" /&gt;&lt;link href="/static/css/basscss.css" rel="stylesheet" /&gt;&lt;link href="/static/css/customization.css" rel="stylesheet" /&gt;&lt;link href="/data/favico.png" rel="icon" type="image/png" /&gt;&lt;script src="/static/js/highlight.pack.js"&gt;&lt;/script&gt;&lt;script&gt;hljs.initHighlightingOnLoad()&lt;/script&gt;&lt;/head&gt;&lt;body&gt;&lt;nav class="nav"&gt;&lt;div class="nav-container"&gt;&lt;div class="nav-left"&gt;&lt;div id="nav-icon" onClick="toggleMenu()"&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;/div&gt;&lt;img class="nav-logo" src="/data/ico-light.png" width="32" /&gt;&lt;/div&gt;&lt;div class="nav-links"&gt;&lt;a class="nav-links-item" href="/"&gt;&lt;span&gt;Home&lt;/span&gt;&lt;/a&gt;&lt;a class="nav-links-item" href="/getting-started"&gt;&lt;span&gt;Docs&lt;/span&gt;&lt;/a&gt;&lt;a class="nav-links-item" href="https://github.com/theiceshelf/firn"&gt;&lt;span&gt;Github&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;/nav&gt;&lt;main&gt;&lt;article class="def-wrapper"&gt;&lt;aside class="def-sidebar" id="sidebar"&gt;&lt;div class="pb1"&gt;&lt;a href="/getting-started"&gt;Getting Started&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/configuration"&gt;Configuration&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/layout"&gt;Layout&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/pages"&gt;Custom Pages&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/setup"&gt;Firn Setup (with Emacs)&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/data-and-metadata"&gt;Data and Metadata&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/limitations"&gt;Limitations&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/sample-page"&gt;Sample Page&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/changelog"&gt;Changelog&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/index"&gt;Home&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/tags"&gt;Tags&lt;/a&gt;&lt;/div&gt;&lt;/aside&gt;&lt;div class="def-content"&gt;&lt;h1&gt;Firn Setup (with Emacs)&lt;/h1&gt;&lt;div&gt;&lt;ol&gt;&lt;li&gt;&lt;a href="#folder-structure"&gt;Folder Structure&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#links"&gt;Links&lt;/a&gt;&lt;ol&gt;&lt;li&gt;&lt;a href="#linking-between-files"&gt;Linking between files&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#attachments"&gt;Attachments&lt;/a&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#miscellaneous"&gt;Miscellaneous&lt;/a&gt;&lt;ol&gt;&lt;li&gt;&lt;a href="#how-to-auto-timestamp-date_updated-on-every-file"&gt;How to auto timestamp DATE_UPDATED on every file&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#ignoring-certain-files-or-directories"&gt;Ignoring certain files or directories&lt;/a&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/div&gt;&lt;div&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;The following are notes on how to best setup Emacs and your folder of org-files
+for a Firn site.&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="folder-structure"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Folder Structure&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;Firn was originally intended to build sites from a flat wiki structure, although
+this is not mandatory. Firn works well with &lt;/span&gt;&lt;a class="firn-external" href="https://github.com/jethrokuan/org-roam" target="_blank"&gt;Org-Roam&lt;/a&gt;&lt;span&gt;, which is also not
+required, but useful. You can have nested folders, which &lt;/span&gt;&lt;em&gt;&lt;span&gt;will&lt;/span&gt;&lt;/em&gt;&lt;span&gt; translate into
+nested url paths.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;An example directory:&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;❯ tree -L 2
+.
+├── _firn
+│   ├── _site
+│   ├── bin
+│   ├── layouts
+│   ├── partials
+│   └── static
+├── attach
+│   ├── _20200328_190456_an_attachment.jpg
+│   └── test-img.png
+├── file1.org        # =&gt; site.com/file1.html
+├── file2.org        # =&gt; site.com/file2.html
+└── foo
+    └── level-2.org  # =&gt; site.com/foo/file1.html
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="links"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Links&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;div class="firn-headline-section firn-headline-section-2"&gt;&lt;h2 class="firn-headline firn-headline-2" id="linking-between-files"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Linking between files&lt;/span&gt;&lt;/span&gt;&lt;/h2&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;All links should be relative.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;In your wiki directory, add a &lt;/span&gt;&lt;code&gt;.dir-locals.el&lt;/code&gt;&lt;span&gt; file with these contents to make
+sure org links are relative (or just change it in your config.el if you don't
+mind having this setting apply across all org files.):&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;((org-mode
+  (org-link-file-path-type . relative)))
+&lt;/code&gt;&lt;/pre&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-2"&gt;&lt;h2 class="firn-headline firn-headline-2" id="attachments"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Attachments&lt;/span&gt;&lt;/span&gt;&lt;/h2&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;When it comes to attachments:&lt;/span&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;It's recommended to put all images/attachments in a single folder (your
+  &lt;/span&gt;&lt;code&gt;:dir-data&lt;/code&gt;&lt;span&gt;)&lt;/span&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;You can configure which directory this is via the &lt;/span&gt;&lt;code&gt;:dir-data&lt;/code&gt;&lt;span&gt; key in your
+  config.&lt;/span&gt;&lt;/p&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/section&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="miscellaneous"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Miscellaneous&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;div class="firn-headline-section firn-headline-section-2"&gt;&lt;h2 class="firn-headline firn-headline-2" id="how-to-auto-timestamp-date_updated-on-every-file"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;How to auto timestamp &lt;/span&gt;&lt;code&gt;DATE_UPDATED&lt;/code&gt;&lt;span&gt; on every file&lt;/span&gt;&lt;/span&gt;&lt;/h2&gt;&lt;section&gt;&lt;ul&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;Ensure that you have a &lt;/span&gt;&lt;code&gt;#+DATE_UPDATED&lt;/code&gt;&lt;span&gt; keyword in your org-files:&lt;/span&gt;&lt;/p&gt;&lt;/li&gt;&lt;/ul&gt;&lt;pre&gt;&lt;code&gt;#+TITLE: Firn
+#+DATE_CREATED: &lt;2020-03-01 09:53&gt;
+#+DATE_UPDATED: &lt;2020-03-22 13:24&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;In your wiki directory, add a &lt;/span&gt;&lt;code&gt;.dir-locals&lt;/code&gt;&lt;span&gt; file with these contents&lt;/span&gt;&lt;/p&gt;&lt;/li&gt;&lt;/ul&gt;&lt;pre&gt;&lt;code&gt;((org-mode
+  (time-stamp-pattern . "8/DATE_UPDATED:[ 	]+\\\\?[\"&lt;]+%:y-%02m-%02d %02H:%02M\\\\?[\"&gt;]")
+  ))
+&lt;/code&gt;&lt;/pre&gt;&lt;ul&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;Somewhere in your config, add a hook to run emacs' time-stamp function on save:&lt;/span&gt;&lt;/p&gt;&lt;/li&gt;&lt;/ul&gt;&lt;pre&gt;&lt;code&gt;(add-hook 'write-file-hooks 'time-stamp) ; update timestamp, if it exists, when saving
+&lt;/code&gt;&lt;/pre&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-2"&gt;&lt;h2 class="firn-headline firn-headline-2" id="ignoring-certain-files-or-directories"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Ignoring certain files or directories&lt;/span&gt;&lt;/span&gt;&lt;/h2&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;Setting the keyword &lt;/span&gt;&lt;code&gt;#+FIRN_PRIVATE: true&lt;/code&gt;&lt;span&gt; in an org-mode file will cause the file
+not to be rendered. Similarly, you can set an entire directory to be ignored in
+your &lt;/span&gt;&lt;code&gt;config.edn&lt;/code&gt;&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;footer&gt;&lt;script src="/static/js/main.js"&gt;&lt;/script&gt;&lt;/footer&gt;&lt;/div&gt;&lt;/article&gt;&lt;/main&gt;&lt;/body&gt;&lt;/html&gt;</description><pubDate>Fri, 27 Mar 2020 00:00:00 +0000</pubDate><title>Firn Setup (with Emacs)</title><link>/setup</link></item><item><description>&lt;html&gt;&lt;head&gt;&lt;meta charset="UTF-8" /&gt;&lt;meta content="width=device-width, initial-scale=1.0" name="viewport" /&gt;&lt;link href="/static/css/hljs-tomorrow.css" rel="stylesheet" /&gt;&lt;link href="/static/css/firn_base.css" rel="stylesheet" /&gt;&lt;link href="/static/css/basscss.css" rel="stylesheet" /&gt;&lt;link href="/static/css/customization.css" rel="stylesheet" /&gt;&lt;link href="/data/favico.png" rel="icon" type="image/png" /&gt;&lt;script src="/static/js/highlight.pack.js"&gt;&lt;/script&gt;&lt;script&gt;hljs.initHighlightingOnLoad()&lt;/script&gt;&lt;/head&gt;&lt;body&gt;&lt;nav class="nav"&gt;&lt;div class="nav-container"&gt;&lt;div class="nav-left"&gt;&lt;div id="nav-icon" onClick="toggleMenu()"&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;/div&gt;&lt;img class="nav-logo" src="/data/ico-light.png" width="32" /&gt;&lt;/div&gt;&lt;div class="nav-links"&gt;&lt;a class="nav-links-item" href="/"&gt;&lt;span&gt;Home&lt;/span&gt;&lt;/a&gt;&lt;a class="nav-links-item" href="/getting-started"&gt;&lt;span&gt;Docs&lt;/span&gt;&lt;/a&gt;&lt;a class="nav-links-item" href="https://github.com/theiceshelf/firn"&gt;&lt;span&gt;Github&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;/nav&gt;&lt;main&gt;&lt;article class="def-wrapper"&gt;&lt;aside class="def-sidebar" id="sidebar"&gt;&lt;div class="pb1"&gt;&lt;a href="/getting-started"&gt;Getting Started&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/configuration"&gt;Configuration&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/layout"&gt;Layout&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/pages"&gt;Custom Pages&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/setup"&gt;Firn Setup (with Emacs)&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/data-and-metadata"&gt;Data and Metadata&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/limitations"&gt;Limitations&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/sample-page"&gt;Sample Page&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/changelog"&gt;Changelog&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/index"&gt;Home&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/tags"&gt;Tags&lt;/a&gt;&lt;/div&gt;&lt;/aside&gt;&lt;div class="def-content"&gt;&lt;h1&gt;Limitations&lt;/h1&gt;&lt;div&gt;&lt;ol&gt;&lt;li&gt;&lt;a href="#development-server"&gt;Development Server&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#attachments"&gt;Attachments&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#footnotes"&gt;Footnotes&lt;/a&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/div&gt;&lt;div&gt;&lt;section&gt;&lt;/section&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="development-server"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Development Server&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;ul&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;The file watcher (reloading of files on change) is a bit slow.&lt;/span&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;Certain site-wide data/metadata collected happens at the initial compile time. Things like the site-logs, site-map, site-links &lt;/span&gt;&lt;strong&gt;&lt;span&gt;do not&lt;/span&gt;&lt;/strong&gt;&lt;span&gt; get updated when a single file is updated when using the development server. You will need to re-start the server to re-process the files.&lt;/span&gt;&lt;/p&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="attachments"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Attachments&lt;/span&gt;&lt;/span&gt;&lt;span class="firn-tags"&gt;&lt;span&gt;&lt;a class="firn-tag" href="/tags#attachments"&gt;attachments&lt;/a&gt;&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;ul&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;Currently, Firn copies the &lt;/span&gt;&lt;u&gt;&lt;span&gt;entirety of this folder into your build output&lt;/span&gt;&lt;/u&gt;&lt;span&gt;. This means that if you have attachments which are private or simply unlinked to from org-files, they will be included in your build output.&lt;/span&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;Org-attach links are not supported.&lt;/span&gt;&lt;/p&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="footnotes"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Footnotes&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;This does not affect user's who are using the Firn binary - only those using the
+repl within the repo.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;Currently it seems that &lt;/span&gt;&lt;strong&gt;&lt;span&gt;in dev-mode&lt;/span&gt;&lt;/strong&gt;&lt;span&gt; - ie. when in the repl and using the
+pre-compiled rust parser, footnotes definitions that have children on the same
+line are not parse-able:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;code&gt;[fn:1] Content here &lt; fails the parser.&lt;/code&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;Whereas, if you add a newline and add the content below, it works.
+So, far this seems to be fine using the final compiled Firn binary.&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;/div&gt;&lt;footer&gt;&lt;script src="/static/js/main.js"&gt;&lt;/script&gt;&lt;/footer&gt;&lt;/div&gt;&lt;/article&gt;&lt;/main&gt;&lt;/body&gt;&lt;/html&gt;</description><pubDate>Fri, 27 Mar 2020 00:00:00 +0000</pubDate><title>Limitations</title><link>/limitations</link></item><item><description>&lt;html&gt;&lt;head&gt;&lt;meta charset="UTF-8" /&gt;&lt;meta content="width=device-width, initial-scale=1.0" name="viewport" /&gt;&lt;link href="/static/css/hljs-tomorrow.css" rel="stylesheet" /&gt;&lt;link href="/static/css/firn_base.css" rel="stylesheet" /&gt;&lt;link href="/static/css/basscss.css" rel="stylesheet" /&gt;&lt;link href="/static/css/customization.css" rel="stylesheet" /&gt;&lt;link href="/data/favico.png" rel="icon" type="image/png" /&gt;&lt;script src="/static/js/highlight.pack.js"&gt;&lt;/script&gt;&lt;script&gt;hljs.initHighlightingOnLoad()&lt;/script&gt;&lt;/head&gt;&lt;body&gt;&lt;nav class="nav"&gt;&lt;div class="nav-container"&gt;&lt;div class="nav-left"&gt;&lt;div id="nav-icon" onClick="toggleMenu()"&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;/div&gt;&lt;img class="nav-logo" src="/data/ico-light.png" width="32" /&gt;&lt;/div&gt;&lt;div class="nav-links"&gt;&lt;a class="nav-links-item" href="/"&gt;&lt;span&gt;Home&lt;/span&gt;&lt;/a&gt;&lt;a class="nav-links-item" href="/getting-started"&gt;&lt;span&gt;Docs&lt;/span&gt;&lt;/a&gt;&lt;a class="nav-links-item" href="https://github.com/theiceshelf/firn"&gt;&lt;span&gt;Github&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;/nav&gt;&lt;main&gt;&lt;article class="def-wrapper"&gt;&lt;aside class="def-sidebar" id="sidebar"&gt;&lt;div class="pb1"&gt;&lt;a href="/getting-started"&gt;Getting Started&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/configuration"&gt;Configuration&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/layout"&gt;Layout&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/pages"&gt;Custom Pages&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/setup"&gt;Firn Setup (with Emacs)&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/data-and-metadata"&gt;Data and Metadata&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/limitations"&gt;Limitations&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/sample-page"&gt;Sample Page&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/changelog"&gt;Changelog&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/index"&gt;Home&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/tags"&gt;Tags&lt;/a&gt;&lt;/div&gt;&lt;/aside&gt;&lt;div class="def-content"&gt;&lt;h1&gt;Getting Started&lt;/h1&gt;&lt;div&gt;&lt;ol&gt;&lt;li&gt;&lt;a href="#overview"&gt;Overview&lt;/a&gt;&lt;ol&gt;&lt;li&gt;&lt;a href="#a-note-on-emacs"&gt;A note on Emacs&lt;/a&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#get-the-firn-binary"&gt;Get the Firn binary&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#create-a-new-site"&gt;Create a new site&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#inspecting-the-_firn-directory"&gt;Inspecting the _firn directory&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#development-server"&gt;Development Server&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#inspecting-a-firn-org-mode-file"&gt;Inspecting a Firn org-mode-file&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#rendering-content"&gt;Rendering Content&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#understanding-configedn"&gt;Understanding config.edn&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#adding-attachments"&gt;Adding attachments&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#summary"&gt;Summary&lt;/a&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/div&gt;&lt;div&gt;&lt;section&gt;&lt;/section&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="overview"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Overview&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;This document describes a step-by-step process to generate a static site with
+Firn. The author assumes the reader has a working familiarity with the command-line.&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;div class="firn-headline-section firn-headline-section-2"&gt;&lt;h2 class="firn-headline firn-headline-2" id="a-note-on-emacs"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;A note on Emacs&lt;/span&gt;&lt;/span&gt;&lt;span class="firn-tags"&gt;&lt;span&gt;&lt;a class="firn-tag" href="/tags#emacs"&gt;emacs&lt;/a&gt;&lt;/span&gt;&lt;/span&gt;&lt;/h2&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;It is almost a safe assumption that if you are here, then you are are already familiar with Org mode, Emacs, Lisp, or all three combined. But that's an assumption. So, for those that consider themselves quite savvy already, you should skip to the &lt;/span&gt;&lt;a class="firn-internal" href="./getting-started#summary"&gt;summary&lt;/a&gt;&lt;span&gt;.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;For beginners: It you are not using org-mode with Emacs, or have never heard of either of these tools - you may be confused. Still, this document is tailored toward complete beginners and will not assume you are familiar with Emacs. But you might want to go do that, and come back in a few days (or weeks).&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;Onwards.&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="get-the-firn-binary"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Get the Firn binary&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;Head to GitHub to get the &lt;/span&gt;&lt;a class="firn-external" href="https://github.com/theiceshelf/firn/releases" target="_blank"&gt;latest release&lt;/a&gt;&lt;span&gt; of Firn. Currently, Firn is supported on Mac and Linux. After downloading the release, unzip it and move it to &lt;/span&gt;&lt;code&gt;usr/local/bin&lt;/code&gt;&lt;span&gt; if you prefer to be able to run the binary from anywhere on your system.&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;mv ~/Downloads/firn /usr/local/bin
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;span&gt;If you are on Linux, you may need to run &lt;/span&gt;&lt;code&gt;chmod +x firn&lt;/code&gt;&lt;span&gt; to make Firn executable on your system.&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="create-a-new-site"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Create a new site&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;This document assumes that you are working with a totally new directory with no org-files yet created. The below code sample will create a folder in your root directory, as well as a &lt;/span&gt;&lt;code&gt;index.org&lt;/code&gt;&lt;span&gt; file with some text redirected into it.&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;mkdir -p ~/firn-test-site # create a test directory at root
+cd ~/firn-test-site       # navigate into the new directory
+touch index.org           # create a sample org file
+
+# redirect some sample org-mode content into the new file.
+echo "#+TITLE: My Index Page \n* Test heading" &gt;&gt; index.org
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;span&gt;Great! Let's see if it builds.&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;firn new          # creates a _firn directory in ~/firn-test-site
+firn build        # transform org files to html files
+ls -l _firn/_site # take a look at resulting built files:
+
+# your terminal should look something like this:
+# -rw-r--r--  1 &lt;usr&gt;  staff  266 22 Jun 18:23 feed.xml
+# -rw-r--r--  1 &lt;usr&gt;  staff  343 22 Jun 18:23 index.html
+# drwxr-xr-x  3 &lt;usr&gt;  staff   96 22 Jun 18:23 static
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;span&gt;If you open the compiled index.html file, you should see the sample "Test heading" on the page.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;You've got yourself a plain, simple HTML page, with very little functionality. Behind the scenes, however, a few things happened.&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="inspecting-the-_firn-directory"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Inspecting the _firn directory&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;When calling the &lt;/span&gt;&lt;code&gt;firn new&lt;/code&gt;&lt;span&gt; command, a series of folders and files are created:&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;# the `tree` command, run in the firn-test-site dir shows the following:
+
+.
+├── _firn
+│   ├── _site
+│   │   ├── feed.xml
+│   │   ├── index.html
+│   │   └── static
+│   │       └── css
+│   │           └── main.css
+│   ├── config.edn
+│   ├── layouts
+│   │   └── default.clj
+│   ├── partials
+│   │   └── head.clj
+│   ├── pages
+│   │   └── tags.clj
+│   └── static
+│       └── css
+│           └── main.css
+└── index.org
+
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;span&gt;These files are the defaults that come out of the box with Firn. They provide you with the tools to write a bit of CSS, code the layout of your files, and configure the build process and features Firn offers.&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="development-server"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Development Server&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;Running &lt;/span&gt;&lt;code&gt;firn build&lt;/code&gt;&lt;span&gt; every time you make a change is a bit cumbersome. This is where the development server comes in. In your terminal run the following command:&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;firn serve
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;span&gt;Your site is now being served on port 4000 - head to &lt;/span&gt;&lt;a class="firn-external" href="http://localhost:4000" target="_blank"&gt;http://localhost:4000&lt;/a&gt;&lt;span&gt; to take a look.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;Try adding another heading to the &lt;/span&gt;&lt;code&gt;index.org&lt;/code&gt;&lt;span&gt; file - it will re-compile and display in the browser on refresh. You will also notice that page looks different. The output of a Firn site (the &lt;/span&gt;&lt;code&gt;_site&lt;/code&gt;&lt;span&gt; folder) is intended to be hosted on a server or CDN. So, running &lt;/span&gt;&lt;code&gt;firn build&lt;/code&gt;&lt;span&gt; will simply output the files as they are expected to be hosted on a server - this means that your styles and inter-linking between files will not work. Using the development server will solve this, and be used frequently for this purpose.&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="inspecting-a-firn-org-mode-file"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Inspecting a Firn org-mode-file&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;For Firn to be able to "pick-up" and transform org-mode files into html, a file will need to have something that is often known as "front-matter" in a static-site-generator. In org-mode, &lt;/span&gt;&lt;a class="firn-external" href="https://orgmode.org/manual/In_002dbuffer-Settings.html" target="_blank"&gt;in-buffer-settings&lt;/a&gt;&lt;span&gt; are used to create "front-matter." All files must have at least a &lt;/span&gt;&lt;code&gt;#+TITLE:&lt;/code&gt;&lt;span&gt; keyword, but should also have a &lt;/span&gt;&lt;code&gt;FIRN_LAYOUT:&lt;/code&gt;&lt;span&gt; keywords as well. The keywords are documented in the &lt;/span&gt;&lt;a class="firn-internal" href="./configuration#reference"&gt;reference section&lt;/a&gt;&lt;span&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="rendering-content"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Rendering Content&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;Firn is capable of picking and choosing what parts of an org-file you want to render (display as HTML). Let's explore that now. In your editor, create an org mode file with several headings, and content under each heading. Following, open the file &lt;/span&gt;&lt;code&gt;_firn/layouts/default.clj&lt;/code&gt;&lt;span&gt;. It will look something like this:&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;(defn default
+  [{:keys [render partials]}]
+  (let [{:keys [head]} partials
+        default-styles {:style "max-width: 700px; padding: 32px; margin: 0 auto"}]
+    (head
+     [:body default-styles
+      [:main
+       [:article
+        [:div (render :file)] ;; &lt; this line is important
+        ]]])))
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;span&gt;The above is Clojure code, which is the language that was used to build Firn. This code uses Hiccup to render HTML. Look to the &lt;/span&gt;&lt;code&gt;(render ...)&lt;/code&gt;&lt;span&gt; function. Right now, it's indicating that the default layout for an org-mode file should render the file in it's entirety.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;Change that line to the following:&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;
+(render "{My New Heading}")
+
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;span&gt;Where you will replace &lt;/span&gt;&lt;code&gt;{My New Heading}&lt;/code&gt;&lt;span&gt; with the specific headline you have created. On saving changes, the server will reload the layout and only render the specified heading and it's contents.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;Read more about the render function and layouts in the &lt;/span&gt;&lt;a class="firn-internal" href="./layout"&gt;layout document&lt;/a&gt;&lt;span&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="understanding-configedn"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Understanding config.edn&lt;/span&gt;&lt;/span&gt;&lt;span class="firn-tags"&gt;&lt;span&gt;&lt;a class="firn-tag" href="/tags#configuration"&gt;configuration&lt;/a&gt;&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;When generating a new site, Firn will create a &lt;/span&gt;&lt;code&gt;config.edn&lt;/code&gt;&lt;span&gt; file in the &lt;/span&gt;&lt;code&gt;_firn&lt;/code&gt;&lt;span&gt; directory. This file covers several different aspects of customization for the building of your site. Making changes to this file will largely affect the build output of Firn, as well as rendering behaviour across all files.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;Consider an intial config.edn file:&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;{:dir-data         "data"   ; org-attachments/files to get copied into _site.
+ :enable-rss?      true     ; If true, creates a feed.xml in _site.
+ :firn-properties? false    ; global: whether to render properties under all headings
+ :firn-toc         nil      ; global: settings for any rendered table of contents
+ :ignored-dirs     ["priv"] ; Directories to ignore org files in.
+ :site-desc        ""       ; Used for RSS.
+ :site-title       ""       ; Used for RSS.
+ :site-url         ""}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;span&gt;Most of the keys and their values are self explanatory, but let's discuss an example none-the-less. Perhaps a user already has an existing folder of org-files, and these files often link to images in a directory named "attach". Rather than have to rename "attach" to "data" and painfully rename several &lt;/span&gt;&lt;code&gt;file&lt;/code&gt;&lt;span&gt;
+links in org-files, a user can change the &lt;/span&gt;&lt;code&gt;dir-data&lt;/code&gt;&lt;span&gt; key to point to the folder that already exists.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;The available configuration keys are commented within the file itself, and are more heavily documented in the &lt;/span&gt;&lt;a class="firn-internal" href="./configuration"&gt;configuration documentation&lt;/a&gt;&lt;span&gt;. Beyond the above example, the functionality of this file is out of scope for the getting started guide.&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="adding-attachments"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Adding attachments&lt;/span&gt;&lt;/span&gt;&lt;span class="firn-tags"&gt;&lt;span&gt;&lt;a class="firn-tag" href="/tags#attachments"&gt;attachments&lt;/a&gt;&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;The above example largely describes how to use "attachments" (ie, a folder with images etc). Set the name of your folder where images/files are linked to, and it will copy the contents over.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;Attachments must be linked with a &lt;/span&gt;&lt;a class="firn-external" href="https://orgmode.org/manual/External-Links.html" target="_blank"&gt;"file" type link&lt;/a&gt;&lt;span&gt;. &lt;/span&gt;&lt;code&gt;Attachment&lt;/code&gt;&lt;span&gt; links are not currently supported.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;strong&gt;&lt;span&gt;NOTE&lt;/span&gt;&lt;/strong&gt;&lt;span&gt;: Currently, Firn copies the &lt;/span&gt;&lt;u&gt;&lt;span&gt;entirety of this folder into your build output&lt;/span&gt;&lt;/u&gt;&lt;span&gt;. This means that if you have attachments which are private or simply unlinked to from org-files, they will be included in your build output.&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="summary"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Summary&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;ol&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;Download the &lt;/span&gt;&lt;a class="firn-external" href="https://github.com/theiceshelf/firn/releases" target="_blank"&gt;latest release&lt;/a&gt;&lt;span&gt; (only Mac and Linux currently supported)&lt;/span&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;Move the Firn binary into your path: &lt;/span&gt;&lt;code&gt;mv ~/Downloads/firn /usr/local/bin&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;Navigate to your directory of org files&lt;/span&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;Run &lt;/span&gt;&lt;code&gt;firn new&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;Run &lt;/span&gt;&lt;code&gt;firn serve&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;Run &lt;/span&gt;&lt;code&gt;firn build&lt;/code&gt;&lt;span&gt; when ready to put your site online!&lt;/span&gt;&lt;/p&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/section&gt;&lt;/div&gt;&lt;/div&gt;&lt;footer&gt;&lt;script src="/static/js/main.js"&gt;&lt;/script&gt;&lt;/footer&gt;&lt;/div&gt;&lt;/article&gt;&lt;/main&gt;&lt;/body&gt;&lt;/html&gt;</description><pubDate>Fri, 27 Mar 2020 00:00:00 +0000</pubDate><title>Getting Started</title><link>/getting-started</link></item><item><description>&lt;html&gt;&lt;head&gt;&lt;meta charset="UTF-8" /&gt;&lt;meta content="width=device-width, initial-scale=1.0" name="viewport" /&gt;&lt;link href="/static/css/hljs-tomorrow.css" rel="stylesheet" /&gt;&lt;link href="/static/css/firn_base.css" rel="stylesheet" /&gt;&lt;link href="/static/css/basscss.css" rel="stylesheet" /&gt;&lt;link href="/static/css/customization.css" rel="stylesheet" /&gt;&lt;link href="/data/favico.png" rel="icon" type="image/png" /&gt;&lt;script src="/static/js/highlight.pack.js"&gt;&lt;/script&gt;&lt;script&gt;hljs.initHighlightingOnLoad()&lt;/script&gt;&lt;/head&gt;&lt;body&gt;&lt;nav class="nav"&gt;&lt;div class="nav-container"&gt;&lt;div class="nav-left"&gt;&lt;div id="nav-icon" onClick="toggleMenu()"&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;/div&gt;&lt;img class="nav-logo" src="/data/ico-light.png" width="32" /&gt;&lt;/div&gt;&lt;div class="nav-links"&gt;&lt;a class="nav-links-item" href="/"&gt;&lt;span&gt;Home&lt;/span&gt;&lt;/a&gt;&lt;a class="nav-links-item" href="/getting-started"&gt;&lt;span&gt;Docs&lt;/span&gt;&lt;/a&gt;&lt;a class="nav-links-item" href="https://github.com/theiceshelf/firn"&gt;&lt;span&gt;Github&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;/nav&gt;&lt;main&gt;&lt;article class="def-wrapper"&gt;&lt;aside class="def-sidebar" id="sidebar"&gt;&lt;div class="pb1"&gt;&lt;a href="/getting-started"&gt;Getting Started&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/configuration"&gt;Configuration&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/layout"&gt;Layout&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/pages"&gt;Custom Pages&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/setup"&gt;Firn Setup (with Emacs)&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/data-and-metadata"&gt;Data and Metadata&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/limitations"&gt;Limitations&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/sample-page"&gt;Sample Page&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/changelog"&gt;Changelog&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/index"&gt;Home&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/tags"&gt;Tags&lt;/a&gt;&lt;/div&gt;&lt;/aside&gt;&lt;div class="def-content"&gt;&lt;h1&gt;Data and Metadata&lt;/h1&gt;&lt;div&gt;&lt;ol&gt;&lt;li&gt;&lt;a href="#metadata"&gt;Metadata&lt;/a&gt;&lt;ol&gt;&lt;li&gt;&lt;a href="#site-tags"&gt;Site Tags&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#logbook"&gt;Logbook&lt;/a&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#data"&gt;Data&lt;/a&gt;&lt;ol&gt;&lt;li&gt;&lt;a href="#interacting-with-data"&gt;Interacting with data&lt;/a&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/div&gt;&lt;div&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;🚧 This document is in flux as Firn's API shifts and changes. 🚧&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;This document describe the data and metadata made available in Firn when it
+comes time to customize the rendering of your content in your &lt;/span&gt;&lt;a class="firn-internal" href="./layout"&gt;layouts&lt;/a&gt;&lt;span&gt;. This is a
+more advanced topic that may require a bit of comfort with Clojure.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;Because Firn transforms org files into a data structure, it is possible to group
+content available to user's who want more advanced control and flexibility with
+their data. The two main sections in the document provide the following:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;strong&gt;&lt;span&gt;Metadata&lt;/span&gt;&lt;/strong&gt;&lt;span&gt; - a description of the opinionated choices Firn makes to organize data
+for end-users.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;strong&gt;&lt;span&gt;Data&lt;/span&gt;&lt;/strong&gt;&lt;span&gt; - the raw data available when a file is parsed - and how to access it if
+you need more fine grained control of your data.&lt;/span&gt;&lt;/p&gt;&lt;hr /&gt;&lt;/section&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="metadata"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Metadata&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;Currently, &lt;/span&gt;&lt;strong&gt;&lt;span&gt;links&lt;/span&gt;&lt;/strong&gt;&lt;span&gt;, &lt;/span&gt;&lt;strong&gt;&lt;span&gt;logbook entries&lt;/span&gt;&lt;/strong&gt;&lt;span&gt;, a &lt;/span&gt;&lt;strong&gt;&lt;span&gt;table of contents&lt;/span&gt;&lt;/strong&gt;&lt;span&gt;, are made available to
+users. Using the &lt;/span&gt;&lt;code&gt;render&lt;/code&gt;&lt;span&gt; function in layouts you can output pre-made html for
+certain metadata. Refer to the &lt;/span&gt;&lt;a class="firn-internal" href="./layout"&gt;layout&lt;/a&gt;&lt;span&gt; file to learn more about the &lt;/span&gt;&lt;code&gt;render&lt;/code&gt;&lt;span&gt;
+function.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;If you would like to access the raw data in your layouts, destructure the "file"
+value into your layout. The &lt;/span&gt;&lt;code&gt;file&lt;/code&gt;&lt;span&gt; value is a Clojure map with quite a bit of
+content in it - the raw file contents, the contents as EDN, JSON, etc - too much
+so to describe in it's entirety here. Currently, the &lt;/span&gt;&lt;code&gt;file&lt;/code&gt;&lt;span&gt; map has a sub-map
+called &lt;/span&gt;&lt;code&gt;:meta&lt;/code&gt;&lt;span&gt; that provides all sorts of metadata available in your file.&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;(defn my-layout
+  [{:keys [render file] :as data}]
+  ; ...
+  ; access meta (-&gt; file :meta ...)
+  )
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;span&gt;As the API for accessing file data changes, you can keep an eye on the &lt;/span&gt;&lt;a class="firn-external" href="https://github.com/theiceshelf/firn/blob/master/clojure/src/firn/file.clj#L55" target="_blank"&gt;file.clj&lt;/a&gt;&lt;span&gt;,
+source code to see what content is made available at "layout-time".&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;div class="firn-headline-section firn-headline-section-2"&gt;&lt;h2 class="firn-headline firn-headline-2" id="site-tags"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Site Tags&lt;/span&gt;&lt;/span&gt;&lt;/h2&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;Tags are collected and are grouped by tag name. The structure of the data is as follows:&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;{"FAQ"       [{:from-headline  "Do I have to use layouts?",
+               :headline-link  "/layout#do-i-have-to-use-layouts?",
+               :from-file      "Layout",
+               :from-file-path "layout",
+               :tag-value      "FAQ"
+              {:from-headline  "How do I customize the styling of my layouts?",
+               :headline-link  "/layout#how-do-i-customize-the-styling-of-my-layouts?",
+               :from-file      "Layout",
+               :from-file-path "layout",
+               :tag-value      "FAQ"}]
+ "reference" [{:from-headline  "Data and Functions available to layouts",
+               :headline-link  "/layout#data-and-functions-available-to-layouts",
+               :from-file      "Layout",
+               :from-file-path "layout",
+               :tag-value      "reference"}]}
+
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;span&gt;Out of the box, Firn provides a basic "Tags" page for displayings headline-tags.
+If you do not wish to have a "/tags" page, simply remove it from &lt;/span&gt;&lt;code&gt;_firn/pages/tags.clj&lt;/code&gt;&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-2"&gt;&lt;h2 class="firn-headline firn-headline-2" id="logbook"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Logbook&lt;/span&gt;&lt;/span&gt;&lt;/h2&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;The logbook is collected and sorted by timestamp. The available data looks like so:&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;[{:duration "1:04",
+  :end {:day 23, :dayname "Tue", :hour 15, :minute 39, :month 6, :year 2020},
+  :end-ts 1592926740000,
+  :from-file "Test File",
+  :from-file-path "Test File",
+  :from-headline "Sample Heading",
+  :post_blank 0,
+  :start {:day 23, :dayname "Tue", :hour 14, :minute 35, :month 6, :year 2020},
+  :start-ts 1592922900000,
+  :type "clock"}
+ ;....
+ ]
+&lt;/code&gt;&lt;/pre&gt;&lt;/section&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="data"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Data&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;Org files are parsed using a parser library called &lt;/span&gt;&lt;a class="firn-external" href="https://github.com/PoiScript/orgize" target="_blank"&gt;Orgize&lt;/a&gt;&lt;span&gt;. When processing or
+serving your site, Firn sends your org-file as a string into Orgize, and gets
+back a data structure representing the contents of your file.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;Currently, the raw parsed output of Orgize is stored in in the &lt;/span&gt;&lt;code&gt;file&lt;/code&gt;&lt;span&gt; map under&lt;/span&gt;&lt;code&gt;:as-edn&lt;/code&gt;&lt;span&gt;. As per using your layouts as described in the Metadata section above,
+you can access the file map in your layouts.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;A simple file with a few headings, tasks, logbook, etc, looks like this
+after being parsed to JSON and converted to EDN:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;&lt;details&gt;
+&lt;summary&gt; Click to view code sample&lt;/summary&gt;&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;{:type "document",
+ :children
+ [{:type "section",
+   :children
+   [{:type "keyword",
+     :key "TITLE",
+     :value "Sample File!"}
+    {:type "keyword",
+     :key "FIRN_LAYOUT",
+     :value "default"}]}
+  {:type "headline",
+   :level 1,
+   :children
+   [{:type "title",
+     :level 1,
+     :raw "Meta",
+     :properties
+     {:file_under "Projects",
+      :state "active",
+      :date_completed "?",
+      :links "?",
+      :intent "Wiki",
+      :date_started "&lt;2020-03-01 Sun&gt;",
+      :slug "firn"},
+     :children [{:type "text", :value "Meta"}]}
+    {:type "section",
+     :children
+     [{:type "drawer",
+       :name "LOGBOOK",
+       :children
+       [{:type "clock",
+         :start {:year 2020, :month 3, :day 28, :dayname "Sat", :hour 15, :minute 45},
+         :end {:year 2020, :month 3, :day 28, :dayname "Sat", :hour 18, :minute 29},
+         :duration "2:44"}]}]}]}
+  {:type "headline",
+   :level 1,
+   :children
+   [{:type "title",
+     :level 1,
+     :raw "Headlines &lt;2020-03-27 Fri&gt;",
+     :properties {:foo "bar"},
+     :children
+     [{:type "text", :value "Headlines "}
+      {:type "timestamp",
+       :timestamp_type "active",
+       :start
+       {:year 2020,
+        :month 3,
+        :day 27,
+        :dayname "Fri"}}]}
+    {:type "section",
+     :children
+     [{:type "paragraph",
+       :children
+       [{:type "text",
+         :value "and some stuff with a date: "}
+        {:type "timestamp",
+         :timestamp_type "active",
+         :start
+         {:year 2020,
+          :month 3,
+          :day 27,
+          :dayname "Fri"}}
+        {:type "text", :value "\r"}]}]}
+    {:type "headline",
+     :level 2,
+     :children
+     [{:type "title",
+       :level 2,
+       :keyword "TODO",
+       :raw "Headline (2) with /keyword/",
+       :children
+       [{:type "text",
+         :value "Headline (2) with "}
+        {:type "italic",
+         :children
+         [{:type "text",
+           :value "keyword"}]}]}]}
+    {:type "headline",
+     :level 2,
+     :children
+     [{:type "title",
+       :level 2,
+       :priority "B",
+       :keyword "TODO",
+       :raw "Headline 2 with priority",
+       :children
+       [{:type "text",
+         :value "Headline 2 with priority"}]}]}]}
+  {:type "headline",
+   :level 1,
+   :children
+   [{:type "title",
+     :level 1,
+     :raw "Some Links",
+     :children
+     [{:type "text", :value "Some Links"}]}
+    {:type "section",
+     :children
+     [{:type "paragraph",
+       :children
+       [{:type "text", :value "A "}
+        {:type "verbatim", :value "file:"}
+        {:type "text", :value " link "}
+        {:type "link",
+         :path "file:file2.org",
+         :desc "File 2"}
+        {:type "text", :value "\r"}]}]}]}
+  {:type "headline",
+   :level 1,
+   :children
+   [{:type "title",
+     :level 1,
+     :raw "Tables",
+     :children
+     [{:type "text", :value "Tables"}]}
+    {:type "section",
+     :children
+     [{:type "paragraph",
+       :children
+       [{:type "text",
+         :value
+         "Some tables with texte markup in them\r"}]}
+      {:type "table",
+       :table_type "org",
+       :tblfm nil,
+       :children
+       [{:type "table-row", :table_row_type "standard",
+         :children
+         [{:type "table-cell", :children [{:type "text", :value "1"}]}
+          {:type "table-cell", :children [{:type "text", :value "2"}]}
+          {:type "table-cell", :children [{:type "text", :value "3"}]}
+          {:type "table-cell", :children [{:type "text", :value "4"}]}
+          {:type "table-cell", :children [{:type "text", :value "5"}]}]}
+        {:type "table-row",
+         :table_row_type "rule"}
+        {:type "table-row",
+         :table_row_type "standard",
+         :children
+         [{:type "table-cell",
+           :children
+           [{:type "text", :value "foo"}]}
+          {:type "table-cell",
+           :children
+           [{:type "verbatim", :value "foo"}]}
+          {:type "table-cell",
+           :children
+           [{:type "italic",
+             :children
+             [{:type "text",
+               :value "italic"}]}]}
+          {:type "table-cell"}
+          {:type "table-cell",
+           :children
+           [{:type "bold",
+             :children
+             [{:type "text",
+               :value "bold"}]}]}]}]}]}]}]}
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;span&gt;&lt;/details&gt;&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;div class="firn-headline-section firn-headline-section-2"&gt;&lt;h2 class="firn-headline firn-headline-2" id="interacting-with-data"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Interacting with data&lt;/span&gt;&lt;/span&gt;&lt;/h2&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;As you can see, lots of data. Currently, Firn is not capable of interacting with
+this data very easily while you develop your Layouts. There are tentative plans
+to include a repl, or at least the ability to &lt;/span&gt;&lt;code&gt;println debug&lt;/code&gt;&lt;span&gt; in future releases.
+For now, it is possible to independently use the &lt;/span&gt;&lt;a class="firn-external" href="https://orgize.herokuapp.com" target="_blank"&gt;Orgize parser online&lt;/a&gt;&lt;span&gt; to see
+test results as JSON.&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;footer&gt;&lt;script src="/static/js/main.js"&gt;&lt;/script&gt;&lt;/footer&gt;&lt;/div&gt;&lt;/article&gt;&lt;/main&gt;&lt;/body&gt;&lt;/html&gt;</description><pubDate>Wed, 25 Mar 2020 00:00:00 +0000</pubDate><title>Data and Metadata</title><link>/data-and-metadata</link></item><item><description>&lt;html&gt;&lt;head&gt;&lt;meta charset="UTF-8" /&gt;&lt;meta content="width=device-width, initial-scale=1.0" name="viewport" /&gt;&lt;link href="/static/css/hljs-tomorrow.css" rel="stylesheet" /&gt;&lt;link href="/static/css/firn_base.css" rel="stylesheet" /&gt;&lt;link href="/static/css/basscss.css" rel="stylesheet" /&gt;&lt;link href="/static/css/customization.css" rel="stylesheet" /&gt;&lt;link href="/data/favico.png" rel="icon" type="image/png" /&gt;&lt;script src="/static/js/highlight.pack.js"&gt;&lt;/script&gt;&lt;script&gt;hljs.initHighlightingOnLoad()&lt;/script&gt;&lt;/head&gt;&lt;body&gt;&lt;nav class="nav"&gt;&lt;div class="nav-container"&gt;&lt;div class="nav-left"&gt;&lt;div id="nav-icon" onClick="toggleMenu()"&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;/div&gt;&lt;img class="nav-logo" src="/data/ico-light.png" width="32" /&gt;&lt;/div&gt;&lt;div class="nav-links"&gt;&lt;a class="nav-links-item" href="/"&gt;&lt;span&gt;Home&lt;/span&gt;&lt;/a&gt;&lt;a class="nav-links-item" href="/getting-started"&gt;&lt;span&gt;Docs&lt;/span&gt;&lt;/a&gt;&lt;a class="nav-links-item" href="https://github.com/theiceshelf/firn"&gt;&lt;span&gt;Github&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;/nav&gt;&lt;main&gt;&lt;article class="def-wrapper"&gt;&lt;aside class="def-sidebar" id="sidebar"&gt;&lt;div class="pb1"&gt;&lt;a href="/getting-started"&gt;Getting Started&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/configuration"&gt;Configuration&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/layout"&gt;Layout&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/pages"&gt;Custom Pages&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/setup"&gt;Firn Setup (with Emacs)&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/data-and-metadata"&gt;Data and Metadata&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/limitations"&gt;Limitations&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/sample-page"&gt;Sample Page&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/changelog"&gt;Changelog&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/index"&gt;Home&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/tags"&gt;Tags&lt;/a&gt;&lt;/div&gt;&lt;/aside&gt;&lt;div class="def-content"&gt;&lt;h1&gt;Layout&lt;/h1&gt;&lt;div&gt;&lt;ol&gt;&lt;li&gt;&lt;a href="#overview"&gt;Overview&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#usage"&gt;Usage&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#do-i-have-to-use-layouts?"&gt;Do I have to use layouts?&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#how-do-i-customize-the-styling-of-my-layouts?"&gt;How do I customize the styling of my layouts?&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#the-render-function"&gt;The Render function&lt;/a&gt;&lt;ol&gt;&lt;li&gt;&lt;a href="#render-an-entire-file"&gt;Render an entire file&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#rendering-specific-headlines-and-content"&gt;Rendering specific headlines and content&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#render-a-logbook-svg-polyline"&gt;Render a Logbook SVG Polyline&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#rendering-a-table-of-contents"&gt;Rendering a Table of Contents&lt;/a&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#data-and-functions-available-to-layouts"&gt;Data and Functions available to layouts&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#styling-layouts"&gt;Styling Layouts&lt;/a&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/div&gt;&lt;div&gt;&lt;section&gt;&lt;/section&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="overview"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Overview&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;When you create a new Firn site for the first time, it will create a folder:&lt;/span&gt;&lt;code&gt;_firn/layouts&lt;/code&gt;&lt;span&gt;. The layout folder stores Clojure files (&lt;/span&gt;&lt;code&gt;.clj&lt;/code&gt;&lt;span&gt;) that are
+responsible for how your org-file is rendered to-html; The act of "applying" a
+template means to pass the content of the org-file through a specific &lt;/span&gt;&lt;a class="firn-external" href="https://github.com/weavejester/hiccup" target="_blank"&gt;clojure hiccup&lt;/a&gt;&lt;span&gt; template that organizes how the content is displayed.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;When an org-mode file is processed by Firn it looks for the in-buffer-setting&lt;/span&gt;&lt;code&gt;#+FIRN_LAYOUT:&lt;/code&gt;&lt;span&gt; to see if it uses a Layout. If none are specified, the &lt;/span&gt;&lt;u&gt;&lt;span&gt;default
+template&lt;/span&gt;&lt;/u&gt;&lt;span&gt; is used.&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="usage"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Usage&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;Let's walk through an example of how to use layouts.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;Create a sample org file; we will call it &lt;/span&gt;&lt;code&gt;foo.org&lt;/code&gt;&lt;span&gt;. Edit it to include the
+following:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;strong&gt;&lt;span&gt;NOTE&lt;/span&gt;&lt;/strong&gt;&lt;span&gt;: Because the snippet below is org-mode code, you will need to remove the &lt;/span&gt;&lt;code&gt;\&lt;/code&gt;&lt;span&gt;
+preceding the &lt;/span&gt;&lt;code&gt;*&lt;/code&gt;&lt;span&gt; Headlines.&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;
+#+TITLE: Layout
+#+DATE_CREATED: &lt;2020-03-24 Tue&gt;
+#+DATE_UPDATED: &lt;2020-03-24 14:20&gt;
+#+FILE_UNDER: docs
+#+FIRN_LAYOUT: docs
+
+\* My project
+
+ This is my project.
+
+\* Notes
+
+ - [ ] Figure out how layouts work.
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;span&gt;Now we have a file that is going to look for a layout called "docs" in the
+layouts folder. Return to the terminal.&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;cd layouts
+touch docs.clj
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;span&gt;Inside docs.clj place the following clojure code.&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;(defn project
+  [{:keys [render title partials]}]
+  (let [{:keys [head nav]} partials]
+    (head
+     [:body
+      (nav)
+      [:main
+       [:article
+        [:div (render "Notes")]]]]))) ;; Renders The notes section.
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;strong&gt;&lt;span&gt;NOTE:&lt;/span&gt;&lt;/strong&gt;&lt;span&gt; Layouts can have multiple Clojure functions in them, however only the last
+function of the file will be applied as the layout.&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="do-i-have-to-use-layouts?"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Do I have to use layouts?&lt;/span&gt;&lt;/span&gt;&lt;span class="firn-tags"&gt;&lt;span&gt;&lt;a class="firn-tag" href="/tags#FAQ"&gt;FAQ&lt;/a&gt;&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;Not exactly. When you create a new Firn site, it will have a &lt;/span&gt;&lt;code&gt;default.clj&lt;/code&gt;&lt;span&gt; file in
+the &lt;/span&gt;&lt;code&gt;layouts&lt;/code&gt;&lt;span&gt; directory. This provides a very basic out of the box formatting and
+will render the entirety of your org mode file. If you want to add any kinds of
+customization - even css, you'll need to work with layouts.&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="how-do-i-customize-the-styling-of-my-layouts?"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;How do I customize the styling of my layouts?&lt;/span&gt;&lt;/span&gt;&lt;span class="firn-tags"&gt;&lt;span&gt;&lt;a class="firn-tag" href="/tags#FAQ"&gt;FAQ&lt;/a&gt;&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;As with normal HTML, you'll need to add a &lt;/span&gt;&lt;code&gt;head&lt;/code&gt;&lt;span&gt; tag with a &lt;/span&gt;&lt;code&gt;link&lt;/code&gt;&lt;span&gt; that references
+to a css file. It might make sense for you to create a partial for defining your
+html &lt;/span&gt;&lt;code&gt;head&lt;/code&gt;&lt;span&gt; tag, allowing it to be shared across layouts:&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;(defn head
+  [body]
+  [:html
+   [:head
+    [:link {:rel "stylesheet" :href "/static/css/firn_base.css"}]]
+   body])
+&lt;/code&gt;&lt;/pre&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="the-render-function"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;The Render function&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;Render is used to render content from your org file. It's an important one - if
+you don't use it, you won't see any org-mode content.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;Quite a bit of data and functions are made available in your layouts. The &lt;/span&gt;&lt;code&gt;render&lt;/code&gt;&lt;span&gt;
+function you to decide what parts of your org-file you would like to display. Firn
+makes some "pre-made" content available for rendering - logbook graphs, table of
+contents, etc. It can render multiple kinds of content"&lt;/span&gt;&lt;/p&gt;&lt;table&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;Render type&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;Paramaters&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;Example&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;Entire file&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;keyword&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;code&gt;(render :file)&lt;/code&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;Specific headline&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;string&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;code&gt;(render "Notes")&lt;/code&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;Specific content&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;string, keyword&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;code&gt;(render "Notes" :content)&lt;/code&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;Table of contents&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;keyword, map&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;code&gt;(render :toc {:depth int :exclusive? bool :headline "Notes"})&lt;/code&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;Logbook Polyline&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;keyword, map&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;code&gt;(render :logbook-polyline {:stroke "#45698A" :height 60 :width 365})&lt;/code&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/section&gt;&lt;div class="firn-headline-section firn-headline-section-2"&gt;&lt;h2 class="firn-headline firn-headline-2" id="render-an-entire-file"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Render an entire file&lt;/span&gt;&lt;/span&gt;&lt;/h2&gt;&lt;section&gt;&lt;pre&gt;&lt;code&gt;(defn default
+  [{:keys [render partials]}]
+  (let [{:keys [head]} partials]
+
+    (head
+     [:body
+       [:div (render :file)]])))
+&lt;/code&gt;&lt;/pre&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-2"&gt;&lt;h2 class="firn-headline firn-headline-2" id="rendering-specific-headlines-and-content"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Rendering specific headlines and content&lt;/span&gt;&lt;/span&gt;&lt;/h2&gt;&lt;section&gt;&lt;pre&gt;&lt;code&gt;(defn default
+  [{:keys [render partials]}]
+  (let [{:keys [head]} partials]
+    (head
+     [:body
+       [:div (render "Notes")] ; render everything in "Notes" (including the heading "Notes")
+       [:div (render "Notes")] ; render the content in "Notes", excluding the heading.
+      ])))
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-2"&gt;&lt;h2 class="firn-headline firn-headline-2" id="render-a-logbook-svg-polyline"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Render a Logbook SVG Polyline&lt;/span&gt;&lt;/span&gt;&lt;/h2&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;Graphs all logbook entries for the current file in a polyline, generating a chart for each year.&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;(defn default
+  [{:keys [render partials]}]
+  (let [{:keys [head]} partials]
+    (head
+     [:body
+       [:div (render :logbook-polyline {:stroke "#45698A" :height 60 :width 365})]])))
+&lt;/code&gt;&lt;/pre&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-2"&gt;&lt;h2 class="firn-headline firn-headline-2" id="rendering-a-table-of-contents"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Rendering a Table of Contents&lt;/span&gt;&lt;/span&gt;&lt;/h2&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;When a file is processed, Firn collects &lt;/span&gt;&lt;strong&gt;&lt;span&gt;all&lt;/span&gt;&lt;/strong&gt;&lt;span&gt; of it's headlines, whether you're
+choosing to render the entire file, or just one headline.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;There are several ways you can create table of contents in your files, from simple to more complex use cases.&lt;/span&gt;&lt;/p&gt;&lt;ol&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;Render a table of contents for an entire file.&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;  (defn default
+    [{:keys [render partials]}]
+    (let [{:keys [head]} partials]
+
+      (head
+       [:body
+         [:div (render :toc)]
+         [:div (render :file)]])))
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;Render a table of contents for everything within a specific headline.&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;  (defn default
+    [{:keys [render partials]}]
+    (let [{:keys [head]} partials]
+      (head
+       [:body
+         ;; only renders a table of contents for a single headline's children.
+         ;; `:eclusive?` means we don't render "Notes"; just headlines that fall under it dflakdjflksadjf lksadjf lkasdjf lkasdjf .
+         [:div (render :toc {:headline "Notes"
+                             :depth 4
+                             :exclusive? true})]
+         [:div (render "Notes")]])))
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;From within a file, you can set the keyword &lt;/span&gt;&lt;code&gt;#+FIRN_TOC&lt;/code&gt;&lt;span&gt; and pass it a map with
+   the properties above to enable a table of contents specific to a single file:&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;  #+FIRN_TOC: {:depth 4}
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/section&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="data-and-functions-available-to-layouts"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Data and Functions available to layouts&lt;/span&gt;&lt;/span&gt;&lt;span class="firn-tags"&gt;&lt;span&gt;&lt;a class="firn-tag" href="/tags#reference"&gt;reference&lt;/a&gt;&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;The following keys are made available in your layouts.&lt;/span&gt;&lt;/p&gt;&lt;table&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;Function/Data&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;Intent&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;Data-type&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;config&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;The site wide config.&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;map&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;date-created&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;The #+DATE_CREATED value of the file&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;string&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;date-updated&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;The #+DATE_UPDATED value of the file&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;string&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;file&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;The file as a data structure.&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;map&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;file-links&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;A list of links per file&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;list&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;firn-under&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;The #+FIRN_UNDER value of the file&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;string&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;logbook&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;A list of logbooks entries per file.&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;list&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;logbook-total&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;The sum of all the logbook entries per file&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;string&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;meta&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;A map of metadata per file (logbook, links, etc)&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;map&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;partials&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;a list of invokable partials &lt;/span&gt;&lt;code&gt;/partials&lt;/code&gt;&lt;span&gt; dir&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;list&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;render&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;Enables rendering parts or entirety of an org file.&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;function&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;site-links&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;A list of all links across all documents&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;vector&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;site-logs&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;A list of aLL logbook entries.&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;vector&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;site-map&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;A list of all files on the wiki&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;vector&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;title&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;The #+TITLE value of the file.&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;string&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;p&gt;&lt;span&gt;This may seem like a lot of information to make available to a layout template.
+And that's because it is. But thanks to destructuring in Clojure, you can make
+your templates only ask for what they need:&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;(defn project
+  [{:keys [ render partials logbook] :as data}] ; &lt; destructuring to make available only what you need.
+  (let [{:keys [head nav]} partials]
+    (head
+     [:body
+      (nav)
+      [:main.main-container
+       (page-header data)
+       [:div.container
+        (main-section render)
+        (sidebar render logbook)]]])))
+&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;&lt;span&gt;The above template only needs access to &lt;/span&gt;&lt;code&gt;render&lt;/code&gt;&lt;span&gt;, &lt;/span&gt;&lt;code&gt;partials&lt;/code&gt;&lt;span&gt; and the &lt;/span&gt;&lt;code&gt;logbook&lt;/code&gt;&lt;span&gt;. Then functions, such as &lt;/span&gt;&lt;code&gt;page-header&lt;/code&gt;&lt;span&gt; can simply take the data map and destructure what &lt;/span&gt;&lt;em&gt;&lt;span&gt;it&lt;/span&gt;&lt;/em&gt;&lt;span&gt; needs again:&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;(defn page-header
+  [{:keys [title logbook-total date-updated date-created firn-under]}]
+  (let [rndr (fn [i s]
+               (when i [:span.flex.pr2
+                        [:h4.italic.bold.pr1 s " "]
+                        [:h4.italic.thin i]]))]
+    [:div.page_meta
+     [:h1.page_meta_title title]
+     [:div.flex
+      (rndr date-created "Published: ")
+      (rndr date-updated "Last Updated: ")
+      (rndr firn-under "File Under: ")
+      (when-not (= logbook-total "0:00")
+        (rndr logbook-total "Time Logged: "))]]))
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="styling-layouts"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Styling Layouts&lt;/span&gt;&lt;/span&gt;&lt;span class="firn-tags"&gt;&lt;span&gt;&lt;a class="firn-tag" href="/tags#styling"&gt;styling&lt;/a&gt;&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;You can write css as you normally would by placing css files in the&lt;/span&gt;&lt;code&gt;_firn/static/css&lt;/code&gt;&lt;span&gt; folder and then having &lt;/span&gt;&lt;code&gt;firn&lt;/code&gt;&lt;span&gt; move them into your &lt;/span&gt;&lt;code&gt;_site&lt;/code&gt;&lt;span&gt; folder
+when run. Styling is applied through &lt;/span&gt;&lt;a class="firn-external" href="https://github.com/weavejester/hiccup#syntax" target="_blank"&gt;hiccup&lt;/a&gt;&lt;span&gt;.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;There are some internal styles that are applied when org-mode text is
+transformed into data. These styles are all prefaced with the keyword &lt;/span&gt;&lt;code&gt;firn-&lt;/code&gt;&lt;span&gt;, (ie.&lt;/span&gt;&lt;code&gt;firn-headline-text&lt;/code&gt;&lt;span&gt; or &lt;/span&gt;&lt;code&gt;firn-tag&lt;/code&gt;&lt;span&gt;).&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;Inspect the file &lt;/span&gt;&lt;code&gt;_firn/static/css/firn_base.css&lt;/code&gt;&lt;span&gt; to see the configurable elements.&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;/div&gt;&lt;footer&gt;&lt;script src="/static/js/main.js"&gt;&lt;/script&gt;&lt;/footer&gt;&lt;/div&gt;&lt;/article&gt;&lt;/main&gt;&lt;/body&gt;&lt;/html&gt;</description><pubDate>Tue, 24 Mar 2020 00:00:00 +0000</pubDate><title>Layout</title><link>/layout</link></item><item><description>&lt;html&gt;&lt;head&gt;&lt;meta charset="UTF-8" /&gt;&lt;meta content="width=device-width, initial-scale=1.0" name="viewport" /&gt;&lt;link href="/static/css/hljs-tomorrow.css" rel="stylesheet" /&gt;&lt;link href="/static/css/firn_base.css" rel="stylesheet" /&gt;&lt;link href="/static/css/basscss.css" rel="stylesheet" /&gt;&lt;link href="/static/css/customization.css" rel="stylesheet" /&gt;&lt;link href="/data/favico.png" rel="icon" type="image/png" /&gt;&lt;script src="/static/js/highlight.pack.js"&gt;&lt;/script&gt;&lt;script&gt;hljs.initHighlightingOnLoad()&lt;/script&gt;&lt;/head&gt;&lt;body&gt;&lt;nav class="nav"&gt;&lt;div class="nav-container"&gt;&lt;div class="nav-left"&gt;&lt;div id="nav-icon" onClick="toggleMenu()"&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;/div&gt;&lt;img class="nav-logo" src="/data/ico-light.png" width="32" /&gt;&lt;/div&gt;&lt;div class="nav-links"&gt;&lt;a class="nav-links-item" href="/"&gt;&lt;span&gt;Home&lt;/span&gt;&lt;/a&gt;&lt;a class="nav-links-item" href="/getting-started"&gt;&lt;span&gt;Docs&lt;/span&gt;&lt;/a&gt;&lt;a class="nav-links-item" href="https://github.com/theiceshelf/firn"&gt;&lt;span&gt;Github&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;/nav&gt;&lt;main&gt;&lt;article class="def-wrapper"&gt;&lt;aside class="def-sidebar" id="sidebar"&gt;&lt;div class="pb1"&gt;&lt;a href="/getting-started"&gt;Getting Started&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/configuration"&gt;Configuration&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/layout"&gt;Layout&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/pages"&gt;Custom Pages&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/setup"&gt;Firn Setup (with Emacs)&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/data-and-metadata"&gt;Data and Metadata&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/limitations"&gt;Limitations&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/sample-page"&gt;Sample Page&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/changelog"&gt;Changelog&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/index"&gt;Home&lt;/a&gt;&lt;/div&gt;&lt;div class="pb1"&gt;&lt;a href="/tags"&gt;Tags&lt;/a&gt;&lt;/div&gt;&lt;/aside&gt;&lt;div class="def-content"&gt;&lt;h1&gt;Custom Pages&lt;/h1&gt;&lt;div&gt;&lt;ol&gt;&lt;li&gt;&lt;a href="#overview"&gt;Overview&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#tags---an-out-of-the-box-page"&gt;Tags - an out of the box page&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#differences-from-layouts"&gt;Differences from layouts&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#limitations"&gt;Limitations&lt;/a&gt;&lt;ol&gt;&lt;li&gt;&lt;a href="#metadata"&gt;Metadata&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;a href="#flat-routing"&gt;Flat routing&lt;/a&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/div&gt;&lt;div&gt;&lt;section&gt;&lt;/section&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="overview"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Overview&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;Similar to &lt;/span&gt;&lt;a class="firn-internal" href="./layout"&gt;layouts&lt;/a&gt;&lt;span&gt;, on creating a Firn site, you will find a folder: &lt;/span&gt;&lt;code&gt;_firn/pages&lt;/code&gt;&lt;span&gt;. This folder enables users to create custom pages that are converted from the template language (hiccup) into HTML. This is useful if you want to create a page that does not render any org-mode content.&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="tags---an-out-of-the-box-page"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Tags - an out of the box page&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;Creating a new firn site comes with a custom page: &lt;/span&gt;&lt;code&gt;tags.clj&lt;/code&gt;&lt;span&gt;. This file exists to provide an example of a custom page, as well as to give user's an out-of-the-box solution for rendering tags with Firn. When Firn processes your org-mode files, it collects all heading tags, and stores them in a Clojure vector (simply, a list). This list of tags are made available to layouts and pages - in this case, the latter, which uses it to render all the tags your org-mode content has. You can of course delete this file if you do not want to render tags.&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="differences-from-layouts"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Differences from layouts&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;Pages have less data available to them at site-generation time. Because there are no org-mode files concerned, there is no &lt;/span&gt;&lt;code&gt;render&lt;/code&gt;&lt;span&gt; function. The following content is available to a page, which like layouts, can be destructured and made available to your Clojure hiccup function.&lt;/span&gt;&lt;/p&gt;&lt;table&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;Function/Data&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;Intent&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;Data-type&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;config&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;The site wide config&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;map&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;partials&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;a list of invokable partials &lt;/span&gt;&lt;code&gt;/partials&lt;/code&gt;&lt;span&gt; dir&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;list&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;site-links&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;A list of all links across all documents&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;vector&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;site-logs&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;A list of all logbook entries&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;vector&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;site-map&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;A list of all files on a site&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;vector&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;&lt;span&gt;site-tags&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;A list of all tags across all org files&lt;/span&gt;&lt;/td&gt;&lt;td&gt;&lt;span&gt;map (string&lt;&gt;list)&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;h1 class="firn-headline firn-headline-1" id="limitations"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Limitations&lt;/span&gt;&lt;/span&gt;&lt;/h1&gt;&lt;div class="firn-headline-section firn-headline-section-2"&gt;&lt;h2 class="firn-headline firn-headline-2" id="metadata"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Metadata&lt;/span&gt;&lt;/span&gt;&lt;/h2&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;Custom pages will not sort in the site-map. Site-map metadata, such as the &lt;/span&gt;&lt;code&gt;firn-order&lt;/code&gt;&lt;span&gt;, or &lt;/span&gt;&lt;code&gt;firn-under&lt;/code&gt;&lt;span&gt; values enable to sort and group your site-map as you like. This data is gathered from org-mode keywords. Because custom pages in the &lt;/span&gt;&lt;code&gt;/pages&lt;/code&gt;&lt;span&gt; directory do not have this metadata available, they are rendered with a pre-configured set of metadata as so:&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;{:path       "/&lt;the-file-name&gt;" ; the file path must have no spaces, and will become the web path
+ :title      "The file name"    ; the file path is converted into a sentence cased value
+ :firn-order 9999               ; pages will auto group at at the end of the site-map
+ :firn-under "Page"})))         ; pages are grouped under "Pages"
+&lt;/code&gt;&lt;/pre&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-2"&gt;&lt;h2 class="firn-headline firn-headline-2" id="flat-routing"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Flat routing&lt;/span&gt;&lt;/span&gt;&lt;/h2&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;Currently, Firn only supports creating custom pages at the root level of &lt;/span&gt;&lt;code&gt;/pages&lt;/code&gt;&lt;span&gt; - unlike org-mode files, if you have a directory within the &lt;/span&gt;&lt;code&gt;/pages&lt;/code&gt;&lt;span&gt; directory, it will not translate to a nested url. For example, if you have the file &lt;/span&gt;&lt;code&gt;/pages/my-category/my-custom-page-1.clj&lt;/code&gt;&lt;span&gt; - it will be translated into an html file named &lt;/span&gt;&lt;code&gt;my-custom-page-1.html&lt;/code&gt;&lt;span&gt; at the root of your site url.&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;footer&gt;&lt;script src="/static/js/main.js"&gt;&lt;/script&gt;&lt;/footer&gt;&lt;/div&gt;&lt;/article&gt;&lt;/main&gt;&lt;/body&gt;&lt;/html&gt;</description><pubDate>Tue, 24 Mar 2020 00:00:00 +0000</pubDate><title>Custom Pages</title><link>/pages</link></item><item><description>&lt;html&gt;&lt;head&gt;&lt;meta charset="UTF-8" /&gt;&lt;meta content="width=device-width, initial-scale=1.0" name="viewport" /&gt;&lt;link href="/static/css/hljs-tomorrow.css" rel="stylesheet" /&gt;&lt;link href="/static/css/firn_base.css" rel="stylesheet" /&gt;&lt;link href="/static/css/basscss.css" rel="stylesheet" /&gt;&lt;link href="/static/css/customization.css" rel="stylesheet" /&gt;&lt;link href="/data/favico.png" rel="icon" type="image/png" /&gt;&lt;script src="/static/js/highlight.pack.js"&gt;&lt;/script&gt;&lt;script&gt;hljs.initHighlightingOnLoad()&lt;/script&gt;&lt;/head&gt;&lt;body&gt;&lt;nav class="nav"&gt;&lt;div class="nav-container"&gt;&lt;div class="nav-left"&gt;&lt;div id="nav-icon" onClick="toggleMenu()"&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;span&gt;&lt;/span&gt;&lt;/div&gt;&lt;img class="nav-logo" src="/data/ico-light.png" width="32" /&gt;&lt;/div&gt;&lt;div class="nav-links"&gt;&lt;a class="nav-links-item" href="/"&gt;&lt;span&gt;Home&lt;/span&gt;&lt;/a&gt;&lt;a class="nav-links-item" href="/getting-started"&gt;&lt;span&gt;Docs&lt;/span&gt;&lt;/a&gt;&lt;a class="nav-links-item" href="https://github.com/theiceshelf/firn"&gt;&lt;span&gt;Github&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;&lt;/div&gt;&lt;/nav&gt;&lt;header class="index-nav"&gt;&lt;div class="flex align-start"&gt;&lt;h1 class="h2 m0"&gt;Firn&lt;/h1&gt;&lt;a href="https://github.com/theiceshelf/firn/releases" target="_blank"&gt;&lt;sup class="self-start"&gt;v.0.0.7&lt;/sup&gt;&lt;/a&gt;&lt;/div&gt;&lt;div class="h4 my2 italics"&gt;A static site generator for org-mode.&lt;/div&gt;&lt;div class="index-download-btns"&gt;&lt;a class="mx2" href="https://github.com/theiceshelf/firn/releases" target="_blank"&gt;Download latest&lt;/a&gt;&lt;a class="mx2" href="/getting-started"&gt;Read documentation&lt;/a&gt;&lt;/div&gt;&lt;/header&gt;&lt;main class="content"&gt;&lt;div class="py3"&gt;&lt;div class="firn-headline-section firn-headline-section-1"&gt;&lt;div class="firn-headline-section firn-headline-section-2"&gt;&lt;h2 class="firn-headline firn-headline-2" id="quickstart"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Quickstart&lt;/span&gt;&lt;/span&gt;&lt;/h2&gt;&lt;section&gt;&lt;ol&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;Download the &lt;/span&gt;&lt;a class="firn-external" href="https://github.com/theiceshelf/firn/releases" target="_blank"&gt;latest release&lt;/a&gt;&lt;span&gt; (only Mac and Linux currently supported), or use the below code snippet to install:&lt;/span&gt;&lt;/p&gt;&lt;pre&gt;&lt;code&gt;  curl -s https://raw.githubusercontent.com/theiceshelf/firn/master/install -o install-firn
+  chmod +x install-firn &amp;&amp; ./install-firn
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;Move the Firn binary into your path: &lt;/span&gt;&lt;code&gt;mv ~/Downloads/firn /usr/local/bin&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;Navigate to your directory of org files&lt;/span&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;Run &lt;/span&gt;&lt;code&gt;firn new&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;Run &lt;/span&gt;&lt;code&gt;firn serve&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;Run &lt;/span&gt;&lt;code&gt;firn build&lt;/code&gt;&lt;span&gt; when ready to put your site online!&lt;/span&gt;&lt;/p&gt;&lt;/li&gt;&lt;/ol&gt;&lt;hr /&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-2"&gt;&lt;h2 class="firn-headline firn-headline-2" id="overview"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Overview&lt;/span&gt;&lt;/span&gt;&lt;/h2&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;Firn is a static site generator that aims to be a drop-in solution for creating
+web-sites from existing directories of org-mode files. Firn is a little
+different than some static site generators in that it is exclusively for
+rendering org-mode content; it is tailored to convert org-files into data
+structures, from which data and meta-data can be collected when processing a
+file.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;When you create and build a Firn site, the following happens:&lt;/span&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;Org files are read from a directory and parsed into a data structure
+  (internally called &lt;/span&gt;&lt;em&gt;&lt;span&gt;the org-tree&lt;/span&gt;&lt;/em&gt;&lt;span&gt;).&lt;/span&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;Functions collect data (logbook entries, links, headlines) from the org-tree
+  across individual and collective files.&lt;/span&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;A user creates a "layout" file, using Hiccup and Clojure functions to render
+  the collected data:&lt;/span&gt;&lt;/p&gt;&lt;ul&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;The entire file can simply be rendered to HTML.&lt;/span&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;Specific headlines, their content, or org-data can be processed in a &lt;/span&gt;&lt;a class="firn-internal" href="./layout"&gt;layout&lt;/a&gt;&lt;span&gt;
+    through the available &lt;/span&gt;&lt;code&gt;render&lt;/code&gt;&lt;span&gt; function.&lt;/span&gt;&lt;/p&gt;&lt;/li&gt;&lt;li&gt;&lt;p&gt;&lt;span&gt;The org-tree and as a data-structure is also available to layouts if a user
+    need more fine-grained control.&lt;/span&gt;&lt;/p&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/li&gt;&lt;/ul&gt;&lt;hr /&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-2"&gt;&lt;h2 class="firn-headline firn-headline-2" id="faq"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;FAQ&lt;/span&gt;&lt;/span&gt;&lt;span class="firn-tags"&gt;&lt;span&gt;&lt;a class="firn-tag" href="/tags#FAQ"&gt;FAQ&lt;/a&gt;&lt;/span&gt;&lt;/span&gt;&lt;/h2&gt;&lt;div class="firn-headline-section firn-headline-section-3"&gt;&lt;h3 class="firn-headline firn-headline-3" id="will-windows-be-supported?"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Will Windows be supported?&lt;/span&gt;&lt;/span&gt;&lt;/h3&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;Unknown. GraalVM is capable of compiling to &lt;/span&gt;&lt;a class="firn-external" href="https://www.graalvm.org/docs/reference-manual/native-image/" target="_blank"&gt;native images&lt;/a&gt;&lt;span&gt; for Windows. It may be
+possible to compile it but the core developer is only capable of supporting Mac
+and Linux at this time.&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-3"&gt;&lt;h3 class="firn-headline firn-headline-3" id="where-can-i-see-the-feature-roadmap?"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Where can I see the feature roadmap?&lt;/span&gt;&lt;/span&gt;&lt;/h3&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;Keep an eye on the Github repository's &lt;/span&gt;&lt;a class="firn-external" href="https://github.com/theiceshelf/firn/issues" target="_blank"&gt;issues&lt;/a&gt;&lt;span&gt; and &lt;/span&gt;&lt;a class="firn-external" href="https://github.com/theiceshelf/firn/projects/1" target="_blank"&gt;projects board&lt;/a&gt;&lt;span&gt;.&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-3"&gt;&lt;h3 class="firn-headline firn-headline-3" id="do-i-have-to-use-clojure-in-my-layouts?"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;Do I have to use Clojure in my layouts?&lt;/span&gt;&lt;/span&gt;&lt;/h3&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;For now, yes.&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-3"&gt;&lt;h3 class="firn-headline firn-headline-3" id="how-can-i-easily-learn-about-e-macs-and-org-mode?"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;How can I easily learn about E-macs and Org-mode?&lt;/span&gt;&lt;/span&gt;&lt;/h3&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;An opinionated response: try &lt;/span&gt;&lt;a class="firn-external" href="https://github.com/hlissner/doom-emacs" target="_blank"&gt;Doom Emacs&lt;/a&gt;&lt;span&gt;, including &lt;/span&gt;&lt;a class="firn-external" href="https://www.youtube.com/watch?v=rCMh7srOqvw&amp;amp;list=PLhXZp00uXBk4np17N39WvB80zgxlZfVwj" target="_blank"&gt;Zaiste's tutorials&lt;/a&gt;&lt;span&gt; (which
+also cover org-mode).&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;div class="firn-headline-section firn-headline-section-3"&gt;&lt;h3 class="firn-headline firn-headline-3" id="at-what-point,-if-i-chew-gum-enough,-will-it-go-from-having-flavour,-to-having-no-flavour-to-having-flavour-again?"&gt;&lt;span class="firn-headline-text"&gt;&lt;span&gt;At what point, if I chew gum enough, will it go from having flavour, to having no flavour to having flavour again?&lt;/span&gt;&lt;/span&gt;&lt;/h3&gt;&lt;section&gt;&lt;p&gt;&lt;span&gt;That's a puzzler. I'm going to have to think about it.&lt;/span&gt;&lt;/p&gt;&lt;/section&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&lt;/main&gt;&lt;footer&gt;&lt;script src="/static/js/main.js"&gt;&lt;/script&gt;&lt;/footer&gt;&lt;/body&gt;&lt;/html&gt;</description><pubDate>Tue, 24 Mar 2020 00:00:00 +0000</pubDate><title>Home</title><link>/index</link></item></channel></rss>
