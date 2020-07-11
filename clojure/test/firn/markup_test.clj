@@ -20,35 +20,31 @@
 
 (t/deftest link->html
   (t/testing "http-link"
-    (t/is (= (sut/link->html (sample-links :http-link))
+    (t/is (= (sut/link->html (sample-links :http-link) {:site-url ""})
              [:a.firn-external
               {:href "https://docs.cider.mx/cider/usage/misc_features.html" :target "_blank"}
               "Miscellaneous Features :: CIDER Docs"])))
 
   (t/testing "http-image-link"
-    (t/is (= (sut/link->html (sample-links :http-img))
+    (t/is (= (sut/link->html (sample-links :http-img) {:site-url ""})
              [:span.firn-img-with-caption
               [:img {:src "https://www.fillmurray.com/g/200/300.jpg"}]
               [:span.firn-img-caption "Fill murray"]])))
 
   (t/testing "img-link"
-    (t/is (= (sut/link->html (sample-links :img-file))
-             [:img {:src "test-img.png"}])))
-
-  (t/testing "img-rel-file"
-    (t/is (= (sut/link->html (sample-links :img-rel-file))
-             [:img {:src "./static/images/test-img.png"}])))
+    (t/is (= (sut/link->html (sample-links :img-file) {:site-url "http://foo.com"})
+             [:img {:src "http://foo.com/test-img.png"}])))
 
   (t/testing "internal-link"
-    (t/is (= (sut/link->html (sample-links :file-link))
-             [:a.firn-internal {:href "./file2"} "File 2"]))))
+    (t/is (= (sut/link->html (sample-links :file-link) {:site-url ""})
+             [:a.firn-internal {:href "/file2"} "File 2"]))))
 
 (t/deftest internal-link-handler
   (t/testing "Expected results."
     (let [res1 (sut/internal-link-handler "file:foo.org")
           res2 (sut/internal-link-handler "file:foo.org::*my headline link")]
-      (t/is (= res1 "./foo"))
-      (t/is (= res2 "./foo#my-headline-link")))))
+      (t/is (= res1 "/foo"))
+      (t/is (= res2 "/foo#my-headline-link")))))
 
 (t/deftest make-toc
   (let [ex1     [{:level 1, :text "Process" :anchor "#process"}

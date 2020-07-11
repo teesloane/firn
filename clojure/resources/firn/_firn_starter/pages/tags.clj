@@ -1,5 +1,5 @@
 (defn tags
-  [{:keys [site-tags partials]}]
+  [{:keys [site-tags site-url partials]}]
   (let [{:keys [head]} partials]
     (head
      [:body
@@ -12,6 +12,6 @@
             [:h2 {:id tag-name :class "firn-tag-heading"} tag-name]
             (for [tag tags]
               [:div
-               [:a {:href (tag :headline-link)}
+               [:a {:href (str site-url (tag :headline-link))}
                 (tag :from-file) " - "
                 (tag :from-headline)]])])]]]])))

@@ -181,12 +181,14 @@
   FIXME: (In a later release) - do something similar to `file/get-web-path` and
   enable `load-fns-into-map` to save filenames as :namespaced/keys, allowing
   make-parent to work on it."
-  [{:keys [dir-site pages partials site-map site-links site-logs site-tags] :as config}]
-  (let [user-api {:partials   partials
+  [{:keys [dir-site pages partials site-map site-links site-logs site-tags user-config] :as config}]
+  (let [site-url (user-config :site-url)
+        user-api {:partials   partials
                   :site-map   site-map
                   :site-links site-links
                   :site-logs  site-logs
                   :site-tags  site-tags
+                  :site-url   site-url
                   :config     config}]
 
     (doseq [[k f] pages

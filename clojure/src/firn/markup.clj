@@ -154,7 +154,6 @@
         ;; img regexs / ctor fns.
         img-file-regex  #"(file:)(.*)\.(jpg|JPG|gif|GIF|png)"
         img-http-regex  #"(http:\/\/|https:\/\/)(.*)\.(jpg|JPG|gif|GIF|png)"
-        img-rel-regex   #"(\.(.*))\.(jpg|JPG|gif|GIF|png)"
         img-make-url    #(->> (re-matches img-file-regex link-href)
                               (take-last 2)
                               (s/join "."))
@@ -166,11 +165,8 @@
       ;; Images ---
       ;; img file or attach: `file:`
       (re-matches img-file-regex link-href)
-      (img-link->figure {:desc link-val :path (img-make-url)})
-
-      ;; relative: `../../foo.jpg`
-      (re-matches img-rel-regex link-href)
-      (img-link->figure {:desc link-val :path link-href})
+      (img-link->figure {:desc link-val
+                         :path (str (opts :site-url) "/" (img-make-url))})
 
       ;; a normal http image.
       (re-matches img-http-regex link-href)
@@ -178,7 +174,8 @@
 
       ;; org files
       (re-matches org-file-regex link-href)
-      [:a.firn-internal {:href (str #p (opts :site-url) (internal-link-handler link-href))} link-val]
+      [:a.firn-internal
+       {:href (str (opts :site-url) (internal-link-handler link-href))} link-val]
 
       (re-matches http-link-regex link-href)
       [:a.firn-external {:href link-href :target "_blank"} link-val]
