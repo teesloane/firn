@@ -5,5 +5,5 @@
  :ignored-dirs     ["priv"] ; Directories to ignore org files in.
  :site-desc        ""       ; Used for RSS.
  :site-title       ""       ; Used for RSS.
- :site-url         ""
+ :site-url         "https://firn.theiceshelf.com"
  :site-map-pages?   true}

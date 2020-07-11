@@ -38,6 +38,7 @@
 
 ;; Values that a user can contribute/change via their config.edn
 (defn make-external-config
+  "Reads a user's config and merges it into the starting external"
   [dir-files]
   (let [user-cfg-path (str (make-dir-firn dir-files) "/config.edn")]
     (if-not (fs/exists? user-cfg-path)
@@ -52,8 +53,11 @@
           (println "Failed to read 'config.edn' file - is it properly formatted?"))))))
 
 (defn prepare
-  [dir-files]
-  (let [ext-config (make-external-config dir-files)
-        int-config (make-internal-config dir-files ext-config)]
-    (assoc int-config :user-config ext-config)))
-
+  "Prepares the configuration for build/serve."
+  [{:keys [dir --server?]}]
+  (let [ext-config   (make-external-config dir)
+        int-config   (make-internal-config dir ext-config)
+        final-config (assoc int-config :user-config ext-config)]
+    (if --server?
+      (assoc-in final-config [:user-config :site-url] "http://localhost:4000")
+      final-config)))

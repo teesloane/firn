@@ -54,7 +54,7 @@
          config-settings       (config :user-config) ; site-wide config: 0 precedence
          file-settings         (file/keywords->map file) ; file-setting config: 2 precedence
          layout-settings       (if (map? opts) opts {})
-         merged-options        (merge config-settings layout-settings  file-settings)
+         merged-options        (merge config-settings layout-settings file-settings)
          is-headline?          (string? action)]
 
 
@@ -108,6 +108,7 @@
    :site-map      (config :site-map)
    :site-links    (config :site-links)
    :site-logs     (config :site-logs)
+   :site-url      (-> config :user-config :site-url)
    :config        config
    ;; File wide meta --
    :file          file
@@ -125,4 +126,3 @@
   [config file layout]
   (let [selected-layout (get-layout config file layout)]
     (h/html (selected-layout (prepare config file)))))
-

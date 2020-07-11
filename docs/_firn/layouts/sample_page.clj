@@ -1,7 +1,7 @@
 (defn default
-  [{:keys [title render partials]}]
+  [{:keys [title render partials site-url]}]
   (let [{:keys [head nav footer]} partials]
-    (head
+    (head site-url
      [:body
       (nav)
       [:main
