@@ -1,4 +1,4 @@
-name: firn
+name: Docs Build
 
 on:
   push:
