@@ -26,7 +26,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
-    if: success() && github.ref == "refs/heads/master"
+    if: success() && github.ref == 'refs/heads/master'
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v1
