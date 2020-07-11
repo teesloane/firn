@@ -28,7 +28,7 @@
   []
   (delete-firn-dir)
   (build/new-site {:dir test-dir})
-  (config/prepare test-dir))
+  (config/prepare {:dir test-dir}))
 
 
 ;; org test files that we can request using "get-test-file"

@@ -1,7 +1,7 @@
 (defn default
-  [{:keys [render partials]}]
+  [{:keys [render partials site-url]}]
   (let [{:keys [head]} partials]
-    (head
+    (head site-url
      [:body
       [:main
        [:article.content

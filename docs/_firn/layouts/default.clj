@@ -5,9 +5,9 @@
     (map #(vector :div.pb1 [:a {:href (% :path)} (% :title)]))))
 
 (defn default
-  [{:keys [site-map title render partials]}]
+  [{:keys [site-map site-url title render partials]}]
   (let [{:keys [head nav footer]} partials]
-    (head
+    (head site-url
      [:body
       (nav)
       [:main

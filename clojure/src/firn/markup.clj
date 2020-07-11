@@ -142,19 +142,18 @@
         anchor-link (last res)
         anchor-link (when anchor-link (-> res last u/clean-anchor))]
     (if anchor-link
-      (str "./" (nth res 2) anchor-link)
-      (str "./" (nth res 2)))))
+      (str "/" (nth res 2) anchor-link)
+      (str "/" (nth res 2)))))
 
 (defn link->html
   "Parses links from the org-tree.
   Checks if a link is an HTTP link or File link."
-  [v]
+  [v opts]
   (let [link-val        (get v :desc)
         link-href       (get v :path "Missing HREF attribute.")
         ;; img regexs / ctor fns.
         img-file-regex  #"(file:)(.*)\.(jpg|JPG|gif|GIF|png)"
         img-http-regex  #"(http:\/\/|https:\/\/)(.*)\.(jpg|JPG|gif|GIF|png)"
-        img-rel-regex   #"(\.(.*))\.(jpg|JPG|gif|GIF|png)"
         img-make-url    #(->> (re-matches img-file-regex link-href)
                               (take-last 2)
                               (s/join "."))
@@ -166,11 +165,8 @@
       ;; Images ---
       ;; img file or attach: `file:`
       (re-matches img-file-regex link-href)
-      (img-link->figure {:desc link-val :path (img-make-url)})
-
-      ;; relative: `../../foo.jpg`
-      (re-matches img-rel-regex link-href)
-      (img-link->figure {:desc link-val :path link-href})
+      (img-link->figure {:desc link-val
+                         :path (str (opts :site-url) "/" (img-make-url))})
 
       ;; a normal http image.
       (re-matches img-http-regex link-href)
@@ -178,7 +174,8 @@
 
       ;; org files
       (re-matches org-file-regex link-href)
-      [:a.firn-internal {:href (internal-link-handler link-href)} link-val]
+      [:a.firn-internal
+       {:href (str (opts :site-url) (internal-link-handler link-href))} link-val]
 
       (re-matches http-link-regex link-href)
       [:a.firn-external {:href link-href :target "_blank"} link-val]
@@ -269,7 +266,7 @@
        "table-row"     (make-child :tr)
        "table-cell"    (make-child :td)
        "source-block"  (src-block->html v)
-       "link"          (link->html v)
+       "link"          (link->html v opts)
        "fn-ref"        (footnote-ref v)
        "fn-def"        (footnote-def v)
        "code"          [:code value]

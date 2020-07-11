@@ -9,7 +9,8 @@
             [org.httpkit.server :as http]
             [ring.middleware.file :as r-file]
             [ring.util.response :refer [response]]
-            [firn.file :as file]))
+            [firn.config :as config]))
+           
 
 (declare server)
 (def file-watcher  (atom nil))
@@ -133,7 +134,6 @@
          :or   {dir (u/get-cwd)
                 port 4000}}           (mount/args)
         path-to-site                  (str dir "/_firn/_site")
-        ;; NOTE: consider making this global, and so available to a sci repl?
         config!                       (atom (-> (mount/args) build/all-files))
         {:keys [dir-layouts dir-partials dir-static dir-data dir-pages]} @config!
         watch-list                    (map io/file [dir-layouts dir-partials dir-static dir-data dir-pages])]
@@ -158,8 +158,5 @@
   ([]
    (serve {}))
   ([opts]
-   (mount/start-with-args opts)))
-
-;; -- Repl Land --
-
-;; (mount/stop)
+   (mount/start-with-args
+    (merge {:--server? true} opts))))

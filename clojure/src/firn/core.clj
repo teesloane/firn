@@ -5,7 +5,8 @@
             [clojure.tools.cli :refer [parse-opts]]
             [firn.server :as server]
             [clojure.string :as s]
-            [firn.util :as u]))
+            [firn.util :as u]
+            [mount.core :as mount]))
 
 
 (def FIRN-VERSION (s/trim (slurp (io/resource "FIRN_VERSION"))))
@@ -98,3 +99,9 @@
           "serve"  (server/serve    options)
           "build"  (build/all-files options)
           "new"    (build/new-site  options))))))
+
+;; Repl Land -
+
+(comment
+  (mount/stop) (-main "serve" "-d" "/Users/tees/Projects/firn/firn/docs")
+  )
