@@ -211,8 +211,8 @@
 
 (defn all-files
   "Processes all files in the org-directory"
-  [{:keys [dir]}]
-  (let [config (setup (config/prepare dir))
+  [cfg]
+  (let [config (setup (config/prepare cfg))
         rss?   (-> config :user-config :enable-rss?)]
     (cond->> config
       true process-all

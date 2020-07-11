@@ -108,6 +108,7 @@
    :site-map      (config :site-map)
    :site-links    (config :site-links)
    :site-logs     (config :site-logs)
+   :site-url      (-> config :user-config :site-url)
    :config        config
    ;; File wide meta --
    :file          file
