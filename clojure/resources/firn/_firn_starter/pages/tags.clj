@@ -1,7 +1,7 @@
 (defn tags
   [{:keys [site-tags site-url partials]}]
   (let [{:keys [head]} partials]
-    (head
+    (head site-url
      [:body
       [:main
        [:article
