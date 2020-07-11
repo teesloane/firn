@@ -142,13 +142,13 @@
         anchor-link (last res)
         anchor-link (when anchor-link (-> res last u/clean-anchor))]
     (if anchor-link
-      (str "./" (nth res 2) anchor-link)
-      (str "./" (nth res 2)))))
+      (str "/" (nth res 2) anchor-link)
+      (str "/" (nth res 2)))))
 
 (defn link->html
   "Parses links from the org-tree.
   Checks if a link is an HTTP link or File link."
-  [v]
+  [v opts]
   (let [link-val        (get v :desc)
         link-href       (get v :path "Missing HREF attribute.")
         ;; img regexs / ctor fns.
@@ -178,7 +178,7 @@
 
       ;; org files
       (re-matches org-file-regex link-href)
-      [:a.firn-internal {:href (internal-link-handler link-href)} link-val]
+      [:a.firn-internal {:href (str #p (opts :site-url) (internal-link-handler link-href))} link-val]
 
       (re-matches http-link-regex link-href)
       [:a.firn-external {:href link-href :target "_blank"} link-val]
@@ -269,7 +269,7 @@
        "table-row"     (make-child :tr)
        "table-cell"    (make-child :td)
        "source-block"  (src-block->html v)
-       "link"          (link->html v)
+       "link"          (link->html v opts)
        "fn-ref"        (footnote-ref v)
        "fn-def"        (footnote-def v)
        "code"          [:code value]

@@ -101,6 +101,6 @@
           "new"    (build/new-site  options))))))
 
 (comment
-  (do
-    (mount/stop)
-    (-main "serve" "-d" "/Users/tees/Projects/firn/firn/docs")))
+  (mount/stop)
+  (-main "serve" "-d" "/Users/tees/Projects/firn/firn/docs")
+  )
