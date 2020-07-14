@@ -31,7 +31,7 @@
 
   UGH. this is a mess of a function, and should be refactored. Basically:
   - Loop through the children that represent a title.
-  - get the values out and trim them incase there is whitespace
+  - get the values out and trim them in case there is whitespace
   (between say, a cookie or a priority, or empty text)
   - Then, filter out all empty strings
   - Then join them together.

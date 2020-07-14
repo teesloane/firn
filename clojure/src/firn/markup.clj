@@ -196,6 +196,8 @@
         priority         (v :priority)
         properties       (v :properties)
         parent           {:type "headline" :level level :children [v]} ; reconstruct the parent so we can pull out the content.
+        ;; this let section builds the heading elements and their respective
+        ;; classes; construcing a single heading element with various children..
         heading-priority (u/str->keywrd "span.firn-headline-priority.firn-headline-priority__" priority)
         heading-keyword  (u/str->keywrd "span.firn-headline-keyword.firn-headline-keyword__" keywrd)
         heading-tags     [:span.firn-tags (for [t tags] [:span [:a.firn-tag {:href (str "/tags#" t)} t]])]
@@ -215,9 +217,18 @@
                           (make-child :span.firn-headline-text)
                           (when tags heading-tags)]]
 
-    (if (and properties (opts :firn-properties?))
+    (cond
+      ;; render properties
+      (and properties (opts :firn-properties?))
       [:div render-headline (props->html v)]
-      render-headline)))
+
+      ;; For rendering folded headline. NOTE: when folded, this fn has been
+      ;; called from the `headline` case, and so the V node the parent node.
+      (opts :fold?) ; TODO - this is not a boolean but a ... list of heading levels?
+      [(u/str->keywrd "summary.firn-headline-summary-" level) (org/get-headline-helper v)]
+
+      :else render-headline)))
+
 
 (defn- footnote-ref
   [v]
@@ -236,6 +247,12 @@
      [:a {:href (str "#fn-" (v :label))
           :style "padding-left: 4px"} "↩"]]))
 
+(defn headline-fold->html
+  [v {:keys [headline-level make-child headline-el] :as opts}]
+  [(u/str->keywrd  "details.firn-fold-" headline-level)
+   (title->html v opts)
+   (make-child headline-el)])
+
 (defn to-html
   "Recursively Parses the org-edn into hiccup.
   Some values don't get parsed (drawers) - yet. They return empty strings.
@@ -248,12 +265,19 @@
          value          (if value (s/trim-newline value) value)
          ordered        (get v :ordered) ;; for lists
          headline-level (get v :level)
-         headline-el    (u/str->keywrd "div.firn-headline-section.firn-headline-section-" headline-level)
+         headline-el    (if (opts :fold?)
+                          (u/str->keywrd "div.firn-headline-section-folded.firn-headline-section-" headline-level)
+                          (u/str->keywrd "div.firn-headline-section.firn-headline-section-" headline-level))
+
          make-child     #(into [%] (map (fn [c] (to-html c opts)) children))]
+
      (case type
        "document"      (make-child :div)
-       "headline"      (make-child headline-el)
-       "title"         (title->html v opts)
+       ;; if folding is turned on for a headline, render title+section from within.
+       "headline"      (if (opts :fold?)
+                         (headline-fold->html v (merge opts {:headline-level headline-level :make-child make-child :headline-el headline-el}))
+                         (make-child headline-el))
+       "title"         (title->html v (dissoc opts :fold?))
        "section"       (make-child :section)
        "paragraph"     (make-child :p)
        "underline"     (make-child :u)
