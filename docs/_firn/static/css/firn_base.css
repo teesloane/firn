@@ -199,7 +199,7 @@ samp {
   margin: 0 0.1rem;
   padding: 0 0.5rem;
   font-family: "IBM Plex Mono";
-  font-size: small;
+  font-size: 0.85em;
 }
 
 details {
@@ -424,6 +424,7 @@ table td,
 table th,
 table tr {
   padding: 0.4rem 0.8rem;
+  font-size: 0.9em;
 }
 
 /* Firn currently can't discern if a table has a <th>,*/
@@ -650,9 +651,15 @@ li > p {
 
 /* If folding, we have to style the <summary> tags to make them look like headings. */
 
-.firn-headline-summary-1 { font-size: 1.4em;  margin: 1em 0; }
-.firn-headline-summary-2 { font-size: 1.2em;  margin: 1em 0; }
-.firn-headline-summary-3 { font-size: 1.10em; margin: 1em 0; }
+/* Set the parent element, so we can size-down on mobile. */
+.firn-fold { font-size: 15px; }
+.firn-headline-summary-1 { font-size: 1.3em;  margin: 1em 0; }
+.firn-headline-summary-2 { font-size: 1.15em;  margin: 1em 0; }
+.firn-headline-summary-3 { font-size: 1.05em; margin: 1em 0; }
 .firn-headline-summary-4 { font-size: 1em;    margin: 1em 0; }
-.firn-headline-summary-5 { font-size: 0.83em; margin: 1em 0; }
-.firn-headline-summary-6 { font-size: 0.67em; margin: 1em 0; }
+.firn-headline-summary-5 { font-size: 0.75em; margin: 1em 0; }
+.firn-headline-summary-6 { font-size: 0.6em; margin: 1em 0; }
+
+@media(max-width: 768px) {
+  .firn-fold { font-size: 12px; }
+}

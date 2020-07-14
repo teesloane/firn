@@ -249,7 +249,9 @@
 
 (defn headline-fold->html
   [v {:keys [headline-level make-child headline-el] :as opts}]
-  [(u/str->keywrd  "details.firn-fold-" headline-level)
+  [(u/str->keywrd  "details.firn-fold.firn-fold-" headline-level)
+   {:style (str "margin-left: " (* (- headline-level 1) 12) "px")
+    :open true}
    (title->html v opts)
    (make-child headline-el)])
 
