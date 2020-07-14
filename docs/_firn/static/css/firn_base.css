@@ -218,6 +218,7 @@ h4,
 h5,
 h6 {
   line-height: var(--line-height);
+  margin: 1em 0;
 }
 
 mark {
@@ -636,6 +637,17 @@ li > p {
 /* Folding is a bit hacky; we hide the regular heading (so that it still exists so as to make it anchorable)*/
 /* and then push up the tags.*/
 
+
+.firn-headline-section .firn-headline-text {
+  visibility: visible;
+  overflow: auto;
+}
+
+.firn-headline-section .firn-headline {
+  justify-content: flex-start;
+  margin: inherit;
+}
+
 .firn-headline-section-folded {
 }
 
@@ -644,10 +656,12 @@ li > p {
   overflow: hidden;
 }
 
+
 .firn-headline-section-folded .firn-headline {
   justify-content: right;
   margin-top: -2.5em;
 }
+
 
 /* If folding, we have to style the <summary> tags to make them look like headings. */
 
