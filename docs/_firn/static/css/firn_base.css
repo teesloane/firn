@@ -209,6 +209,7 @@ details {
 details summary {
   font-weight: bold;
   cursor: pointer;
+  padding: 0 8px;
 }
 
 h1,
@@ -228,11 +229,13 @@ mark {
 ol,
 ul {
   margin: 0.125rem 0;
+  padding-left: 1.25rem;
 }
 
 ol li,
 ul li {
   padding: 0.125rem 0;
+  /* padding-left: 1.25rem; */
 }
 
 p {
@@ -646,6 +649,7 @@ li > p {
 .firn-headline-text-hidden {
   visibility: collapse;
   overflow: auto;
+  flex: 1;
 }
 
 /* This moves tags, priority, other non-content text in headings up to
