@@ -105,7 +105,7 @@ contents, etc. It can render multiple kinds of content"
 | Entire file       | keyword         | ~(render :file)~                                                       |
 | Specific headline | string          | ~(render "Notes")~                                                     |
 | Specific content  | string, keyword | ~(render "Notes" :content)~                                            |
-| Table of contents | keyword, map    | ~(render :toc {:depth int :exclusive? bool :headline "Notes"})~        |
+| Table of contents | keyword, map    | ~(render :toc {:depth int :exclude-headline? bool :headline "Notes"})~        |
 | Logbook Polyline  | keyword, map    | ~(render :logbook-polyline {:stroke "#45698A" :height 60 :width 365})~ |
 |                   |                 |                                                                      |
 
@@ -179,7 +179,7 @@ There are several ways you can create table of contents in your files, from simp
          ;; `:eclusive?` means we don't render "Notes"; just headlines that fall under it dflakdjflksadjf lksadjf lkasdjf lkasdjf .
          [:div (render :toc {:headline "Notes"
                              :depth 4
-                             :exclusive? true})]
+                             :exclude-headline? true})]
          [:div (render "Notes")]])))
   #+END_SRC
 

@@ -17,5 +17,5 @@
         [:div.def-content
          [:h1 title]
          [:div (render :toc)] ;; Optional; add a table of contents
-         (render :file {:firn-fold {:levels [1 4 5] :open true}})
+         (render :file {:firn-fold {1 true 2 true 3 false 4 false 5 false}})
          (footer)]]]])))

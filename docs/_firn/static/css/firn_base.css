@@ -44,7 +44,7 @@
   --priority-c-bg: #2ecc71;
   --priority-size: xx-small;
   /* Headline Tags (:my-tag: :unfinished: etc)*/
-  --tag-size: small;
+  --tag-size: x-small;
   --tag-bg: #ecf0f1;
 }
 
@@ -633,46 +633,39 @@ li > p {
 }
 
 /* -- Folding ---------------------------------------------------------------- */
-/* Folding leverages html <details> and <summary> tags to emulate the folding feature of org-mode*/
-/* Folding is a bit hacky; we hide the regular heading (so that it still exists so as to make it anchorable)*/
-/* and then push up the tags.*/
+
+/* Folding leverages html <details> and <summary> tags to emulate the folding
+   feature of org-mode. This is a bit hacky; we hide the regular heading (so
+   that it still exists so as to make it anchorable and to display tags and
+   priority.)
+*/
 
 
-.firn-headline-section .firn-headline-text {
-  visibility: visible;
+/* Headline text is hidden when using folding; it is instead rendered in a
+   <summary> tag. */
+.firn-headline-text-hidden {
+  visibility: collapse;
   overflow: auto;
 }
 
-.firn-headline-section .firn-headline {
-  justify-content: flex-start;
-  margin: inherit;
-}
-
-.firn-headline-section-folded {
-}
-
-.firn-headline-section-folded .firn-headline-text {
-  visibility: collapse;
-  overflow: hidden;
-}
-
-
-.firn-headline-section-folded .firn-headline {
+/* This moves tags, priority, other non-content text in headings up to
+   approximately where the <summary> tag is. */
+.firn-headline-hidden {
+  margin-top: -2.6em;
   justify-content: right;
-  margin-top: -2.5em;
+  display: flex;
 }
-
 
 /* If folding, we have to style the <summary> tags to make them look like headings. */
 
 /* Set the parent element, so we can size-down on mobile. */
 .firn-fold { font-size: 15px; }
-.firn-headline-summary-1 { font-size: 1.3em;  margin: 1em 0; }
+.firn-headline-summary-1 { font-size: 1.3em;   margin: 1em 0; }
 .firn-headline-summary-2 { font-size: 1.15em;  margin: 1em 0; }
-.firn-headline-summary-3 { font-size: 1.05em; margin: 1em 0; }
-.firn-headline-summary-4 { font-size: 1em;    margin: 1em 0; }
-.firn-headline-summary-5 { font-size: 0.75em; margin: 1em 0; }
-.firn-headline-summary-6 { font-size: 0.6em; margin: 1em 0; }
+.firn-headline-summary-3 { font-size: 1.05em;  margin: 1em 0; }
+.firn-headline-summary-4 { font-size: 1em;     margin: 1em 0; }
+.firn-headline-summary-5 { font-size: 0.85em;  margin: 1em 0; }
+.firn-headline-summary-6 { font-size: 0.75em;   margin: 1em 0; }
 
 @media(max-width: 768px) {
   .firn-fold { font-size: 12px; }

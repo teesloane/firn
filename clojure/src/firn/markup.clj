@@ -78,7 +78,7 @@
   or unto what depth we want the headings to render."
   ([toc]
    (make-toc toc {}))
-  ([toc {:keys [headline depth list-type exclusive?]
+  ([toc {:keys [headline depth list-type exclude-headline?]
          :or   {depth nil list-type :ol}
          :as   opts}]
    (let [s-h         (u/find-first #(= (% :text) headline) toc)     ; if user specified a heading to start at, go find it.
@@ -87,7 +87,7 @@
                        headline   (drop-while #(not= s-h %))        ; drop everything up till the selected heading we want.
                        headline   (u/take-while-after-first         ; remove everything that's not a child of the selected heading.
                                    #(> (% :level) (s-h :level)))
-                       exclusive? (drop 1))                         ; don't include selected heading; just it's children.)
+                       exclude-headline? (drop 1))                         ; don't include selected heading; just it's children.)
 
          min-level   (if (seq toc) (:level (apply min-key :level toc)) 1) ; get the min level for calibrating the reduce.
          toc-cleaned (->> toc
@@ -184,6 +184,11 @@
       :else
       [:a {:href (u/clean-anchor link-href)} link-val])))
 
+(defn level-in-fold?
+  [opts level]
+  (contains? (opts :firn-fold) level))
+
+
 (defn- title->html
   "Constructs a headline title - with possible additional values
   (keywords, priorities, timestamps -> can all be found in a headline.)
@@ -202,7 +207,9 @@
         heading-keyword  (u/str->keywrd "span.firn-headline-keyword.firn-headline-keyword__" keywrd)
         heading-tags     [:span.firn-tags (for [t tags] [:span [:a.firn-tag {:href (str "/tags#" t)} t]])]
         heading-anchor   (org/make-headline-anchor parent)
-        heading-id+class #(u/str->keywrd "h" % heading-anchor ".firn-headline.firn-headline-" %)
+        heading-is-folded (level-in-fold? opts level)
+        heading-id+class #(u/str->keywrd "h" % heading-anchor ".firn-headline.firn-headline-" %
+                                         (when heading-is-folded ".firn-headline-hidden"))
         h-level          (case level
                            1 (heading-id+class 1)
                            2 (heading-id+class 2)
@@ -214,22 +221,15 @@
         render-headline  [h-level
                           (when keywrd [heading-keyword (str keywrd " ")])
                           (when priority [heading-priority (str priority " ")])
-                          (make-child :span.firn-headline-text)
+                          (if heading-is-folded
+                            (make-child :span.firn-headline-text-hidden)
+                            (make-child :span.firn-headline-text))
                           (when tags heading-tags)]]
-
-    ;; FIXME - leaving off - firn-headline-section-folded .firn-headline-text
-    ;; styling will have to be handled with inline styles due to the possibility
-    ;; of non-consecutive nested details tags
 
     (cond
       ;; render properties
       (and properties (opts :firn-properties?))
       [:div render-headline (props->html v)]
-
-      ;; For rendering folded headline. NOTE: when folded, this fn has been
-      ;; called from the `headline` case, and so the V node the parent node.
-      (u/in? (-> opts :firn-fold :levels) level)
-      [(u/str->keywrd "summary.firn-headline-summary-" level) (org/get-headline-helper v)]
 
       :else render-headline)))
 
@@ -251,13 +251,13 @@
           :style "padding-left: 4px"} "↩"]]))
 
 (defn headline-fold->html
-  [v {:keys [firn-fold headline-level make-child headline-el] :as opts}]
-  (let [{:keys [levels open]} firn-fold]
-    [(u/str->keywrd  "details.firn-fold.firn-fold-" headline-level)
-     {:style (str "margin-left: " (* (- headline-level 1) 12) "px")
-      :open  open}
-     (title->html v opts)
-     (make-child headline-el)]))
+  "Handles rendering a heading+section folded in a details+summary tag."
+  [v {:keys [firn-fold headline-level make-child headline-el]}]
+  [(u/str->keywrd "details.firn-fold.firn-fold-" headline-level)
+   {:style (str "margin-left: " (* (- headline-level 1) 12) "px")
+    :open  (firn-fold headline-level)}
+   [(u/str->keywrd "summary.firn-headline-summary-" headline-level) (org/get-headline-helper v)]
+   (make-child headline-el)])
 
 (defn to-html
   "Recursively Parses the org-edn into hiccup.
@@ -271,19 +271,24 @@
          value          (if value (s/trim-newline value) value)
          ordered        (get v :ordered) ;; for lists
          headline-level (get v :level)
-         headline-el    (if (u/in? (-> opts :firn-fold :levels) headline-level) ; (= headline-level (-> opts :firn-fold :))
+         ;; Since this is recursive, I wonder if performance matters for cases where we KNOW type is NOT a headline.
+         headline-fold? (level-in-fold? opts headline-level)
+         headline-el    (if headline-fold?
                           (u/str->keywrd "div.firn-headline-section-folded.firn-headline-section-" headline-level)
                           (u/str->keywrd "div.firn-headline-section.firn-headline-section-" headline-level))
+         make-child     #(into [%] (map (fn [c] (to-html c opts)) children))
+         handle-fold    #(headline-fold->html v (merge opts {:headline-level headline-level
+                                                             :make-child make-child
+                                                             :headline-el headline-el}))]
 
-         make-child     #(into [%] (map (fn [c] (to-html c opts)) children))]
 
      (case type
        "document"      (make-child :div)
        ;; if folding is turned on for a headline, render title+section from within.
-       "headline"      (if (u/in? (-> opts :firn-fold :levels) headline-level)
-                         (headline-fold->html v (merge opts {:headline-level headline-level :make-child make-child :headline-el headline-el}))
+       "headline"      (if headline-fold?
+                         (handle-fold)
                          (make-child headline-el))
-       "title"         (title->html v (dissoc opts :firn-fold))
+       "title"         (title->html v opts)
        "section"       (make-child :section)
        "paragraph"     (make-child :p)
        "underline"     (make-child :u)

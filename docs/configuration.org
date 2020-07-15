@@ -47,7 +47,7 @@ The firn table of contents is rendered in a layout. If you use the default layou
 #+BEGIN_SRC clojure
 {:depth 3          ; render only headlines that are of level 3 and below in the table of contents.
  :headline "Notes" ; The table of contents will begin at the headline "Notes"
- :exclusive? true  ; Do not render the headline "Notes", just its children.
+ :exclude-headline? true  ; Do not render the headline "Notes", just its children.
 }
 #+END_SRC
 * Reference                                                      :reference:

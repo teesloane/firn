@@ -35,8 +35,8 @@
           [:hr]]
          [:div
           [:h3 "Rendering a table of contents, up to a specific depth, starting at a specific heading, but excluding the heading started at."]
-          [:pre [:code "(render :toc {:headline \"Headings\" :depth 1 :exclusive? true})"]]
-          (render :toc {:headline "Headings" :depth 1 :exclusive? true})
+          [:pre [:code "(render :toc {:headline \"Headings\" :depth 1 :exclude-headline? true})"]]
+          (render :toc {:headline "Headings" :depth 1 :exclude-headline? true})
           [:hr]]
          [:div
           [:h3 "Rendering the sum Logbook of this file, as a polyline svg. This is a rather opinionated 'render'; it sorts your logbooks into years and the renders a graph for each year. "]

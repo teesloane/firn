@@ -64,7 +64,7 @@
        (markup/to-html (file :as-edn) merged-options)
 
        ;; render just the content of a headline.
-       (and is-headline? (= opts :content))
+       (and is-headline? (opts :exclude-headline?))
        (let [headline-content (org/get-headline-content org-tree action)]
          (markup/to-html headline-content merged-options))
 
