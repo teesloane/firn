@@ -4,12 +4,12 @@
  * Change the default variables below to find a styling you like.
  */
 
-
 /* Reset / Overrides */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
-
 
 :root {
   --border-radius: 4px;
@@ -23,7 +23,8 @@
   --color-shadow: #f4f4f4;
   --color-text: #444;
   --color-text-secondary: #999;
-  --font-family: "IBM Plex Serif", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  --font-family: "IBM Plex Serif", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   --hover-brightness: 1.2;
   --justify-important: center;
   --justify-normal: left;
@@ -34,7 +35,7 @@
   --width-content: 960px;
   /* Currently, Firn only supports 'todo | done' keywords. */
   --keyword-active: #2ecc71; /* For "active" Todo keywords. */
-  --keyword-done: #bdc3c7;   /* For "done type keywords" */
+  --keyword-done: #bdc3c7; /* For "done type keywords" */
   --keyword-size: xx-small;
 
   /* Headline priorities ([#A] [#B] etc) */
@@ -43,11 +44,9 @@
   --priority-c-bg: #2ecc71;
   --priority-size: xx-small;
   /* Headline Tags (:my-tag: :unfinished: etc)*/
-  --tag-size: small;
-  --tag-bg: #ecf0f1
-
+  --tag-size: x-small;
+  --tag-bg: #ecf0f1;
 }
-
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -178,7 +177,7 @@ nav ul li ul {
   display: none;
   height: auto;
   left: -2px;
-  padding: .5rem 1rem;
+  padding: 0.5rem 1rem;
   position: absolute;
   top: 1.7rem;
   white-space: nowrap;
@@ -200,7 +199,7 @@ samp {
   margin: 0 0.1rem;
   padding: 0 0.5rem;
   font-family: "IBM Plex Mono";
-  font-size: small;
+  font-size: 0.85em;
 }
 
 details {
@@ -210,6 +209,7 @@ details {
 details summary {
   font-weight: bold;
   cursor: pointer;
+  padding: 0 8px;
 }
 
 h1,
@@ -219,19 +219,23 @@ h4,
 h5,
 h6 {
   line-height: var(--line-height);
+  margin: 1em 0;
 }
 
 mark {
   padding: 0.1rem;
 }
 
-ol, ul {
+ol,
+ul {
   margin: 0.125rem 0;
+  padding-left: 1.25rem;
 }
 
 ol li,
 ul li {
   padding: 0.125rem 0;
+  /* padding-left: 1.25rem; */
 }
 
 p {
@@ -381,8 +385,8 @@ input[type="radio"] {
   display: inline-block;
 }
 
-input[type="checkbox"]+label,
-input[type="radio"]+label {
+input[type="checkbox"] + label,
+input[type="radio"] + label {
   display: inline-block;
   font-weight: normal;
   position: relative;
@@ -424,7 +428,7 @@ table td,
 table th,
 table tr {
   padding: 0.4rem 0.8rem;
-  /* text-align: var(--justify-important); */
+  font-size: 0.9em;
 }
 
 /* Firn currently can't discern if a table has a <th>,*/
@@ -473,13 +477,10 @@ blockquote footer {
   padding: 1.5rem 0;
 }
 
-
-
-
 /* Firn Org Tweaks*/
 
 /* Because firn spits out nested contents (for example, the parser spits out p
-   tags within li tags), sometimes you may need to style the childrne of html
+   tags within li tags), sometimes you may need to style the children of html
    elements to get the spacing you like.*/
 
 li > p {
@@ -487,9 +488,7 @@ li > p {
   padding: 0;
 }
 
-
 /*** Firn classes for org-mode functionality: ***/
-
 
 /* Images */
 .firn-img-with-caption {
@@ -527,7 +526,6 @@ li > p {
   padding: 0.2rem 0.3rem;
   font-size: var(--priority-size);
 }
-
 
 .firn-headline-priority__A {
   background-color: var(--priority-a-bg);
@@ -571,9 +569,7 @@ li > p {
   align-items: center;
 }
 
-
 .firn-tags {
-
 }
 
 .firn-tag-heading {
@@ -598,13 +594,16 @@ li > p {
   content: "#";
 }
 
-.firn-cookie {}
+.firn-cookie {
+}
 
 /* Org Footnotes */
 
-.firn-footnote-ref {}
+.firn-footnote-ref {
+}
 
-.firn-footnote-def {}
+.firn-footnote-def {
+}
 
 /* Org Property Drawers */
 
@@ -612,20 +611,66 @@ li > p {
   background-color: var(--color-bg-secondary);
 }
 
-.firn-property-key {}
+.firn-property-key {
+}
 
-.firn-property-value {}
+.firn-property-value {
+}
 
 /* Styling for internal and external links */
 
-.firn-external {}
+.firn-external {
+}
 
-.firn-internal {}
+.firn-internal {
+}
 
 /* If you choose to render :PROPERTIES: drawers, you may style them: */
 .firn-properties {
   background: var(--color-bg-secondary);
   padding: 8px;
 }
-.firn-property-key {}
-.firn-property-value {}
+.firn-property-key {
+}
+.firn-property-value {
+}
+
+/* -- Folding ---------------------------------------------------------------- */
+
+/* Folding leverages html <details> and <summary> tags to emulate the folding
+   feature of org-mode. This is a bit hacky; we hide the regular heading (so
+   that it still exists so as to make it anchorable and to display tags and
+   priority.)
+*/
+
+
+/* Headline text is hidden when using folding; it is instead rendered in a
+   <summary> tag. */
+.firn-headline-text-hidden {
+  visibility: collapse;
+  overflow: auto;
+  flex: 1;
+}
+
+/* This moves tags, priority, other non-content text in headings up to
+   approximately where the <summary> tag is. */
+.firn-headline-hidden {
+  margin-top: -2.6em;
+  justify-content: right;
+  display: flex;
+}
+
+/* If folding, we have to style the <summary> tags to make them look like headings. */
+
+/* Set the parent element, so we can size-down on mobile. */
+.firn-fold { font-size: 15px; }
+.firn-headline-summary-1 { font-size: 1.3em;   margin: 1em 0; }
+.firn-headline-summary-2 { font-size: 1.15em;  margin: 1em 0; }
+.firn-headline-summary-3 { font-size: 1.05em;  margin: 1em 0; }
+.firn-headline-summary-4 { font-size: 1em;     margin: 1em 0; }
+.firn-headline-summary-5 { font-size: 0.85em;  margin: 1em 0; }
+.firn-headline-summary-6 { font-size: 0.75em;   margin: 1em 0; }
+
+@media(max-width: 768px) {
+  .firn-fold { font-size: 12px; }
+}

@@ -17,5 +17,5 @@
         [:div.def-content
          [:h1 title]
          [:div (render :toc)] ;; Optional; add a table of contents
-         (render :file)
+         (render :file )
          (footer)]]]])))
