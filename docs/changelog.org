@@ -2,12 +2,17 @@
 #+FIRN_ORDER: 8
 #+FIRN_TOC: {:depth 1}
 
-* TODO V.0.0.8                                                   :roadmap:
-
-*NOTE*: 0.0.8 is currently in development.
+* V.0.0.8                                                       
 
 ** Feature: Folding
 - headlines and their content can be folded on a site-wide, layout-wide, or file-specific basis.
+** Breaking Changes
+- when rendering a table of contents, the options map has renamed a key from "exclusive?" to "exclude-headline?". As such:
+
+#+BEGIN_SRC clojure
+(render :toc {:headline "Headings" :depth 1 :exclude-headline? true}) ; is now valid
+(render :toc {:headline "Headings" :depth 1 :exclusive? true}) ; no longer works.
+#+END_SRC
 
 * V.0.0.7
 ** Feature: Pages
