@@ -194,13 +194,13 @@ h2 {
     position: fixed;
     transition: all 0.3s ease;
     left: -2000px;
-    top: 60px;
+    top: 52px;
     padding: 32px;
   }
 
   .def-sidebar-open {
     left: 0;
-    top: 60px;
+    top: 52px;
     padding: 32px;
   }
 
