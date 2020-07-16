@@ -2,9 +2,16 @@
 #+FIRN_ORDER: 8
 #+FIRN_TOC: {:depth 1}
 
-* V.0.0.8                                                       
+* V.0.0.8
 
-** Feature: Folding
+Currently In Development.
+
+** TODO Clean up unused attachments.
+** TODO Exclude files from site-map.
+** Refactor: site-link ([[https://github.com/theiceshelf/firn/pull/33][33]])
+- Enables Firn sites to be hosted at non-root addresses.
+- Before, all internal href links were relative. Now they are absolute and based off the ~:site-url~ value in a user's ~config.edn~
+** Feature: Folding ([[https://github.com/theiceshelf/firn/pull/34][34]])
 - headlines and their content can be folded on a site-wide, layout-wide, or file-specific basis.
 ** Breaking Changes
 - when rendering a table of contents, the options map has renamed a key from "exclusive?" to "exclude-headline?". As such:
