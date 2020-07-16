@@ -10,7 +10,7 @@
             [sci.core :as sci]))
 
 ;; #+ORG_KEYWORDS that we want to evaluate into real clojure values.
-(def keywords-to-eval [:firn-toc :firn-properties? :firn-order])
+(def keywords-to-eval [:firn-toc :firn-properties? :firn-order :firn-fold])
 
 ;; -- Getters
 

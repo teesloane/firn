@@ -1,16 +1,18 @@
 #+TITLE: Layout
 #+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-07-05 14:55>
+#+DATE_UPDATED: <2020-07-16 13:00>
 #+FILE_UNDER: docs
 #+FIRN_LAYOUT: docs
 #+FIRN_ORDER: 2
+#+FIRN_FOLD: {2 true}
 
 * Overview
 
 When you create a new Firn site for the first time, it will create a folder:
 =_firn/layouts=. The layout folder stores Clojure files (=.clj=) that are
 responsible for how your org-file is rendered to-html; The act of "applying" a
-template means to pass the content of the org-file through a specific [[https://github.com/weavejester/hiccup][clojure hiccup]] template that organizes how the content is displayed.
+template means to pass the content of the org-file through a specific [[https://github.com/weavejester/hiccup][clojure hiccup]]
+template that organizes how the content is displayed.
 
 When an org-mode file is processed by Firn it looks for the in-buffer-setting
 ~#+FIRN_LAYOUT:~ to see if it uses a Layout. If none are specified, the _default
@@ -105,10 +107,9 @@ contents, etc. It can render multiple kinds of content"
 | Entire file       | keyword         | ~(render :file)~                                                       |
 | Specific headline | string          | ~(render "Notes")~                                                     |
 | Specific content  | string, keyword | ~(render "Notes" :content)~                                            |
-| Table of contents | keyword, map    | ~(render :toc {:depth int :exclusive? bool :headline "Notes"})~        |
+| Table of contents | keyword, map    | ~(render :toc {:depth int :exclude-headline? bool :headline "Notes"})~ |
 | Logbook Polyline  | keyword, map    | ~(render :logbook-polyline {:stroke "#45698A" :height 60 :width 365})~ |
 |                   |                 |                                                                      |
-
 
 ** Render an entire file
 
@@ -130,10 +131,34 @@ contents, etc. It can render multiple kinds of content"
     (head
      [:body
        [:div (render "Notes")] ; render everything in "Notes" (including the heading "Notes")
-       [:div (render "Notes")] ; render the content in "Notes", excluding the heading.
+       [:div (render "Notes" {:exclude-headline? true})] ; render the content in "Notes", excluding the heading.
       ])))
 
 #+END_SRC
+
+** Rendering folded headlines                                   :folding:
+
+Firn includes basic semantic HTML folding that aims to replicate org-mode
+headline folding. JavaScript is not used to accomplish folding (although this is
+certainly possible); instead Firn uses the ~details~ and ~summary~ tag to
+accomplish similar functionality.
+
+Due to how the summary and details tag work, there is some finicky styling and
+all the same features of using normal headlines (tags, keywords, properties,
+etc) may not work as well. Incorporating folding may require some user styling
+in the ~firn_base.css~ stylesheet.
+
+Similar to a table of contents, you can set Firn's folding on a site-wide,
+layout-wide, or file-specific basis:
+
+#+BEGIN_SRC clojure
+(render :file {:firn-fold {1 true 2 true}}) ; All H1 and H2's will be folded, and will be started open.
+(render :file {:firn-fold {3 false  4 false 5}}) ; H3 through H5 will be foldable, and will start closed_
+#+END_SRC
+
+The ~:firn-fold~  value takes a *map* in which the keys correspond to heading
+levels, and the value is a boolean, indicating whether or not the details tag
+is, open or not. ~:firn-fold~ supports up to 6 headings (corresponding from ~h1~ to ~h6~)
 
 ** Render a Logbook SVG Polyline
 
@@ -179,7 +204,7 @@ There are several ways you can create table of contents in your files, from simp
          ;; `:eclusive?` means we don't render "Notes"; just headlines that fall under it dflakdjflksadjf lksadjf lkasdjf lkasdjf .
          [:div (render :toc {:headline "Notes"
                              :depth 4
-                             :exclusive? true})]
+                             :exclude-headline? true})]
          [:div (render "Notes")]])))
   #+END_SRC
 
@@ -230,7 +255,9 @@ your templates only ask for what they need:
         (sidebar render logbook)]]])))
 #+END_SRC
 
-The above template only needs access to =render=, =partials= and the =logbook=. Then functions, such as =page-header= can simply take the data map and destructure what /it/ needs again:
+The above template only needs access to =render=, =partials= and the =logbook=.
+Then functions, such as =page-header= can simply take the data map and
+destructure what /it/ needs again:
 
 #+BEGIN_SRC clojure
 (defn page-header
@@ -253,11 +280,13 @@ The above template only needs access to =render=, =partials= and the =logbook=. 
 * Styling Layouts                                                :styling:
 
 You can write css as you normally would by placing css files in the
-=_firn/static/css= folder and then having =firn= move them into your =_site= folder
-when run. Styling is applied through [[https://github.com/weavejester/hiccup#syntax][hiccup]].
+=_firn/static/css= folder and then having =firn= move them into your =_site=
+folder when run. Styling is applied through
+[[https://github.com/weavejester/hiccup#syntax][hiccup]].
 
 There are some internal styles that are applied when org-mode text is
-transformed into data. These styles are all prefaced with the keyword ~firn-~, (ie.
-=firn-headline-text= or =firn-tag=).
+transformed into data. These styles are all prefaced with the keyword ~firn-~,
+(ie. =firn-headline-text= or =firn-tag=).
 
-Inspect the file ~_firn/static/css/firn_base.css~ to see the configurable elements.
+Inspect the file ~_firn/static/css/firn_base.css~ to see the configurable
+elements.
