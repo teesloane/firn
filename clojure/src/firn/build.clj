@@ -139,12 +139,14 @@
                                   output
                                   (assoc output (processed-file :path-web) processed-file))
               new-site-map-item (merge
+                                 ;; remove metadata that would just pollute site-map links.
                                  (dissoc (processed-file :meta) :logbook :links :keywords :toc)
                                  {:path (str "/" (processed-file :path-web))})]
 
           ;; add to sitemap when file is not private.
           (when-not is-private
-            (swap! site-map conj new-site-map-item)
+            (when-not (= #p (-> processed-file :meta :keywords :firn-sitemap? ) false)
+              (swap! site-map conj new-site-map-item)) ;; add to site map unless user has specified not to.
             (swap! site-links concat (-> processed-file :meta :links))
             (swap! site-logs concat  (-> processed-file :meta :logbook))
             (swap! site-tags concat  (-> processed-file :meta :tags)))

@@ -78,4 +78,5 @@ The following in-buffer settings are processed by Firn and/or made available to 
 | ~#+FIRN_TOC~         | map           | Settings for any rendered table of contents     |
 | ~#+FIRN_ORDER~       | integer       | Enables sorting files in the site-map           |
 | ~#+FIRN_PRIVATE~     | boolean       | Whether or not to read the file in question     |
+| #+FIRN_SITEMAP?    | boolean       | Whether to include the file in the site-map.    |
 | ~#+FIRN_UNDER~       | string        | Category for which the documents falls under    |
