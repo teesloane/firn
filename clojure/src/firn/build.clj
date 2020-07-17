@@ -145,7 +145,7 @@
 
           ;; add to sitemap when file is not private.
           (when-not is-private
-            (when-not (= #p (-> processed-file :meta :keywords :firn-sitemap? ) false)
+            (when-not (= (-> processed-file :meta :keywords :firn-sitemap? ) false)
               (swap! site-map conj new-site-map-item)) ;; add to site map unless user has specified not to.
             (swap! site-links concat (-> processed-file :meta :links))
             (swap! site-logs concat  (-> processed-file :meta :logbook))
@@ -224,19 +224,3 @@
       true write-pages!
       true write-files)))
 
-(defn reload-requested-file
-  "Take a request to a file, pulls the file out of memory
-  grabs the path of the original file, reslurps it and reprocesses"
-  [file config]
-  (let [re-slurped (-> file :path io/file)
-        re-processed (process-one config re-slurped)]
-    re-processed))
-
-
-(defn reload-requested-page
-  "When user requests a non-org-file page (pages/*.clj), we reslurp the clj files
-  into the config and then re-write them to html."
-  [config!]
-  (let [pages (file/read-clj :pages @config!)]
-    (swap! config! assoc :pages pages)
-    (write-pages! @config!)))

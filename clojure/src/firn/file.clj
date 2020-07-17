@@ -187,8 +187,8 @@
 
           "clock" ; if clock, merge headline-data into it, and push/recurse new-logs.
           (let [headline-meta {:from-headline (-> last-headline :children first :raw)}
-                log-augmented (merge headline-meta file-metadata x)
-                new-logs      (conj out-logs log-augmented)]
+                new-log-item  (merge headline-meta file-metadata x)
+                new-logs      (conj out-logs new-log-item)]
             (recur xs new-logs out-links out-tags out-toc last-headline))
 
           "link" ; if link, also merge file metadata and push into new-links and recurse.
@@ -201,12 +201,13 @@
 
 (defn extract-metadata
   "Iterates over a tree, and returns metadata for site-wide usage such as
-  links (for graphing between documents, tbd) and logbook entries."
+  links (for graphing between documents, tbd) and logbook entries.
+  Many of the values in the map are also contained in `keywords`"
   [file]
   (let [org-tree       (file :as-edn)
         tree-data      (tree-seq map? :children org-tree)
-        keywords       (keywords->map file) ; keywords are "in-buffer-settings"
-        {:keys [date-updated date-created title firn-under firn-order]} keywords
+        keywords       (keywords->map file) ; keywords are "in-buffer-settings" - things that start with #+<MY_KEYWORD>
+        {:keys [date-updated date-created title firn-under firn-order ]} keywords
         file-metadata  {:from-file title :from-file-path (file :path-web)}
         metadata       (extract-metadata-helper tree-data file-metadata)
         logbook-sorted (sort-logbook (metadata :logbook) file)] ;; TODO - I think sorting this in extract-metadata helper makes more sense. Better internal API.

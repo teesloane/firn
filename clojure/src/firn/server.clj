@@ -2,15 +2,14 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as s]
             [firn.build :as build]
-            [firn.util :as u]
             [firn.dirwatch :refer [close-watcher watch-dir]]
+            [firn.file :as file]
+            [firn.util :as u]
             [me.raynes.fs :as fs]
             [mount.core :as mount :refer [defstate]]
             [org.httpkit.server :as http]
             [ring.middleware.file :as r-file]
-            [ring.util.response :refer [response]]
-            [firn.config :as config]))
-           
+            [ring.util.response :refer [response]]))
 
 (declare server)
 (def file-watcher  (atom nil))
@@ -21,6 +20,25 @@
   [req]
   (let [stripped (s/join "" (-> req :uri rest))]
     (u/remove-ext stripped "html")))
+
+
+(defn reload-requested-file
+  "Take a request to a file, pulls the file out of memory
+  grabs the path of the original file, reslurps it and reprocesses"
+  [file config]
+  (let [re-slurped (-> file :path io/file)
+        re-processed (build/process-one config re-slurped)]
+    re-processed))
+
+
+(defn reload-requested-page
+  "When user requests a non-org-file page (pages/*.clj), we reslurp the clj files
+  into the config and then re-write them to html."
+  [config!]
+  (let [pages (file/read-clj :pages @config!)]
+    (swap! config! assoc :pages pages)
+    (build/write-pages! @config!)))
+
 
 (defn handler
   "Handles web requests for the development server."
@@ -37,12 +55,12 @@
       (cond
         ;; Handle reloading of the index / no uri
         (and (= req-uri-file "") (some? index-file))
-        (let [reloaded-file (build/reload-requested-file index-file @config!)] ; reslurp in case it has changed.
+        (let [reloaded-file (reload-requested-file index-file @config!)] ; reslurp in case it has changed.
           (response (reloaded-file :as-html)))
 
         ;; Handle when the route matches a file in memory
         (some? memory-file) ; If req-uri finds the file in the config's memory...
-        (let [reloaded-file (build/reload-requested-file memory-file @config!)] ; reslurp in case it has changed.
+        (let [reloaded-file (reload-requested-file memory-file @config!)] ; reslurp in case it has changed.
           (response (reloaded-file :as-html)))
 
         ;; request is a "page" (and not in memory)
@@ -50,7 +68,7 @@
         ;; then responsds with the html file.
         (fs/exists? (str dir-pages "/" req-uri-file ".clj"))
         (let [modded-req (update request :uri #(str % ".html"))]
-          (build/reload-requested-page config!)
+          (reload-requested-page config!)
           ((r-file/wrap-file modded-req dir-site) modded-req))
 
         ;; Handle loading from file system if nothing else found.
