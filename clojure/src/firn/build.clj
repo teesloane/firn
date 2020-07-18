@@ -102,7 +102,6 @@
                              :firn-under "Page"})))
   @site-map!)
 
-
 (defn process-all ; (ie, just org-files, not pages)
   "Receives config, processes all ORG files and builds up site-data logbooks, site-map, link-map, etc.
   This is where the magic happens for collecting metadata. Follow the chain:
@@ -176,7 +175,6 @@
        (spit feed-file)))
   config)
 
-
 (defn write-pages!
   "Responsible for publishing html pages from clojure templates found in pages/
   Currently, we can only render a flat file list of .clj files in /pages.
@@ -199,7 +197,6 @@
       (io/make-parents out-file)
       (spit out-file out-str)))
   config)
-
 
 (defn write-files
   "Takes a config, of which we can presume has :processed-files.

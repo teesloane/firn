@@ -152,18 +152,10 @@
   - eventually... a plugin for custom file collection?"
   [tree-data file-metadata]
   (loop [tree-data     tree-data
-         out-logs      []
-         out-links     []
-         out-tags      []
-         out-toc       []
+         out           {:logbook [] :links [] :tags [] :toc []}
          last-headline nil]  ; the most recent headline we've encountered.
     (if (empty? tree-data)
-      ;; All done! return the collected stuff.
-      {:logbook out-logs
-       :toc     out-toc
-       :tags    out-tags
-       :links   out-links}
-      ;; Do the work.
+      out
       (let [x  (first tree-data)
             xs (rest tree-data)]
         (case (:type x)
@@ -171,10 +163,10 @@
           (let [toc-item {:level  (x :level)
                           :text   (org/get-headline-helper x)
                           :anchor (org/make-headline-anchor x)}
-                new-toc  (conj out-toc toc-item)]
-            (recur xs out-logs out-links out-tags new-toc x))
+                out      (update out :toc conj toc-item)]
+            (recur xs out x))
 
-          "title" ; if title, collect tags, map with metadata, push into out-tags
+          "title" ; if title, collect tags, map with metadata, push into out :tags
           (let [headline-link  (str "/"
                                     (file-metadata :from-file-path)
                                     (org/make-headline-anchor last-headline))
@@ -182,22 +174,24 @@
                                 :headline-link headline-link}
                 tags           (x :tags)
                 tags-with-meta (map #(merge headline-meta file-metadata {:tag-value %}) tags)
-                new-tags       (vec (concat out-tags tags-with-meta))]
-            (recur xs out-logs out-links new-tags out-toc last-headline))
+                add-tags       #(vec (concat % tags-with-meta))
+                out            (update out :tags add-tags)]
+            (recur xs out last-headline))
 
-          "clock" ; if clock, merge headline-data into it, and push/recurse new-logs.
+          "clock" ; if clock, merge headline-data into it, and push/recurse into out
           (let [headline-meta {:from-headline (-> last-headline :children first :raw)}
                 new-log-item  (merge headline-meta file-metadata x)
-                new-logs      (conj out-logs new-log-item)]
-            (recur xs new-logs out-links out-tags out-toc last-headline))
+                out           (update out :logbook conj new-log-item)]
+            (recur xs out last-headline))
 
           "link" ; if link, also merge file metadata and push into new-links and recurse.
           (let [link-item (merge x file-metadata)
-                new-links (conj out-links link-item)]
-            (recur xs out-logs new-links out-tags out-toc last-headline))
+                ;; new-links (conj out-links link-item)
+                out       (update out :links conj link-item)]
+            (recur xs out last-headline))
 
           ;; default case, recur.
-          (recur xs out-logs out-links out-tags out-toc last-headline))))))
+          (recur xs out last-headline))))))
 
 (defn extract-metadata
   "Iterates over a tree, and returns metadata for site-wide usage such as
