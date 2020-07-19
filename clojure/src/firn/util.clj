@@ -153,6 +153,11 @@
         (s/join "/" list-b)
         (recur (rest list-a) (rest list-b))))))
 
+(defn drop-path-until
+  [path until]
+  (let [split-path (s/split path #"/")
+        res        (drop-while #(not= % until) split-path)]
+   (s/join "/" res)))
 
 (defn is-attachment?
   "Checks is a path is an attachment; a local file that is not an org file."

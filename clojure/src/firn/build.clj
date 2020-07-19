@@ -10,7 +10,8 @@
             [cheshire.core :as json]
             [firn.util :as u]
             [me.raynes.fs :as fs]
-            [hiccup.core :as h]))
+            [hiccup.core :as h]
+            [clojure.string :as str]))
 
 (set! *warn-on-reflection* true)
 
@@ -205,22 +206,42 @@
 (defn remove-unused-attachments
   "Deletes all attachments in the _site/<dir-data> that aren't found in the
   site-wide collected attachment paths."
-  [site-attachments]
-  (prn "remove unused attachments called")
-  nil)
- 
+  [{:keys [attachments dir]}]
+  (let [dir-files             (fs/find-files dir #"(.*)\.(jpg|JPG|gif|GIF|png)")
+        clean-file-link-regex #"(file:)((.*\.)\.\/?)?"
+        attachments           (map #(str/replace-first % clean-file-link-regex "") attachments)
+        unused                (atom [])]
+    (doseq [f    dir-files
+            :let [f-path (.getPath ^java.io.File f)
+                  match (u/find-first #(str/includes? f-path %) attachments)]]
+      (when (nil? match)
+        (swap! unused conj {:full-path  f-path
+                            :short-path (u/drop-path-until f-path "_site")})))
+
+    (when (seq @unused)
+      (println "\nThere were" (count @unused) "attachments that appear to be unlinked to from your org-files:")
+      (doseq [f @unused] (println (f :short-path)))
+      (let [res (u/prompt? "\nDo you want to delete these files (Y) or allow them to be included in your _site output folder?")]
+        (if res
+          (do
+            (println "\nOk, cleaning " dir " directory of unusued attachments...")
+            (doseq [f @unused] (fs/delete (f :full-path))))
+          (println "Leaving files in place."))))))
 
 (defn post-build-clean
   "Clean up fn for after a site is built."
-  [{:keys [site-attachments user-config] :as config}]
+  [{:keys [site-attachments user-config dir-site-data] :as config}]
   (let [{:keys [run-build-clean? dir-data]} user-config
-        prompt (str "Would you like to remove unused attachments from _site/" dir-data "?")]
+        prompt       (str "Would you like to scan for unused attachments from _site/" dir-data "?")
+        clean-params {:attachments site-attachments :dir dir-site-data}]
+    (prn "run build clean is " run-build-clean?)
     (case run-build-clean?
       "never"  nil
-      "always" (remove-unused-attachments nil)
-      "prompt" (when (u/prompt? prompt) (remove-unused-attachments nil))
-      nil)
-    #_config))
+      "always" (remove-unused-attachments clean-params)
+      "prompt" (when (= run-build-clean? "prompt")
+                 (when (u/prompt? prompt)
+                   (remove-unused-attachments clean-params)))
+      config)))
 
 
 (defn all-files
@@ -233,4 +254,5 @@
       rss? write-rss-file!
       true write-pages!
       true write-files
-      true post-build-clean)))
+      true post-build-clean
+      )))
