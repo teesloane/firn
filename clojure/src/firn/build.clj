@@ -110,13 +110,13 @@
   process-all -> process-one -> file/extract-metadata -> file/extract-metadata-helper"
   [config]
   (loop [org-files (config :org-files)
-         site-vals {:processed-files {} :site-map [] :site-tags [] :site-links [] :attachments []}
+         site-vals {:processed-files {} :site-map [] :site-tags [] :site-links [] :site-attachments []}
          output    {}]
     (if (empty? org-files)
       ;; run one more loop on all files, and create their html,
       ;; now that we have processed everything.
       (let [config-with-data (merge config
-                                    site-vals
+                                    site-vals ;; contains logbook already
                                     {:processed-files output
                                      :site-map        (process-site-map-with-pages! (site-vals :site-map) config)
                                      :site-tags       (into (sorted-map) (group-by :tag-value (site-vals :site-tags)))})
@@ -139,7 +139,7 @@
                 updated-site-vals (cond-> site-vals
                                     true        (update :site-links concat links)
                                     true        (update :site-logs concat logbook)
-                                    true        (update :attachments concat attachments)
+                                    true        (update :site-attachments concat attachments)
                                     true        (update :site-tags concat tags)
                                     in-sitemap? (update :site-map conj (file/make-site-map-item processed-file)))]
             (recur org-files updated-site-vals updated-output)))))))
@@ -202,11 +202,26 @@
         (spit out-file-name (f :as-html)))))
   config)
 
+(defn remove-unused-attachments
+  "Deletes all attachments in the _site/<dir-data> that aren't found in the
+  site-wide collected attachment paths."
+  [site-attachments]
+  (prn "remove unused attachments called")
+  nil)
+ 
+
 (defn post-build-clean
   "Clean up fn for after a site is built."
-  [{:keys [attachments] :as config}]
-  (prn "site attachments are " (count attachments) attachments)
-  config)
+  [{:keys [site-attachments user-config] :as config}]
+  (let [{:keys [run-build-clean? dir-data]} user-config
+        prompt (str "Would you like to remove unused attachments from _site/" dir-data "?")]
+    (case run-build-clean?
+      "never"  nil
+      "always" (remove-unused-attachments nil)
+      "prompt" (when (u/prompt? prompt) (remove-unused-attachments nil))
+      nil)
+    #_config))
+
 
 (defn all-files
   "Processes all files in the org-directory"

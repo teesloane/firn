@@ -162,6 +162,14 @@
 
 ;; General fns ----
 
+(defn prompt?
+  [p]
+  (print p)
+  (print " [Y/n]: ")
+  (flush)
+  (let [x (read-line)]
+    (if (= x "Y") true false)))
+
 (defn find-index-of
   "Finds the index of an item that matches a predicate."
   [pred sequence]
