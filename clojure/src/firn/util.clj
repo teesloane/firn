@@ -153,6 +153,13 @@
         (s/join "/" list-b)
         (recur (rest list-a) (rest list-b))))))
 
+
+(defn is-attachment?
+  "Checks is a path is an attachment; a local file that is not an org file."
+  [path]
+  (let [local-file-rgx #"(file:)(.*)\.(jpg|JPG|gif|GIF|png)"]
+    (re-matches local-file-rgx path)))
+
 ;; General fns ----
 
 (defn find-index-of

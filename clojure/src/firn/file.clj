@@ -118,6 +118,20 @@
      (some? in-priv-folder?)
      (some? is-private?))))
 
+(defn in-site-map?
+  "Checks if the processed file is in the site-map
+  By default, all files are in the sitemap, so we check that the keywords is nil."
+  [processed-file]
+  (nil? (-> processed-file :meta :keywords :firn-sitemap?)))
+
+(defn make-site-map-item
+  "When processing a file, we generate a site-map item that receives the pertinent
+  metadata, and discards anything not needed."
+  [processed-file]
+  (merge
+   (dissoc (processed-file :meta) :logbook :links :keywords :toc)
+   {:path (str "/" (processed-file :path-web))}))
+
 (defn sum-logbook
   "Iterates over a logbook and parses logbook :duration's and sums 'em up"
   [logbook]
@@ -128,19 +142,19 @@
                               new-res    [(+ acc-hours hour) (+ acc-minutes min)]]
                           new-res))]
     (->> logbook
-         (reduce reduce-fn hours-minutes)
-         (u/timevec->time-str))))
+       (reduce reduce-fn hours-minutes)
+       (u/timevec->time-str))))
 
 (defn- sort-logbook
   "Loops over all logbooks, adds start and end unix timestamps."
-  [logbook file]
-  (let [mf #(org/parsed-org-date->unix-time %1 file)]
+  [logbook file-name]
+  (let [mf #(org/parsed-org-date->unix-time %1 file-name)]
     (->> logbook
        ;; Filter out timestamps if they don't have a start or end.
-         (filter #(and (% :start) (% :end) (% :duration)))
+       (filter #(and (% :start) (% :end) (% :duration)))
        ;; adds a unix timestamp for the :start and :end time so that's sortable.
-         (map #(assoc % :start-ts (mf (:start %)) :end-ts (mf (:end %))))
-         (sort-by :start-ts #(> %1 %2)))))
+       (map #(assoc % :start-ts (mf (:start %)) :end-ts (mf (:end %))))
+       (sort-by :start-ts #(> %1 %2)))))
 
 (defn extract-metadata-helper
   "There are lots of things we want to extract when iterating over the AST.
@@ -152,10 +166,16 @@
   - eventually... a plugin for custom file collection?"
   [tree-data file-metadata]
   (loop [tree-data     tree-data
-         out           {:logbook [] :links [] :tags [] :toc []}
+         out           {:logbook [] :logbook-total nil :links [] :tags [] :toc [] :attachments []}
          last-headline nil]  ; the most recent headline we've encountered.
     (if (empty? tree-data)
-      out
+
+      ;; << The final formatting pre-return >>
+      (let [out (update out :logbook #(sort-logbook % (file-metadata :from-file)))
+            out (assoc out :logbook-total (sum-logbook (out :logbook)))]
+        out)
+
+      ;; << The Loop >>
       (let [x  (first tree-data)
             xs (rest tree-data)]
         (case (:type x)
@@ -186,8 +206,11 @@
 
           "link" ; if link, also merge file metadata and push into new-links and recurse.
           (let [link-item (merge x file-metadata)
-                ;; new-links (conj out-links link-item)
-                out       (update out :links conj link-item)]
+                out       (update out :links conj link-item)
+                ;; if link starts with `file:` an ends with .png|.jpg|etc
+                out       (if (u/is-attachment? (link-item :path))
+                            (update out :attachments conj (link-item :path))
+                            out)]
             (recur xs out last-headline))
 
           ;; default case, recur.
@@ -203,19 +226,14 @@
         keywords       (keywords->map file) ; keywords are "in-buffer-settings" - things that start with #+<MY_KEYWORD>
         {:keys [date-updated date-created title firn-under firn-order ]} keywords
         file-metadata  {:from-file title :from-file-path (file :path-web)}
-        metadata       (extract-metadata-helper tree-data file-metadata)
-        logbook-sorted (sort-logbook (metadata :logbook) file)] ;; TODO - I think sorting this in extract-metadata helper makes more sense. Better internal API.
+        metadata       (extract-metadata-helper tree-data file-metadata)]
 
-    {:links           (metadata :links)
-     :logbook         logbook-sorted
-     :tags            (metadata :tags)
-     :logbook-total   (sum-logbook logbook-sorted)
-     :keywords        keywords
-     :title           title
-     :firn-under      firn-under
-     :firn-order      firn-order
-     :toc             (metadata :toc)
-     :date-updated    (when date-updated (u/strip-org-date date-updated))
-     :date-created    (when date-created (u/strip-org-date date-created))
-     :date-updated-ts (when date-updated (u/org-date->ts date-updated))
-     :date-created-ts (when date-created (u/org-date->ts date-created))}))
+    (merge metadata
+           {:keywords        keywords
+            :title           title
+            :firn-under      firn-under
+            :firn-order      firn-order
+            :date-updated    (when date-updated (u/strip-org-date date-updated))
+            :date-created    (when date-created (u/strip-org-date date-created))
+            :date-updated-ts (when date-updated (u/org-date->ts date-updated))
+            :date-created-ts (when date-created (u/org-date->ts date-created))})))
