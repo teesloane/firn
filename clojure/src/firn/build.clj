@@ -207,7 +207,7 @@
   "Deletes all attachments in the _site/<dir-data> that aren't found in the
   site-wide collected attachment paths."
   [{:keys [attachments dir]}]
-  (let [dir-files             (fs/find-files dir #"(.*)\.(jpg|JPG|gif|GIF|png)")
+  (let [dir-files             (u/find-files dir #"(.*)\.(jpg|JPG|gif|GIF|png)")
         clean-file-link-regex #"(file:)((.*\.)\.\/?)?"
         attachments           (map #(str/replace-first % clean-file-link-regex "") attachments)
         unused                (atom [])]
@@ -234,7 +234,6 @@
   (let [{:keys [run-build-clean? dir-data]} user-config
         prompt       (str "Would you like to scan for unused attachments from _site/" dir-data "?")
         clean-params {:attachments site-attachments :dir dir-site-data}]
-    (prn "run build clean is " run-build-clean?)
     (case run-build-clean?
       "never"  nil
       "always" (remove-unused-attachments clean-params)
