@@ -240,8 +240,8 @@
       "prompt" (when (= run-build-clean? "prompt")
                  (when (u/prompt? prompt)
                    (remove-unused-attachments clean-params)))
-      config)))
-
+      nil)
+    config))
 
 (defn all-files
   "Processes all files in the org-directory"
