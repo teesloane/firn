@@ -58,7 +58,8 @@
   (let [ext-regex (re-pattern (str "^.*\\.(" ext ")$"))
         files     (find-files dir ext-regex)]
     (if (= 0 (count files))
-      (do (print-err! :warning "No" ext "files found at " dir) files)
+      ;; NOTE: taking out this notifications - not sure it's necessary.
+      (do #_(print-err! :warning "No" ext "files found at " dir) files)
       files)))
 
 (defn file-name-no-ext
