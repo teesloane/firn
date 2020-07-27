@@ -226,7 +226,11 @@
         keywords       (keywords->map file) ; keywords are "in-buffer-settings" - things that start with #+<MY_KEYWORD>
         {:keys [date-updated date-created title firn-under firn-order ]} keywords
         file-metadata  {:from-file title :from-file-path (file :path-web)}
-        metadata       (extract-metadata-helper tree-data file-metadata)]
+        metadata       (extract-metadata-helper tree-data file-metadata)
+        date-parser    #(try
+                          (when % (u/org-date->ts date-created))
+                          (catch Exception e
+                            (u/print-err! :error  (str "Could not parse date for file: " (or title "<unknown file>") "\nPlease confirm that you have correctly set the #+DATE_CREATED: and #+DATE_UPDATED values in your org file." ))))]
 
     (merge metadata
            {:keywords        keywords
@@ -235,5 +239,5 @@
             :firn-order      firn-order
             :date-updated    (when date-updated (u/strip-org-date date-updated))
             :date-created    (when date-created (u/strip-org-date date-created))
-            :date-updated-ts (when date-updated (u/org-date->ts date-updated))
-            :date-created-ts (when date-created (u/org-date->ts date-created))})))
+            :date-updated-ts (date-parser date-updated)
+            :date-created-ts (date-parser date-created)})))
