@@ -1,6 +1,7 @@
 (ns firn.build-test
   (:require [firn.build :as sut]
             [firn.stubs :as stub]
+            [firn.util :as u]
             [firn.file-test :as file-test]
             [me.raynes.fs :as fs]
             [clojure.test :as t]))
@@ -61,3 +62,19 @@
     (t/is (every? #(contains? processed %)
                   [:path :as-json  :meta     :as-html
                    :name :original :path-web :keywords  :as-edn]))))
+
+;; TODO: This feature needs to be tested properly. I got sort of far but
+;; The repl is hanging
+(comment
+  (t/deftest post-build-cleanup
+    (let [cfg             (stub/sample-config)
+          cfg             (assoc cfg :dir stub/test-dir)
+          cfg             (assoc-in cfg [:user-config :run-build-clean?] "always")]
+
+      (prn cfg)
+      (sut/all-files (assoc-in cfg [:user-config :run-build-clean?] "always"))
+
+      (let [unusued-files #p (u/find-files (cfg :dir-data)  #"(.*)\.(jpg|JPG|gif|GIF|png)")
+            final-files   #p (u/find-files (cfg :dir-site-data)  #"(.*)\.(jpg|JPG|gif|GIF|png)")]
+
+        (t/is (= true true))))))
