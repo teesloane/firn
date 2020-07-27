@@ -219,9 +219,9 @@
                             :short-path (u/drop-path-until f-path "_site")})))
 
     (when (seq @unused)
-      (println "\nThere were" (count @unused) "attachments that appear to be unlinked to from your org-files:")
+      (println "\nThere were" (count @unused) "attachments that appear to be unlinked to from your org-files:\n")
       (doseq [f @unused] (println (f :short-path)))
-      (let [res (u/prompt? "\nDo you want to delete these files (Y) or allow them to be included in your _site output folder?")]
+      (let [res (u/prompt? "\nDo you want to delete these files (Y) or included in your _site output folder?")]
         (if res
           (do
             (println "\nOk, cleaning " dir " directory of unusued attachments...")
@@ -232,8 +232,9 @@
   "Clean up fn for after a site is built."
   [{:keys [site-attachments user-config dir-site-data] :as config}]
   (let [{:keys [run-build-clean? dir-data]} user-config
-        prompt       (str "Would you like to scan for unused attachments from _site/" dir-data "?")
+        prompt       (str "Would you like to scan for unused attachments in _site/" dir-data "?")
         clean-params {:attachments site-attachments :dir dir-site-data}]
+    (prn "post build clean is " run-build-clean?)
     (case run-build-clean?
       "never"  nil
       "always" (remove-unused-attachments clean-params)
