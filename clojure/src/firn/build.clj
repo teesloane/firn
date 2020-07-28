@@ -224,7 +224,7 @@
       (if (= run-build-clean? "always")
         (doseq [f @unused] (fs/delete (f :full-path)))
         (do
-          (println "\n" (count @unused) "unused attachments were found (they are not linked to from your org-files:\n")
+          (println "\n" (count @unused) "unused attachments were found (they are not linked to from your org-files):\n")
           (doseq [f @unused] (println (f :short-path)))
           (let [res (u/prompt? "\nDo you want to delete these files?")]
             (if res
