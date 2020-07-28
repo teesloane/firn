@@ -78,6 +78,7 @@ bin/compile
 - You can run test / build commands inside the =core-test= namespace.
 - to package up a new version of the rust binary for development (a binary we
   can shell out to) run the script =bin/build-dev-parser=
+- NOTE: Some of the functions from the =me.raynes.fs= have been duplicated in the util.clj namespace; largely, the functions that have issues with reflection.
 * Thank-you's
 
 - Thank you to [[https://github.com/borkdude][@borkdude]] for building some awesome libraries ([[https://github.com/borkdude/sci][sci]] is used in

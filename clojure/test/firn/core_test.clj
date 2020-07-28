@@ -6,7 +6,6 @@
 
 (when u/dev?
   (def test-dir      "test/firn/demo_org")
-  (def wiki-dir      "/Users/tees/Dropbox/wiki")
 
   (defn build-test-files
     [dir-to-build]
@@ -14,5 +13,4 @@
     (build/new-site {:dir dir-to-build})
     (build/all-files {:dir dir-to-build}))
 
-  (build-test-files test-dir)
-  (build-test-files wiki-dir))
+  (build-test-files test-dir))
