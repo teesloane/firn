@@ -206,11 +206,12 @@
 (defn remove-unused-attachments
   "Deletes all attachments in the _site/<dir-data> that aren't found in the
   site-wide collected attachment paths."
-  [{:keys [attachments dir]}]
+  [{:keys [attachments dir run-build-clean?]}]
   (let [dir-files             (u/find-files dir #"(.*)\.(jpg|JPG|gif|GIF|png)")
         clean-file-link-regex #"(file:)((.*\.)\.\/?)?"
         attachments           (map #(str/replace-first % clean-file-link-regex "") attachments)
         unused                (atom [])]
+    ;; find unused files.
     (doseq [f    dir-files
             :let [f-path (.getPath ^java.io.File f)
                   match (u/find-first #(str/includes? f-path %) attachments)]]
@@ -218,23 +219,26 @@
         (swap! unused conj {:full-path  f-path
                             :short-path (u/drop-path-until f-path "_site")})))
 
+    ;; when we have some, delete automatically if `always`, otherwise, prompt user.
     (when (seq @unused)
-      (println "\nThere were" (count @unused) "attachments that appear to be unlinked to from your org-files:\n")
-      (doseq [f @unused] (println (f :short-path)))
-      (let [res (u/prompt? "\nDo you want to delete these files (Y) or included in your _site output folder?")]
-        (if res
-          (do
-            (println "\nOk, cleaning " dir " directory of unusued attachments...")
-            (doseq [f @unused] (fs/delete (f :full-path))))
-          (println "Leaving files in place."))))))
+      (if (= run-build-clean? "always")
+        (doseq [f @unused] (fs/delete (f :full-path)))
+        (do
+          (println "\n" (count @unused) "unused attachments were found (they are not linked to from your org-files:\n")
+          (doseq [f @unused] (println (f :short-path)))
+          (let [res (u/prompt? "\nDo you want to delete these files?")]
+            (if res
+              (do
+                (println "\nOk, cleaning " dir " directory of unusued attachments...")
+                (doseq [f @unused] (fs/delete (f :full-path))))
+              (println "Leaving files in place."))))))))
 
 (defn post-build-clean
   "Clean up fn for after a site is built."
   [{:keys [site-attachments user-config dir-site-data] :as config}]
   (let [{:keys [run-build-clean? dir-data]} user-config
         prompt       (str "Would you like to scan for unused attachments in _site/" dir-data "?")
-        clean-params {:attachments site-attachments :dir dir-site-data}]
-    (prn "post build clean is " run-build-clean?)
+        clean-params {:attachments site-attachments :dir dir-site-data :run-build-clean? run-build-clean?}]
     (case run-build-clean?
       "never"  nil
       "always" (remove-unused-attachments clean-params)
@@ -247,12 +251,12 @@
 (defn all-files
   "Processes all files in the org-directory"
   [cfg]
-  (let [config (setup (config/prepare cfg))
-        rss?   (-> config :user-config :enable-rss?)]
+  (let [config     (setup (config/prepare cfg))
+        rss?       (-> config :user-config :enable-rss?)
+        is-server? (cfg :--server?)]
     (cond->> config
-      true process-all
-      rss? write-rss-file!
-      true write-pages!
-      true write-files
-      true post-build-clean
-      )))
+      true             process-all
+      rss?             write-rss-file!
+      true             write-pages!
+      true             write-files
+      (nil? is-server?) post-build-clean)))
