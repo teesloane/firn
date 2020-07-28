@@ -118,6 +118,20 @@
      (some? in-priv-folder?)
      (some? is-private?))))
 
+(defn in-site-map?
+  "Checks if the processed file is in the site-map
+  By default, all files are in the sitemap, so we check that the keywords is nil."
+  [processed-file]
+  (nil? (-> processed-file :meta :keywords :firn-sitemap?)))
+
+(defn make-site-map-item
+  "When processing a file, we generate a site-map item that receives the pertinent
+  metadata, and discards anything not needed."
+  [processed-file]
+  (merge
+   (dissoc (processed-file :meta) :logbook :links :keywords :toc)
+   {:path (str "/" (processed-file :path-web))}))
+
 (defn sum-logbook
   "Iterates over a logbook and parses logbook :duration's and sums 'em up"
   [logbook]
@@ -128,19 +142,19 @@
                               new-res    [(+ acc-hours hour) (+ acc-minutes min)]]
                           new-res))]
     (->> logbook
-         (reduce reduce-fn hours-minutes)
-         (u/timevec->time-str))))
+       (reduce reduce-fn hours-minutes)
+       (u/timevec->time-str))))
 
 (defn- sort-logbook
   "Loops over all logbooks, adds start and end unix timestamps."
-  [logbook file]
-  (let [mf #(org/parsed-org-date->unix-time %1 file)]
+  [logbook file-name]
+  (let [mf #(org/parsed-org-date->unix-time %1 file-name)]
     (->> logbook
        ;; Filter out timestamps if they don't have a start or end.
-         (filter #(and (% :start) (% :end) (% :duration)))
+       (filter #(and (% :start) (% :end) (% :duration)))
        ;; adds a unix timestamp for the :start and :end time so that's sortable.
-         (map #(assoc % :start-ts (mf (:start %)) :end-ts (mf (:end %))))
-         (sort-by :start-ts #(> %1 %2)))))
+       (map #(assoc % :start-ts (mf (:start %)) :end-ts (mf (:end %))))
+       (sort-by :start-ts #(> %1 %2)))))
 
 (defn extract-metadata-helper
   "There are lots of things we want to extract when iterating over the AST.
@@ -152,18 +166,16 @@
   - eventually... a plugin for custom file collection?"
   [tree-data file-metadata]
   (loop [tree-data     tree-data
-         out-logs      []
-         out-links     []
-         out-tags      []
-         out-toc       []
+         out           {:logbook [] :logbook-total nil :links [] :tags [] :toc [] :attachments []}
          last-headline nil]  ; the most recent headline we've encountered.
     (if (empty? tree-data)
-      ;; All done! return the collected stuff.
-      {:logbook out-logs
-       :toc     out-toc
-       :tags    out-tags
-       :links   out-links}
-      ;; Do the work.
+
+      ;; << The final formatting pre-return >>
+      (let [out (update out :logbook #(sort-logbook % (file-metadata :from-file)))
+            out (assoc out :logbook-total (sum-logbook (out :logbook)))]
+        out)
+
+      ;; << The Loop >>
       (let [x  (first tree-data)
             xs (rest tree-data)]
         (case (:type x)
@@ -171,10 +183,10 @@
           (let [toc-item {:level  (x :level)
                           :text   (org/get-headline-helper x)
                           :anchor (org/make-headline-anchor x)}
-                new-toc  (conj out-toc toc-item)]
-            (recur xs out-logs out-links out-tags new-toc x))
+                out      (update out :toc conj toc-item)]
+            (recur xs out x))
 
-          "title" ; if title, collect tags, map with metadata, push into out-tags
+          "title" ; if title, collect tags, map with metadata, push into out :tags
           (let [headline-link  (str "/"
                                     (file-metadata :from-file-path)
                                     (org/make-headline-anchor last-headline))
@@ -182,22 +194,27 @@
                                 :headline-link headline-link}
                 tags           (x :tags)
                 tags-with-meta (map #(merge headline-meta file-metadata {:tag-value %}) tags)
-                new-tags       (vec (concat out-tags tags-with-meta))]
-            (recur xs out-logs out-links new-tags out-toc last-headline))
+                add-tags       #(vec (concat % tags-with-meta))
+                out            (update out :tags add-tags)]
+            (recur xs out last-headline))
 
-          "clock" ; if clock, merge headline-data into it, and push/recurse new-logs.
+          "clock" ; if clock, merge headline-data into it, and push/recurse into out
           (let [headline-meta {:from-headline (-> last-headline :children first :raw)}
                 new-log-item  (merge headline-meta file-metadata x)
-                new-logs      (conj out-logs new-log-item)]
-            (recur xs new-logs out-links out-tags out-toc last-headline))
+                out           (update out :logbook conj new-log-item)]
+            (recur xs out last-headline))
 
           "link" ; if link, also merge file metadata and push into new-links and recurse.
           (let [link-item (merge x file-metadata)
-                new-links (conj out-links link-item)]
-            (recur xs out-logs new-links out-tags out-toc last-headline))
+                out       (update out :links conj link-item)
+                ;; if link starts with `file:` an ends with .png|.jpg|etc
+                out       (if (u/is-attachment? (link-item :path))
+                            (update out :attachments conj (link-item :path))
+                            out)]
+            (recur xs out last-headline))
 
           ;; default case, recur.
-          (recur xs out-logs out-links out-tags out-toc last-headline))))))
+          (recur xs out last-headline))))))
 
 (defn extract-metadata
   "Iterates over a tree, and returns metadata for site-wide usage such as
@@ -210,18 +227,17 @@
         {:keys [date-updated date-created title firn-under firn-order ]} keywords
         file-metadata  {:from-file title :from-file-path (file :path-web)}
         metadata       (extract-metadata-helper tree-data file-metadata)
-        logbook-sorted (sort-logbook (metadata :logbook) file)] ;; TODO - I think sorting this in extract-metadata helper makes more sense. Better internal API.
+        date-parser    #(try
+                          (when % (u/org-date->ts date-created))
+                          (catch Exception e
+                            (u/print-err! :error  (str "Could not parse date for file: " (or title "<unknown file>") "\nPlease confirm that you have correctly set the #+DATE_CREATED: and #+DATE_UPDATED values in your org file." ))))]
 
-    {:links           (metadata :links)
-     :logbook         logbook-sorted
-     :tags            (metadata :tags)
-     :logbook-total   (sum-logbook logbook-sorted)
-     :keywords        keywords
-     :title           title
-     :firn-under      firn-under
-     :firn-order      firn-order
-     :toc             (metadata :toc)
-     :date-updated    (when date-updated (u/strip-org-date date-updated))
-     :date-created    (when date-created (u/strip-org-date date-created))
-     :date-updated-ts (when date-updated (u/org-date->ts date-updated))
-     :date-created-ts (when date-created (u/org-date->ts date-created))}))
+    (merge metadata
+           {:keywords        keywords
+            :title           title
+            :firn-under      firn-under
+            :firn-order      firn-order
+            :date-updated    (when date-updated (u/strip-org-date date-updated))
+            :date-created    (when date-created (u/strip-org-date date-created))
+            :date-updated-ts (date-parser date-updated)
+            :date-created-ts (date-parser date-created)})))

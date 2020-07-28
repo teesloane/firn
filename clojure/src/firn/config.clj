@@ -18,23 +18,31 @@
   (let [mdp             #(str dir-files "/_firn" %)
         parent-dir-name (-> dir-files (s/split #"/") last)
         dir-site-data   (mdp (str "/_site/" (ext-config :dir-data)))] ; make-dir-path
-    {:dir-data        (str dir-files "/" (ext-config :dir-data))
-     :dir-files       dir-files                 ; where org content lives.
-     :dir-firn        (make-dir-firn dir-files) ; the _firn root folder.
-     :dir-layouts     (mdp "/layouts/")         ; where layouts are stored.
-     :dir-partials    (mdp "/partials/")        ; where partials are stored.
-     :dir-pages       (mdp "/pages/")           ; where pages are stored (tags.clj, user pages, etc)
-     :dir-site        (mdp "/_site/")           ; the root dir of the compiled firn site.
-     :dir-site-data   dir-site-data             ; _site data folder output.
-     :dir-site-static (mdp "/_site/static/")    ; _site static output for dir-static.
-     :dir-static      (mdp "/static/")          ; static folder for css/js
-     :dirname-files   parent-dir-name           ; the name of directory where firn is run.
-     :layouts         {}                        ; layouts loaded into memory - ie, org -> clj -> html
-     :pages           {}                        ; layouts sans org-mode files - ie, clj -> html
-     :org-files       []                        ; a list of org files, fetched when running setup.
-     :user-config     {}                        ; user's config.edn values.
-     :partials        {}}))                     ; partials loaded into memory
+    {;; Paths to common directories
+     :dir-data         (str dir-files "/" (ext-config :dir-data))
+     :dir-files        dir-files                 ; where org content lives.
+     :dir-firn         (make-dir-firn dir-files) ; the _firn root folder.
+     :dir-layouts      (mdp "/layouts/")         ; where layouts are stored.
+     :dir-partials     (mdp "/partials/")        ; where partials are stored.
+     :dir-pages        (mdp "/pages/")           ; where pages are stored (tags.clj, user pages, etc)
+     :dir-site         (mdp "/_site/")           ; the root dir of the compiled firn site.
+     :dir-site-data    dir-site-data             ; _site data folder output.
+     :dir-site-static  (mdp "/_site/static/")    ; _site static output for dir-static.
+     :dir-static       (mdp "/static/")          ; static folder for css/js
+     :dirname-files    parent-dir-name           ; the name of directory where firn is run.
+     :layouts          {}                        ; layouts loaded into memory - ie, org -> clj -> html
+     :pages            {}                        ; layouts sans org-mode files - ie, clj -> html
+     :org-files        []                        ; a list of org files, fetched when running setup.
+     :user-config      {}                        ; user's config.edn values.
+     :partials         {}                        ; partials loaded into memory
 
+     ;; values collected during build/process-all:
+     :processed-files  []
+     :site-map         []                        ; list of all pages converted for the site.
+     :site-tags        {}                        ; collected tags from all processed files
+     :site-logs        []                        ; collected logs from all processed files
+     :site-links       []                        ; collected links from all processed files
+     :site-attachments []}))                     ; collected (paths to) attachments of all processed files.
 
 ;; Values that a user can contribute/change via their config.edn
 (defn make-external-config

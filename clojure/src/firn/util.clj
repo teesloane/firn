@@ -58,7 +58,8 @@
   (let [ext-regex (re-pattern (str "^.*\\.(" ext ")$"))
         files     (find-files dir ext-regex)]
     (if (= 0 (count files))
-      (do (print-err! :warning "No" ext "files found at " dir) files)
+      ;; NOTE: taking out this notifications - not sure it's necessary.
+      (do #_(print-err! :warning "No" ext "files found at " dir) files)
       files)))
 
 (defn file-name-no-ext
@@ -153,7 +154,27 @@
         (s/join "/" list-b)
         (recur (rest list-a) (rest list-b))))))
 
+(defn drop-path-until
+  [path until]
+  (let [split-path (s/split path #"/")
+        res        (drop-while #(not= % until) split-path)]
+   (s/join "/" res)))
+
+(defn is-attachment?
+  "Checks is a path is an attachment; a local file that is not an org file."
+  [path]
+  (let [local-file-rgx #"(file:)(.*)\.(jpg|JPG|gif|GIF|png)"]
+    (re-matches local-file-rgx path)))
+
 ;; General fns ----
+
+(defn prompt?
+  [p]
+  (print p)
+  (print " [Y/n]: ")
+  (flush)
+  (let [x (read-line)]
+    (if (= x "Y") true false)))
 
 (defn find-index-of
   "Finds the index of an item that matches a predicate."

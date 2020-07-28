@@ -1,6 +1,7 @@
 (ns firn.build-test
   (:require [firn.build :as sut]
             [firn.stubs :as stub]
+            [firn.util :as u]
             [firn.file-test :as file-test]
             [me.raynes.fs :as fs]
             [clojure.test :as t]))
@@ -61,3 +62,4 @@
     (t/is (every? #(contains? processed %)
                   [:path :as-json  :meta     :as-html
                    :name :original :path-web :keywords  :as-edn]))))
+

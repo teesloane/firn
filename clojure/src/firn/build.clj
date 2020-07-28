@@ -10,7 +10,8 @@
             [cheshire.core :as json]
             [firn.util :as u]
             [me.raynes.fs :as fs]
-            [hiccup.core :as h]))
+            [hiccup.core :as h]
+            [clojure.string :as str]))
 
 (set! *warn-on-reflection* true)
 
@@ -93,65 +94,56 @@
 (defn process-site-map-with-pages!
   "If a user has 'pages/*.clj' files - and their config enables it,
   Add these to the site map."
-  [site-map! config]
-  (when (-> config :user-config :site-map-pages?)
-    (doseq [[k _] (config :pages)]
-      (swap! site-map! conj {:path       (u/keyword->web-path k)
-                             :title      (u/keyword->normal-text k)
-                             :firn-order 9999
-                             :firn-under "Page"})))
-  @site-map!)
+  [site-map config]
+  (if (-> config :user-config :site-map-pages?)
+    (into site-map (for [[k _] (config :pages)]
+                     {:path       (u/keyword->web-path k)
+                      :title      (u/keyword->normal-text k)
+                      :firn-order 9999
+                      :firn-under "Page"}))
+    site-map))
 
+;; @site-map!)
 
 (defn process-all ; (ie, just org-files, not pages)
   "Receives config, processes all ORG files and builds up site-data logbooks, site-map, link-map, etc.
   This is where the magic happens for collecting metadata. Follow the chain:
   process-all -> process-one -> file/extract-metadata -> file/extract-metadata-helper"
   [config]
-  (let [site-links (atom [])
-        site-logs  (atom [])
-        site-tags  (atom [])
-        site-map   (atom [])]
-    ;; recurse over the org-files, gradually processing them and
-    ;; pulling out links, logs, and other useful data.
-    (loop [org-files (config :org-files)
-           output    {}]
-      (if (empty? org-files)
-        ;; run one more loop on all files, and create their html,
-        ;; now that we have processed everything.
-        (let [config-with-data     (assoc config
-                                          :processed-files output
-                                          :site-map        (process-site-map-with-pages! site-map config)
-                                          :site-links      @site-links
-                                          :site-tags       (into (sorted-map) (group-by :tag-value @site-tags))
-                                          :site-logs       @site-logs)
-              ;; FIXME: I think we are rendering html twice here, should prob only happen here?
-              with-html        (into {} (for [[k pf] output] [k (htmlify config-with-data pf)]))
-              final            (assoc config-with-data :processed-files with-html)]
-          final)
+  (loop [org-files (config :org-files)
+         site-vals {:processed-files {} :site-map [] :site-tags [] :site-links [] :site-attachments []}
+         output    {}]
+    (if (empty? org-files)
+      ;; run one more loop on all files, and create their html,
+      ;; now that we have processed everything.
+      (let [config-with-data (merge config
+                                    site-vals ;; contains logbook already
+                                    {:processed-files output
+                                     :site-map        (process-site-map-with-pages! (site-vals :site-map) config)
+                                     :site-tags       (into (sorted-map) (group-by :tag-value (site-vals :site-tags)))})
 
-        ;; Otherwise continue...
-        (let [next-file         (first org-files)
-              processed-file    (process-one config next-file)
-              is-private        (file/is-private? config processed-file)
-              org-files         (rest org-files)
-              output            (if is-private
-                                  output
-                                  (assoc output (processed-file :path-web) processed-file))
-              new-site-map-item (merge
-                                 ;; remove metadata that would just pollute site-map links.
-                                 (dissoc (processed-file :meta) :logbook :links :keywords :toc)
-                                 {:path (str "/" (processed-file :path-web))})]
+            ;; FIXME: I think we are rendering html twice here, should prob only happen here?
+            with-html (into {} (for [[k pf] output] [k (htmlify config-with-data pf)]))
+            final     (assoc config-with-data :processed-files with-html)]
+        final)
 
-          ;; add to sitemap when file is not private.
-          (when-not is-private
-            (when-not (= (-> processed-file :meta :keywords :firn-sitemap? ) false)
-              (swap! site-map conj new-site-map-item)) ;; add to site map unless user has specified not to.
-            (swap! site-links concat (-> processed-file :meta :links))
-            (swap! site-logs concat  (-> processed-file :meta :logbook))
-            (swap! site-tags concat  (-> processed-file :meta :tags)))
-          ;; add links and logs to site wide data.
-          (recur org-files output))))))
+      ;; Otherwise continue...
+      (let [next-file                    (first org-files)
+            processed-file               (process-one config next-file)
+            is-private                   (file/is-private? config processed-file)
+            in-sitemap?                  (file/in-site-map? processed-file)
+            org-files                    (rest org-files)
+            {:keys [links logbook tags attachments]} (-> processed-file :meta)]
+        (if is-private
+          (recur org-files site-vals output)
+          (let [updated-output    (assoc output (processed-file :path-web) processed-file)
+                updated-site-vals (cond-> site-vals
+                                    true        (update :site-links concat links)
+                                    true        (update :site-logs concat logbook)
+                                    true        (update :site-attachments concat attachments)
+                                    true        (update :site-tags concat tags)
+                                    in-sitemap? (update :site-map conj (file/make-site-map-item processed-file)))]
+            (recur org-files updated-site-vals updated-output)))))))
 
 (defn write-rss-file!
   "Build an rss file. It sorts files by file:meta:date-created, writes to feed.xml"
@@ -176,7 +168,6 @@
        (spit feed-file)))
   config)
 
-
 (defn write-pages!
   "Responsible for publishing html pages from clojure templates found in pages/
   Currently, we can only render a flat file list of .clj files in /pages.
@@ -200,7 +191,6 @@
       (spit out-file out-str)))
   config)
 
-
 (defn write-files
   "Takes a config, of which we can presume has :processed-files.
   Iterates on these files, and writes them to html using layouts. Must return
@@ -213,14 +203,60 @@
         (spit out-file-name (f :as-html)))))
   config)
 
+(defn remove-unused-attachments
+  "Deletes all attachments in the _site/<dir-data> that aren't found in the
+  site-wide collected attachment paths."
+  [{:keys [attachments dir run-build-clean?]}]
+  (let [dir-files             (u/find-files dir #"(.*)\.(jpg|JPG|gif|GIF|png)")
+        clean-file-link-regex #"(file:)((.*\.)\.\/?)?"
+        attachments           (map #(str/replace-first % clean-file-link-regex "") attachments)
+        unused                (atom [])]
+    ;; find unused files.
+    (doseq [f    dir-files
+            :let [f-path (.getPath ^java.io.File f)
+                  match (u/find-first #(str/includes? f-path %) attachments)]]
+      (when (nil? match)
+        (swap! unused conj {:full-path  f-path
+                            :short-path (u/drop-path-until f-path "_site")})))
+
+    ;; when we have some, delete automatically if `always`, otherwise, prompt user.
+    (when (seq @unused)
+      (if (= run-build-clean? "always")
+        (doseq [f @unused] (fs/delete (f :full-path)))
+        (do
+          (println "\n" (count @unused) "unused attachments were found (they are not linked to from your org-files):\n")
+          (doseq [f @unused] (println (f :short-path)))
+          (let [res (u/prompt? "\nDo you want to delete these files?")]
+            (if res
+              (do
+                (println "\nOk, cleaning " dir " directory of unusued attachments...")
+                (doseq [f @unused] (fs/delete (f :full-path))))
+              (println "Leaving files in place."))))))))
+
+(defn post-build-clean
+  "Clean up fn for after a site is built."
+  [{:keys [site-attachments user-config dir-site-data] :as config}]
+  (let [{:keys [run-build-clean? dir-data]} user-config
+        prompt       (str "Would you like to scan for unused attachments in _site/" dir-data "?")
+        clean-params {:attachments site-attachments :dir dir-site-data :run-build-clean? run-build-clean?}]
+    (case run-build-clean?
+      "never"  nil
+      "always" (remove-unused-attachments clean-params)
+      "prompt" (when (= run-build-clean? "prompt")
+                 (when (u/prompt? prompt)
+                   (remove-unused-attachments clean-params)))
+      nil)
+    config))
+
 (defn all-files
   "Processes all files in the org-directory"
   [cfg]
-  (let [config (setup (config/prepare cfg))
-        rss?   (-> config :user-config :enable-rss?)]
+  (let [config     (setup (config/prepare cfg))
+        rss?       (-> config :user-config :enable-rss?)
+        is-server? (cfg :--server?)]
     (cond->> config
-      true process-all
-      rss? write-rss-file!
-      true write-pages!
-      true write-files)))
-
+      true             process-all
+      rss?             write-rss-file!
+      true             write-pages!
+      true             write-files
+      (nil? is-server?) post-build-clean)))
