@@ -1,9 +1,10 @@
-{:dir-data         "data"   ; org-attachments/files to get copied into _site.
- :enable-rss?      true     ; If true, creates a feed.xml in _site.
- :firn-properties? false    ; global: whether to render properties under all headings
-  :firn-toc        nil      ; global: settings for any rendered table of contents
- :ignored-dirs     ["priv"] ; Directories to ignore org files in.
- :site-desc        ""       ; Used for RSS.
- :site-title       ""       ; Used for RSS.
+{:dir-data         "data"                                              ; org-attachments/files to get copied into _site.
+ :enable-rss?      true                                                ; If true, creates a feed.xml in _site.
+ :firn-properties? false                                               ; global: whether to render properties under all headings
+ :firn-toc         nil                                                 ; global: settings for any rendered table of contents
+ :firn-fold        nil                                                 ; global: fold headlines. Example: fold all headings of level 3 and 4: `{3 true 4 true}`
+ :ignored-dirs     ["priv"]                                            ; Directories to ignore org files in.
+ :site-desc        "Documentation for the Firn Static Sight Generator" ; Used for RSS.
+ :site-title       "Firn - The Ice Shelf"                              ; Used for RSS.
  :site-url         "https://firn.theiceshelf.com"
- :site-map-pages?   true}
+ :site-map-pages? true}
