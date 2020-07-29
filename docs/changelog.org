@@ -4,10 +4,15 @@
 
 * V.0.0.8
 
-Currently In Development.
+** Feature: Clean up unused attachments.
+- Adds a configuration option to config.edn: ~run-build-clean?~ - which will
+  remove unused file attachments from ~_firn/_site~ after finishing building.
+  - if "always" -> always remove unusued attachments from final _site output.
+  - if "prompt" -> CLI will prompt user to delete files.
+  - if "never" -> CLI will never delete unusued attachments.
 
-** TODO Clean up unused attachments.
-** TODO Exclude files from site-map.
+** Feature: Exclude files from site-map.
+- User's can exclude org files from showing in the site-map by using the ~#+FIRN_SITEMAP?~ in-buffer-setting.
 ** Refactor: site-link ([[https://github.com/theiceshelf/firn/pull/33][33]])
 - Enables Firn sites to be hosted at non-root addresses.
 - Before, all internal href links were relative. Now they are absolute and based off the ~:site-url~ value in a user's ~config.edn~

@@ -53,30 +53,33 @@ The firn table of contents is rendered in a layout. If you use the default layou
 * Reference                                                      :reference:
 ** config.edn
 
-| Key               | Type    | Purpose                                                |
-|-------------------+---------+--------------------------------------------------------|
-| =:dir-data=         | string  | org-attachments/files to get copied into _site.        |
-| =:enable-rss?=      | boolean | If true, creates a feed.xml in _site.                  |
-| =:firn-properties?= | boolean | Files: whether to render properties under all headings |
-| =:firn-toc=         | map     | Files: settings for any rendered table of contents.    |
-| =:ignored-dirs=     | vector  | Dirs of org files to ignore at build time.             |
-| =:site-desc=        | string  | The description of your site, used for RSS.            |
-| =:site-title=       | string  | The title of your site, used for RSS.                  |
-| =:site-url=         | string  | The root url of your site.                             |
-| =:site-map-pages?=  | boolean | Whether to include custom pages in your site-map       |
+| Key               | Type    | Purpose                                                                                 |
+|-------------------+---------+-----------------------------------------------------------------------------------------|
+| =:dir-data=         | string  | org-attachments/files to get copied into _site.                                         |
+| =:enable-rss?=      | boolean | If true, creates a feed.xml in _site.                                                   |
+| =:firn-properties?= | boolean | Files: whether to render properties under all headings                                  |
+| =:firn-toc=         | map     | Files: settings for any rendered table of contents.                                     |
+| =:firn-fold=        | map     | Renders folded headlines. Ex: ~{2 true}~ - all level 2 headlines will be folded.          |
+| =:ignored-dirs=     | vector  | Dirs of org files to ignore at build time.                                              |
+| =:site-desc=        | string  | The description of your site, used for RSS.                                             |
+| =:site-title=       | string  | The title of your site, used for RSS.                                                   |
+| =:site-url=         | string  | The root url of your site.                                                              |
+| =:site-map-pages?=  | boolean | Whether to include custom pages in your site-map                                        |
+| =:run-build-clean?= | string  | Whether to clean out unused attachments on build. Values: "never" / "always" / "prompt" |
 
 ** Per-file configuration
 
 The following in-buffer settings are processed by Firn and/or made available to layouts for processing.
 
-| Key                | Type          | Purpose                                         |
-|--------------------+---------------+-------------------------------------------------|
-| ~#+TITLE:~           | string        | Used in site-map, links, etc                    |
-| ~#+DATE_CREATED~     | org-mode-date | File date created                               |
-| ~#+DATE_UPDATED~     | org-mode-date | File last updated                               |
-| ~#+FIRN_PROPERTIES?~ | boolean       | Whether to render properties under all headings |
-| ~#+FIRN_TOC~         | map           | Settings for any rendered table of contents     |
-| ~#+FIRN_ORDER~       | integer       | Enables sorting files in the site-map           |
-| ~#+FIRN_PRIVATE~     | boolean       | Whether or not to read the file in question     |
-| #+FIRN_SITEMAP?    | boolean       | Whether to include the file in the site-map.    |
-| ~#+FIRN_UNDER~       | string        | Category for which the documents falls under    |
+| Key                | Type          | Purpose                                                 |
+|--------------------+---------------+---------------------------------------------------------|
+| ~#+TITLE:~           | string        | Used in site-map, links, etc                            |
+| ~#+DATE_CREATED~     | org-mode-date | File date created                                       |
+| ~#+DATE_UPDATED~     | org-mode-date | File last updated                                       |
+| ~#+FIRN_PROPERTIES?~ | boolean       | Whether to render properties under all headings         |
+| ~#+FIRN_TOC~         | map           | Settings for any rendered table of contents             |
+| ~#+FIRN_FOLD~        | map           | Fold headings of a specified level: ex: {3 true 4 true} |
+| ~#+FIRN_ORDER~       | integer       | Enables sorting files in the site-map                   |
+| ~#+FIRN_PRIVATE~     | boolean       | Whether or not to read the file in question             |
+| ~#+FIRN_SITEMAP?~    | boolean       | Whether to include the file in the site-map.            |
+| ~#+FIRN_UNDER~       | string        | Category for which the documents falls under            |
