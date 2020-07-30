@@ -7,5 +7,5 @@
  :run-build-clean? nil
  :site-desc        "Documentation for the Firn Static Sight Generator" ; Used for RSS.
  :site-title       "Firn - The Ice Shelf"                              ; Used for RSS.
- :site-url         "https://firn.theiceshelf.com"
+ :site-url         "https://theiceshelf.github.io/firn"
  :site-map-pages? true}
