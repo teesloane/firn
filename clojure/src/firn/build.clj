@@ -142,7 +142,7 @@
                                     true        (update :site-logs concat logbook)
                                     true        (update :site-attachments concat attachments)
                                     true        (update :site-tags concat tags)
-                                    in-sitemap? (update :site-map conj (file/make-site-map-item processed-file)))]
+                                    in-sitemap? (update :site-map conj (file/make-site-map-item processed-file (-> config :user-config :site-url))))]
             (recur org-files updated-site-vals updated-output)))))))
 
 (defn write-rss-file!
