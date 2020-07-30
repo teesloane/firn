@@ -1,9 +1,10 @@
 (defn default
-  [{:keys [render partials site-url]}]
+  [{:keys [render partials build-url site-url]}]
   (let [{:keys [head]} partials]
-    (head site-url
+    [:html
+     (head build-url)
      [:body
       [:main
        [:article.content
         ;; [:div (render :toc)] ;; Optional; add a table of contents
-        [:div (render :file)]]]])))
+        [:div (render :file)]]]]]))
