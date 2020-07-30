@@ -3,7 +3,7 @@
   (let [{:keys [head nav footer]} partials]
     (head site-url
      [:body
-      (nav)
+      (nav site-url)
       [:main
        [:article.def-wrapper
         [:div.def-content

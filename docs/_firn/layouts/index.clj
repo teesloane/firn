@@ -15,7 +15,7 @@
   (let [{:keys [head nav footer]} partials]
     (head site-url
      [:body
-      (nav)
+      (nav site-url)
       (header)
       [:main.content
        [:div.py3
