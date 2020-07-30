@@ -1,15 +1,16 @@
 (defn render-site-map
   [sm]
   (->> sm
-    (sort-by :firn-order)
-    (map #(vector :div.pb1 [:a {:href (% :path)} (% :title)]))))
+     (sort-by :firn-order)
+     (map #(vector :div.pb1 [:a {:href (% :path)} (% :title)]))))
 
 (defn tags
-  [{:keys [site-map site-tags site-url partials]}]
+  [{:keys [site-map build-url site-tags partials]}]
   (let [{:keys [head nav footer]} partials]
-    (head site-url
+    [:html
+     (head build-url)
      [:body
-      (nav site-url)
+      (nav build-url)
       [:main
        [:article.def-wrapper
         [:aside#sidebar.def-sidebar
@@ -20,9 +21,9 @@
            [:div
             [:h2 {:id tag-name :class "firn-tag-heading"} tag-name]
             (for [tag tags
-                  :let [link (str site-url (tag :headline-link))]]
+                  :let [link (build-url (tag :headline-link))]]
               [:div
                [:a
                 {:href link}
                 (tag :from-file) " - " (tag :from-headline)]])])
-         (footer)]]]])))
+         (footer)]]]]]))

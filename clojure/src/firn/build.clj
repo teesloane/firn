@@ -97,7 +97,7 @@
   [site-map config]
   (if (-> config :user-config :site-map-pages?)
     (into site-map (for [[k _] (config :pages)]
-                     {:path       (u/keyword->web-path k)
+                     {:path       (str (-> config :user-config :site-url) (u/keyword->web-path k))
                       :title      (u/keyword->normal-text k)
                       :firn-order 9999
                       :firn-under "Page"}))
@@ -182,6 +182,7 @@
                   :site-logs  site-logs
                   :site-tags  site-tags
                   :site-url   site-url
+                  :build-url  (layout/build-url site-url)
                   :config     config}]
 
     (doseq [[k f] pages

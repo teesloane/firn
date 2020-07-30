@@ -1,9 +1,10 @@
 (defn default
-  [{:keys [title render partials site-url]}]
+  [{:keys [title render build-url partials site-url]}]
   (let [{:keys [head nav footer]} partials]
-    (head site-url
+    [:html
+     (head build-url)
      [:body
-      (nav site-url)
+      (nav build-url)
       [:main
        [:article.def-wrapper
         [:div.def-content
@@ -43,4 +44,4 @@
           [:pre [:code "(render :logbook-polyline {:height 70 :stroke \"salmon\"})"]]
           (render :logbook-polyline {:height 70 :stroke "salmon"})
           [:hr]]]]]
-      (footer)])))
+      (footer)]]))
