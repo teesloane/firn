@@ -95,34 +95,44 @@
             "<br></div> "
             "</div>")))))
 
+(defn build-url
+  "returns a helper function for use in layouts for easier building of urls from
+  site-url"
+  [site-url]
+  (fn [& args] (apply str site-url args)))
+
+
 (defn prepare
   "Prepare functions and data to be available in layout functions.
   This is a 'public api' that a user would 'invoke' for common rendering tasks
   made available in user layouts.
   NOTE | PERF:  This might be being called twice."
   [config file]
-  {;; Layout stuff --
-   :render        (partial render {:file file :config config})
-   :partials      (config :partials)
-   ;; Site-side stuff --
-   :site-map      (config :site-map)
-   :site-links    (config :site-links)
-   :site-logs     (config :site-logs)
-   :site-url      (-> config :user-config :site-url)
-   :config        config
-   ;; File wide meta --
-   :file          file
-   :meta          (file :meta)
-   :logbook       (-> file :meta :logbook)
-   :file-links    (-> file :meta :links)
-   :title         (-> file :meta :title)
-   :firn-under    (-> file :meta :firn-under)
-   :logbook-total (-> file :meta :logbook-total)
-   :date-updated  (-> file :meta :date-updated)
-   :date-created  (-> file :meta :date-created)})
+  (let [site-url (-> config :user-config :site-url)]
+    {;; Layout stuff --
+     :render        (partial render {:file file :config config})
+     :partials      (config :partials)
+     ;; Site-side stuff --
+     :site-map      (config :site-map)
+     :site-links    (config :site-links)
+     :site-logs     (config :site-logs)
+     :site-url      site-url
+     :build-url     (build-url site-url)
+     :config        config
+     ;; File wide meta --
+     :file          file
+     :meta          (file :meta)
+     :logbook       (-> file :meta :logbook)
+     :file-links    (-> file :meta :links)
+     :title         (-> file :meta :title)
+     :firn-under    (-> file :meta :firn-under)
+     :logbook-total (-> file :meta :logbook-total)
+     :date-updated  (-> file :meta :date-updated)
+     :date-created  (-> file :meta :date-created)}))
 
 (defn apply-layout
   "If a file has a template, render the file with it, or use the default layout"
   [config file layout]
   (let [selected-layout (get-layout config file layout)]
     (h/html (selected-layout (prepare config file)))))
+

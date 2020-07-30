@@ -127,10 +127,10 @@
 (defn make-site-map-item
   "When processing a file, we generate a site-map item that receives the pertinent
   metadata, and discards anything not needed."
-  [processed-file]
+  [processed-file site-url]
   (merge
    (dissoc (processed-file :meta) :logbook :links :keywords :toc)
-   {:path (str "/" (processed-file :path-web))}))
+   {:path (str site-url "/" (processed-file :path-web))}))
 
 (defn sum-logbook
   "Iterates over a logbook and parses logbook :duration's and sums 'em up"

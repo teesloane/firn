@@ -1,7 +1,8 @@
 (defn tags
-  [{:keys [site-tags site-url partials]}]
+  [{:keys [site-tags build-url site-url partials]}]
   (let [{:keys [head]} partials]
-    (head site-url
+    [:html
+     (head build-url)
      [:body
       [:main
        [:article
@@ -14,4 +15,4 @@
               [:div
                [:a {:href (str site-url (tag :headline-link))}
                 (tag :from-file) " - "
-                (tag :from-headline)]])])]]]])))
+                (tag :from-headline)]])])]]]]]))

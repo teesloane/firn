@@ -11,13 +11,14 @@
     [:a.mx2 {:href "/getting-started"} "Read documentation"]]])
 
 (defn index
-  [{:keys [render partials site-url] :as data}]
+  [{:keys [render build-url partials site-url] :as data}]
   (let [{:keys [head nav footer]} partials]
-    (head site-url
+    [:html
+     (head build-url)
      [:body
-      (nav)
+      (nav build-url)
       (header)
       [:main.content
        [:div.py3
         (render "Details" :content)]]
-      (footer)])))
+      (footer)]]))
