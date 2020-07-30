@@ -32,7 +32,7 @@
   --width-card: 285px;
   --width-card-medium: 460px;
   --width-card-wide: 800px;
-  --width-content: 960px;
+  --width-content: 860px;
   /* Currently, Firn only supports 'todo | done' keywords. */
   --keyword-active: #2ecc71; /* For "active" Todo keywords. */
   --keyword-done: #bdc3c7; /* For "done type keywords" */
@@ -81,6 +81,7 @@ main {
 
 .content {
   max-width: var(--width-content);
+  margin: 0 auto;
 }
 
 hr {
