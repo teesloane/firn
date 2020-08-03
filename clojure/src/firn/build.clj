@@ -119,7 +119,7 @@
       (let [config-with-data (merge config
                                     site-vals ;; contains logbook already
                                     {:processed-files output
-                                     :site-map        (process-site-map-with-pages! (site-vals :site-map) config)
+                                     :site-map        #p (process-site-map-with-pages! (site-vals :site-map) config)
                                      :site-tags       (into (sorted-map) (group-by :tag-value (site-vals :site-tags)))})
 
             ;; FIXME: I think we are rendering html twice here, should prob only happen here?
@@ -159,13 +159,13 @@
                                 :description (str (f :as-html))))]
     (io/make-parents feed-file)
     (->> processed-files
-       (filter (fn [[_ f]] (-> f :meta :date-created)))
-       (map make-rss)
-       (sort-by :pubDate)
-       (reverse)
-       (u/prepend-vec first-entry) ; first entry must be about the site
-       (apply rss/channel-xml)
-       (spit feed-file)))
+         (filter (fn [[_ f]] (-> f :meta :date-created)))
+         (map make-rss)
+         (sort-by :pubDate)
+         (reverse)
+         (u/prepend-vec first-entry) ; first entry must be about the site
+         (apply rss/channel-xml)
+         (spit feed-file)))
   config)
 
 (defn write-pages!
@@ -261,3 +261,151 @@
       true             write-pages!
       true             write-files
       (nil? is-server?) post-build-clean)))
+
+
+;; What a site-map might look like:
+
+(def x
+  [{:attachments     []
+    :date-created    "2020-03-24 Tue"
+    :date-created-ts 1585022400
+    :date-updated    "2020-07-08 17:14"
+    :date-updated-ts 1585022400
+    :firn-order      1000
+    :firn-under      nil
+    :logbook-total   "0:00"
+    :path            "http://localhost:4000/index"
+    :title           "Home"}
+   {:attachments     []
+    :date-created    nil
+    :date-created-ts nil
+    :date-updated    nil
+    :date-updated-ts nil
+    :firn-order      1
+    :firn-under      nil
+    :logbook-total   "0:00"
+    :path            "http://localhost:4000/configuration"
+    :title           "Configuration"}
+   {:attachments     []
+    :date-created    nil
+    :date-created-ts nil
+    :date-updated    nil
+    :date-updated-ts nil
+    :firn-order      7
+    :firn-under      nil
+    :logbook-total   "121:01"
+    :path            "http://localhost:4000/sample-page"
+    :title           "Sample Page"}
+   {:attachments     []
+    :date-created    "2020-03-25 Wed"
+    :date-created-ts 1585108800
+    :date-updated    "2020-07-05 17:24"
+    :date-updated-ts 1585108800
+    :firn-order      5
+    :firn-under      nil
+    :logbook-total   nil
+    :path            "http://localhost:4000/data-and-metadata"
+    :title           "Data and Metadata"}
+   {:attachments     []
+    :date-created    "2020-03-27 Fri"
+    :date-created-ts 1585281600
+    :date-updated    "2020-07-03 18:22"
+    :date-updated-ts 1585281600
+    :firn-order      4
+    :firn-under      nil
+    :logbook-total   "0:00"
+    :path            "http://localhost:4000/setup"
+    :title           "Firn Setup (with Emacs)"}
+   {:attachments     []
+    :date-created    "2020-03-24 Tue"
+    :date-created-ts 1585022400
+    :date-updated    "2020-07-16 13:00"
+    :date-updated-ts 1585022400
+    :firn-order      2
+    :firn-under      nil
+    :path            "http://localhost:4000/layout"
+    :title           "Layout"}
+   {:attachments     []
+    :date-created    "2020-03-24 Tue"
+    :date-created-ts 1585022400
+    :date-updated    "2020-07-05 15:07"
+    :date-updated-ts 1585022400
+    :firn-order      3
+    :firn-under      nil
+    :logbook-total   "0:00"
+    :path            "http://localhost:4000/pages"
+    :title           "Custom Pages"}
+   {:attachments     []
+    :date-created    "2020-03-27 Fri"
+    :date-created-ts 1585281600
+    :date-updated    "2020-07-15 18:28"
+    :date-updated-ts 1585281600
+    :firn-order      6
+    :firn-under      "Foobar"
+    :logbook-total "0:00",
+    :path            "http://localhost:4000/limitations"
+    :title           "Limitations"}
+   {:attachments     []
+    :date-created    nil
+    :date-created-ts nil
+    :date-updated    nil
+    :date-updated-ts nil
+    :firn-order      8
+    :firn-under      ["Contributors" "Things"]
+    :logbook-total   "0:00"
+    :path            "http://localhost:4000/changelog"
+    :title           "Changelog"}
+   {:attachments     []
+    :date-created    "2020-03-27 Fri"
+    :date-created-ts 1585281600
+    :date-updated    "2020-07-15 18:44"
+    :date-updated-ts 1585281600
+    :firn-order      0
+    :firn-under      ["Contributors" "Things"]
+    :logbook-total   "0:00"
+    :path            "http://localhost:4000/getting-started"
+    :title           "Getting Started"}
+
+   {:attachments     []
+    :date-created    nil
+    :date-created-ts nil
+    :date-updated    nil
+    :date-updated-ts nil
+    :firn-order      8
+    :firn-under      nil
+    :logbook-total   "0:00"
+    :path            "http://localhost:4000/contributors"
+    :title           "Contributors"}
+   {:firn-order 9999
+    :firn-under ["Page"]
+    :path       "http://localhost:4000/tags"
+    :title      "Tags"}])
+
+
+(loop [files x
+       out   {}]
+  (if (seq files)
+    (let [head (first files)
+          tail (rest files)]
+      (cond
+        ;; if there is no "firn-under" it's a top level site-map item, and it's not in the map yet.
+        (and (nil? (head :firn-under)) (not (contains? out (head :title))))
+        (recur tail (assoc out (head :title) head))
+
+        ;; the item is already in `out` b/c the firn-under val created it with an update-in call.
+        (contains? out (head :title))
+        (let [x #p (update out (head :title) #(merge % head))]
+          (recur tail (update out (head :title) #(merge % head))))
+
+        ;; if firn-under is just a string - it's a 2nd level.
+        (string? (head :firn-under))
+        (recur tail (update-in out [(head :firn-under)] assoc :children {(head :title) head}))
+
+        ;; if user wants to make a nested value, do that.
+        (seq (head :firn-under))
+        (let [path-to-update (vec (concat (interpose :children (head :firn-under)) [:children]))]
+          (recur tail (update-in out path-to-update assoc (head :title) head)))
+
+        :else
+        (recur tail out)))
+    out))

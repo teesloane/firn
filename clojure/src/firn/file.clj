@@ -129,7 +129,7 @@
   metadata, and discards anything not needed."
   [processed-file site-url]
   (merge
-   (dissoc (processed-file :meta) :logbook :links :keywords :toc)
+   (dissoc (processed-file :meta) :logbook :links :toc :keywords :tags)
    {:path (str site-url "/" (processed-file :path-web))}))
 
 (defn sum-logbook
