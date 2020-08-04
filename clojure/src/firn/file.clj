@@ -132,6 +132,39 @@
    (dissoc (processed-file :meta) :logbook :links :toc :keywords :tags)
    {:path (str site-url "/" (processed-file :path-web))}))
 
+(defn make-site-map
+  "Builds the site maps a tree where a file might fall under one or more files.
+  Checks the value of `#+FIRN_UNDER` to decide under what parent to place a child."
+  [processed-files]
+  (loop [files processed-files
+         out   {}]
+    (if (seq files)
+      (let [head (first files)
+            tail (rest files)]
+        (cond
+          ;; if there is no "firn-under" it's a top level site-map item, and it's not in the map yet.
+          (and (nil? (head :firn-under)) (not (contains? out (head :title))))
+          (recur tail (assoc out (head :title) head))
+
+          ;; the item is already in `out` b/c the firn-under val created it with an update-in call.
+          (contains? out (head :title))
+          (let [updated-out (update out (head :title) #(merge % head))]
+            (recur tail updated-out))
+
+          ;; if firn-under is just a string - it's a 2nd level.
+          (string? (head :firn-under))
+          (recur tail (update-in out [(head :firn-under)] assoc :children {(head :title) head}))
+
+          ;; if user wants to make a nested value, do that.
+          (seq (head :firn-under))
+          (let [path-to-update (vec (concat (interpose :children (head :firn-under)) [:children]))]
+            (recur tail (update-in out path-to-update assoc (head :title) head)))
+
+          :else
+          (recur tail out)))
+      out)))
+
+
 (defn sum-logbook
   "Iterates over a logbook and parses logbook :duration's and sums 'em up"
   [logbook]
@@ -230,7 +263,7 @@
         date-parser    #(try
                           (when % (u/org-date->ts date-created))
                           (catch Exception e
-                            (u/print-err! :error  (str "Could not parse date for file: " (or title "<unknown file>") "\nPlease confirm that you have correctly set the #+DATE_CREATED: and #+DATE_UPDATED values in your org file." ))))]
+                            (u/print-err! :error  (str "Could not parse date for file: " (or title "<unknown file>") "\nPlease confirm that you have correctly set the #+DATE_CREATED: and #+DATE_UPDATED values in your org file."))))]
 
     (merge metadata
            {:keywords        keywords
