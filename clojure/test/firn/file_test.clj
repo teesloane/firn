@@ -163,7 +163,7 @@
                 :path       "http://localhost:4000/tags"
                 :title      "Tags"}]]
     (t/testing "Files without firn-under are put as top level keys"
-      (let [res           #p (sut/make-site-map files)
+      (let [res           (sut/make-site-map files)
             top-keys      (keys res)
             expected-keys '("Foobar" "Firn Setup (with Emacs)" "Data and Metadata" "Custom Pages" "Page" "Sample Page" "Configuration" "Layout" "Home" "Contributors")]
 

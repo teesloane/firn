@@ -118,8 +118,8 @@
       ;; now that we have processed everything.
       (let [config-with-data (merge config
                                     site-vals ;; contains logbook already
-                                    {:processed-files output
-                                     :site-map        #p (process-site-map-with-pages! (site-vals :site-map) config)
+                                    {:processed-files (vals output)
+                                     :site-map        (file/make-site-map (site-vals :site-map)) #_(process-site-map-with-pages! (site-vals :site-map) config)
                                      :site-tags       (into (sorted-map) (group-by :tag-value (site-vals :site-tags)))})
 
             ;; FIXME: I think we are rendering html twice here, should prob only happen here?

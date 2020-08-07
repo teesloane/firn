@@ -129,7 +129,7 @@
   metadata, and discards anything not needed."
   [processed-file site-url]
   (merge
-   (dissoc (processed-file :meta) :logbook :links :toc :keywords :tags)
+   (dissoc (processed-file :meta) :logbook :links :toc :keywords :tags :attachments)
    {:path (str site-url "/" (processed-file :path-web))}))
 
 (defn make-site-map
@@ -139,26 +139,28 @@
   (loop [files processed-files
          out   {}]
     (if (seq files)
-      (let [head (first files)
-            tail (rest files)]
+      (let [head       (first files)
+            tail       (rest files)
+            firn-under (-> head :firn-under)
+            title      (-> head :title)]
         (cond
           ;; if there is no "firn-under" it's a top level site-map item, and it's not in the map yet.
-          (and (nil? (head :firn-under)) (not (contains? out (head :title))))
-          (recur tail (assoc out (head :title) head))
+          (and (nil? firn-under) (not (contains? out title)))
+          (recur tail (assoc out title head))
 
           ;; the item is already in `out` b/c the firn-under val created it with an update-in call.
-          (contains? out (head :title))
-          (let [updated-out (update out (head :title) #(merge % head))]
+          (contains? out title)
+          (let [updated-out (update out title #(merge % head))]
             (recur tail updated-out))
 
           ;; if firn-under is just a string - it's a 2nd level.
-          (string? (head :firn-under))
-          (recur tail (update-in out [(head :firn-under)] assoc :children {(head :title) head}))
+          (string? firn-under)
+          (recur tail (update-in out [firn-under] assoc :children {title head}))
 
           ;; if user wants to make a nested value, do that.
-          (seq (head :firn-under))
-          (let [path-to-update (vec (concat (interpose :children (head :firn-under)) [:children]))]
-            (recur tail (update-in out path-to-update assoc (head :title) head)))
+          (seq firn-under)
+          (let [path-to-update (vec (concat (interpose :children firn-under) [:children]))]
+            (recur tail (update-in out path-to-update assoc title head)))
 
           :else
           (recur tail out)))

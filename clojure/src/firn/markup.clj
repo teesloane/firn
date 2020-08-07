@@ -6,7 +6,12 @@
 
 (declare to-html)
 
-;; Feature: Table of Contents --------------------------------------------------
+;; Render: Site-map ------------------------------------------------------------
+(defn render-site-map
+  [site-map]
+  (str site-map))
+
+;; Render: Table of Contents --------------------------------------------------
 
 (defn make-toc-helper-reduce
   "(ಥ﹏ಥ) Yeah. So. See the docstring for make-toc.

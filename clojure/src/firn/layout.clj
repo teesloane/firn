@@ -52,6 +52,7 @@
    (let [{:keys [file config]} partial-map
          org-tree              (file :as-edn)
          config-settings       (config :user-config) ; site-wide config: 0 precedence
+         site-map              (config :site-map)
          file-settings         (file/keywords->map file) ; file-setting config: 2 precedence
          layout-settings       (if (map? opts) opts {})
          merged-options        (merge config-settings layout-settings file-settings)
@@ -75,6 +76,9 @@
        ;; render a polyline graph of the logbook of the file.
        (= action :logbook-polyline)
        (org/poly-line (-> file :meta :logbook) opts)
+
+       (= action :sitemap)
+       (markup/render-site-map site-map)
 
        ;; render a table of contents
        (= action :toc)
@@ -100,7 +104,6 @@
   site-url"
   [site-url]
   (fn [& args] (apply str site-url args)))
-
 
 (defn prepare
   "Prepare functions and data to be available in layout functions.
