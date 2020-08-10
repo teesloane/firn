@@ -2,8 +2,17 @@
 #+FIRN_ORDER: 8
 #+FIRN_TOC: {:depth 1}
 
-* V.0.0.8
+* V.0.0.9
 
+** New
+- [X] Add ~:sitemap~ (with options for :sort-by, :start-at )
+- [ ] breadcrumbs
+- [ ] previous-file
+- [ ] next-file
+** Fixed
+** Breaking Changes
+
+* V.0.0.8
 ** Feature: Clean up unused attachments.
 - Adds a configuration option to config.edn: ~run-build-clean?~ - which will
   remove unused file attachments from ~_firn/_site~ after finishing building.
