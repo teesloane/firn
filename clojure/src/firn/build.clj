@@ -91,6 +91,8 @@
 
     final-file))
 
+;; TODO - remove this, I don't think custom pages should go into final site-map
+;; since we can't add metadata (order, time published, etc) anyway.
 (defn process-site-map-with-pages!
   "If a user has 'pages/*.clj' files - and their config enables it,
   Add these to the site map."

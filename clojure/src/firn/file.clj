@@ -10,7 +10,7 @@
             [sci.core :as sci]))
 
 ;; #+ORG_KEYWORDS that we want to evaluate into real clojure values.
-(def keywords-to-eval [:firn-toc :firn-properties? :firn-order :firn-fold :firn-sitemap?])
+(def keywords-to-eval [:firn-toc :firn-properties? :firn-order :firn-fold :firn-sitemap? :firn-under])
 
 ;; -- Getters
 
@@ -134,7 +134,8 @@
 
 (defn make-site-map
   "Builds the site maps a tree where a file might fall under one or more files.
-  Checks the value of `#+FIRN_UNDER` to decide under what parent to place a child."
+  Checks the value of `#+FIRN_UNDER` to decide under what parent to place a child.
+  TODO: move this to build."
   [processed-files]
   (loop [files processed-files
          out   {}]
@@ -155,16 +156,30 @@
 
           ;; if firn-under is just a string - it's a 2nd level.
           (string? firn-under)
-          (recur tail (update-in out [firn-under] assoc :children {title head}))
+          (recur tail (update-in out [firn-under :children] assoc title head))
 
           ;; if user wants to make a nested value, do that.
           (seq firn-under)
-          (let [path-to-update (vec (concat (interpose :children firn-under) [:children]))]
-            (recur tail (update-in out path-to-update assoc title head)))
+          (let [path-to-update (vec (concat (interpose :children firn-under) [:children]))
+                ;; HACK: we are doing merges within an update so that parents
+                ;; don't overwrite children. basically, the merge has to happen
+                ;; at the (vals) level, and then be re-set to the existing node.
+                update-fn      (fn [existing-site-map-node title head]
+                                 (let [vals1       (get existing-site-map-node title {})
+                                       merged-vals (merge vals1 head)
+                                       final       (hash-map title merged-vals)]
+                                   (merge existing-site-map-node final)))]
+            (recur tail (update-in out path-to-update update-fn title head)))
 
           :else
           (recur tail out)))
       out)))
+
+
+(comment
+  [research :children language :children french] {"language" ...}
+  [research :children language]
+  )
 
 
 (defn sum-logbook

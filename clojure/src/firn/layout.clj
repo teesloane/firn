@@ -51,11 +51,12 @@
   ([partial-map action opts]
    (let [{:keys [file config]} partial-map
          org-tree              (file :as-edn)
-         config-settings       (config :user-config) ; site-wide config: 0 precedence
+         config-settings       (config :user-config)     ; site-wide config: 0 precedence
          site-map              (config :site-map)
          file-settings         (file/keywords->map file) ; file-setting config: 2 precedence
          layout-settings       (if (map? opts) opts {})
          merged-options        (merge config-settings layout-settings file-settings)
+         cached-sitemap        (atom nil)
          is-headline?          (string? action)]
 
 
@@ -77,12 +78,15 @@
        (= action :logbook-polyline)
        (org/poly-line (-> file :meta :logbook) opts)
 
-       (= action :sitemap)
-       (markup/render-site-map site-map)
+       (= action :sitemap) ;; we don't need to actualyl render this everytime, so we cache it into an atom.
+       (if-not @cached-sitemap
+         (do (reset! cached-sitemap (markup/render-site-map site-map opts))
+             @cached-sitemap)
+         @cached-sitemap)
 
        ;; render a table of contents
        (= action :toc)
-       (let [toc      (-> file :meta :toc) ; get the toc for the file.
+       (let [toc  (-> file :meta :toc) ; get the toc for the file.
              ;; get configuration for toc in order of precedence
              opts (merge (config-settings :firn-toc)
                          layout-settings

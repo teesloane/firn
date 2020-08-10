@@ -192,6 +192,12 @@
   [coll elm]
   (some #(= elm %) coll))
 
+(defn interpose+tail
+  "Interposes a keywords and ensures the key is at the end of the list"
+  [lst k]
+ (vec (concat (interpose k lst) [k])))
+
+
 (defn take-while-after-first
   [pred lst]
   (let [head (first lst)
