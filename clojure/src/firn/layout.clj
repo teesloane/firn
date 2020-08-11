@@ -56,9 +56,12 @@
          file-settings         (file/keywords->map file) ; file-setting config: 2 precedence
          layout-settings       (if (map? opts) opts {})
          merged-options        (merge config-settings layout-settings file-settings)
-         cached-sitemap        (atom nil)
+         cached-sitemap-html   (atom nil)
          is-headline?          (string? action)]
 
+     ;; cache the site-map if it's not there already
+     (when-not @cached-sitemap-html
+       (reset! cached-sitemap-html (markup/render-site-map site-map opts)))
 
      (cond
        ;; render the whole file.
@@ -78,11 +81,16 @@
        (= action :logbook-polyline)
        (org/poly-line (-> file :meta :logbook) opts)
 
-       (= action :sitemap) ;; we don't need to actualyl render this everytime, so we cache it into an atom.
-       (if-not @cached-sitemap
-         (do (reset! cached-sitemap (markup/render-site-map site-map opts))
-             @cached-sitemap)
-         @cached-sitemap)
+       ;; Render the sitemap; cache it the first time it runs
+       (= action :sitemap)
+       (if-not @cached-sitemap-html
+         (do (reset! cached-sitemap-html (markup/render-site-map site-map opts))
+             @cached-sitemap-html)
+         @cached-sitemap-html)
+
+       ;; render breadcrumbs
+       (= action :breadcrumbs)
+       (markup/render-breadcrumbs (-> file :meta :firn-under) site-map opts)
 
        ;; render a table of contents
        (= action :toc)

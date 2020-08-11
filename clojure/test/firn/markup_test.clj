@@ -2,9 +2,7 @@
   (:require [firn.markup :as sut]
             [clojure.test :as t]))
 
-
 ;; Mocks
-
 
 (def sample-links {:img-file     {:type "link", :path "file:test-img.png"}
                    :img-rel-file {:type "link", :path "./static/images/test-img.png"}
@@ -15,6 +13,15 @@
                    :http-link    {:type "link",
                                   :path "https://docs.cider.mx/cider/usage/misc_features.html",
                                   :desc "Miscellaneous Features :: CIDER Docs"}})
+
+(def sample-sitemap
+  {"Writing"  {:path "http://localhost:4000/writing", :date-created "2020-05-04 15:10", :date-updated "2020-08-11 15:56", :firn-under nil, :date-created-ts 1588564800, :title "Writing", :firn-order 0, :date-updated-ts 1588564800, :logbook-total "0:00"},
+   "Research" {:path     "http://localhost:4000/research",
+               :children {"Writing"         {:children {"Index" {:path "http://localhost:4000/index", :date-created "2020-03-23 12:00", :date-updated "2020-08-11 16:02", :firn-under ["Research" "Writing"], :date-created-ts 1584936000, :title "Index", :firn-order nil, :date-updated-ts 1584936000, :logbook-total "0:00"}}},
+                          "Quil"            {:path "http://localhost:4000/quil", :date-created "2020-02-28 08:31", :date-updated "2020-08-04 20:59", :firn-under ["Research"], :date-created-ts 1582866000, :title "Quil", :firn-order nil, :date-updated-ts 1582866000, :logbook-total "0:00"},
+                          "Generative Art"  {:path "http://localhost:4000/generative_art", :date-created "2020-06-02 Tue", :date-updated "2020-08-04 20:51", :firn-under ["Research"], :date-created-ts 1591070400, :title "Generative Art", :firn-order nil, :date-updated-ts 1591070400, :logbook-total "0:00"},
+                          "Org Mode"        {:path "http://localhost:4000/org-mode", :date-created "2020-02-28 20:56", :date-updated "2020-08-04 21:02", :firn-under ["Research"], :date-created-ts 1582866000, :title "Org Mode", :firn-order nil, :date-updated-ts 1582866000, :logbook-total "0:00"},
+                          "Open Frameworks" {:path "http://localhost:4000/open_frameworks", :date-created "2020-07-08 15:48", :date-updated "2020-08-06 17:35", :firn-under ["Research"], :date-created-ts 1594180800, :title "Open Frameworks", :firn-order nil, :date-updated-ts 1594180800, :logbook-total "0:00"}}}})
 
 ;; Tests
 
@@ -94,3 +101,16 @@
                        [:a {:href "#relevance"} "Relevance"]
                        [:ol '([:li [:a {:href "#level3"} "Level3"]])]]]]
         (t/is (= res-1 expected))))))
+
+(t/deftest render-breadcrumbs
+  (t/testing "expected output"
+    (let [res (sut/render-breadcrumbs ["Research" "Writing"] sample-sitemap {})]
+      (t/is (= res [:div.firn-breadcrumbs '([:a {:href "http://localhost:4000/research"} "Research"] [:span " > "] [:span "Writing"])]))))
+
+  (t/testing "Separator works"
+    (let [res (sut/render-breadcrumbs ["Research" "Writing"] sample-sitemap {:separator " | "})]
+      (t/is (= res [:div.firn-breadcrumbs '([:a {:href "http://localhost:4000/research"} "Research"] [:span " | "] [:span "Writing"])]))))
+
+  (t/testing "Value not found in sitemap returns a plain text span"
+    (let [res (sut/render-breadcrumbs ["Foobar"] sample-sitemap {})]
+      (t/is (= res [:div.firn-breadcrumbs '([:span "Foobar"])])))))

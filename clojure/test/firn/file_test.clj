@@ -5,7 +5,6 @@
   (:require [firn.file :as sut]
             [firn.stubs :as stub]
             [clojure.test :as t]
-            [sci.core :as sci]
             [firn.util :as u]))
 
 

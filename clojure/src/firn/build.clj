@@ -85,8 +85,8 @@
         file-metadata (file/extract-metadata new-file)                         ; collect the file-metadata from the edn tree.
         new-file      (file/change new-file {:meta file-metadata})             ; shadow the file and add the metadata
         ;; TODO PERF: htmlify happening as well in `process-all`.
-        ;; this is due to the dev server. There should be a conditional
-        ;; that checks if we are running in server.
+        ;; this is due to the dev server hot reload.
+        ;; There should be a conditional that checks if we are running in server.
         final-file    (htmlify config new-file)]                   ; parses the edn tree -> html.
 
     final-file))

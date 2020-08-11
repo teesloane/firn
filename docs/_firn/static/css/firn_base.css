@@ -341,7 +341,7 @@ figure figcaption {
   color: var(--color-text-secondary);
 }
 
-/* Forms */
+/* Forms TODO: remove */
 
 button:disabled,
 input:disabled {
@@ -673,4 +673,11 @@ li > p {
 
 @media(max-width: 768px) {
   .firn-fold { font-size: 12px; }
+}
+
+
+/* Sitemap, breadcrumbs, siblings files, related files. ---------------------- */
+
+.firn-breadcrumbs {
+ 
 }

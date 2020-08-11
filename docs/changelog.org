@@ -5,10 +5,11 @@
 * V.0.0.9
 
 ** New
-- [X] Add ~:sitemap~ (with options for :sort-by, :start-at )
-- [ ] breadcrumbs
+- Add ~(render :sitemap)~ (with options for :sort-by, :start-at )
+- Add ~(render :breadcrumbs)~ breadcrumbs
 - [ ] previous-file
 - [ ] next-file
+- [ ] siblings
 ** Fixed
 ** Breaking Changes
 
