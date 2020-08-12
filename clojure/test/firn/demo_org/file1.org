@@ -1,6 +1,7 @@
-#+TITLE: Sample File!
+#+TITLE: Org Mode
 #+FIRN_LAYOUT: default
 #+FIRN_TOC: {:depth 5 :headline "Notes"}
+#+FIRN_UNDER: ["Research"]
 
 
 * Meta

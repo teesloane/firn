@@ -1,6 +1,8 @@
 (ns firn.markup-test
   (:require [firn.markup :as sut]
-            [clojure.test :as t]))
+            [clojure.test :as t]
+            [hiccup.core :as h]))
+
 
 ;; Mocks
 
@@ -17,11 +19,12 @@
 (def sample-sitemap
   {"Writing"  {:path "http://localhost:4000/writing", :date-created "2020-05-04 15:10", :date-updated "2020-08-11 15:56", :firn-under nil, :date-created-ts 1588564800, :title "Writing", :firn-order 0, :date-updated-ts 1588564800, :logbook-total "0:00"},
    "Research" {:path     "http://localhost:4000/research",
-               :children {"Writing"         {:children {"Index" {:path "http://localhost:4000/index", :date-created "2020-03-23 12:00", :date-updated "2020-08-11 16:02", :firn-under ["Research" "Writing"], :date-created-ts 1584936000, :title "Index", :firn-order nil, :date-updated-ts 1584936000, :logbook-total "0:00"}}},
-                          "Quil"            {:path "http://localhost:4000/quil", :date-created "2020-02-28 08:31", :date-updated "2020-08-04 20:59", :firn-under ["Research"], :date-created-ts 1582866000, :title "Quil", :firn-order nil, :date-updated-ts 1582866000, :logbook-total "0:00"},
-                          "Generative Art"  {:path "http://localhost:4000/generative_art", :date-created "2020-06-02 Tue", :date-updated "2020-08-04 20:51", :firn-under ["Research"], :date-created-ts 1591070400, :title "Generative Art", :firn-order nil, :date-updated-ts 1591070400, :logbook-total "0:00"},
-                          "Org Mode"        {:path "http://localhost:4000/org-mode", :date-created "2020-02-28 20:56", :date-updated "2020-08-04 21:02", :firn-under ["Research"], :date-created-ts 1582866000, :title "Org Mode", :firn-order nil, :date-updated-ts 1582866000, :logbook-total "0:00"},
-                          "Open Frameworks" {:path "http://localhost:4000/open_frameworks", :date-created "2020-07-08 15:48", :date-updated "2020-08-06 17:35", :firn-under ["Research"], :date-created-ts 1594180800, :title "Open Frameworks", :firn-order nil, :date-updated-ts 1594180800, :logbook-total "0:00"}}}})
+               :children {"Quil"            {:path "http://localhost:4000/quil", :date-created "2020-02-28 08:31", :date-updated "2020-08-04 20:59", :firn-under ["Research"], :date-created-ts 1582866000, :title "Quil", :firn-order 10, :date-updated-ts 1582866000, :logbook-total "0:00"},
+                          "Generative Art"  {:path "http://localhost:4000/generative_art", :date-created "2020-06-02 Tue", :date-updated "2020-08-04 20:51", :firn-under ["Research"], :date-created-ts 1591070400, :title "Generative Art", :firn-order 2, :date-updated-ts 1591070400, :logbook-total "0:00"},
+                          "Org Mode"        {:path "http://localhost:4000/org-mode", :date-created "2020-02-28 20:56", :date-updated "2020-08-04 21:02", :firn-under ["Research"], :date-created-ts 1582866000, :title "Org Mode", :firn-order 3, :date-updated-ts 1582866000, :logbook-total "0:00"},
+                          "Open Frameworks" {:path "http://localhost:4000/open_frameworks", :date-created "2020-07-08 15:48", :date-updated "2020-08-06 17:35", :firn-under ["Research"], :date-created-ts 1594180800, :title "Open Frameworks", :firn-order 4, :date-updated-ts 1594180800, :logbook-total "0:00"}}}})
+(sort-by :firn-order (vals (get-in sample-sitemap ["Research" :children])))
+
 
 ;; Tests
 
@@ -114,3 +117,17 @@
   (t/testing "Value not found in sitemap returns a plain text span"
     (let [res (sut/render-breadcrumbs ["Foobar"] sample-sitemap {})]
       (t/is (= res [:div.firn-breadcrumbs '([:span "Foobar"])])))))
+
+
+(t/deftest render-adjacent-file
+  (t/testing "Exepected result"
+    (let [params   {:sitemap sample-sitemap :firn-under ["Research"] :firn-order 3}
+          res      (sut/render-adjacent-file params)
+          expected [:div.firn-file-navigation [:span.firn-file-nav-prev "Previous: " [:a {:href "http://localhost:4000/generative_art"} "Generative Art"]] " " [:span.firn-file-nav-next "Next: " [:a {:href "http://localhost:4000/open_frameworks"} "Open Frameworks"]]]]
+      (t/is (= res expected))))
+
+  (t/testing ":as-data? responds with just data."
+    (let [params {:sitemap sample-sitemap :firn-under ["Research"] :firn-order 3 :as-data? true}
+          res    (sut/render-adjacent-file params)]
+      (t/is (= res {:next     (get-in sample-sitemap ["Research" :children "Open Frameworks"])
+                    :previous (get-in sample-sitemap ["Research" :children "Generative Art"])})))))

@@ -179,8 +179,8 @@
   [{:keys [dir-site pages partials site-map site-links site-logs site-tags user-config] :as config}]
   (let [site-url (user-config :site-url)
         user-api {:partials   partials
-                  :site-map   site-map
                   :site-links site-links
+                  ;; TODO - add render to here for rendering sitemap stuff.
                   :site-logs  site-logs
                   :site-tags  site-tags
                   :site-url   site-url

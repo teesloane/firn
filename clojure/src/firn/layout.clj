@@ -49,15 +49,16 @@
   ([partial-map action]
    (render partial-map action {}))
   ([partial-map action opts]
-   (let [{:keys [file config]} partial-map
-         org-tree              (file :as-edn)
-         config-settings       (config :user-config)     ; site-wide config: 0 precedence
-         site-map              (config :site-map)
-         file-settings         (file/keywords->map file) ; file-setting config: 2 precedence
-         layout-settings       (if (map? opts) opts {})
-         merged-options        (merge config-settings layout-settings file-settings)
-         cached-sitemap-html   (atom nil)
-         is-headline?          (string? action)]
+   (let [{:keys [file config]}            partial-map
+         org-tree                         (file :as-edn)
+         config-settings                  (config :user-config)     ; site-wide config: 0 precedence
+         site-map                         (config :site-map)
+         file-settings                    (file/keywords->map file) ; file-setting config: 2 precedence
+         layout-settings                  (if (map? opts) opts {})
+         merged-options                   (merge config-settings layout-settings file-settings)
+         cached-sitemap-html              (atom nil)
+         is-headline?                     (string? action)
+         {:keys [toc logbook firn-under firn-order]} (file :meta)]
 
      ;; cache the site-map if it's not there already
      (when-not @cached-sitemap-html
@@ -79,7 +80,7 @@
 
        ;; render a polyline graph of the logbook of the file.
        (= action :logbook-polyline)
-       (org/poly-line (-> file :meta :logbook) opts)
+       (org/poly-line logbook opts)
 
        ;; Render the sitemap; cache it the first time it runs
        (= action :sitemap)
@@ -90,11 +91,19 @@
 
        ;; render breadcrumbs
        (= action :breadcrumbs)
-       (markup/render-breadcrumbs (-> file :meta :firn-under) site-map opts)
+       (markup/render-breadcrumbs firn-under site-map opts)
+
+       ;; render the previous file based on firn-order
+       (= action :adjacent-files)
+       (markup/render-adjacent-file {:sitemap    site-map
+                                     :firn-under firn-under
+                                     :firn-order firn-order
+                                     :as-data?   (opts :as-data?)})
+
 
        ;; render a table of contents
        (= action :toc)
-       (let [toc  (-> file :meta :toc) ; get the toc for the file.
+       (let [toc  toc ; get the toc for the file.
              ;; get configuration for toc in order of precedence
              opts (merge (config-settings :firn-toc)
                          layout-settings

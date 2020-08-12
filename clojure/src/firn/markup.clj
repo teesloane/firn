@@ -55,7 +55,7 @@
                   [:ul.firn-sitemap-item--parent
                    (map make-child (sort-site-map children))]])))]
      (let [starting-site-map (-> sm starting-point sort-site-map)]
-       [:ul.firn-sitemap (map make-child starting-site-map)]))))
+       [:ul.firn-sitemap.firn-sitemap-item--parent (map make-child starting-site-map)]))))
 
 (defn render-breadcrumbs
   "Iterates firn-under, fetching the link to each item, constructuring a breadcrumb
@@ -63,7 +63,6 @@
   out             [{:name Research :path /Research} {:name Language :path /Language}]
   :out-data       [:div [:a {:href path} name] ' > ' [:a {:href path} name]]]] etc."
   [firn-under sitemap opts]
-  (prn firn-under sitemap opts)
   (loop [firn-under   firn-under
          sitemap-node sitemap
          out          []]
@@ -81,6 +80,40 @@
             (interpose [:span (or (opts :separator) " > ")]))]
         ;; --
         (recur tail (get-in sitemap [head :children]) new-out)))))
+
+(defn render-adjacent-file
+  "Renders html (or returns data) of the previous and next link in the sitemap.
+  Expects that your files are using `firn-order` to work."
+  [{:keys [sitemap firn-under firn-order as-data?]}]
+  (let [site-map-node (if (nil? firn-under) sitemap
+                          (get-in sitemap (u/interpose+tail firn-under :children)))
+        ordered-smn   (->> site-map-node vals (sort-by :firn-order))
+        out           (atom {:next nil :previous nil})]
+    ;; since firn-order can be sporadic and non-sequential (can have gaps, 1..2..5..10)
+    ;; we use loop/recur to just get the prev/after
+    (loop [lst ordered-smn
+           prev nil]
+      (when (seq lst)
+        (let [head (first lst)]
+          ;; when firn-order equals the item we are iterative over.
+          (if (= (:firn-order head) firn-order)
+            (reset! out {:next (second lst) :previous prev})
+            (recur (rest lst) head)))))
+    (if as-data? @out
+        (let [{:keys [previous next]} @out]
+          [:div.firn-file-navigation
+           (when previous
+             [:span.firn-file-nav-prev
+              "Previous: " [:a {:href (previous :path)} (previous :title)]])
+           " "
+           (when next
+             [:span.firn-file-nav-next
+              "Next: " [:a {:href (next :path)} (next :title)]])]))))
+
+
+        
+
+    
 
 
 ;; Render: Table of Contents --------------------------------------------------
@@ -107,16 +140,16 @@
           with-meta   (assoc curr :next-sibling (prev :next-child))
           with-meta   (assoc with-meta :next-child (conj (prev :next-child) parent-path :children))]
       (-> acc
-         (update-in (prev :next-child) conj with-meta)
-         (assoc :prev with-meta)))
+          (update-in (prev :next-child) conj with-meta)
+          (assoc :prev with-meta)))
 
     (= (curr :level) (prev :level))
     (let [parent-path (count (get-in acc (prev :next-sibling)))
           with-meta   (assoc curr :next-sibling (prev :next-sibling)) ;; if more, add children, if equal, conj onto children.
           with-meta   (assoc with-meta :next-child (conj (prev :next-sibling) parent-path :children))] ;; if more, add children, if equal, conj onto children.
       (-> acc
-         (update-in (prev :next-sibling) conj with-meta)
-         (assoc :prev with-meta)))
+          (update-in (prev :next-sibling) conj with-meta)
+          (assoc :prev with-meta)))
 
     (< (curr :level) (prev :level))
     (let [difference   (- (prev :level) (curr :level)) ; if we are on level 5, and the next is level 3...
@@ -129,8 +162,8 @@
           with-meta    (assoc curr :next-sibling path) ;; if more, add children, if equal, conj onto children.
           with-meta    (assoc with-meta :next-child (conj path parent-path :children))]
       (-> acc
-         (update-in path conj with-meta)
-         (assoc :prev with-meta)))
+          (update-in path conj with-meta)
+          (assoc :prev with-meta)))
 
     :else
     (do (println "Something has gone wrong. ") acc)))
