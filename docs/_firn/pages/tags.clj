@@ -1,8 +1,8 @@
-(defn render-site-map
-  [sm]
-  (->> sm
-     (sort-by :firn-order)
-     (map #(vector :div.pb1 [:a {:href (% :path)} (% :title)]))))
+;; (defn render-site-map
+;;   [sm]
+;;   (->> sm
+;;      (sort-by :firn-order)
+;;      (map #(vector :div.pb1 [:a {:href (% :path)} (% :title)]))))
 
 (defn tags
   [{:keys [site-map build-url site-tags partials]}]
@@ -14,7 +14,7 @@
       [:main
        [:article.def-wrapper
         [:aside#sidebar.def-sidebar
-         (render-site-map site-map)]
+         #_(render-site-map site-map)]
         [:div.def-content
          [:h1 "Tags"]
          (for [[tag-name tags] site-tags]
