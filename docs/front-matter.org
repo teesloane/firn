@@ -1,0 +1,45 @@
+#+TITLE: Front Matter
+#+FIRN_UNDER: ["Content"]
+#+FIRN_ORDER: 0
+
+* TODO Overview
+* Firn Front Matter
+
+The following in-buffer settings are processed by Firn and/or made available to layouts for processing.
+
+| Key                | Type          | Purpose                                                 |
+|--------------------+---------------+---------------------------------------------------------|
+| ~#+TITLE:~           | string        | Used in site-map, links, etc                            |
+| ~#+DATE_CREATED~     | org-mode-date | File date created                                       |
+| ~#+DATE_UPDATED~     | org-mode-date | File last updated                                       |
+| ~#+FIRN_PROPERTIES?~ | boolean       | Whether to render properties under all headings         |
+| ~#+FIRN_TOC~         | map           | Settings for any rendered table of contents             |
+| ~#+FIRN_FOLD~        | map           | Fold headings of a specified level: ex: {3 true 4 true} |
+| ~#+FIRN_ORDER~       | integer       | Enables sorting files in the site-map                   |
+| ~#+FIRN_PRIVATE~     | boolean       | Whether or not to read the file in question             |
+| ~#+FIRN_SITEMAP?~    | boolean       | Whether to include the file in the site-map.            |
+| ~#+FIRN_UNDER~       | list          | Categories for which the documents falls under          |
+
+Changing some of these values from file to file will result in your files being
+rendered differently. Meanwhile, you can set the default values for certain
+front-matter in your ~config.edn~ file, as detailed in the [[file:configuration.org][configuration document]].
+
+The following example is an /excerpt/ from a sample ~config.edn~.
+
+#+BEGIN_SRC clojure
+{
+ :firn-fold  {3 true 4 true}
+}
+#+END_SRC
+
+The above will result in *all* level 3 and 4 headings being /folded/. IF you would
+like to render a certain file so that all level 1 headings (and no others) are
+folded, you could do by overriding the ~:firn-fold~ value in your config in your
+front matter by setting ~#+FIRN_FOLD: {1 true}~
+
+In this case, ~FIRN_FOLD~ actually takes a *clojure value* (in this case, a map)
+that is *evaluated* when your site is built.
+
+
+* TODO Custom Front Matter                                       :advanced:
+* TODO Limitations

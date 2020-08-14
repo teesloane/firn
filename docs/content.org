@@ -1,0 +1,11 @@
+#+TITLE: Content
+#+FIRN_ORDER: 2
+
+The content subsection handles everything to do with converting org files to html.
+
+- Front Matter - TODO
+- [[file:layout.org][Layouts & Partials]] - How to organize and present your org-mode content.
+- [[file:the-render-function.org][The Render Function]] - How and what you want to render on your site.
+- [[file:styling.org][Styling]] - How to style templates and about the built-in styles
+- Static Assets - TODO
+- [[file:pages.org][Non-Org Pages]] - On creating pages without org-mode.

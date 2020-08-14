@@ -9,7 +9,8 @@
 ;; Render: Site-map et al. --------------------------------------------------------
 
 (defn render-site-map
-  "Converts the site map data structure into html. Takes options for sorting."
+  "Converts the site map data structure into html. Takes options for sorting.
+  TODO: needs tests."
   ([sm]
    (render-site-map sm {}))
   ([sm opts]
@@ -17,15 +18,19 @@
              ([smn prop] (sort-by-key smn prop false))
              ([smn prop flip-keys?]
               (fn [key1 key2]
-                (let [k1 (if flip-keys? key2 key1)
-                      k2 (if flip-keys? key1 key2)]
+                (let [k1         (if flip-keys? key2 key1)
+                      k2         (if flip-keys? key1 key2)
+                      ;; HACK - if a file doesn't have a firn-order, set a large order on it.
+                      ;; TODO - move all files that have firn-order of nil to the end of the their respective category?
+                      ;; FIXME: this is also bad because it subs in CREATED_AT/UPDATED_AT if those don't exist and we are sorting by time.
+                      ;; ALSO (OMG) this doesn't seem to work on sub maps (site-mapn odes)?
+                      backup-max 1000000000] ;; 
                   (compare
                    ;; we have to compare on values, and because some are duplicate (nil) we have to use compare a bit differently.
                    ;; https://clojuredocs.org/clojure.core/sorted-map-by#example-542692d5c026201cdc327094
-                   [(get-in smn [k1 prop]) k1]
-                   [(get-in smn [k2 prop]) k2])))))
+                   [(get-in smn [k1 prop] backup-max) k1]
+                   [(get-in smn [k2 prop] backup-max) k2])))))
 
-           ;; TODO - test this more.
            (starting-point [sm]
              (if (opts :start-at)
                (get-in sm (u/interpose+tail (opts :start-at) :children))
@@ -109,12 +114,6 @@
            (when next
              [:span.firn-file-nav-next
               "Next: " [:a {:href (next :path)} (next :title)]])]))))
-
-
-        
-
-    
-
 
 ;; Render: Table of Contents --------------------------------------------------
 

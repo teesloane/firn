@@ -104,4 +104,5 @@
 
 (comment
   (mount/stop) (-main "serve" "-d" "/Users/tees/Projects/firn/firn/docs")
+  ;; (mount/stop) (-main "serve" "-d" "/Users/tees/Desktop/foo")
   )

@@ -1,7 +1,9 @@
 #+TITLE: Sample Page
 #+FIRN_LAYOUT: sample-page
 #+FIRN_PROPERTIES?: true
-#+FIRN_ORDER: 7 
+#+FIRN_ORDER: 4
+#+FIRN_UNDER: ["Reference"]
+
 
 * Example content
 

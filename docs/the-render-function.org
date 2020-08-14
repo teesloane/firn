@@ -1,0 +1,125 @@
+#+TITLE: The Render Function
+#+FIRN_UNDER: ["Content"]
+#+FIRN_ORDER: 3
+
+
+The ~(render)~ function is used to render content from your org file. It's an
+important one - if you don't use it, you won't see any org-mode content.
+
+Quite a bit of data and functions are made available in your layouts. The =render=
+function you to decide what parts of your org-file you would like to display. Firn
+makes some "pre-made" content available for rendering - logbook graphs, table of
+contents, etc. It can render multiple kinds of content"
+
+| Render type       | Paramaters      | Example                                                              |
+|-------------------+-----------------+----------------------------------------------------------------------|
+| Entire file       | keyword         | ~(render :file)~                                                       |
+| Specific headline | string          | ~(render "Notes")~                                                     |
+| Specific content  | string, keyword | ~(render "Notes" :content)~                                            |
+| Table of contents | keyword, map    | ~(render :toc {:depth int :exclude-headline? bool :headline "Notes"})~ |
+| Logbook Polyline  | keyword, map    | ~(render :logbook-polyline {:stroke "#45698A" :height 60 :width 365})~ |
+|                   |                 |                                                                      |
+
+** Render an entire file
+
+#+BEGIN_SRC clojure
+(defn default
+  [{:keys [render partials]}]
+  (let [{:keys [head]} partials]
+
+    (head
+     [:body
+       [:div (render :file)]])))
+#+END_SRC
+** Rendering specific headlines and content
+
+#+BEGIN_SRC clojure
+(defn default
+  [{:keys [render partials]}]
+  (let [{:keys [head]} partials]
+    (head
+     [:body
+       [:div (render "Notes")] ; render everything in "Notes" (including the heading "Notes")
+       [:div (render "Notes" {:exclude-headline? true})] ; render the content in "Notes", excluding the heading.
+      ])))
+
+#+END_SRC
+
+** Rendering folded headlines                                   :folding:
+
+Firn includes basic semantic HTML folding that aims to replicate org-mode
+headline folding. JavaScript is not used to accomplish folding (although this is
+certainly possible); instead Firn uses the ~details~ and ~summary~ tag to
+accomplish similar functionality.
+
+Due to how the summary and details tag work, there is some finicky styling and
+all the same features of using normal headlines (tags, keywords, properties,
+etc) may not work as well. Incorporating folding may require some user styling
+in the ~firn_base.css~ stylesheet.
+
+Similar to a table of contents, you can set Firn's folding on a site-wide,
+layout-wide, or file-specific basis:
+
+#+BEGIN_SRC clojure
+(render :file {:firn-fold {1 true 2 true}}) ; All H1 and H2's will be folded, and will be started open.
+(render :file {:firn-fold {3 false  4 false 5}}) ; H3 through H5 will be foldable, and will start closed_
+#+END_SRC
+
+The ~:firn-fold~  value takes a *map* in which the keys correspond to heading
+levels, and the value is a boolean, indicating whether or not the details tag
+is, open or not. ~:firn-fold~ supports up to 6 headings (corresponding from ~h1~ to ~h6~)
+
+** Render a Logbook SVG Polyline
+
+Graphs all logbook entries for the current file in a polyline, generating a chart for each year.
+
+#+BEGIN_SRC clojure
+(defn default
+  [{:keys [render partials]}]
+  (let [{:keys [head]} partials]
+    (head
+     [:body
+       [:div (render :logbook-polyline {:stroke "#45698A" :height 60 :width 365})]])))
+#+END_SRC
+
+** Rendering a Table of Contents
+When a file is processed, Firn collects *all* of it's headlines, whether you're
+choosing to render the entire file, or just one headline.
+
+There are several ways you can create table of contents in your files, from simple to more complex use cases.
+
+1. Render a table of contents for an entire file.
+
+  #+BEGIN_SRC clojure
+  (defn default
+    [{:keys [render partials]}]
+    (let [{:keys [head]} partials]
+
+      (head
+       [:body
+         [:div (render :toc)]
+         [:div (render :file)]])))
+  #+END_SRC
+
+2. Render a table of contents for everything within a specific headline.
+
+  #+BEGIN_SRC clojure
+  (defn default
+    [{:keys [render partials]}]
+    (let [{:keys [head]} partials]
+      (head
+       [:body
+         ;; only renders a table of contents for a single headline's children.
+         ;; `:eclusive?` means we don't render "Notes"; just headlines that fall under it dflakdjflksadjf lksadjf lkasdjf lkasdjf .
+         [:div (render :toc {:headline "Notes"
+                             :depth 4
+                             :exclude-headline? true})]
+         [:div (render "Notes")]])))
+  #+END_SRC
+
+3. From within a file, you can set the keyword ~#+FIRN_TOC~ and pass it a map with
+   the properties above to enable a table of contents specific to a single file:
+
+  #+BEGIN_SRC
+  #+FIRN_TOC: {:depth 4}
+  #+END_SRC

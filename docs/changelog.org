@@ -1,6 +1,7 @@
 #+TITLE: Changelog
-#+FIRN_ORDER: 8
+#+FIRN_ORDER: 5
 #+FIRN_TOC: {:depth 1}
+#+FIRN_UNDER: ["Reference"]
 
 * V.0.0.9
 

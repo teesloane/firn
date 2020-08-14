@@ -678,6 +678,19 @@ li > p {
 
 /* Sitemap, breadcrumbs, siblings files, related files. ---------------------- */
 
+.firn-sitemap {
+
+}
+
+.firn-sitemap-item--parent {
+  list-style-type: none;
+}
+
 .firn-breadcrumbs {
- 
+  display: flex;
+}
+
+.firn-file-navigation {
+  display: flex;
+  justify-content: space-between;
 }
