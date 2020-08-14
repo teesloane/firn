@@ -2,14 +2,21 @@
 #+FIRN_UNDER: ["Content"]
 #+FIRN_ORDER: 0
 
-* TODO Overview
+* Overview
+
+To use Firn, you will need to add some "Front Matter" to your org-files. Front
+Matter is common in many static-site-generators. Firn uses org-mode
+[[https://orgmode.org/manual/In_002dbuffer-Settings.html][in-buffer-settings]] to set Front Matter.
+
+Currently, Firn only requires that you have a ~#+TITLE:~ front-matter.
+
 * Firn Front Matter
 
 The following in-buffer settings are processed by Firn and/or made available to layouts for processing.
 
 | Key                | Type          | Purpose                                                 |
 |--------------------+---------------+---------------------------------------------------------|
-| ~#+TITLE:~           | string        | Used in site-map, links, etc                            |
+| ~#+TITLE:~           | string        | Required: Used in site-map, links, etc                  |
 | ~#+DATE_CREATED~     | org-mode-date | File date created                                       |
 | ~#+DATE_UPDATED~     | org-mode-date | File last updated                                       |
 | ~#+FIRN_PROPERTIES?~ | boolean       | Whether to render properties under all headings         |
@@ -32,7 +39,7 @@ The following example is an /excerpt/ from a sample ~config.edn~.
 }
 #+END_SRC
 
-The above will result in *all* level 3 and 4 headings being /folded/. IF you would
+The above will result in *all* level 3 and 4 headings being /folded/. If you would
 like to render a certain file so that all level 1 headings (and no others) are
 folded, you could do by overriding the ~:firn-fold~ value in your config in your
 front matter by setting ~#+FIRN_FOLD: {1 true}~
@@ -40,6 +47,16 @@ front matter by setting ~#+FIRN_FOLD: {1 true}~
 In this case, ~FIRN_FOLD~ actually takes a *clojure value* (in this case, a map)
 that is *evaluated* when your site is built.
 
+* Custom Front Matter                                            :advanced:
 
-* TODO Custom Front Matter                                       :advanced:
-* TODO Limitations
+All front matter will be accessible as metadata when it comes time to render
+your layouts. That is to say, you can create your own custom keywords in your
+files, and use them in your layouts. To access your front-matter, you will have
+to dig into the data structure of your "file" in your layout.
+
+#+BEGIN_SRC clojure
+(defn project
+  [{:keys [meta]}]
+  (let [my-keywords (-> meta :keywords)]
+    [:html [:body (str my-keywords)]]))
+#+END_SRC

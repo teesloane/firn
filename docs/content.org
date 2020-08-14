@@ -3,7 +3,7 @@
 
 The content subsection handles everything to do with converting org files to html.
 
-- Front Matter - TODO
+- [[file:front-matter.org][Front Matter]] - Required and optional values found at the top of each org file.
 - [[file:layout.org][Layouts & Partials]] - How to organize and present your org-mode content.
 - [[file:the-render-function.org][The Render Function]] - How and what you want to render on your site.
 - [[file:styling.org][Styling]] - How to style templates and about the built-in styles
