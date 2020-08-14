@@ -49,16 +49,16 @@
   ([partial-map action]
    (render partial-map action {}))
   ([partial-map action opts]
-   (let [{:keys [file config]}            partial-map
-         org-tree                         (file :as-edn)
-         config-settings                  (config :user-config)     ; site-wide config: 0 precedence
-         site-map                         (config :site-map)
-         file-settings                    (file/keywords->map file) ; file-setting config: 2 precedence
-         layout-settings                  (if (map? opts) opts {})
-         merged-options                   (merge config-settings layout-settings file-settings)
-         cached-sitemap-html              (atom nil)
-         is-headline?                     (string? action)
-         {:keys [toc logbook firn-under firn-order]} (file :meta)]
+   (let [{:keys [file config]}    partial-map
+         org-tree                 (file :as-edn)
+         config-settings          (config :user-config)     ; site-wide config: 0 precedence
+         site-map                 (config :site-map)
+         file-settings            (file/keywords->map file) ; file-setting config: 2 precedence
+         layout-settings          (if (map? opts) opts {})
+         merged-options           (merge config-settings layout-settings file-settings)
+         cached-sitemap-html      (atom nil)
+         is-headline?             (string? action)
+         {:keys [toc logbook firn-under firn-order date-created-ts]} (file :meta)]
 
      ;; cache the site-map if it's not there already
      (when-not @cached-sitemap-html
@@ -95,10 +95,14 @@
 
        ;; render the previous file based on firn-order
        (= action :adjacent-files)
-       (markup/render-adjacent-file {:sitemap    site-map
-                                     :firn-under firn-under
-                                     :firn-order firn-order
-                                     :as-data?   (opts :as-data?)})
+       (markup/render-adjacent-file {:sitemap      site-map
+                                     :firn-under   firn-under
+                                     :firn-order   firn-order
+                                     :date-created date-created-ts
+                                     :prev-text    (opts :prev-text)
+                                     :next-text    (opts :next-text)
+                                     :order-by     (opts :order-by)
+                                     :as-data?     (opts :as-data?)})
 
 
        ;; render a table of contents
@@ -159,4 +163,3 @@
   [config file layout]
   (let [selected-layout (get-layout config file layout)]
     (h/html (selected-layout (prepare config file)))))
-

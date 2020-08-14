@@ -6,6 +6,8 @@
 
 (declare to-html)
 
+(sort-by (juxt #(nil? (% :foo)) :foo ) [{:foo 0} {:foo 30} {:foo 4} {:jo "gar"}] #_[2 6 nil 7 6])
+
 ;; Render: Site-map et al. --------------------------------------------------------
 
 (defn render-site-map
@@ -23,27 +25,38 @@
                       ;; HACK - if a file doesn't have a firn-order, set a large order on it.
                       ;; TODO - move all files that have firn-order of nil to the end of the their respective category?
                       ;; FIXME: this is also bad because it subs in CREATED_AT/UPDATED_AT if those don't exist and we are sorting by time.
-                      ;; ALSO (OMG) this doesn't seem to work on sub maps (site-mapn odes)?
+                      ;; ALSO (!) this doesn't seem to work on sub maps (site-map-nodes)?
                       backup-max 1000000000] ;; 
                   (compare
                    ;; we have to compare on values, and because some are duplicate (nil) we have to use compare a bit differently.
                    ;; https://clojuredocs.org/clojure.core/sorted-map-by#example-542692d5c026201cdc327094
-                   [(get-in smn [k1 prop] backup-max) k1]
-                   [(get-in smn [k2 prop] backup-max) k2])))))
+                   [(get-in smn [k1 prop] ) k1]
+                   [(get-in smn [k2 prop] ) k2])))))
 
            (starting-point [sm]
              (if (opts :start-at)
                (get-in sm (u/interpose+tail (opts :start-at) :children))
                sm))
 
+
+
+           ;; HACK: make sorting push nils to the end (for cases where say, firn-order is nil.)
+           (sort-by-key-nil-at-end [smn k reverse]
+             (let [sort-order (fn [a b] (if reverse (compare a b) (compare b a)))]
+               (->> smn
+                  (map (fn [[k v]] (assoc v :__keyname k))) ; keep the key
+                  (sort-by (juxt #(nil? (% k)) k) sort-order)
+                  (map #(hash-map (% :__keyname) %))
+                  (into {}))))
+
            (sort-site-map [site-map-node] ;; site-map-node is a whole site-map or any :children sub maps.
              (case (opts :sort-by)
                "alphabetical" (into (sorted-map) site-map-node)
                "newest"       (into (sorted-map-by (sort-by-key site-map-node :date-created-ts true)) site-map-node)
-               "oldest"       (into (sorted-map-by (sort-by-key site-map-node :date-created-ts)) site-map-node)
+               "oldest"       (into (sorted-map-by (sort-by-key site-map-node :date-created-ts false)) site-map-node)
                ;; TODO: updated doesn't seem to be working yet.
                ;; "updated"      (into (sorted-map-by (sort-by-key site-map-node :date-updated-ts )) site-map-node)
-               "order"        (into (sorted-map-by (sort-by-key site-map-node :firn-order)) site-map-node)
+               "order"       (sort-by-key-nil-at-end site-map-node :firn-order true)
                site-map-node))
 
            (make-child [[k v]]
@@ -88,20 +101,26 @@
 
 (defn render-adjacent-file
   "Renders html (or returns data) of the previous and next link in the sitemap.
-  Expects that your files are using `firn-order` to work."
-  [{:keys [sitemap firn-under firn-order as-data?]}]
+  Expects that your files are using `firn-order` or `:date-created` to work."
+  [{:keys [sitemap firn-under firn-order date-created as-data? order-by prev-text next-text]}]
+
+  (prn prev-text next-text)
   (let [site-map-node (if (nil? firn-under) sitemap
                           (get-in sitemap (u/interpose+tail firn-under :children)))
-        ordered-smn   (->> site-map-node vals (sort-by :firn-order))
+        sort-method   (case order-by :newest :date-created-ts :order :firn-order)
+        sort-value    (case order-by :newest date-created :order firn-order)
+        ordered-smn   (->> site-map-node vals (sort-by sort-method))
+        prev-text     (or prev-text "Previous: ")
+        next-text     (or next-text "Next: ")
         out           (atom {:next nil :previous nil})]
     ;; since firn-order can be sporadic and non-sequential (can have gaps, 1..2..5..10)
     ;; we use loop/recur to just get the prev/after
-    (loop [lst ordered-smn
+    (loop [lst  ordered-smn
            prev nil]
       (when (seq lst)
         (let [head (first lst)]
           ;; when firn-order equals the item we are iterative over.
-          (if (= (:firn-order head) firn-order)
+          (if (= (sort-method head) sort-value)
             (reset! out {:next (second lst) :previous prev})
             (recur (rest lst) head)))))
     (if as-data? @out
@@ -109,11 +128,11 @@
           [:div.firn-file-navigation
            (when previous
              [:span.firn-file-nav-prev
-              "Previous: " [:a {:href (previous :path)} (previous :title)]])
+              prev-text [:a {:href (previous :path)} (previous :title)]])
            " "
            (when next
              [:span.firn-file-nav-next
-              "Next: " [:a {:href (next :path)} (next :title)]])]))))
+              next-text [:a {:href (next :path)} (next :title)]])]))))
 
 ;; Render: Table of Contents --------------------------------------------------
 
