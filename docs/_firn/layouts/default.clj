@@ -8,7 +8,7 @@
       [:main
        [:article.def-wrapper
         [:aside#sidebar.def-sidebar
-         (render :sitemap {:sort-by "oldest"})]
+         (render :sitemap {:sort-by :firn-order})]
         [:div.def-content
 
          [:h1 title]

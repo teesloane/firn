@@ -24,30 +24,11 @@
                           "Org Mode"        {:path "http://localhost:4000/org-mode", :date-created "2020-02-28 20:56", :date-updated "2020-08-04 21:02", :firn-under ["Research"], :date-created-ts 1582866000, :title "Org Mode", :firn-order 3, :date-updated-ts 1582866000, :logbook-total "0:00"},
                           "Open Frameworks" {:path "http://localhost:4000/open_frameworks", :date-created "2020-07-08 15:48", :date-updated "2020-08-06 17:35", :firn-under ["Research"], :date-created-ts 1594180800, :title "Open Frameworks", :firn-order 4, :date-updated-ts 1594180800, :logbook-total "0:00"}}}})
 ;; (sort-by :firn-order (vals (get-in sample-sitemap ["Research" :children])))
-
-(sort-by (juxt #(nil? (% :firn-order)) :firn-order) (vals (get-in sample-sitemap ["Research" :children])))
+;; (sort-by (juxt #(nil? (% :firn-order)) :firn-order) (vals (get-in sample-sitemap ["Research" :children])))
 ;; (sort-by (juxt #(nil? (% :foo)) :foo ) [{:foo 0} {:foo 30} {:foo 4} {:jo "gar"}] #_[2 6 nil 7 6])
 
-(defn sort-by-key-nil-at-end
-  [smn k]
-  (into {}
-        (->> (sort-by (juxt #(nil? (% k)) k) smn)
-           (map #(hash-map (% :title) %))))
 
-  )
-
-(sort-by-key-nil-at-end (vals (get-in sample-sitemap ["Research" :children])) :firn-order)
-
-
-
-
-
-
-;; (sort-by (juxt #(nil? (% k)) k) smn))
-
-
-
-;; Tests
+;; Tests --
 
 (t/deftest link->html
   (t/testing "http-link"
@@ -126,6 +107,65 @@
                        [:ol '([:li [:a {:href "#level3"} "Level3"]])]]]]
         (t/is (= res-1 expected))))))
 
+(t/deftest render-sitemap
+  (t/testing "With no options, an html site map is returned in the order the site-map as data exists"
+    (let [res          (sut/render-site-map sample-sitemap)
+          expected-out [:ul.firn-sitemap.firn-sitemap-item--parent
+                        '([:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/writing"} "Writing"]]
+                          [:li.firn-sitemap-item--child [:a.firn-sitemap-item--link {:href "http://localhost:4000/research"} "Research"]
+                           [:ul.firn-sitemap-item--parent
+                            ([:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/quil"} "Quil"]]
+                             [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/generative_art"} "Generative Art"]]
+                             [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/org-mode"} "Org Mode"]]
+                             [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/open_frameworks"} "Open Frameworks"]])]])]]
+      (t/is (= res expected-out))))
+  (t/testing "Alphabetical sorting works"
+    (let [res          (sut/render-site-map sample-sitemap {:sort-by :alphabetical})
+          expected-out [:ul.firn-sitemap.firn-sitemap-item--parent
+                        '([:li.firn-sitemap-item--child [:a.firn-sitemap-item--link {:href "http://localhost:4000/research"} "Research"]
+                           [:ul.firn-sitemap-item--parent
+                            ([:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/generative_art"} "Generative Art"]]
+                             [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/open_frameworks"} "Open Frameworks"]]
+                             [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/org-mode"} "Org Mode"]]
+                             [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/quil"} "Quil"]])]]
+                          [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/writing"} "Writing"]])]]
+      (t/is (= res expected-out))))
+
+  (t/testing "Sorting by oldest works"
+    (let [res          (sut/render-site-map sample-sitemap {:sort-by :oldest})
+          expected-out [:ul.firn-sitemap.firn-sitemap-item--parent
+                        '([:li.firn-sitemap-item--child [:a.firn-sitemap-item--link {:href "http://localhost:4000/research"} "Research"]
+                           [:ul.firn-sitemap-item--parent
+                            ([:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/org-mode"} "Org Mode"]]
+                             [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/quil"} "Quil"]]
+                             [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/generative_art"} "Generative Art"]]
+                             [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/open_frameworks"} "Open Frameworks"]])]]
+                          [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/writing"} "Writing"]])]]
+      (t/is (= res expected-out)))
+    (t/testing "Sorting by newest works"
+      (let [res          (sut/render-site-map sample-sitemap {:sort-by :newest})
+            expected-out [:ul.firn-sitemap.firn-sitemap-item--parent
+                          '([:li
+                             [:a.firn-sitemap-item--link {:href "http://localhost:4000/writing"} "Writing"]]
+                            [:li.firn-sitemap-item--child [:a.firn-sitemap-item--link {:href "http://localhost:4000/research"} "Research"]
+                             [:ul.firn-sitemap-item--parent
+                              ([:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/open_frameworks"} "Open Frameworks"]]
+                               [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/generative_art"} "Generative Art"]]
+                               [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/quil"} "Quil"]]
+                               [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/org-mode"} "Org Mode"]])]])]]
+        (t/is (= res expected-out))))
+
+    (t/testing ":start-at truncates to a child node."
+      (let [res          (sut/render-site-map sample-sitemap {:start-at ["Research"] :sort-by :newest})
+            expected-out [:ul.firn-sitemap.firn-sitemap-item--parent
+                          '([:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/open_frameworks"} "Open Frameworks"]]
+                            [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/generative_art"} "Generative Art"]]
+                            [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/quil"} "Quil"]]
+                            [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/org-mode"} "Org Mode"]])]
+            ]
+        (t/is (= res expected-out))))))
+
+
 (t/deftest render-breadcrumbs
   (t/testing "expected output"
     (let [res (sut/render-breadcrumbs ["Research" "Writing"] sample-sitemap {})]
@@ -139,12 +179,43 @@
     (let [res (sut/render-breadcrumbs ["Foobar"] sample-sitemap {})]
       (t/is (= res [:div.firn-breadcrumbs '([:span "Foobar"])])))))
 
-
 (t/deftest render-adjacent-file
-  (t/testing "Exepected result"
+  ;; In these tests the "params" map is mimicking what would have been pulled off the file map in a render call.
+  (t/testing "Defaults to return prev/next html tags by firn-order"
     (let [params   {:sitemap sample-sitemap :firn-under ["Research"] :firn-order 3}
           res      (sut/render-adjacent-file params)
-          expected [:div.firn-file-navigation [:span.firn-file-nav-prev "Previous: " [:a {:href "http://localhost:4000/generative_art"} "Generative Art"]] " " [:span.firn-file-nav-next "Next: " [:a {:href "http://localhost:4000/open_frameworks"} "Open Frameworks"]]]]
+          expected [:div.firn-file-navigation
+                    [:span.firn-file-nav-prev "Previous: " [:a {:href "http://localhost:4000/generative_art"} "Generative Art"]]
+                    " "
+                    [:span.firn-file-nav-next "Next: " [:a {:href "http://localhost:4000/open_frameworks"} "Open Frameworks"]]]]
+      (t/is (= res expected))))
+
+
+  (t/testing "When passed options for order-by date, it returns next and prev by proper date."
+    (let [params   {:sitemap         sample-sitemap :firn-under ["Research"]
+                    :firn-order      3
+                    :date-created-ts 1591070400
+                    :order-by        :date}
+          res      (sut/render-adjacent-file params)
+          expected [:div.firn-file-navigation
+                    [:span.firn-file-nav-prev "Previous: " [:a {:href "http://localhost:4000/org-mode"} "Org Mode"]]
+                    " "
+                    [:span.firn-file-nav-next "Next: " [:a {:href "http://localhost:4000/open_frameworks"} "Open Frameworks"]]]]
+      (t/is (= res expected))))
+
+
+  (t/testing "When passed options for changing prev/next text, it does so."
+    (let [params   {:sitemap         sample-sitemap :firn-under ["Research"]
+                    :firn-order      3
+                    :date-created-ts 1591070400
+                    :order-by        :date
+                    :prev-text       "<--"
+                    :next-text        "-->"}
+          res      (sut/render-adjacent-file params)
+          expected [:div.firn-file-navigation
+                    [:span.firn-file-nav-prev "<--" [:a {:href "http://localhost:4000/org-mode"} "Org Mode"]]
+                    " "
+                    [:span.firn-file-nav-next "-->" [:a {:href "http://localhost:4000/open_frameworks"} "Open Frameworks"]]]]
       (t/is (= res expected))))
 
   (t/testing ":as-data? responds with just data."

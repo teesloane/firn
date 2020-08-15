@@ -11,7 +11,12 @@
 ;; Render: Site-map et al. --------------------------------------------------------
 
 (defn render-site-map
-  "Converts the site map data structure into html. Takes options for sorting.
+  "Converts the site map data structure into html. Takes options for sorting
+  This is somewhat complex and has many nested functions for performing sorting..
+  This is complex/featureful because a user can:
+  - a) sort their map by date and `firn-order`
+  - b) a user can choose to start their site-map at a specific 'node'
+  - c) we have to handle for when the user's files don't have all the necessary metadata.
   TODO: needs tests."
   ([sm]
    (render-site-map sm {}))
@@ -20,27 +25,31 @@
              ([smn prop] (sort-by-key smn prop false))
              ([smn prop flip-keys?]
               (fn [key1 key2]
-                (let [k1         (if flip-keys? key2 key1)
-                      k2         (if flip-keys? key1 key2)
-                      ;; HACK - if a file doesn't have a firn-order, set a large order on it.
-                      ;; TODO - move all files that have firn-order of nil to the end of the their respective category?
-                      ;; FIXME: this is also bad because it subs in CREATED_AT/UPDATED_AT if those don't exist and we are sorting by time.
-                      ;; ALSO (!) this doesn't seem to work on sub maps (site-map-nodes)?
-                      backup-max 1000000000] ;; 
+                (let [k1 (if flip-keys? key2 key1)
+                      k2 (if flip-keys? key1 key2)]
                   (compare
                    ;; we have to compare on values, and because some are duplicate (nil) we have to use compare a bit differently.
                    ;; https://clojuredocs.org/clojure.core/sorted-map-by#example-542692d5c026201cdc327094
                    [(get-in smn [k1 prop] ) k1]
                    [(get-in smn [k2 prop] ) k2])))))
 
+           ;; Sometimes a user might want to render the site-map at a lower
+           ;; level than from the top.
            (starting-point [sm]
              (if (opts :start-at)
                (get-in sm (u/interpose+tail (opts :start-at) :children))
                sm))
 
-
-
-           ;; HACK: make sorting push nils to the end (for cases where say, firn-order is nil.)
+           ;; HACK: make sorting push nils to the end (for cases where say,
+           ;; firn-order is nil.) when sorting a sitemap node, the key we sort
+           ;; by might not exist. when collections with nil are sorted, nil ends
+           ;; up at the beginning of this list. Using Juxt, we can push them to
+           ;; the end.
+           ;; The use of `map` and `into` in the thread macro are around just
+           ;; for keeping the shape of the map since we are going from
+           ;; map -> list -> map, and the keys of the map MIGHT not exist as files,
+           ;; (due to how the site-map is built with `firn-under`
+           ;; and thus they also might not have the sorting key. ＼（＾ ＾）／
            (sort-by-key-nil-at-end [smn k reverse]
              (let [sort-order (fn [a b] (if reverse (compare a b) (compare b a)))]
                (->> smn
@@ -51,12 +60,12 @@
 
            (sort-site-map [site-map-node] ;; site-map-node is a whole site-map or any :children sub maps.
              (case (opts :sort-by)
-               "alphabetical" (into (sorted-map) site-map-node)
-               "newest"       (into (sorted-map-by (sort-by-key site-map-node :date-created-ts true)) site-map-node)
-               "oldest"       (into (sorted-map-by (sort-by-key site-map-node :date-created-ts false)) site-map-node)
+               :alphabetical (into (sorted-map) site-map-node)
+               :newest       (into (sorted-map-by (sort-by-key site-map-node :date-created-ts true)) site-map-node)
+               :oldest       (into (sorted-map-by (sort-by-key site-map-node :date-created-ts false)) site-map-node)
                ;; TODO: updated doesn't seem to be working yet.
                ;; "updated"      (into (sorted-map-by (sort-by-key site-map-node :date-updated-ts )) site-map-node)
-               "order"       (sort-by-key-nil-at-end site-map-node :firn-order true)
+               :firn-order   (sort-by-key-nil-at-end site-map-node :firn-order true)
                site-map-node))
 
            (make-child [[k v]]
@@ -101,26 +110,26 @@
 
 (defn render-adjacent-file
   "Renders html (or returns data) of the previous and next link in the sitemap.
-  Expects that your files are using `firn-order` or `:date-created` to work."
-  [{:keys [sitemap firn-under firn-order date-created as-data? order-by prev-text next-text]}]
-
-  (prn prev-text next-text)
+  Expects that your files are using `firn-order` or `:date-created-ts` in order to
+  properly determine what is `next` and what is `previous`."
+  [{:keys [sitemap firn-under firn-order date-created-ts as-data? order-by prev-text next-text]
+    :or   {order-by :firn-order}}]
   (let [site-map-node (if (nil? firn-under) sitemap
                           (get-in sitemap (u/interpose+tail firn-under :children)))
-        sort-method   (case order-by :newest :date-created-ts :order :firn-order)
-        sort-value    (case order-by :newest date-created :order firn-order)
-        ordered-smn   (->> site-map-node vals (sort-by sort-method))
+        sort-mech     {:date       {:key :date-created-ts :file-val date-created-ts}
+                       :firn-order {:key :firn-order :file-val firn-order}}
+        sort-key      (-> sort-mech order-by :key)
+        org-file-val  (-> sort-mech order-by :file-val)
+        ordered-smn   (->> site-map-node vals (sort-by sort-key))
         prev-text     (or prev-text "Previous: ")
         next-text     (or next-text "Next: ")
         out           (atom {:next nil :previous nil})]
-    ;; since firn-order can be sporadic and non-sequential (can have gaps, 1..2..5..10)
-    ;; we use loop/recur to just get the prev/after
     (loop [lst  ordered-smn
            prev nil]
       (when (seq lst)
         (let [head (first lst)]
           ;; when firn-order equals the item we are iterative over.
-          (if (= (sort-method head) sort-value)
+          (if (= (sort-key head) org-file-val)
             (reset! out {:next (second lst) :previous prev})
             (recur (rest lst) head)))))
     (if as-data? @out
