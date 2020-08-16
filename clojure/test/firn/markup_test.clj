@@ -119,6 +119,21 @@
                              [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/org-mode"} "Org Mode"]]
                              [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/open_frameworks"} "Open Frameworks"]])]])]]
       (t/is (= res expected-out))))
+
+  (t/testing "Firn-order sort works"
+    (let [res          (sut/render-site-map sample-sitemap {:sort-by :firn-order})
+          expected-out [:ul.firn-sitemap.firn-sitemap-item--parent
+                        '([:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/writing"} "Writing"]]
+                          ;; Research comes last at top level because it has nil :firn-order
+                          [:li.firn-sitemap-item--child [:a.firn-sitemap-item--link {:href "http://localhost:4000/research"} "Research"]
+                           [:ul.firn-sitemap-item--parent
+                            ([:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/generative_art"} "Generative Art"]]
+                             [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/org-mode"} "Org Mode"]]
+                             [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/open_frameworks"} "Open Frameworks"]]
+                             ;; quil comes last as it has nil :firn-order
+                             [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/quil"} "Quil"]])]])]]
+
+      (t/is (= res expected-out))))
   (t/testing "Alphabetical sorting works"
     (let [res          (sut/render-site-map sample-sitemap {:sort-by :alphabetical})
           expected-out [:ul.firn-sitemap.firn-sitemap-item--parent
@@ -161,8 +176,8 @@
                           '([:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/open_frameworks"} "Open Frameworks"]]
                             [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/generative_art"} "Generative Art"]]
                             [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/quil"} "Quil"]]
-                            [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/org-mode"} "Org Mode"]])]
-            ]
+                            [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/org-mode"} "Org Mode"]])]]
+
         (t/is (= res expected-out))))))
 
 
