@@ -1,8 +1,6 @@
 (ns firn.markup-test
   (:require [firn.markup :as sut]
-            [clojure.test :as t]
-            [hiccup.core :as h]))
-
+            [clojure.test :as t]))
 
 ;; Mocks
 
@@ -23,10 +21,6 @@
                           "Generative Art"  {:path "http://localhost:4000/generative_art", :date-created "2020-06-02 Tue", :date-updated "2020-08-04 20:51", :firn-under ["Research"], :date-created-ts 1591070400, :title "Generative Art", :firn-order 2, :date-updated-ts 1591070400, :logbook-total "0:00"},
                           "Org Mode"        {:path "http://localhost:4000/org-mode", :date-created "2020-02-28 20:56", :date-updated "2020-08-04 21:02", :firn-under ["Research"], :date-created-ts 1582866000, :title "Org Mode", :firn-order 3, :date-updated-ts 1582866000, :logbook-total "0:00"},
                           "Open Frameworks" {:path "http://localhost:4000/open_frameworks", :date-created "2020-07-08 15:48", :date-updated "2020-08-06 17:35", :firn-under ["Research"], :date-created-ts 1594180800, :title "Open Frameworks", :firn-order 4, :date-updated-ts 1594180800, :logbook-total "0:00"}}}})
-;; (sort-by :firn-order (vals (get-in sample-sitemap ["Research" :children])))
-;; (sort-by (juxt #(nil? (% :firn-order)) :firn-order) (vals (get-in sample-sitemap ["Research" :children])))
-;; (sort-by (juxt #(nil? (% :foo)) :foo ) [{:foo 0} {:foo 30} {:foo 4} {:jo "gar"}] #_[2 6 nil 7 6])
-
 
 ;; Tests --
 
@@ -179,7 +173,6 @@
                             [:li [:a.firn-sitemap-item--link {:href "http://localhost:4000/org-mode"} "Org Mode"]])]]
 
         (t/is (= res expected-out))))))
-
 
 (t/deftest render-breadcrumbs
   (t/testing "expected output"

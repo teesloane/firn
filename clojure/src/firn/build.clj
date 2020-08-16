@@ -91,20 +91,6 @@
 
     final-file))
 
-;; TODO - remove this, I don't think custom pages should go into final site-map
-;; since we can't add metadata (order, time published, etc) anyway.
-(defn process-site-map-with-pages!
-  "If a user has 'pages/*.clj' files - and their config enables it,
-  Add these to the site map."
-  [site-map config]
-  (if (-> config :user-config :site-map-pages?)
-    (into site-map (for [[k _] (config :pages)]
-                     {:path       (str (-> config :user-config :site-url) (u/keyword->web-path k))
-                      :title      (u/keyword->normal-text k)
-                      :firn-order 9999
-                      :firn-under "Page"}))
-    site-map))
-
 ;; @site-map!)
 
 (defn process-all ; (ie, just org-files, not pages)
@@ -113,7 +99,8 @@
   process-all -> process-one -> file/extract-metadata -> file/extract-metadata-helper"
   [config]
   (loop [org-files (config :org-files)
-         site-vals {:processed-files {} :site-map [] :site-tags [] :site-links [] :site-attachments []}
+         site-vals {:processed-files {} :site-map   []
+                    :site-tags       [] :site-links [] :site-attachments []}
          output    {}]
     (if (empty? org-files)
       ;; run one more loop on all files, and create their html,
@@ -121,7 +108,7 @@
       (let [config-with-data (merge config
                                     site-vals ;; contains logbook already
                                     {:processed-files (vals output)
-                                     :site-map        (file/make-site-map (site-vals :site-map)) #_(process-site-map-with-pages! (site-vals :site-map) config)
+                                     :site-map        (file/make-site-map (site-vals :site-map))
                                      :site-tags       (into (sorted-map) (group-by :tag-value (site-vals :site-tags)))})
 
             ;; FIXME: I think we are rendering html twice here, should prob only happen here?
@@ -130,11 +117,11 @@
         final)
 
       ;; Otherwise continue...
-      (let [next-file                    (first org-files)
-            processed-file               (process-one config next-file)
-            is-private                   (file/is-private? config processed-file)
-            in-sitemap?                  (file/in-site-map? processed-file)
-            org-files                    (rest org-files)
+      (let [next-file                                (first org-files)
+            processed-file                           (process-one config next-file)
+            is-private                               (file/is-private? config processed-file)
+            in-sitemap?                              (file/in-site-map? processed-file)
+            org-files                                (rest org-files)
             {:keys [links logbook tags attachments]} (-> processed-file :meta)]
         (if is-private
           (recur org-files site-vals output)

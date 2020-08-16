@@ -145,18 +145,16 @@
             firn-under (-> head :firn-under)
             title      (-> head :title)]
         (cond
-          ;; if there is no "firn-under" it's a top level site-map item, and it's not in the map yet.
+          ;; if there is no "firn-under" it's a top level site-map item, and
+          ;; it's not in the map yet.
           (and (nil? firn-under) (not (contains? out title)))
           (recur tail (assoc out title head))
 
-          ;; the item is already in `out` b/c the firn-under val created it with an update-in call.
+          ;; the item is already in `out` b/c the firn-under val created it with
+          ;; an update-in call.
           (contains? out title)
           (let [updated-out (update out title #(merge % head))]
             (recur tail updated-out))
-
-          ;; if firn-under is just a string - it's a 2nd level.
-          (string? firn-under)
-          (recur tail (update-in out [firn-under :children] assoc title head))
 
           ;; if user wants to make a nested value, do that.
           (seq firn-under)
@@ -174,12 +172,6 @@
           :else
           (recur tail out)))
       out)))
-
-
-(comment
-  [research :children language :children french] {"language" ...}
-  [research :children language]
-  )
 
 
 (defn sum-logbook

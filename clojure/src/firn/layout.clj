@@ -101,9 +101,8 @@
                                      :date-created-ts date-created-ts
                                      :prev-text       (opts :prev-text)
                                      :next-text       (opts :next-text)
-                                     :order-by        (opts :order-by)
+                                     :order-by        (get opts :order-by :firn-order)
                                      :as-data?        (opts :as-data?)})
-
 
        ;; render a table of contents
        (= action :toc)
