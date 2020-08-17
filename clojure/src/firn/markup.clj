@@ -16,8 +16,7 @@
   This is complex/featureful because a user can:
   - a) sort their map by date and `firn-order`
   - b) a user can choose to start their site-map at a specific 'node'
-  - c) we have to handle for when the user's files don't have all the necessary metadata.
-  TODO: needs tests."
+  - c) we have to handle for when the user's files don't have all the necessary metadata."
   ([sm]
    (render-site-map sm {}))
   ([sm opts]
@@ -63,8 +62,6 @@
                :alphabetical (into (sorted-map) site-map-node)
                :newest       (into (sorted-map-by (sort-by-key site-map-node :date-created-ts true)) site-map-node)
                :oldest       (into (sorted-map-by (sort-by-key site-map-node :date-created-ts false)) site-map-node)
-               ;; TODO: updated doesn't seem to be working yet.
-               ;; "updated"      (into (sorted-map-by (sort-by-key site-map-node :date-updated-ts )) site-map-node)
                :firn-order   (sort-by-key-nil-at-end site-map-node :firn-order true)
                site-map-node))
 
@@ -112,8 +109,7 @@
   "Renders html (or returns data) of the previous and next link in the sitemap.
   Expects that your files are using `firn-order` or `:date-created-ts` in order to
   properly determine what is `next` and what is `previous`."
-  [{:keys [sitemap firn-under firn-order date-created-ts as-data? order-by prev-text next-text]
-    :or   {order-by :firn-order}}]
+  [{:keys [sitemap firn-under firn-order date-created-ts as-data? order-by prev-text next-text]}]
   (let [site-map-node (if (nil? firn-under) sitemap
                           (get-in sitemap (u/interpose+tail firn-under :children)))
         sort-mech     {:date       {:key :date-created-ts :file-val date-created-ts}

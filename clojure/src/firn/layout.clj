@@ -83,7 +83,7 @@
        (org/poly-line logbook opts)
 
        ;; Render the sitemap; cache it the first time it runs
-       (= action :sitemap)
+       (and (= action :sitemap) (seq site-map))
        (if-not @cached-sitemap-html
          (do (reset! cached-sitemap-html (markup/render-site-map site-map opts))
              @cached-sitemap-html)

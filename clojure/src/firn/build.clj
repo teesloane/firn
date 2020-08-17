@@ -99,8 +99,11 @@
   process-all -> process-one -> file/extract-metadata -> file/extract-metadata-helper"
   [config]
   (loop [org-files (config :org-files)
-         site-vals {:processed-files {} :site-map   []
-                    :site-tags       [] :site-links [] :site-attachments []}
+         site-vals {:processed-files  {}
+                    :site-map         [] ;; < collected as list, transformed later to map.
+                    :site-tags        []
+                    :site-links       []
+                    :site-attachments []}
          output    {}]
     (if (empty? org-files)
       ;; run one more loop on all files, and create their html,
@@ -160,14 +163,14 @@
 (defn write-pages!
   "Responsible for publishing html pages from clojure templates found in pages/
   Currently, we can only render a flat file list of .clj files in /pages.
-  FIXME: (In a later release) - do something similar to `file/get-web-path` and
+  TODO: (In a later release) - do something similar to `file/get-web-path` and
   enable `load-fns-into-map` to save filenames as :namespaced/keys, allowing
   make-parent to work on it."
   [{:keys [dir-site pages partials site-map site-links site-logs site-tags user-config] :as config}]
   (let [site-url (user-config :site-url)
         user-api {:partials   partials
                   :site-links site-links
-                  ;; TODO - add render to here for rendering sitemap stuff.
+                  :site-map   site-map
                   :site-logs  site-logs
                   :site-tags  site-tags
                   :site-url   site-url
