@@ -95,14 +95,13 @@
 
        ;; render the previous file based on firn-order
        (= action :adjacent-files)
-       (markup/render-adjacent-file {:sitemap         site-map
-                                     :firn-under      firn-under
-                                     :firn-order      firn-order
-                                     :date-created-ts date-created-ts
-                                     :prev-text       (opts :prev-text)
-                                     :next-text       (opts :next-text)
-                                     :order-by        (get opts :order-by :firn-order)
-                                     :as-data?        (opts :as-data?)})
+       (markup/render-adjacent-file
+        (merge
+         {:sitemap         site-map
+          :firn-under      firn-under
+          :firn-order      firn-order
+          :date-created-ts date-created-ts}
+         (select-keys opts [:prev-text :next-text :order-by :as-data])))
 
        ;; render a table of contents
        (= action :toc)

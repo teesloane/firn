@@ -6,8 +6,6 @@
 
 (declare to-html)
 
-(sort-by (juxt #(nil? (% :foo)) :foo ) [{:foo 0} {:foo 30} {:foo 4} {:jo "gar"}] #_[2 6 nil 7 6])
-
 ;; Render: Site-map et al. --------------------------------------------------------
 
 (defn render-site-map
@@ -109,7 +107,8 @@
   "Renders html (or returns data) of the previous and next link in the sitemap.
   Expects that your files are using `firn-order` or `:date-created-ts` in order to
   properly determine what is `next` and what is `previous`."
-  [{:keys [sitemap firn-under firn-order date-created-ts as-data? order-by prev-text next-text]}]
+  [{:keys [sitemap firn-under firn-order date-created-ts as-data? order-by prev-text next-text]
+    :or   {order-by :firn-order}}]
   (let [site-map-node (if (nil? firn-under) sitemap
                           (get-in sitemap (u/interpose+tail firn-under :children)))
         sort-mech     {:date       {:key :date-created-ts :file-val date-created-ts}
