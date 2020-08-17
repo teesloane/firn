@@ -37,11 +37,12 @@
                (get-in sm (u/interpose+tail (opts :start-at) :children))
                sm))
 
-           ;; HACK: make sorting push nils to the end (for cases where say,
+           ;; NOTE: make sorting push nils to the end (for cases where say,
            ;; firn-order is nil.) when sorting a sitemap node, the key we sort
            ;; by might not exist. when collections with nil are sorted, nil ends
            ;; up at the beginning of this list. Using Juxt, we can push them to
            ;; the end.
+           ;;
            ;; The use of `map` and `into` in the thread macro are around just
            ;; for keeping the shape of the map since we are going from
            ;; map -> list -> map, and the keys of the map MIGHT not exist as files,

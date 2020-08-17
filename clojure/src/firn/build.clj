@@ -99,9 +99,10 @@
           ;; if user wants to make a nested value, do that.
           (seq firn-under)
           (let [path-to-update (vec (concat (interpose :children firn-under) [:children]))
-                ;; HACK: we are doing merges within an update so that parents
+                ;; NOTE: we are doing merges within an update so that parents
                 ;; don't overwrite children. basically, the merge has to happen
                 ;; at the (vals) level, and then be re-set to the existing node.
+                ;; Incoming vals are <string><map>!
                 update-fn      (fn [existing-site-map-node title head]
                                  (let [vals1       (get existing-site-map-node title {})
                                        merged-vals (merge vals1 head)
