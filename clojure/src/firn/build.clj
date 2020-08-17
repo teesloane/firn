@@ -73,6 +73,46 @@
     ;; as-html
     (file/change f {:as-html as-html})))
 
+(defn make-site-map
+  "Builds the site maps a tree where a file might fall under one or more files.
+  Checks the value of `#+FIRN_UNDER` to decide under what parent to place a child."
+  [processed-files]
+  (loop [files processed-files
+         out   {}]
+    (if (seq files)
+      (let [head       (first files)
+            tail       (rest files)
+            firn-under (-> head :firn-under)
+            title      (-> head :title)]
+        (cond
+          ;; if there is no "firn-under" it's a top level site-map item, and
+          ;; it's not in the map yet.
+          (and (nil? firn-under) (not (contains? out title)))
+          (recur tail (assoc out title head))
+
+          ;; the item is already in `out` b/c the firn-under val created it with
+          ;; an update-in call.
+          (contains? out title)
+          (let [updated-out (update out title #(merge % head))]
+            (recur tail updated-out))
+
+          ;; if user wants to make a nested value, do that.
+          (seq firn-under)
+          (let [path-to-update (vec (concat (interpose :children firn-under) [:children]))
+                ;; HACK: we are doing merges within an update so that parents
+                ;; don't overwrite children. basically, the merge has to happen
+                ;; at the (vals) level, and then be re-set to the existing node.
+                update-fn      (fn [existing-site-map-node title head]
+                                 (let [vals1       (get existing-site-map-node title {})
+                                       merged-vals (merge vals1 head)
+                                       final       (hash-map title merged-vals)]
+                                   (merge existing-site-map-node final)))]
+            (recur tail (update-in out path-to-update update-fn title head)))
+
+          :else
+          (recur tail out)))
+      out)))
+
 (defn process-one
   "Munge the 'file' datastructure; slowly filling it up, using let-shadowing.
   Essentially, converts `org-mode file string` -> json, edn, logbook, keywords"
@@ -90,8 +130,6 @@
         final-file    (htmlify config new-file)]                   ; parses the edn tree -> html.
 
     final-file))
-
-;; @site-map!)
 
 (defn process-all ; (ie, just org-files, not pages)
   "Receives config, processes all ORG files and builds up site-data logbooks, site-map, link-map, etc.
@@ -111,7 +149,7 @@
       (let [config-with-data (merge config
                                     site-vals ;; contains logbook already
                                     {:processed-files (vals output)
-                                     :site-map        (file/make-site-map (site-vals :site-map))
+                                     :site-map        (make-site-map (site-vals :site-map))
                                      :site-tags       (into (sorted-map) (group-by :tag-value (site-vals :site-tags)))})
 
             ;; FIXME: I think we are rendering html twice here, should prob only happen here?
