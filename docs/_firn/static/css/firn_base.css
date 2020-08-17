@@ -29,8 +29,6 @@
   --justify-important: center;
   --justify-normal: left;
   --line-height: 1.75;
-  --width-card: 285px;
-  --width-card-medium: 460px;
   --width-card-wide: 800px;
   --width-content: 960px;
   /* Currently, Firn only supports 'todo | done' keywords. */
@@ -90,27 +88,6 @@ hr {
   margin: 3rem 0;
 }
 
-section {
-  /* display: flex; */
-  /* flex-wrap: wrap; */
-}
-
-section aside {
-  border: 1px solid var(--color-bg-secondary);
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow) var(--color-shadow);
-  margin: 1rem;
-  padding: 1.25rem;
-  width: var(--width-card);
-}
-
-section aside:hover {
-  box-shadow: var(--box-shadow) var(--color-bg-secondary);
-}
-
-section aside img {
-  max-width: 100%;
-}
 
 [hidden] {
   display: none;
@@ -123,71 +100,6 @@ main header {
   padding-top: 0;
 }
 
-header {
-  text-align: var(--justify-important);
-}
-
-header a b,
-header a em,
-header a i,
-header a strong {
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
-}
-
-header nav img {
-  margin: 1rem 0;
-}
-
-section header {
-  padding-top: 0;
-  width: 100%;
-}
-
-/* Nav */
-nav {
-  align-items: center;
-  display: flex;
-  font-weight: bold;
-  justify-content: space-between;
-}
-
-nav ul {
-  list-style: none;
-  padding: 0;
-}
-
-nav ul li {
-  display: inline-block;
-  margin: 0 0.5rem;
-  position: relative;
-  text-align: left;
-}
-
-/* Nav Dropdown */
-nav ul li:hover ul {
-  display: block;
-}
-
-nav ul li ul {
-  background: var(--color-bg);
-  border: 1px solid var(--color-bg-secondary);
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow) var(--color-shadow);
-  display: none;
-  height: auto;
-  left: -2px;
-  padding: 0.5rem 1rem;
-  position: absolute;
-  top: 1.7rem;
-  white-space: nowrap;
-  width: auto;
-}
-
-nav ul li ul li,
-nav ul li ul li a {
-  display: block;
-}
 
 /* Typography */
 code,
@@ -212,12 +124,7 @@ details summary {
   padding: 0 8px;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 {
   line-height: var(--line-height);
   margin: 1em 0;
 }
@@ -235,7 +142,6 @@ ul {
 ol li,
 ul li {
   padding: 0.125rem 0;
-  /* padding-left: 1.25rem; */
 }
 
 p {
@@ -245,14 +151,12 @@ p {
 
 pre {
   margin: 1rem 0;
-  max-width: var(--width-card-wide);
   padding: 1rem 0;
 }
 
 pre code,
 pre samp {
   display: block;
-  max-width: var(--width-card-wide);
   padding: 0.5rem 1rem;
   overflow-x: auto;
 }
@@ -286,48 +190,9 @@ a:hover {
   text-decoration: underline;
 }
 
-a b,
-a em,
-a i,
-a strong,
-button {
-  border-radius: var(--border-radius);
-  display: inline-block;
-  font-size: medium;
-  font-weight: bold;
-  line-height: var(--line-height);
-  margin: 0.5rem 0;
-  cursor: pointer;
-  padding: 0.5rem 0.75rem;
-}
 
-button {
-  font-family: var(--font-family);
-}
+/* -- Images */
 
-button:hover {
-  cursor: pointer;
-  filter: brightness(var(--hover-brightness));
-}
-
-a b,
-a strong,
-button {
-  background-color: var(--color-primary);
-  border: 2px solid var(--color-primary);
-  color: var(--color-bg);
-}
-
-a em,
-a i {
-  border: 2px solid var(--color-primary);
-  border-radius: var(--border-radius);
-  color: var(--color-primary);
-  display: inline-block;
-  padding: 1rem 2rem;
-}
-
-/* Images */
 figure {
   margin: 0;
   padding: 0;
@@ -341,78 +206,8 @@ figure figcaption {
   color: var(--color-text-secondary);
 }
 
-/* Forms TODO: remove */
 
-button:disabled,
-input:disabled {
-  background: var(--color-bg-secondary);
-  border-color: var(--color-bg-secondary);
-  color: var(--color-text-secondary);
-  cursor: not-allowed;
-}
-
-button[disabled]:hover {
-  filter: none;
-}
-
-form {
-  border: 1px solid var(--color-bg-secondary);
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow) var(--color-shadow);
-  display: block;
-  max-width: var(--width-card-wide);
-  min-width: var(--width-card);
-  padding: 1.5rem;
-  text-align: var(--justify-normal);
-}
-
-form header {
-  margin: 1.5rem 0;
-  padding: 1.5rem 0;
-}
-
-input,
-label,
-select,
-textarea {
-  display: block;
-  font-size: inherit;
-  max-width: var(--width-card-wide);
-}
-
-input[type="checkbox"],
-input[type="radio"] {
-  display: inline-block;
-}
-
-input[type="checkbox"] + label,
-input[type="radio"] + label {
-  display: inline-block;
-  font-weight: normal;
-  position: relative;
-  top: 1px;
-}
-
-input,
-select,
-textarea {
-  border: 1px solid var(--color-bg-secondary);
-  border-radius: var(--border-radius);
-  margin-bottom: 1rem;
-  padding: 0.4rem 0.8rem;
-}
-
-input[readonly],
-textarea[readonly] {
-  background-color: var(--color-bg-secondary);
-}
-
-label {
-  font-weight: bold;
-  margin-bottom: 0.2rem;
-}
-
-/* Tables */
+/* -- Tables */
 table {
   border: 1px solid var(--color-bg-secondary);
   border-radius: var(--border-radius);
@@ -459,7 +254,7 @@ table tr:nth-child(even) {
   background-color: var(--color-primary-accent);
 }
 
-/* Quotes */
+/* -- Quotes */
 blockquote {
   display: block;
   font-size: large;
@@ -477,7 +272,7 @@ blockquote footer {
   padding: 1.5rem 0;
 }
 
-/* Firn Org Tweaks*/
+/* -- Firn Org Tweaks */
 
 /* Because firn spits out nested contents (for example, the parser spits out p
    tags within li tags), sometimes you may need to style the children of html
@@ -639,8 +434,7 @@ li > p {
 
 /* Folding leverages html <details> and <summary> tags to emulate the folding
    feature of org-mode. This is a bit hacky; we hide the regular heading (so
-   that it still exists so as to make it anchorable and to display tags and
-   priority.)
+   that it still exists so it is anchorable, still has tags, priority etc).
 */
 
 
@@ -669,7 +463,7 @@ li > p {
 .firn-headline-summary-3 { font-size: 1.05em;  margin: 1em 0; }
 .firn-headline-summary-4 { font-size: 1em;     margin: 1em 0; }
 .firn-headline-summary-5 { font-size: 0.85em;  margin: 1em 0; }
-.firn-headline-summary-6 { font-size: 0.75em;   margin: 1em 0; }
+.firn-headline-summary-6 { font-size: 0.75em;  margin: 1em 0; }
 
 @media(max-width: 768px) {
   .firn-fold { font-size: 12px; }
@@ -679,7 +473,6 @@ li > p {
 /* Sitemap, breadcrumbs, siblings files, related files. ---------------------- */
 
 .firn-sitemap {
-
 }
 
 .firn-sitemap-item--parent {

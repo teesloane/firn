@@ -109,8 +109,6 @@ h2 {
 }
 
 
-
-
 .def-content {
   margin-left: calc(var(--sidebar-width) + 20px);
   overflow: auto;
@@ -120,8 +118,6 @@ h2 {
   padding: 0 32px;
   max-width: 58em;
 }
-
-
 
 
 /* Common */
