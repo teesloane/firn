@@ -7,7 +7,8 @@
   (:require [clojure.string :as s]
             [firn.org :as org]
             [firn.util :as u]
-            [sci.core :as sci]))
+            [sci.core :as sci]
+            [firn.markup :as markup]))
 
 ;; #+ORG_KEYWORDS that we want to evaluate into real clojure values.
 (def keywords-to-eval [:firn-toc :firn-properties? :firn-order :firn-fold :firn-sitemap? :firn-under])
@@ -60,16 +61,19 @@
   [config io-file]
   (let [name     (get-io-name io-file)
         path-abs (.getPath ^java.io.File io-file)
-        path-web (get-web-path (config :dirname-files) path-abs)]
-    {:as-edn    nil      ; JSON of org file -> converted to a map.
-     :as-html   nil      ; the html output
-     :as-json   nil      ; The org file, read as json and spat out by the rust binary.
-     :keywords  nil      ; list of keywords at top of org file: #+TITLE:, #+CATEGORY, etc.
-     :name      name     ; the file name
-     :path      path-abs ; dir path to the file.
-     :meta      {}       ; is filled when process-file / extract-metadata is run.
-     :path-web  path-web ; path to file from cwd.
-     :original  nil}))   ; the file as as javaFile object.
+        path-web (get-web-path (config :dirname-files) path-abs)
+        path-url (str (get-in config [:user-config :site-url]) "/"  path-web)]
+
+    {:as-edn   nil      ; JSON of org file -> converted to a map.
+     :as-html  nil      ; the html output
+     :as-json  nil      ; The org file, read as json and spat out by the rust binary.
+     :keywords nil      ; list of keywords at top of org file: #+TITLE:, #+CATEGORY, etc.
+     :name     name     ; the file name
+     :path     path-abs ; dir path to the file.
+     :meta     {}       ; is filled when process-file / extract-metadata is run.
+     :path-web path-web ; path to file from cwd: some/dirs/to/the/file - not well named.
+     :path-url path-url
+     :original nil}))   ; the file as as javaFile object.
 
 (defn change
   "Merges new keys into a file map."
@@ -166,7 +170,12 @@
   - eventually... a plugin for custom file collection?"
   [tree-data file-metadata]
   (loop [tree-data     tree-data
-         out           {:logbook [] :logbook-total nil :links [] :tags [] :toc [] :attachments []}
+         out           {:logbook       []
+                        :logbook-total nil
+                        :links         []
+                        :tags          []
+                        :toc           []
+                        :attachments   []}
          last-headline nil]  ; the most recent headline we've encountered.
     (if (empty? tree-data)
 
@@ -187,8 +196,7 @@
             (recur xs out x))
 
           "title" ; if title, collect tags, map with metadata, push into out :tags
-          (let [headline-link  (str "/"
-                                    (file-metadata :from-file-path)
+          (let [headline-link  (str (file-metadata :from-url)
                                     (org/make-headline-anchor last-headline))
                 headline-meta  {:from-headline (org/get-headline-helper last-headline)
                                 :headline-link headline-link}
@@ -225,7 +233,7 @@
         tree-data      (tree-seq map? :children org-tree)
         keywords       (keywords->map file) ; keywords are "in-buffer-settings" - things that start with #+<MY_KEYWORD>
         {:keys [date-updated date-created title firn-under firn-order ]} keywords
-        file-metadata  {:from-file title :from-file-path (file :path-web)}
+        file-metadata  {:from-file title :from-url (file :path-url)}
         metadata       (extract-metadata-helper tree-data file-metadata)
         date-parser    #(try
                           (when % (u/org-date->ts date-created))

@@ -14,7 +14,14 @@
          [:h1 title]
          [:div (render :toc)] ;; Optional; add a table of contents
          (render :file)
-         [:div
-          [:hr]
+         (when-let [backlinks (render :backlinks)]
+           [:div
+            [:hr]
+            [:div.backlinks
+             [:h4 "Backlinks to this document:"]
+             backlinks]])
+
+         [:div.adjacent-files
           [:span (render :adjacent-files)]]
+
          (footer)]]]]]))

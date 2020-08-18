@@ -47,10 +47,10 @@
 
 (t/deftest internal-link-handler
   (t/testing "Expected results."
-    (let [res1 (sut/internal-link-handler "file:foo.org")
-          res2 (sut/internal-link-handler "file:foo.org::*my headline link")]
-      (t/is (= res1 "/foo"))
-      (t/is (= res2 "/foo#my-headline-link")))))
+    (let [res1 (sut/internal-link-handler "file:foo.org" "http://mysite.com")
+          res2 (sut/internal-link-handler "file:foo.org::*my headline link" "http://mysite.com")]
+      (t/is (= res1 "http://mysite.com/foo"))
+      (t/is (= res2 "http://mysite.com/foo#my-headline-link")))))
 
 (t/deftest make-toc
   (let [ex1     [{:level 1, :text "Process" :anchor "#process"}

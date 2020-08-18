@@ -286,3 +286,30 @@ h2 {
     margin-left: -18px;
   }
 }
+
+.backlinks {
+  border: 1px solid var(--border-col);
+  background-color: var(--nav-bg);
+  margin-top: 32px;
+  padding: 16px;
+  margin: 8px 0;
+}
+
+.adjacent-files {
+  margin-top: 32px;
+  padding: 16px 0;
+}
+
+.firn-file-nav-prev {
+  background: var(--nav-bg);
+  padding: 12px;
+  border: 1px solid var(--border-col);
+  border-radius: 2px;
+}
+
+.firn-file-nav-next {
+  background: var(--nav-bg);
+  border: 1px solid var(--border-col);
+  padding: 12px;
+  border-radius: 2px;
+}

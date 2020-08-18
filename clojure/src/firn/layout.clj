@@ -93,6 +93,12 @@
        (= action :breadcrumbs)
        (markup/render-breadcrumbs firn-under site-map opts)
 
+       ;; render a list of links that link back to the current file
+       (= action :backlinks)
+       (markup/render-backlinks {:site-links (config :site-links)
+                                 :file       file
+                                 :site-url   (get-in config [:user-config :site-url])})
+
        ;; render the previous file based on firn-order
        (= action :adjacent-files)
        (markup/render-adjacent-file

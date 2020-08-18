@@ -184,9 +184,9 @@
         feed-file   (str dir-site "feed.xml")
         first-entry {:title site-title :link site-url :description site-desc}
         make-rss    (fn [[_ f]]
-                      (hash-map :title   (-> f :meta :title)
-                                :link    (str site-url "/" (-> f :path-web))
-                                :pubDate (u/org-date->java-date  (-> f :meta :date-created))
+                      (hash-map :title       (-> f :meta :title)
+                                :link        (f :path-web)
+                                :pubDate     (u/org-date->java-date  (-> f :meta :date-created))
                                 :description (str (f :as-html))))]
     (io/make-parents feed-file)
     (->> processed-files

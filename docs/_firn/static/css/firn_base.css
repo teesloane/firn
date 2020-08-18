@@ -88,7 +88,6 @@ hr {
   margin: 3rem 0;
 }
 
-
 [hidden] {
   display: none;
 }
@@ -99,7 +98,6 @@ div header,
 main header {
   padding-top: 0;
 }
-
 
 /* Typography */
 code,
@@ -124,7 +122,12 @@ details summary {
   padding: 0 8px;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   line-height: var(--line-height);
   margin: 1em 0;
 }
@@ -190,7 +193,6 @@ a:hover {
   text-decoration: underline;
 }
 
-
 /* -- Images */
 
 figure {
@@ -205,7 +207,6 @@ figure img {
 figure figcaption {
   color: var(--color-text-secondary);
 }
-
 
 /* -- Tables */
 table {
@@ -437,7 +438,6 @@ li > p {
    that it still exists so it is anchorable, still has tags, priority etc).
 */
 
-
 /* Headline text is hidden when using folding; it is instead rendered in a
    <summary> tag. */
 .firn-headline-text-hidden {
@@ -457,18 +457,39 @@ li > p {
 /* If folding, we have to style the <summary> tags to make them look like headings. */
 
 /* Set the parent element, so we can size-down on mobile. */
-.firn-fold { font-size: 15px; }
-.firn-headline-summary-1 { font-size: 1.3em;   margin: 1em 0; }
-.firn-headline-summary-2 { font-size: 1.15em;  margin: 1em 0; }
-.firn-headline-summary-3 { font-size: 1.05em;  margin: 1em 0; }
-.firn-headline-summary-4 { font-size: 1em;     margin: 1em 0; }
-.firn-headline-summary-5 { font-size: 0.85em;  margin: 1em 0; }
-.firn-headline-summary-6 { font-size: 0.75em;  margin: 1em 0; }
-
-@media(max-width: 768px) {
-  .firn-fold { font-size: 12px; }
+.firn-fold {
+  font-size: 15px;
+}
+.firn-headline-summary-1 {
+  font-size: 1.3em;
+  margin: 1em 0;
+}
+.firn-headline-summary-2 {
+  font-size: 1.15em;
+  margin: 1em 0;
+}
+.firn-headline-summary-3 {
+  font-size: 1.05em;
+  margin: 1em 0;
+}
+.firn-headline-summary-4 {
+  font-size: 1em;
+  margin: 1em 0;
+}
+.firn-headline-summary-5 {
+  font-size: 0.85em;
+  margin: 1em 0;
+}
+.firn-headline-summary-6 {
+  font-size: 0.75em;
+  margin: 1em 0;
 }
 
+@media (max-width: 768px) {
+  .firn-fold {
+    font-size: 12px;
+  }
+}
 
 /* Sitemap, breadcrumbs, siblings files, related files. ---------------------- */
 

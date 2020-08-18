@@ -21,4 +21,5 @@
       [:main.content
        [:div.py3
         (render "Details" :content)]]
+
       (footer)]]))

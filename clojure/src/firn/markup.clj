@@ -5,8 +5,11 @@
             [firn.org :as org]))
 
 (declare to-html)
+(declare internal-link-handler)
 
-;; Render: Site-map et al. --------------------------------------------------------
+;; Renderers -------------------------------------------------------------------
+
+;; R: Site-map et al. --
 
 (defn render-site-map
   "Converts the site map data structure into html. Takes options for sorting
@@ -139,7 +142,22 @@
              [:span.firn-file-nav-next
               next-text [:a {:href (next :path)} (next :title)]])]))))
 
-;; Render: Table of Contents --------------------------------------------------
+;; R: Backlinks -------
+
+
+(defn render-backlinks
+  [{:keys [site-links file site-url]}]
+  (let [org-path-match-file-url? #(let [x (internal-link-handler (% :path) site-url)]
+                                    (= x (file :path-url)))
+        to-html                  (fn [x] [:li.firn-backlink [:a {:href (x :from-url)} (x :from-file)]])
+        backlinks                (->> site-links (filter org-path-match-file-url?))]
+    (if (seq backlinks)
+      (into [:ul.firn-backlinks] (map to-html backlinks))
+      nil)))
+
+
+
+;; R: Table of Contents --------------------------------------------------
 
 (defn make-toc-helper-reduce
   "(ಥ﹏ಥ) Yeah. So. See the docstring for make-toc.
@@ -152,8 +170,8 @@
     (let [with-meta (assoc curr :next-sibling [:out (count out)])
           with-meta (assoc with-meta :next-child [:out (count out) :children])]
       (-> acc
-         (update :out conj with-meta)
-         (assoc :prev with-meta)))
+          (update :out conj with-meta)
+          (assoc :prev with-meta)))
 
     ;; if the new items level >= prev item, go to the last item in out
     ;; iterate through children, and try and find `prev`, when you do, collect "path to prev"
@@ -231,7 +249,7 @@
      (if (empty? toc-cleaned) nil
          (into [list-type] (toc->html toc-cleaned list-type))))))
 
-;; General Renderers -----------------------------------------------------------
+;; General HTML Renderers ------------------------------------------------
 
 (defn date->html
   [v]
@@ -269,14 +287,14 @@
 
 (defn internal-link-handler
   "Takes an org link and converts it into an html path."
-  [org-link]
+  [org-link site-url]
   (let [regex       #"(file:)(.*)\.(org)(\:\:\*.+)?"
         res         (re-matches regex org-link)
         anchor-link (last res)
         anchor-link (when anchor-link (-> res last u/clean-anchor))]
     (if anchor-link
-      (str "/" (nth res 2) anchor-link)
-      (str "/" (nth res 2)))))
+      (str site-url "/" (nth res 2) anchor-link)
+      (str site-url "/" (nth res 2)))))
 
 (defn link->html
   "Parses links from the org-tree.
@@ -308,7 +326,7 @@
       ;; org files
       (re-matches org-file-regex link-href)
       [:a.firn-internal
-       {:href (str (opts :site-url) (internal-link-handler link-href))} link-val]
+       {:href (internal-link-handler link-href (opts :site-url))} link-val]
 
       (re-matches http-link-regex link-href)
       [:a.firn-external {:href link-href :target "_blank"} link-val]
@@ -394,7 +412,10 @@
 (defn to-html
   "Recursively Parses the org-edn into hiccup.
   Some values don't get parsed (drawers) - yet. They return empty strings.
-  Don't destructure! - with recursion, it can create uneven maps from possible nil vals on `v`"
+  Don't destructure! - with recursion, it can create uneven maps from possible nil vals on `v`
+
+  Here, `opts` is largely going to be the `config` map, with the possibility that it's values
+  are overwritten with layout or file-specific settings. This happens in layout/render"
   ([v] (to-html v {}))
   ([v opts]
    (let [type           (get v :type)

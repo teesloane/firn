@@ -1,6 +1,6 @@
 #+TITLE: Data and Metadata
 #+DATE_CREATED: <2020-03-25 Wed>
-#+DATE_UPDATED: <2020-08-14 14:27>
+#+DATE_UPDATED: <2020-08-18 16:51>
 #+FIRN_UNDER: ["Content"]
 #+FIRN_LAYOUT: docs
 #+FIRN_ORDER: 20
@@ -31,7 +31,7 @@ The following table describes all the data and functions  "passed" to a layout e
 | Function/Data | Intent                                                | Data-type |
 |---------------+-------------------------------------------------------+-----------|
 | config        | The site wide config, containing everything!          | map       |
-| build-url     | Function to more easily construct internal urls       | function         |
+| build-url     | Function to more easily construct internal urls       | function  |
 | date-created  | The ~#+DATE_CREATED~ value of the processed file        | string    |
 | date-updated  | The ~#+DATE_UPDATED~ value of the processed file        | string    |
 | file          | The file as a data structure                          | map       |
@@ -41,7 +41,7 @@ The following table describes all the data and functions  "passed" to a layout e
 | logbook-total | The sum of all the logbook entries per file           | string    |
 | meta          | A map of metadata per file (logbook, links, keywords) | map       |
 | partials      | a list of invokable partials from the =/partials= dir   | list      |
-| render        | See the [[file:the-render-function.org][Render Function document]]                      | function         |
+| render        | See the [[file:the-render-function.org][Render Function document]]                      | function  |
 | site-links    | A list of all links across all documents              | vector    |
 | site-logs     | A list of all logbook entries                         | vector    |
 | site-map      | A map of all files as sorted by ~#+FIRN_UNDER~          | map       |
@@ -136,7 +136,6 @@ The logbook is collected and sorted by timestamp. The available data looks like 
  ;....
  ]
 #+END_SRC
-
 
 * Data
 
