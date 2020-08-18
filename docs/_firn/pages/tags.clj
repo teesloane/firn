@@ -15,7 +15,7 @@
            [:div
             [:h2 {:id tag-name :class "firn-tag-heading"} tag-name]
             (for [tag tags
-                  :let [link (build-url (tag :headline-link))]]
+                  :let [link (tag :headline-link)]]
               [:div
                [:a
                 {:href link}

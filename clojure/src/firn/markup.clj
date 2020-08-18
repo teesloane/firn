@@ -144,15 +144,16 @@
 
 ;; R: Backlinks -------
 
-
 (defn render-backlinks
   [{:keys [site-links file site-url]}]
   (let [org-path-match-file-url? #(let [x (internal-link-handler (% :path) site-url)]
                                     (= x (file :path-url)))
         to-html                  (fn [x] [:li.firn-backlink [:a {:href (x :from-url)} (x :from-file)]])
-        backlinks                (->> site-links (filter org-path-match-file-url?))]
-    (if (seq backlinks)
-      (into [:ul.firn-backlinks] (map to-html backlinks))
+        backlinks                (->> site-links (filter org-path-match-file-url?))
+        backlinks-unique         (map first (vals (group-by :from-url backlinks)))]
+
+    (if (seq backlinks-unique)
+      (into [:ul.firn-backlinks] (map to-html backlinks-unique))
       nil)))
 
 
