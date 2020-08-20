@@ -1,6 +1,8 @@
 (ns firn.markup-test
   (:require [firn.markup :as sut]
-            [clojure.test :as t]))
+            [clojure.test :as t]
+            [firn.stubs :as stub]
+            [firn.build :as build]))
 
 ;; Mocks
 
@@ -231,3 +233,13 @@
           res    (sut/render-adjacent-file params)]
       (t/is (= res {:next     (get-in sample-sitemap ["Research" :children "Open Frameworks"])
                     :previous (get-in sample-sitemap ["Research" :children "Generative Art"])})))))
+
+(t/deftest render-backlinks
+  (t/testing "Expected results"
+    (let [
+          test-file     (stub/gtf :tf-small :processed)
+          sample-config (-> (stub/sample-config) build/setup build/process-all)
+          res           (sut/render-backlinks  {:site-links (sample-config :site-links)
+                                                :site-url   ""
+                                                :file       test-file})]
+      (t/is (= res [:ul.firn-backlinks [:li.firn-backlink [:a {:href "/file1"} "Org Mode"]]])))))
