@@ -1,7 +1,7 @@
 #+TITLE: Step by Step Tutorial
 #+DATE_CREATED: <2020-03-27 Fri>
 #+FIRN_LAYOUT: docs
-#+FIRN_UNDER: ["Getting Started"]
+#+FIRN_UNDER: "Getting Started"
 #+FIRN_ORDER: 0
 #+FIRN_FOLD: {2 true}
 

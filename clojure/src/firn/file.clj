@@ -8,10 +8,11 @@
             [firn.org :as org]
             [firn.util :as u]
             [sci.core :as sci]
-            [firn.markup :as markup]))
+            [firn.markup :as markup]
+            [clojure.string :as str]))
 
 ;; #+ORG_KEYWORDS that we want to evaluate into real clojure values.
-(def keywords-to-eval [:firn-toc :firn-properties? :firn-order :firn-fold :firn-sitemap? :firn-under])
+(def keywords-to-eval [:firn-toc :firn-properties? :firn-order :firn-fold :firn-sitemap?])
 
 ;; -- Getters
 
@@ -232,7 +233,7 @@
   (let [org-tree       (file :as-edn)
         tree-data      (tree-seq map? :children org-tree)
         keywords       (keywords->map file) ; keywords are "in-buffer-settings" - things that start with #+<MY_KEYWORD>
-        {:keys [date-updated date-created title firn-under firn-order ]} keywords
+        {:keys [date-updated date-created title firn-under firn-order firn-tags]} keywords
         file-metadata  {:from-file title :from-url (file :path-url)}
         metadata       (extract-metadata-helper tree-data file-metadata)
         date-parser    #(try
@@ -240,11 +241,16 @@
                           (catch Exception e
                             (u/print-err! :error  (str "Could not parse date for file: " (or title "<unknown file>") "\nPlease confirm that you have correctly set the #+DATE_CREATED: and #+DATE_UPDATED values in your org file."))))]
 
+    ;; (prn "firn under is " firn-under)
+    ;; (u/org-keyword->vector  "\"Getting Started\" Foo")
+    ;; (str/split "\"Getting Started\" Foo" #"\\w+|\"(?:\\\\\"|[^\"])+\"")
+    ;; (count (str/split "\"Getting Started\" Foo" #" \w+|"[^"]+"  ")) ;; LEAVING OFF
     (merge metadata
            {:keywords        keywords
             :title           title
-            :firn-under      firn-under
+            :firn-under      (when firn-under #p (u/org-keyword->vector firn-under))
             :firn-order      firn-order
+            :firn-tags       (when firn-tags (u/org-keyword->vector firn-tags))
             :date-updated    (when date-updated (u/strip-org-date date-updated))
             :date-created    (when date-created (u/strip-org-date date-created))
             :date-updated-ts (date-parser date-updated)

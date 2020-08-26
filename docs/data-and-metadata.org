@@ -1,7 +1,7 @@
 #+TITLE: Data and Metadata
 #+DATE_CREATED: <2020-03-25 Wed>
-#+DATE_UPDATED: <2020-08-18 16:51>
-#+FIRN_UNDER: ["Content"]
+#+DATE_UPDATED: <2020-08-25 16:54>
+#+FIRN_UNDER: "Content"
 #+FIRN_LAYOUT: docs
 #+FIRN_ORDER: 20
 

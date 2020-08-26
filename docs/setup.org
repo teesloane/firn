@@ -1,8 +1,8 @@
 #+TITLE: Firn Setup (with Emacs)
 #+DATE_CREATED: <2020-03-26 Thu>
-#+DATE_UPDATED: <2020-08-14 17:47>
+#+DATE_UPDATED: <2020-08-25 17:01>
 #+FIRN_LAYOUT: docs
-#+FIRN_UNDER: ["Getting Started"]
+#+FIRN_UNDER: "Getting Started" Foo
 #+FIRN_ORDER: 2
 
 The following are optional notes and suggestions on how to best setup Emacs and

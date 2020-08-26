@@ -1,5 +1,5 @@
 #+TITLE: Front Matter
-#+FIRN_UNDER: ["Content"]
+#+FIRN_UNDER: "Content"
 #+FIRN_ORDER: 0
 
 * Overview

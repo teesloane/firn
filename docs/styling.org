@@ -1,5 +1,5 @@
 #+TITLE: Styling
-#+FIRN_UNDER: ["Content"]
+#+FIRN_UNDER: "Content"
 
 #+FIRN_ORDER: 5
 

@@ -140,7 +140,8 @@
   (loop [org-files (config :org-files)
          site-vals {:processed-files  {}
                     :site-map         [] ;; < collected as list, transformed later to map.
-                    :site-tags        []
+                    :site-tags        [] ;; org-headline tags
+                    :site-firn-tags   {} ;; file-specific tags (#+ROAM-TAGS or #+FIRN-TAGS)
                     :site-links       []
                     :site-attachments []}
          output    {}]
@@ -164,7 +165,7 @@
             is-private                               (file/is-private? config processed-file)
             in-sitemap?                              (file/in-site-map? processed-file)
             org-files                                (rest org-files)
-            {:keys [links logbook tags attachments]} (-> processed-file :meta)]
+            {:keys [links logbook tags attachments firn-tags]} (-> processed-file :meta)]
         (if is-private
           (recur org-files site-vals output)
           (let [updated-output    (assoc output (processed-file :path-web) processed-file)

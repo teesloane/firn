@@ -1,7 +1,8 @@
 (ns firn.util
   (:require [clojure.java.io :as io]
             [clojure.string :as s]
-            [sci.core :as sci])
+            [sci.core :as sci]
+            [clojure.string :as str])
   (:import (java.lang Integer)
            (java.time LocalDate)))
 
@@ -196,6 +197,15 @@
   "Interposes a keywords and ensures the key is at the end of the list"
   [lst k]
  (vec (concat (interpose k lst) [k])))
+
+(defn org-keyword->vector
+  "Converts something like `#+FIRN_UNDER: 'Foo bar bo'` into 'Foo' 'bar' 'bo'"
+  [s]
+  ;; see: https://stackoverflow.com/a/40120309
+  (let [the-beast #"(?=\\S)[^\"\\s]*(?:\"[^\\\\\"]*(?:\\\\[\\s\\S][^\\\\\"]*)*\"[^\"\\s]*)*"]
+    (-> s
+       str/trim
+       (str/split the-beast))))
 
 
 (defn take-while-after-first
