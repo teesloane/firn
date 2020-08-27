@@ -149,6 +149,7 @@
      :site-links    (config :site-links)
      :site-logs     (config :site-logs)
      :site-url      site-url
+     :org-tags      (config :org-tags)
      :build-url     (build-url site-url)
      :config        config
      ;; File wide meta --

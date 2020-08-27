@@ -39,7 +39,7 @@
      ;; values collected during build/process-all:
      :processed-files  []
      :site-map         []                        ; list of all pages converted for the site.
-     :site-tags        {}                        ; collected tags from all processed files
+     :org-tags        {}                        ; collected tags from all processed files
      :site-logs        []                        ; collected logs from all processed files
      :site-links       []                        ; collected links from all processed files
      :site-attachments []}))                     ; collected (paths to) attachments of all processed files.

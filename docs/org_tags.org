@@ -1,0 +1,71 @@
+#+TITLE: Org Tags
+#+FIRN_UNDER: Content
+#+FIRN_ORDER: 5
+
+* Overview
+
+Firn collects org-tags when it parses your org-mode files and are accessible in your layouts through the render function or as raw data.
+
+* Usage
+
+** TODO Using the render function
+
+Once the org-tags renderer is built, document it here.
+
+** org-tags data structure
+A map of org tags is available in your layouts under the key "org-tags". The map might look like so:
+
+#+BEGIN_SRC clojure
+
+{"FAQ"           [{:from-headline "FAQ",
+                   :headline-link "http://localhost:4000/index#faq",
+                   :from-file     "Home",
+                   :from-url      "http://localhost:4000/index",
+                   :tag-value     "FAQ"}
+                  {:from-headline "How do I customize the styling of my layouts?",
+                   :headline-link "http://localhost:4000/styling#how-do-i-customize-the-styling-of-my-layouts?",
+                   :from-file     "Styling",
+                   :from-url      "http://localhost:4000/styling",
+                   :tag-value     "FAQ"}],
+ "advanced"      [{:from-headline "Custom Front Matter",
+                   :headline-link "http://localhost:4000/front-matter#custom-front-matter",
+                   :from-file     "Front Matter",
+                   :from-url      "http://localhost:4000/front-matter",
+                   :tag-value     "advanced"}],
+ "attachments"   [{:from-headline "Adding attachments",
+                   :headline-link "http://localhost:4000/tutorial#adding-attachments",
+                   :from-file     "Step by Step Tutorial",
+                   :from-url      "http://localhost:4000/tutorial",
+                   :tag-value     "attachments"}
+                  {:from-headline "Attachments",
+                   :headline-link "http://localhost:4000/limitations#attachments",
+                   :from-file     "Limitations",
+                   :from-url      "http://localhost:4000/limitations",
+                   :tag-value     "attachments"}],
+ "configuration" [{:from-headline "Understanding config.edn",
+                   :headline-link "http://localhost:4000/tutorial#understanding-configedn",
+                   :from-file     "Step by Step Tutorial",
+                   :from-url      "http://localhost:4000/tutorial",
+                   :tag-value     "configuration"}],
+ "emacs"         [{:from-headline "A note on Emacs",
+                   :headline-link "http://localhost:4000/tutorial#a-note-on-emacs",
+                   :from-file     "Step by Step Tutorial",
+                   :from-url      "http://localhost:4000/tutorial",
+                   :tag-value     "emacs"}],
+ "example"       [{:from-headline "Tags",
+                   :headline-link "http://localhost:4000/sample-page#tags",
+                   :from-file     "Sample Page",
+                   :from-url      "http://localhost:4000/sample-page",
+                   :tag-value     "example"}],
+ "folding"       [{:from-headline "Rendering folded headlines",
+                   :headline-link "http://localhost:4000/the-render-function#rendering-folded-headlines",
+                   :from-file     "The Render Function",
+                   :from-url      "http://localhost:4000/the-render-function",
+                   :tag-value     "folding"}],
+ "reference"     [{:from-headline "Reference",
+                   :headline-link "http://localhost:4000/configuration#reference",
+                   :from-file     "Configuration",
+                   :from-url      "http://localhost:4000/configuration",
+                   :tag-value     "reference"}]}
+
+#+END_SRC

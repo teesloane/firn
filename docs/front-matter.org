@@ -1,5 +1,5 @@
 #+TITLE: Front Matter
-#+FIRN_UNDER: "Content"
+#+FIRN_UNDER: Content
 #+FIRN_ORDER: 0
 
 * Overview
@@ -19,6 +19,7 @@ The following in-buffer settings are processed by Firn and/or made available to 
 | ~#+TITLE:~           | string        | Required: Used in site-map, links, etc                  |
 | ~#+DATE_CREATED~     | org-mode-date | File date created                                       |
 | ~#+DATE_UPDATED~     | org-mode-date | File last updated                                       |
+| ~#+FIRN_TAGS~        | list          | Creates [[file:firn_tags.org][file based tags]].                                |
 | ~#+FIRN_PROPERTIES?~ | boolean       | Whether to render properties under all headings         |
 | ~#+FIRN_TOC~         | map           | Settings for any rendered table of contents             |
 | ~#+FIRN_FOLD~        | map           | Fold headings of a specified level: ex: {3 true 4 true} |

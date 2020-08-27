@@ -1,5 +1,5 @@
 #+TITLE: The Render Function
-#+FIRN_UNDER: "Content"
+#+FIRN_UNDER: Content
 #+FIRN_ORDER: 3
 
 

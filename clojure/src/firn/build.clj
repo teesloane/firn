@@ -140,7 +140,7 @@
   (loop [org-files (config :org-files)
          site-vals {:processed-files  {}
                     :site-map         [] ;; < collected as list, transformed later to map.
-                    :site-tags        [] ;; org-headline tags
+                    :org-tags         [] ;; org-headline tags
                     :site-firn-tags   {} ;; file-specific tags (#+ROAM-TAGS or #+FIRN-TAGS)
                     :site-links       []
                     :site-attachments []}
@@ -152,7 +152,7 @@
                                     site-vals ;; contains logbook already
                                     {:processed-files (vals output)
                                      :site-map        (make-site-map (site-vals :site-map))
-                                     :site-tags       (into (sorted-map) (group-by :tag-value (site-vals :site-tags)))})
+                                     :org-tags       (into (sorted-map) (group-by :tag-value (site-vals :org-tags)))})
 
             ;; FIXME: I think we are rendering html twice here, should prob only happen here?
             with-html (into {} (for [[k pf] output] [k (htmlify config-with-data pf)]))
@@ -173,7 +173,7 @@
                                     true        (update :site-links concat links)
                                     true        (update :site-logs concat logbook)
                                     true        (update :site-attachments concat attachments)
-                                    true        (update :site-tags concat tags)
+                                    true        (update :org-tags concat tags)
                                     in-sitemap? (update :site-map conj (file/make-site-map-item processed-file (-> config :user-config :site-url))))]
             (recur org-files updated-site-vals updated-output)))))))
 
@@ -206,13 +206,13 @@
   TODO: (In a later release) - do something similar to `file/get-web-path` and
   enable `load-fns-into-map` to save filenames as :namespaced/keys, allowing
   make-parent to work on it."
-  [{:keys [dir-site pages partials site-map site-links site-logs site-tags user-config] :as config}]
+  [{:keys [dir-site pages partials site-map site-links site-logs org-tags user-config] :as config}]
   (let [site-url (user-config :site-url)
         user-api {:partials   partials
                   :site-links site-links
                   :site-map   site-map
                   :site-logs  site-logs
-                  :site-tags  site-tags
+                  :org-tags   org-tags ;; TODO - rename this to "org-tags"
                   :site-url   site-url
                   :build-url  (layout/build-url site-url)
                   :config     config}]

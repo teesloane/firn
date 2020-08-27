@@ -1,0 +1,16 @@
+#+TITLE: Firn Tags
+#+FIRN_UNDER: Content
+#+FIRN_ORDER: 4
+
+* Overview
+Firn is able to tag files using the front matter ~#+FIRN_TAGS~ or ~#+ROAM_TAGS~. Firn tags are for categorizing information on a file to file basis. Please note this is different from using org-mode tags (referred to as "org-tags" throughout this documentation.)
+
+* Usage
+
+Firn's file tagging functionality is partially based on how Org Roam [[https://www.orgroam.com/manual/Tags.html#Tags][handles tagging]]. Tag values are space delimited. Multi-word tags must be wrapped in quotations marks.
+
+Example: ~#+FIRN_TAGS: "Programming Languages" Research Development~
+
+Firn automatically reads in the ~ROAM_TAGS~ front matter, allowing you to make use of whatever tags you might already have if you are an org-roam user. If you have both ~FIRN_TAGS~ and ~ROAM_TAGS~ in your front-matter, ~FIRN_TAGS~ will be given precedence for providing the tag values for a file when building your site.
+
+** TODO In your layouts

@@ -1,5 +1,5 @@
 (defn tags
-  [{:keys [build-url site-tags partials]}]
+  [{:keys [build-url org-tags partials]}]
   (let [{:keys [head nav footer]} partials]
     [:html
      (head build-url)
@@ -11,7 +11,7 @@
 
         [:div.def-content
          [:h1 "Tags"]
-         (for [[tag-name tags] site-tags]
+         (for [[tag-name tags] org-tags]
            [:div
             [:h2 {:id tag-name :class "firn-tag-heading"} tag-name]
             (for [tag tags

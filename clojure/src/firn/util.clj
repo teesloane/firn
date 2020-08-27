@@ -199,14 +199,13 @@
  (vec (concat (interpose k lst) [k])))
 
 (defn org-keyword->vector
-  "Converts something like `#+FIRN_UNDER: 'Foo bar bo'` into 'Foo' 'bar' 'bo'"
+  "Reads org frontmatter and converts strings into a vector"
   [s]
   ;; see: https://stackoverflow.com/a/40120309
-  (let [the-beast #"(?=\\S)[^\"\\s]*(?:\"[^\\\\\"]*(?:\\\\[\\s\\S][^\\\\\"]*)*\"[^\"\\s]*)*"]
-    (-> s
-       str/trim
-       (str/split the-beast))))
-
+  (let [the-beast #"\"?( |$)(?=(([^\"]*\"){2})*[^\"]*$)\"?"
+        as-vec    (-> s str/trim (str/split the-beast))
+        cleaned   (map #(str/replace % #"\"" "") as-vec)]
+    (vec cleaned)))
 
 (defn take-while-after-first
   [pred lst]

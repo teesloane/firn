@@ -1,7 +1,7 @@
 #+TITLE: Org Mode
 #+FIRN_LAYOUT: default
 #+FIRN_TOC: {:depth 5 :headline "Notes"}
-#+FIRN_UNDER: "Research"
+#+FIRN_UNDER: Research
 #+FIRN_ORDER: 1
 #+DATE_CREATED: <2020-08-17 Mon>
 #+DATE_UPDATED: <2020-08-17 Mon>

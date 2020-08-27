@@ -1,9 +1,9 @@
 #+TITLE: Custom Pages
 #+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-08-25 16:54>
+#+DATE_UPDATED: <2020-08-27 16:41>
 #+FIRN_LAYOUT: docs
-#+FIRN_UNDER: "Content"
-#+FIRN_ORDER: 4
+#+FIRN_UNDER: Content
+#+FIRN_ORDER: 6
 
 * Overview
 
@@ -24,7 +24,7 @@ Pages have less data available to them at site-generation time. Because there ar
 | site-links    | A list of all links across all documents   | vector             |
 | site-logs     | A list of all logbook entries              | vector             |
 | site-map      | A list of all files on a site              | vector             |
-| site-tags     | A list of all tags across all org files    | map (string<>list) |
+| org-tags     | A list of all tags across all org files    | map (string<>list) |
 
 * Limitations
 

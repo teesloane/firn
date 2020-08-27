@@ -1,7 +1,7 @@
 #+TITLE: Styling
-#+FIRN_UNDER: "Content"
+#+FIRN_UNDER: Content
 
-#+FIRN_ORDER: 5
+#+FIRN_ORDER: 7
 
 
 Firn is not particularly picky about how you style your site. You can setup your own styling mechanisms if you want to use a style preprocessor, or you can use plain css. The simplest method would be to write css as you normally would by placing css files in the =_firn/static/css= folder and then having =firn= move them into your =_site= folder when run. Styling is applied through [[https://github.com/weavejester/hiccup#syntax][hiccup]].

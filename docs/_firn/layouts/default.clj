@@ -1,5 +1,5 @@
 (defn default
-  [{:keys [ build-url title render partials]}]
+  [{:keys [org-tags build-url title render partials]}]
   (let [{:keys [head nav footer]} partials]
     [:html
      (head build-url)
@@ -23,5 +23,4 @@
 
          [:div.adjacent-files
           [:span (render :adjacent-files)]]
-
          (footer)]]]]]))
