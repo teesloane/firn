@@ -223,6 +223,14 @@
           ;; default case, recur.
           (recur xs out last-headline))))))
 
+(defn craft-file-tags
+  "A file tag includes must have metadata attached on create"
+  [{:keys [firn-tags roam-tags date-created-ts file-metadata]}]
+  (let [file-tags #p (or firn-tags roam-tags)
+        file-tags (when file-tags (u/org-keyword->vector file-tags))]
+    (when (seq file-tags)
+      (map #(merge file-metadata {:tag-value % :date-created-ts date-created-ts}) file-tags))))
+
 (defn extract-metadata
   "Iterates over a tree, and returns metadata for site-wide usage such as
   links (for graphing between documents, tbd) and logbook entries.
@@ -233,15 +241,15 @@
         keywords       (keywords->map file) ; keywords are "in-buffer-settings" - things that start with #+<MY_KEYWORD>
         {:keys [date-updated date-created title firn-under firn-order firn-tags roam-tags]} keywords
         file-metadata  {:from-file title :from-url (file :path-url)}
-        ;; convert firn-tags/roam-tags into a list with metadata.
-        file-tags      (or firn-tags roam-tags) ;; firn-tags take precedence over org-roam tags.
-        file-tags      (when (seq file-tags) (u/org-keyword->vector file-tags))
-        file-tags      (map #(merge file-metadata {:tag-value %}) file-tags)
         metadata       (extract-metadata-helper tree-data file-metadata)
         date-parser    #(try
                           (when % (u/org-date->ts date-created))
                           (catch Exception e
-                            (u/print-err! :error  (str "Could not parse date for file: " (or title "<unknown file>") "\nPlease confirm that you have correctly set the #+DATE_CREATED: and #+DATE_UPDATED values in your org file."))))]
+                            (u/print-err! :error  (str "Could not parse date for file: " (or title "<unknown file>") "\nPlease confirm that you have correctly set the #+DATE_CREATED: and #+DATE_UPDATED values in your org file."))))
+        file-tags      (craft-file-tags {:firn-tags       firn-tags
+                                         :roam-tags       roam-tags
+                                         :file-metadata   file-metadata
+                                         :date-created-ts (date-parser date-created)})]
 
     (merge metadata
            {:keywords        keywords

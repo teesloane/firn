@@ -133,3 +133,22 @@
 
       (doseq [k forbidden-keys]
         (t/is (not (u/in? res k)))))))
+
+(t/deftest craft-file-tags
+  (t/testing "expected output"
+    (let [test-input {:firn-tags       "foo bar"
+                      :roam-tags       nil
+                      :date-created-ts 1592625600
+                      :file-metadata   {:from-file "Configuration", :from-url "http://localhost:4000/configuration"}}
+          expected   '({:date-created-ts 1592625600,
+                        :from-file       "Configuration",
+                        :from-url        "http://localhost:4000/configuration",
+                        :tag-value       "foo"}
+                       {:date-created-ts 1592625600,
+                        :from-file       "Configuration",
+                        :from-url        "http://localhost:4000/configuration",
+                        :tag-value       "bar"})
+          res        (sut/craft-file-tags test-input)]
+      (t/is (= res expected))
+      )))
+
