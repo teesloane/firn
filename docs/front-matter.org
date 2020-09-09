@@ -5,8 +5,7 @@
 * Overview
 
 To use Firn, you will need to add some "Front Matter" to your org-files. Front
-Matter is common in many static-site-generators. Firn uses org-mode
-[[https://orgmode.org/manual/In_002dbuffer-Settings.html][in-buffer-settings]] to set Front Matter.
+Matter is common in many static-site-generators. Firn uses org-mode [[https://orgmode.org/manual/In_002dbuffer-Settings.html][in-buffer-settings]] to set Front Matter.
 
 Currently, Firn only requires that you have a ~#+TITLE:~ front-matter.
 
