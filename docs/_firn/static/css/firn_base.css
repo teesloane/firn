@@ -365,14 +365,15 @@ li > p {
   align-items: center;
 }
 
-.firn-tags {
+.firn-org-tags {
+
 }
 
-.firn-tag-heading {
+.firn-org-tag-heading {
   text-transform: capitalize;
 }
 
-.firn-tag {
+.firn-org-tag {
   background-color: var(--tag-bg);
   border-radius: var(--border-radius);
   color: var(--color-text);
@@ -382,11 +383,11 @@ li > p {
   padding: 0.2rem 0.4rem;
 }
 
-.firn-tag:hover {
+.firn-org-tag:hover {
   filter: none;
 }
 
-.firn-tag::before {
+.firn-org-tag::before {
   content: "#";
 }
 
@@ -508,3 +509,11 @@ li > p {
   display: flex;
   justify-content: space-between;
 }
+
+/* Firn Tags (not org-mode tags!) -------------------------------------------- */
+
+.firn-file-tags-container {}
+.firn-file-tag-name       {}
+.firn-file-tag-list       {}
+.firn-file-tag-item       {}
+.firn-file-tag-link       {}

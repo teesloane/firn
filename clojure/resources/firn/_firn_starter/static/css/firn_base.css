@@ -571,14 +571,14 @@ li > p {
   align-items: center;
 }
 
-.firn-tags {
+.firn-org-tags {
 }
 
-.firn-tag-heading {
+.firn-org-tag-heading {
   text-transform: capitalize;
 }
 
-.firn-tag {
+.firn-org-tag {
   background-color: var(--tag-bg);
   border-radius: var(--border-radius);
   color: var(--color-text);
@@ -588,11 +588,11 @@ li > p {
   padding: 0.2rem 0.4rem;
 }
 
-.firn-tag:hover {
+.firn-org-tag:hover {
   filter: none;
 }
 
-.firn-tag::before {
+.firn-org-tag::before {
   content: "#";
 }
 

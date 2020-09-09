@@ -112,6 +112,10 @@
           :date-created-ts date-created-ts}
          (select-keys opts [:prev-text :next-text :order-by :as-data])))
 
+       ;; render a list of file tags
+       (= action :firn-tags)
+       (markup/render-firn-tags (config :firn-tags))
+
        ;; render a table of contents
        (= action :toc)
        (let [toc  toc ; get the toc for the file.

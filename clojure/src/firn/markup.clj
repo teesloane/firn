@@ -156,6 +156,19 @@
       nil)))
 
 
+(defn render-firn-tags
+  "Renders a list of tags and their respective files
+  TODO: enable sort by"
+  [firn-tags]
+  (for [[k lst] firn-tags]
+    [:div.firn-file-tags-container
+     [:div.firn-file-tag-name k]
+     [:ul.firn-file-tag-list
+        (for [f lst]
+          [:li.firn-file-tag-item
+           [:a.firn-file-tag-link {:href (f :from-url)} (f :from-file)]])]]))
+
+
 
 ;; R: Table of Contents --------------------------------------------------
 
@@ -355,7 +368,7 @@
         ;; classes; construcing a single heading element with various children..
         heading-priority (u/str->keywrd "span.firn-headline-priority.firn-headline-priority__" priority)
         heading-keyword  (u/str->keywrd "span.firn-headline-keyword.firn-headline-keyword__" keywrd)
-        heading-tags     [:span.firn-tags (for [t tags] [:span [:a.firn-tag {:href (str "/tags#" t)} t]])]
+        heading-tags     [:span.firn-org-tags (for [t tags] [:span [:a.firn-org-tag {:href (str "/tags#" t)} t]])]
         heading-anchor   (org/make-headline-anchor parent)
         heading-is-folded (level-in-fold? opts level)
         heading-id+class #(u/str->keywrd "h" % heading-anchor ".firn-headline.firn-headline-" %
