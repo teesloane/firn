@@ -55,7 +55,7 @@
                 :firn-layout "default",
                 :firn-order 1,
                 :firn-toc {:depth 5, :headline "Notes"},
-                :firn-under ["Research"],
+                :firn-under "Research",
                 :title "Org Mode"}
                )))))
 
@@ -127,6 +127,7 @@
                     :firn-order      1,
                     :firn-under      ["Research"],
                     :logbook-total   "12:27",
+                    :firn-tags       '()
                     :path            "http://my-site-url.com/file1",
                     :title           "Org Mode"}))
 
