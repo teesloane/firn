@@ -1,6 +1,8 @@
 #+TITLE: Firn Tags
 #+FIRN_UNDER: Content
 #+FIRN_ORDER: 4
+#+DATE_CREATED: <2020-08-27 Thu>
+#+DATE_UPDATED: <2020-09-09 16:16>
 
 * Overview
 Firn is able to tag files using the front matter ~#+FIRN_TAGS~ or ~#+ROAM_TAGS~. Firn tags are for categorizing information on a file to file basis. Please note this is different from using org-mode tags (referred to as "org-tags" throughout this documentation.)
