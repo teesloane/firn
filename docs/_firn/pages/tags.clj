@@ -11,6 +11,7 @@
 
         [:div.def-content
          [:h1 "Tags"]
+         ;; TODO - this sould be `render`-able.
          (for [[tag-name tags] org-tags]
            [:div
             [:h2 {:id tag-name :class "firn-tag-heading"} tag-name]

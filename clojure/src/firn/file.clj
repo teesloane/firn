@@ -232,8 +232,11 @@
         tree-data      (tree-seq map? :children org-tree)
         keywords       (keywords->map file) ; keywords are "in-buffer-settings" - things that start with #+<MY_KEYWORD>
         {:keys [date-updated date-created title firn-under firn-order firn-tags roam-tags]} keywords
-        file-tags      (or firn-tags roam-tags) ;; firn-tags take precedence over org-roam tags.
         file-metadata  {:from-file title :from-url (file :path-url)}
+        ;; convert firn-tags/roam-tags into a list with metadata.
+        file-tags      (or firn-tags roam-tags) ;; firn-tags take precedence over org-roam tags.
+        file-tags      (when (seq file-tags) (u/org-keyword->vector file-tags))
+        file-tags      (map #(merge file-metadata {:tag-value %}) file-tags)
         metadata       (extract-metadata-helper tree-data file-metadata)
         date-parser    #(try
                           (when % (u/org-date->ts date-created))
@@ -245,7 +248,7 @@
             :title           title
             :firn-under      (when firn-under (u/org-keyword->vector firn-under))
             :firn-order      firn-order
-            :firn-tags       (when file-tags (u/org-keyword->vector file-tags))
+            :firn-tags       file-tags
             :date-updated    (when date-updated (u/strip-org-date date-updated))
             :date-created    (when date-created (u/strip-org-date date-created))
             :date-updated-ts (date-parser date-updated)

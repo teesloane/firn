@@ -141,7 +141,7 @@
          site-vals {:processed-files  {}
                     :site-map         [] ;; < collected as list, transformed later to map.
                     :org-tags         [] ;; org-headline tags
-                    :site-firn-tags   {} ;; file-specific tags (#+ROAM-TAGS or #+FIRN-TAGS)
+                    :firn-tags        {} ;; file-specific tags (#+ROAM-TAGS or #+FIRN-TAGS)
                     :site-links       []
                     :site-attachments []}
          output    {}]
@@ -152,19 +152,21 @@
                                     site-vals ;; contains logbook already
                                     {:processed-files (vals output)
                                      :site-map        (make-site-map (site-vals :site-map))
-                                     :org-tags       (into (sorted-map) (group-by :tag-value (site-vals :org-tags)))})
+                                     :org-tags        (into (sorted-map) (group-by :tag-value (site-vals :org-tags)))
+                                     :firn-tags       (into (sorted-map) (group-by :tag-value (site-vals :firn-tags)))})
 
             ;; FIXME: I think we are rendering html twice here, should prob only happen here?
             with-html (into {} (for [[k pf] output] [k (htmlify config-with-data pf)]))
             final     (assoc config-with-data :processed-files with-html)]
+        (when (seq (config :firn-tags)) (config :firn-tags))
         final)
 
       ;; Otherwise continue...
-      (let [next-file                                (first org-files)
-            processed-file                           (process-one config next-file)
-            is-private                               (file/is-private? config processed-file)
-            in-sitemap?                              (file/in-site-map? processed-file)
-            org-files                                (rest org-files)
+      (let [next-file                                          (first org-files)
+            processed-file                                     (process-one config next-file)
+            is-private                                         (file/is-private? config processed-file)
+            in-sitemap?                                        (file/in-site-map? processed-file)
+            org-files                                          (rest org-files)
             {:keys [links logbook tags attachments firn-tags]} (-> processed-file :meta)]
         (if is-private
           (recur org-files site-vals output)
@@ -174,6 +176,7 @@
                                     true        (update :site-logs concat logbook)
                                     true        (update :site-attachments concat attachments)
                                     true        (update :org-tags concat tags)
+                                    true        (update :firn-tags concat firn-tags)
                                     in-sitemap? (update :site-map conj (file/make-site-map-item processed-file (-> config :user-config :site-url))))]
             (recur org-files updated-site-vals updated-output)))))))
 
@@ -212,7 +215,8 @@
                   :site-links site-links
                   :site-map   site-map
                   :site-logs  site-logs
-                  :org-tags   org-tags ;; TODO - rename this to "org-tags"
+                  :org-tags   org-tags
+                  ;; TODO - add :firn-tags
                   :site-url   site-url
                   :build-url  (layout/build-url site-url)
                   :config     config}]

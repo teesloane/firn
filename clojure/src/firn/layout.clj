@@ -49,16 +49,19 @@
   ([partial-map action]
    (render partial-map action {}))
   ([partial-map action opts]
-   (let [{:keys [file config]}                                       partial-map
-         org-tree                                                    (file :as-edn)
-         config-settings                                             (config :user-config)     ; site-wide config: 0 precedence
-         site-map                                                    (config :site-map)
-         file-settings                                               (file/keywords->map file) ; file-setting config: 2 precedence
-         layout-settings                                             (if (map? opts) opts {})
-         merged-options                                              (merge config-settings layout-settings file-settings)
-         cached-sitemap-html                                         (atom nil)
-         is-headline?                                                (string? action)
-         {:keys [toc logbook firn-under firn-order date-created-ts]} (file :meta)]
+   (let [{:keys [file config]}     partial-map
+         org-tree                  (file :as-edn)
+         config-settings           (config :user-config)     ; site-wide config: 0 precedence
+         site-map                  (config :site-map)
+         file-settings             (file/keywords->map file) ; file-setting config: 2 precedence
+         layout-settings           (if (map? opts) opts {})
+         merged-options            (merge config-settings layout-settings file-settings)
+         cached-sitemap-html       (atom nil)
+         is-headline?              (string? action)
+         {:keys [toc logbook
+                 firn-under
+                 firn-order
+                 date-created-ts]} (file :meta)]
 
      ;; cache the site-map if it's not there already
      (when-not @cached-sitemap-html
@@ -150,6 +153,7 @@
      :site-logs     (config :site-logs)
      :site-url      site-url
      :org-tags      (config :org-tags)
+     :firn-tags     (config :firn-tags)
      :build-url     (build-url site-url)
      :config        config
      ;; File wide meta --
