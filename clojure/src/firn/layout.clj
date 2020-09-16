@@ -114,7 +114,7 @@
 
        ;; render a list of file tags
        (= action :firn-tags)
-       (markup/render-firn-tags (config :firn-tags))
+       (markup/render-firn-tags (config :firn-tags) opts)
 
        ;; render a table of contents
        (= action :toc)

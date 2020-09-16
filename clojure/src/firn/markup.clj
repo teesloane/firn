@@ -54,10 +54,10 @@
            (sort-by-key-nil-at-end [smn k reverse]
              (let [sort-order (fn [a b] (if reverse (compare a b) (compare b a)))]
                (->> smn
-                  (map (fn [[k v]] (assoc v :__keyname k))) ; keep the key
-                  (sort-by (juxt #(nil? (% k)) k) sort-order)
-                  (map #(hash-map (% :__keyname) %))
-                  (into {}))))
+                    (map (fn [[k v]] (assoc v :__keyname k))) ; keep the key
+                    (sort-by (juxt #(nil? (% k)) k) sort-order)
+                    (map #(hash-map (% :__keyname) %))
+                    (into {}))))
 
            (sort-site-map [site-map-node] ;; site-map-node is a whole site-map or any :children sub maps.
              (case (opts :sort-by)
@@ -155,18 +155,36 @@
       (into [:ul.firn-backlinks] (map to-html backlinks-unique))
       nil)))
 
-
 (defn render-firn-tags
   "Renders a list of tags and their respective files
-  TODO: enable sort by"
-  [firn-tags]
-  (for [[k lst] firn-tags]
-    [:div.firn-file-tags-container
-     [:div.firn-file-tag-name k]
-     [:ul.firn-file-tag-list
-        (for [f lst]
-          [:li.firn-file-tag-item
-           [:a.firn-file-tag-link {:href (f :from-url)} (f :from-file)]])]]))
+  The tag list sections themsleves renders alphabetically,
+
+  The per-tag-list can be sorted by user input:
+
+    (render :firn-tags {:sort-by :alphabetical})
+    (render :firn-tags {:sort-by :newest})
+    (render :firn-tags {:sort-by :oldest})
+
+  Provided files have a #+DATE_CREATED front matter.
+  "
+  ([firn-tags]
+   (render-firn-tags firn-tags {}))
+  ([firn-tags opts]
+   (let [x-fn      u/sort-map-of-lists-of-maps
+         firn-tags (case (opts :sort-by)
+                     :alphabetical (x-fn {:coll firn-tags :sort-key :from-file :sort-by :alphabetical})
+                     :newest       (x-fn {:coll firn-tags :sort-key :date-created-ts :sort-by :newest})
+                     :oldest       (x-fn {:coll firn-tags :sort-key :date-created-ts :sort-by :oldest})
+                     firn-tags)]
+
+     [:div.firn-file-tags
+      (for [[k lst] firn-tags]
+        [:div.firn-file-tags-container
+         [:div.firn-file-tag-name k]
+         [:ul.firn-file-tag-list
+          (for [f lst]
+            [:li.firn-file-tag-item
+             [:a.firn-file-tag-link {:href (f :from-url)} (f :from-file)]])]])])))
 
 
 

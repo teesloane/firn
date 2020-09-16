@@ -100,9 +100,9 @@
 (defn keyword->normal-text
   [kw]
   (-> kw name
-     (s/replace #"-" " ")
-     (s/replace #"_" " ")
-     (s/capitalize)))
+      (s/replace #"-" " ")
+      (s/replace #"_" " ")
+      (s/capitalize)))
 
 ;; File Path fns ----
 ;; Mostly for operating on paths: `file/paths/woo/hoo.org`
@@ -196,7 +196,7 @@
 (defn interpose+tail
   "Interposes a keywords and ensures the key is at the end of the list"
   [lst k]
- (vec (concat (interpose k lst) [k])))
+  (vec (concat (interpose k lst) [k])))
 
 (defn org-keyword->vector
   "Reads org frontmatter and converts strings into a vector"
@@ -212,6 +212,31 @@
   (let [head (first lst)
         tail (take-while pred (rest lst))]
     (concat [head] tail)))
+
+(def x
+  {"Aesthetic"
+   [{:from-file "Zirn Setup (with Emacs)", :from-url "http://localhost:4000/setup", :tag-value "Aesthetic", :date-created-ts 1585195200}
+    {:from-file "Aayout", :from-url "http://localhost:4000/layout", :tag-value "Aesthetic", :date-created-ts 1585022400}
+    {:from-file "Styling", :from-url "http://localhost:4000/styling", :tag-value "Aesthetic", :date-created-ts 1585108800}],
+   "language"
+   [{:from-file "Configuration", :from-url "http://localhost:4000/configuration", :tag-value "language", :date-created-ts 1592625600}],
+   "programming"
+   [{:from-file "Configuration", :from-url "http://localhost:4000/configuration", :tag-value "programming", :date-created-ts 1592625600}]})
+
+
+(defn sort-map-of-lists-of-maps
+  "TODO: TEST ME - with the above example x"
+  [{:keys [sort-key coll] :as opts}]
+  (let [sort-method (opts :sort-by)]
+    (->> coll
+         (map (fn [[k v]]
+                (let [sorted (sort-by (juxt nil? sort-key) v)]
+                  (hash-map k
+                            (if (= sort-method :newest)
+                              (reverse sorted)
+                              sorted)))))
+         (into {}))))
+
 
 ;; For interception thread macros and enabling printing the passed in value.
 (def spy #(do (println "DEBUG:" %) %))

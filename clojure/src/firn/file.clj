@@ -226,7 +226,7 @@
 (defn craft-file-tags
   "A file tag includes must have metadata attached on create"
   [{:keys [firn-tags roam-tags date-created-ts file-metadata]}]
-  (let [file-tags #p (or firn-tags roam-tags)
+  (let [file-tags (or firn-tags roam-tags)
         file-tags (when file-tags (u/org-keyword->vector file-tags))]
     (when (seq file-tags)
       (map #(merge file-metadata {:tag-value % :date-created-ts date-created-ts}) file-tags))))
