@@ -224,10 +224,9 @@
           (recur xs out last-headline))))))
 
 (defn craft-file-tags
-  "A file tag includes must have metadata attached on create"
-  [{:keys [firn-tags roam-tags date-created-ts file-metadata]}]
-  (let [file-tags (or firn-tags roam-tags)
-        file-tags (when file-tags (u/org-keyword->vector file-tags))]
+  "A file tag includes must-have-metadata attached on create"
+  [{:keys [file-tags date-created-ts file-metadata]}]
+  (let [file-tags (when file-tags (u/org-keyword->vector file-tags))]
     (when (seq file-tags)
       (map #(merge file-metadata {:tag-value % :date-created-ts date-created-ts}) file-tags))))
 
@@ -240,14 +239,16 @@
         tree-data      (tree-seq map? :children org-tree)
         keywords       (keywords->map file) ; keywords are "in-buffer-settings" - things that start with #+<MY_KEYWORD>
         {:keys [date-updated date-created title firn-under firn-order firn-tags roam-tags]} keywords
-        file-metadata  {:from-file title :from-url (file :path-url)}
+        file-tags      (or firn-tags roam-tags)
+        file-metadata  {:from-file title
+                        :from-url  (file :path-url)
+                        :file-tags (when file-tags (u/org-keyword->vector file-tags))}
         metadata       (extract-metadata-helper tree-data file-metadata)
         date-parser    #(try
                           (when % (u/org-date->ts date-created))
                           (catch Exception e
                             (u/print-err! :error  (str "Could not parse date for file: " (or title "<unknown file>") "\nPlease confirm that you have correctly set the #+DATE_CREATED: and #+DATE_UPDATED values in your org file."))))
-        file-tags      (craft-file-tags {:firn-tags       firn-tags
-                                         :roam-tags       roam-tags
+        file-tags      (craft-file-tags {:file-tags       file-tags
                                          :file-metadata   file-metadata
                                          :date-created-ts (date-parser date-created)})]
 

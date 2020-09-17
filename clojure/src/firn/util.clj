@@ -159,7 +159,7 @@
   [path until]
   (let [split-path (s/split path #"/")
         res        (drop-while #(not= % until) split-path)]
-   (s/join "/" res)))
+    (s/join "/" res)))
 
 (defn is-attachment?
   "Checks is a path is an attachment; a local file that is not an org file."
@@ -213,19 +213,7 @@
         tail (take-while pred (rest lst))]
     (concat [head] tail)))
 
-(def x
-  {"Aesthetic"
-   [{:from-file "Zirn Setup (with Emacs)", :from-url "http://localhost:4000/setup", :tag-value "Aesthetic", :date-created-ts 1585195200}
-    {:from-file "Aayout", :from-url "http://localhost:4000/layout", :tag-value "Aesthetic", :date-created-ts 1585022400}
-    {:from-file "Styling", :from-url "http://localhost:4000/styling", :tag-value "Aesthetic", :date-created-ts 1585108800}],
-   "language"
-   [{:from-file "Configuration", :from-url "http://localhost:4000/configuration", :tag-value "language", :date-created-ts 1592625600}],
-   "programming"
-   [{:from-file "Configuration", :from-url "http://localhost:4000/configuration", :tag-value "programming", :date-created-ts 1592625600}]})
-
-
 (defn sort-map-of-lists-of-maps
-  "TODO: TEST ME - with the above example x"
   [{:keys [sort-key coll] :as opts}]
   (let [sort-method (opts :sort-by)]
     (->> coll

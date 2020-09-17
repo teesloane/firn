@@ -216,7 +216,7 @@
                   :site-map   site-map
                   :site-logs  site-logs
                   :org-tags   org-tags
-                  ;; TODO - add :firn-tags
+                  ;; TODO - add :firn-tags, ability to use `render` in pages.
                   :site-url   site-url
                   :build-url  (layout/build-url site-url)
                   :config     config}]
