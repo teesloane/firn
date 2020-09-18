@@ -1,5 +1,5 @@
 (defn tags
-  [{:keys [build-url org-tags partials]}]
+  [{:keys [build-url render partials]}]
   (let [{:keys [head nav footer]} partials]
     [:html
      (head build-url)
@@ -7,18 +7,12 @@
       (nav build-url)
       [:main
        [:article.def-wrapper
-        [:aside#sidebar.def-sidebar]
-
+        [:aside#sidebar.def-sidebar
+         (render :sitemap {:sort-by :firn-order})]
         [:div.def-content
-         [:h1 "Tags"]
-         ;; TODO - this sould be `render`-able.
-         (for [[tag-name tags] org-tags]
-           [:div
-            [:h2 {:id tag-name :class "firn-tag-heading"} tag-name]
-            (for [tag tags
-                  :let [link (tag :headline-link)]]
-              [:div
-               [:a
-                {:href link}
-                (tag :from-file) " - " (tag :from-headline)]])])
+         [:h1 "Org Tags"]
+         (render :org-tags)
+         [:hr]
+         [:h1 "File Tags"]
+         (render :firn-tags)
          (footer)]]]]]))

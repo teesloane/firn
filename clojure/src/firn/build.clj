@@ -209,18 +209,8 @@
   TODO: (In a later release) - do something similar to `file/get-web-path` and
   enable `load-fns-into-map` to save filenames as :namespaced/keys, allowing
   make-parent to work on it."
-  [{:keys [dir-site pages partials site-map site-links site-logs org-tags user-config] :as config}]
-  (let [site-url (user-config :site-url)
-        user-api {:partials   partials
-                  :site-links site-links
-                  :site-map   site-map
-                  :site-logs  site-logs
-                  :org-tags   org-tags
-                  ;; TODO - add :firn-tags, ability to use `render` in pages.
-                  :site-url   site-url
-                  :build-url  (layout/build-url site-url)
-                  :config     config}]
-
+  [{:keys [dir-site pages] :as config}]
+  (let [user-api (layout/prepare config {})]
     (doseq [[k f] pages
             :let  [out-file (str dir-site "/" (name k) ".html")
                    out-str  (h/html (f user-api))]]

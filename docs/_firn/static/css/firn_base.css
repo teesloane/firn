@@ -365,31 +365,7 @@ li > p {
   align-items: center;
 }
 
-.firn-org-tags {
 
-}
-
-.firn-org-tag-heading {
-  text-transform: capitalize;
-}
-
-.firn-org-tag {
-  background-color: var(--tag-bg);
-  border-radius: var(--border-radius);
-  color: var(--color-text);
-  font-size: var(--tag-size);
-  font-weight: bold;
-  margin: 0 4px;
-  padding: 0.2rem 0.4rem;
-}
-
-.firn-org-tag:hover {
-  filter: none;
-}
-
-.firn-org-tag::before {
-  content: "#";
-}
 
 .firn-cookie {
 }
@@ -510,10 +486,57 @@ li > p {
   justify-content: space-between;
 }
 
-/* Firn Tags (not org-mode tags!) -------------------------------------------- */
+/* Tags (Firn / Org tags) ---------------------------------------------------- */
 
+/* There are two types of tags when using Firn: "org-tags" and "firn-tags"
+/* org-tags are your standard org-mode heading tags:  ":mytag:"*/
+/* firn-tags are file-based tags that allows tagging entire files.*/
+
+/* Firn tags (tags that are per file basis.) */
+
+.firn-file-tags           {}
 .firn-file-tags-container {}
-.firn-file-tag-name       {}
+.firn-file-tag-name {
+  font-size: 1.2em;
+  margin: 1em 0;
+  text-transform: capitalize;
+}
 .firn-file-tag-list       {}
 .firn-file-tag-item       {}
 .firn-file-tag-link       {}
+
+/* Org tags (tags that are per heading basis.) */
+
+/* How an org tag (ex - `:mytag:`) looks when rendered alongside an org heading. */
+.firn-org-tag {
+  background-color: var(--tag-bg);
+  border-radius: var(--border-radius);
+  color: var(--color-text);
+  font-size: var(--tag-size);
+  font-weight: bold;
+  margin: 0 4px;
+  padding: 0.2rem 0.4rem;
+}
+
+.firn-org-tag:hover {
+  filter: none;
+}
+
+
+/* Optional: Adds a "#" before an org-tag */
+.firn-org-tag::before {
+  content: "#";
+}
+
+/* The following css classes style the result of rendering your org-tags list via*/
+/* `(render :org-tags)` */
+.firn-org-tags           {}
+.firn-org-tags-container {}
+.firn-org-tag-name {
+  font-size: 1.2em;
+  margin: 1em 0;
+  text-transform: capitalize;
+}
+.firn-org-tag-list       {}
+.firn-org-tag-item       {}
+.firn-org-tag-link       {}

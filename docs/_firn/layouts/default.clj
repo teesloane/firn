@@ -21,8 +21,6 @@
              [:h4 "Backlinks to this document:"]
              backlinks]])
 
-         (render :firn-tags {:sort-by :oldest})
-
          [:div.adjacent-files
           [:span (render :adjacent-files)]]
          (footer)]]]]]))

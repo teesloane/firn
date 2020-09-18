@@ -155,6 +155,8 @@
       (into [:ul.firn-backlinks] (map to-html backlinks-unique))
       nil)))
 
+;; R: Tags (firn / org)
+
 (defn render-firn-tags
   "Renders a list of tags and their respective files
   The tag list sections themsleves renders alphabetically,
@@ -187,8 +189,24 @@
              [:a.firn-file-tag-link {:href (f :from-url)} (f :from-file)]])]])])))
 
 
+(defn render-org-tags
+  "Renders markup for a list of tags and their respective links to org-headings. "
+  [org-tags opts]
+  [:div.firn-org-tags
+   (when (seq org-tags)
+     (for [[tag-name tags] org-tags]
+       [:div.firn-org-tag-container
+        [:div {:id tag-name :class "firn-org-tag-name"} tag-name]
+        (for [tag tags
+              :let [link (tag :headline-link)]]
+          [:ul.firn-org-tag-list
+           [:li.firn-org-tag-item
+            [:a.firn-org-tag-link
+             {:href link}
+             (tag :from-file) " - " (tag :from-headline)]]])]))])
 
 ;; R: Table of Contents --------------------------------------------------
+
 
 (defn make-toc-helper-reduce
   "(ಥ﹏ಥ) Yeah. So. See the docstring for make-toc.
