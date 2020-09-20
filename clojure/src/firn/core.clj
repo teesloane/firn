@@ -26,18 +26,18 @@
       (System/setProperty "java.library.path" (.getPath lib-dir)))))
 
 (defn usage [options-summary]
-  (->> ["Firn - A static-site generator for org-mode."]
-      ""
-      "Usage: firn [options] action"
-      ""
-      "Options:"
-      options-summary
-      ""
-      "Actions:"
-      "  build    Build a static site in a directory with org files."
-      "  new      Scaffold files and folders needed to start a new site."
-      "  serve    Runs a development server for processed org files."
-     (s/join \newline)))
+  (->> ["Firn - A static-site generator for org-mode."
+        ""
+        "Usage: firn [options] action"
+        ""
+        "Options:"
+        options-summary
+        ""
+        "Actions:"
+        "  build    Build a static site in a directory with org files."
+        "  new      Scaffold files and folders needed to start a new site."
+        "  serve    Runs a development server for processed org files."]
+       (s/join \newline)))
 
 (defn error-msg [errors]
   (str "The following errors occurred while parsing your command:\n\n"
@@ -105,5 +105,3 @@
 (comment
   (mount/stop) (-main "serve" "-d" "/Users/tees/Projects/firn/firn/docs")
   )
-
-;; (mount/stop) (-main "serve" "-d" "/Users/tees/Desktop/foo")
