@@ -1,0 +1,52 @@
+#+TITLE: Breadcrumbs
+#+FIRN_UNDER: Content "The Render Function"
+
+*Purpose:* This document explains how to render *breadcrumbs* in your Firn layouts.
+
+*Prerequistes*: an understanding of [[file:the-render-function.org][The Render Function]], [[file:layout.org][layouts]] and [[file:front-matter.org][front matter]]. Breadcrumbs usage is related to the [[file:sitemap.org][sitemap]].
+
+* Overview
+
+/Breadcrumbs/ are a navigational tool that indicate where a file falls in a parent-child heirarchy. For example, this document you are reading right now falls under a parent document ("The Render Function"), which falls under another parent document ("Content").
+
+#+BEGIN_SRC txt
+$ Content > The Render Function > Breadcrumbs
+#+END_SRC
+
+When you render breadcrumbs on your page, it will display the "path" (or list of parent files) that connects the current page displayed.
+
+* Usage
+
+To display breadcrumbs on a page there are two requirements:
+
+** Setting frontmatter
+
+The org document to be rendered must have a ~#+FIRN_UNDER:~ front matter; the value should be the title of another file, of a list of file titles (in a list scenario, the first item is the greatest/oldest ancestor, and the last item in the list is the direct parent of the file.)
+
+#+BEGIN_SRC text
+# Examples 1: nest a file under another single file.
+#+FIRN_UNDER: Content
+
+# Examples 2: Nest under a file with multiple words
+#+FIRN_UNDER: "The Render Function"
+
+# Examples 3: Nest under several files:
+#+FIRN_UNDER: Content "The Render Function"
+#+END_SRC
+
+** Rendering breadcrumbs in a layout.
+
+1. The layout you are using to render the org-mode document needs to use the render function to display it.
+
+#+BEGIN_SRC clojure
+; org file must have front matter such as:
+; my-file.org:
+; #+FIRN_UNDER: Parent
+; #+FIRN_LAYOUT: default
+
+; In `layouts/default.clj`, render breadcrumbs:
+(render :breadcrumbs)
+#+END_SRC
+
+
+Changes you make to the ~#+FIRN_UNDER~ keyword *also affect the sitemap*. The breadcrumbs is, in essence,  a small slice of the [[file:sitemap.org][sitemap]].

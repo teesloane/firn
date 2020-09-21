@@ -4,18 +4,24 @@
 #+FIRN_UNDER: Reference
 
 * V.0.0.9
-
 ** New
-- Several new render functions, for easier pre-set rendering of content:
+- Several new render functions, for easier preset rendering of content:
   - Add ~(render :sitemap)~ (with options for :sort-by, :start-at )
-  - Add ~(render :breadcrumbs)~ breadcrumbs.
+  - Add ~(render :breadcrumbs)~
   - Add ~(render :adjacent-files)~
+  - Add ~(render :backlinks)~
   - Add ~(render :firn-tags)~
   - Add ~(render :org-tags)~
 - Ability to use ~render~ in a non-org ~page~ - only global things may be rendered, however, such as a site-map, or a firn/org tags.
+- Add ~build-url~ function for easier creation of internal urls.
 ** Fixed
 ** Breaking Changes
-- Custom pages are no longer added to the sitemap; they currently present too much trouble as they do not have front matter and thus cannot be discerned where they fit in with possible sorting mechanisms on the site-map (ie, they cannot have a ~FIRN_ORDER~ value, and thus have to default to being pushed to 999999~ order and so remain at the "bottom" of the sitemap. Still looking for a better solution to this.)
+- Custom pages are no longer added to the sitemap; they currently present too
+  much trouble as they do not have front matter and thus cannot be discerned
+  where they fit in with possible sorting mechanisms on the site-map (ie, they
+  cannot have a ~FIRN_ORDER~ value, and thus have to default to being pushed to
+  999999~ order and so remain at the "bottom" of the sitemap. Still looking for
+  a better solution to this.)
 
 * V.0.0.8
 ** Feature: Clean up unused attachments.

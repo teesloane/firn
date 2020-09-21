@@ -99,12 +99,13 @@ h2 {
 .def-sidebar {
   position: fixed;
   width: var(--sidebar-width);
-  padding: 64px 32px;
+  padding: 32px;
   flex-direction: column;
   display: flex;
   left: 0;
   top: 48px;
   border-right: 1px solid var(--border-col);
+  overflow-y: scroll;
   height: 100%;
 }
 

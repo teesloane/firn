@@ -7,11 +7,13 @@
 To use Firn, you will need to add some "Front Matter" to your org-files. Front
 Matter is common in many static-site-generators. Firn uses org-mode [[https://orgmode.org/manual/In_002dbuffer-Settings.html][in-buffer-settings]] to set Front Matter.
 
-Currently, Firn only requires that you have a ~#+TITLE:~ front-matter.
+Currently, Firn requires that each file it processes at least have a ~#+TITLE:~
+front-matter key value.
 
 * Firn Front Matter
 
-The following in-buffer settings are processed by Firn and/or made available to layouts for processing.
+The following front-matter are processed by Firn and/or made available to
+layouts for processing.
 
 | Key                | Type          | Purpose                                                 |
 |--------------------+---------------+---------------------------------------------------------|
@@ -31,12 +33,11 @@ Changing some of these values from file to file will result in your files being
 rendered differently. Meanwhile, you can set the default values for certain
 front-matter in your ~config.edn~ file, as detailed in the [[file:configuration.org][configuration document]].
 
-The following example is an /excerpt/ from a sample ~config.edn~.
+Let's consider an example - we will enable headline [[file:folding.org][folding]] in a document.
 
-#+BEGIN_SRC clojure
-{
- :firn-fold  {3 true 4 true}
-}
+
+#+BEGIN_SRC
+#+FIRN_FOLD {1 true 2 true}
 #+END_SRC
 
 The above will result in *all* level 3 and 4 headings being /folded/. If you would
@@ -52,7 +53,8 @@ that is *evaluated* when your site is built.
 All front matter will be accessible as metadata when it comes time to render
 your layouts. That is to say, you can create your own custom keywords in your
 files, and use them in your layouts. To access your front-matter, you will have
-to dig into the data structure of your "file" in your layout.
+to dig into the data structure of your "file" in your layout. These keywords are
+*not* read in as Clojure values - they will be available just as strings.
 
 #+BEGIN_SRC clojure
 (defn project

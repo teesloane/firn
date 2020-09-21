@@ -1,6 +1,6 @@
 #+TITLE: Layout
 #+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-08-25 16:54>
+#+DATE_UPDATED: <2020-09-20 19:05>
 #+FIRN_UNDER: Content
 #+FIRN_ORDER: 1
 #+FIRN_FOLD: {2 true}
@@ -39,4 +39,5 @@ Let's consider a simple layout file:
 
 The above may look a little strange if you are not familiar with Clojure. The
 next document will expand on what the ~render~ function does.
-
+* TODO Partials
+* TODO Private / Public organization of content

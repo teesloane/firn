@@ -1,0 +1,72 @@
+#+TITLE: Table Of Contents
+#+FIRN_UNDER: Content "The Render Function"
+
+*Purpose:* This document explains how to render and customize a table of contents in your Firn layouts.
+
+*Prerequistes*: an understanding of [[file:the-render-function.org][The Render Function]] and how [[file:layout.org][layouts]] work.
+
+* Overview
+
+A table of contents can be included in any layout that is processing an *org-file* (and thus, table of contents cannot be rendered in a [[file:pages.org][custom page]].)
+
+A table of contents will by default render /every headline/ it finds in an org-mode file. This may not be ideal and so it is possible to customize which headlines are rendered, unto what depth, and more.
+
+* Usage
+
+The table of contents can be complex and customizable. The usage section will cover several examples,the first of which will demonstrate the entire api of the table of contents, and the remainder will be used to provider more specific, simpler examples.
+
+To follow any of the examples below, you will need to be editing a [[file:layout.org][layout]] file.
+
+** Overview
+
+#+BEGIN_SRC clojure
+
+(render :toc {:depth 3           ; [ int ]      - headline depth to render until
+              :headline "Notes"  ; [ string ]   - headline name to start rendering at
+              :exclude-headline? ; [ boolean ]  - whether to include the specified headline
+              :list-type :ol     ; [ symbol ]   - render the toc as an ordered list. Can be ":ul / :ol"
+              })
+#+END_SRC
+
+** Every headline
+
+To have render *every* headline in a layout add the following:
+
+#+BEGIN_SRC clojure
+(render :toc)
+#+END_SRC
+
+** Render only level N headings.
+
+To have render *every* headline in a layout add the following:
+
+#+BEGIN_SRC clojure
+(render :toc {:depth 1})
+#+END_SRC
+** Render only headings starting at a specific name
+
+Some layouts might specify that only certain headlines be rendered in a document. This is useful for separating private and public content in a document. Example:
+
+#+BEGIN_SRC clojure
+(render :toc {:headline "Notes"})
+#+END_SRC
+
+In the above, the table of contents will only items that are children of the "Notes" headline.
+
+If you want to exclude "Notes" and only have its child headlines rendered, do the following:
+
+#+BEGIN_SRC clojure
+(render :toc {:headline "Notes", :exclude-headline? true})
+#+END_SRC
+
+* Overriding values with front matter
+
+The examples above demonstrate how you would setup a table of contents in a [[file:layout.org][layout]]. If you need to customize the table of contents on a per-file basis, set the options map as a value to the ~+FIRN_TOC~ front matter at the top of an org file.
+
+Example:
+
+#+BEGIN_SRC
+#+TITLE: Table Of Contents
+#+FIRN_UNDER: Content "The Render Function"
+#+FIRN_TOC: {:depth 3 :list-type :ul}
+#+END_SRC

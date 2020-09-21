@@ -13,6 +13,7 @@
 
          [:h1 title]
          [:div (render :toc)] ;; Optional; add a table of contents
+         [:hr]
          (render :file)
          (when-let [backlinks (render :backlinks)]
            [:div
