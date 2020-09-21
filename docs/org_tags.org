@@ -3,7 +3,7 @@
 #+FIRN_ORDER: 1
 
 *Purpose:* This document explains how to organize your headlines with org-tags
-as well as how to render a list of tags on a Firn site.
+as well as how to render a list of org-tags on a Firn site.
 
 *Prerequistes*: an understanding of [[file:the-render-function.org][The Render Function]] and [[file:configuration.org][firn configuration]].
 
@@ -14,7 +14,8 @@ your layouts through the render function or as raw data.
 
 * Usage                                                          :foo:
 
-Continue using org-mode tags as you normally would. When it comes time to display your tags you need to do two things.
+Continue using org-mode tags as you normally would. When it comes time to
+/display/ your tags you need to do two things.
 
 1. Setup a tag file
 2. Render your org-tags.
@@ -25,7 +26,7 @@ All org tags are html links that must link somewhere. Clicking on an org-tag sho
 
 You can rename this file to whatever you want, so long as it can be linked to as a valid url link.
 
-If you /do/ choose to change the name of your tag file, make sure you alter the ~tag-file~ value in your ~config.edn~ - this ensures that every tag that displays next to an org-mode heading links to the proper url.
+If you /do/ choose to change the name of your tag file, make sure you alter the ~:org-tags-path~ value in your ~config.edn~ - this ensures that every tag that displays next to an org-mode heading links to the proper url.
 
 ** Render org-tags
 
