@@ -1,18 +1,42 @@
 #+TITLE: Firn Tags
-#+FIRN_UNDER: Content
+#+FIRN_UNDER: Content "The Render Function"
 #+FIRN_ORDER: 4
 #+DATE_CREATED: <2020-08-27 Thu>
-#+DATE_UPDATED: <2020-09-09 16:16>
+#+DATE_UPDATED: <2020-09-21 19:14>
+
+
+*Purpose:* This document explains how to organize your documents with "Firn tags"
+(file based tagging) as well as how to render a list of tags on a Firn site.
+
+*Prerequistes*: an understanding of [[file:the-render-function.org][The Render Function]],  [[file:layout.org][layouts]] and [[file:front-matter.org][front matter]].
 
 * Overview
 Firn is able to tag files using the front matter ~#+FIRN_TAGS~ or ~#+ROAM_TAGS~. Firn tags are for categorizing information on a file to file basis. Please note this is different from using org-mode tags (referred to as "org-tags" throughout this documentation.)
 
 * Usage
 
-Firn's file tagging functionality is partially based on how Org Roam [[https://www.orgroam.com/manual/Tags.html#Tags][handles tagging]]. Tag values are space delimited. Multi-word tags must be wrapped in quotations marks.
+Firn's file tagging functionality is partially based on how Org Roam [[https://www.orgroam.com/manual/Tags.html#Tags][handles
+tagging]]. Tag values are space delimited. Multi-word tags must be wrapped in
+quotations marks.
 
-Example: ~#+FIRN_TAGS: "Programming Languages" Research Development~
+Example:
 
-Firn automatically reads in the ~ROAM_TAGS~ front matter, allowing you to make use of whatever tags you might already have if you are an org-roam user. If you have both ~FIRN_TAGS~ and ~ROAM_TAGS~ in your front-matter, ~FIRN_TAGS~ will be given precedence for providing the tag values for a file when building your site.
+#+BEGIN_SRC
+#+TITLE: "My File"
+#+FIRN_TAGS: "Programming Languages" Research Development
+#+END_SRC
 
-** TODO In your layouts
+Firn automatically reads in the ~ROAM_TAGS~ front matter, allowing you to make use
+of whatever tags you might already have if you are an org-roam user. If you have
+both ~FIRN_TAGS~ and ~ROAM_TAGS~ in your front-matter, ~FIRN_TAGS~ will be given
+precedence for providing the tag values for a file when building your site.
+
+When it comes time to render your list of accumulated tags and their
+respectively tagged files use the following in your layouts:
+
+#+BEGIN_SRC clojure
+(render :firn-tags)
+
+;; It is possible to sort your tags by :alphabetical | :newest | :oldest
+(render :firn-tags {:sort-by :alphabetical})
+#+END_SRC

@@ -1,22 +1,49 @@
 #+TITLE: Org Tags
-#+FIRN_UNDER: Content
-#+FIRN_ORDER: 5
+#+FIRN_UNDER: Content "The Render Function"
+#+FIRN_ORDER: 1
+
+*Purpose:* This document explains how to organize your headlines with org-tags
+as well as how to render a list of tags on a Firn site.
+
+*Prerequistes*: an understanding of [[file:the-render-function.org][The Render Function]] and [[file:configuration.org][firn configuration]].
 
 * Overview
 
-Firn collects org-tags when it parses your org-mode files and are accessible in your layouts through the render function or as raw data.
+Firn collects [[https://orgmode.org/manual/Tags.html][org-tags]] when it parses your org-mode files and are accessible in
+your layouts through the render function or as raw data.
 
-* Usage
+* Usage                                                          :foo:
 
-** TODO Using the render function
+Continue using org-mode tags as you normally would. When it comes time to display your tags you need to do two things.
 
-Once the org-tags renderer is built, document it here.
+1. Setup a tag file
+2. Render your org-tags.
 
-** org-tags data structure
-A map of org tags is available in your layouts under the key "org-tags". The map might look like so:
+** Setup a tag file
+
+All org tags are html links that must link somewhere. Clicking on an org-tag should link to a "tag file" which displays all org-tags as they have been collected during the Firn build process. By default, creating a new firn site with the ~firn new~ commands will generate the file ~_firn/pages/tags.clj~ . This is where your org-tags will be displayed.
+
+You can rename this file to whatever you want, so long as it can be linked to as a valid url link.
+
+If you /do/ choose to change the name of your tag file, make sure you alter the ~tag-file~ value in your ~config.edn~ - this ensures that every tag that displays next to an org-mode heading links to the proper url.
+
+** Render org-tags
+
+Once you have setup your tag file, you need to render your org tags:
 
 #+BEGIN_SRC clojure
+(render :org-tags)
+#+END_SRC
 
+Done!
+
+* The ~org-tags~ data structure
+
+A map  of org tags is available in your layouts under the keyword "org-tags".
+This is useful if you want complete control of how your tags are rendered to page.
+
+The tag data is a map that looks roughly as follows:
+#+BEGIN_SRC clojure
 {"FAQ"           [{:from-headline "FAQ",
                    :headline-link "http://localhost:4000/index#faq",
                    :from-file     "Home",
@@ -67,5 +94,4 @@ A map of org tags is available in your layouts under the key "org-tags". The map
                    :from-file     "Configuration",
                    :from-url      "http://localhost:4000/configuration",
                    :tag-value     "reference"}]}
-
 #+END_SRC

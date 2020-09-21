@@ -1,9 +1,35 @@
 #+TITLE: Adjacent Files
 #+FIRN_UNDER: Content "The Render Function"
 
-*Purpose:* This document explains how to render links to "adjacent files" based on the ~FIRN_ORDER~ frontmatter.
+*Purpose:* This document explains how to render links to "adjacent files" based on the ~#+FIRN_ORDER~ frontmatter.
 
-*Prerequistes*: an understanding of [[file:the-render-function.org][The Render Function]], [[file:layout.org][layouts]]. The sitemap is also related to [[file:breadcrumbs.org][breadcrumbs]].
+*Prerequistes*: an understanding of [[file:the-render-function.org][The Render Function]], [[file:layout.org][layouts]].
 
-* TODO Overview
-* TODO Usage
+* Overview
+
+In some cases, you may wish to indicate what the "next" and "previous" page may be on your Firn site - /adjacent files/ accomplish this.
+
+
+Constructing "adjacent files" will only work if you are using the "Firn Order" keyword:
+
+#+BEGIN_SRC
+#+TITLE: My File
+#+FIRN_ORDER: 3
+#+END_SRC
+
+When rendering ~My File~, the adjacent-files render function will look for the next biggest integer found in a #+FIRN_ORDER of a document
+
+* Usage
+
+#+BEGIN_SRC clojure
+; render a list of the previous and next file.
+; this determines the Next/Previous file based on FIRN_ORDER
+(render :adjacent-files)
+
+; Renders Next/Previous file based on date created.
+(render :adjacent-files {:sort-by :date})
+
+; Changes the html output for "previous" and "next" text:
+(render :adjacent-files {:next-text "Newer post: "
+                         :prev-text "Older post: "})
+#+END_SRC

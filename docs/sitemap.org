@@ -1,9 +1,11 @@
 #+TITLE: Sitemap
 #+FIRN_UNDER: Content "The Render Function"
 
-*Purpose:* This document explains how to render an HTML [[https://en.wikipedia.org/wiki/Site_map][sitemap]] in your Firn layouts.
+*Purpose:* This document explains how to render an HTML [[https://en.wikipedia.org/wiki/Site_map][sitemap]] in your Firn
+layouts.
 
-*Prerequistes*: an understanding of [[file:the-render-function.org][The Render Function]], [[file:layout.org][layouts]]. The sitemap is also related to [[file:breadcrumbs.org][breadcrumbs]].
+*Prerequistes*: an understanding of [[file:the-render-function.org][The Render Function]], [[file:layout.org][layouts]]. The sitemap is
+also related to [[file:breadcrumbs.org][breadcrumbs]].
 
 * Overview
 
@@ -25,12 +27,16 @@ By default, the sitemap will render without being sorted in any manner.
 
 ** Start at a specific node
 
-Similar to the [[file:table-of-contents.org][table of contents]], it is possible to render the sitemap /starting/ at a sepcific file "parent". This is useful, for example, if you group a handful of documents under a specific topic, such as "Projects", which then allows you to render a list of tlinks to all projects:
+Similar to the [[file:table-of-contents.org][table of contents]], it is possible to render the sitemap /starting/
+at a sepcific file "parent". This is useful, for example, if you group a handful
+of documents under a specific topic, such as "Projects", which then allows you
+to render a list of links to all projects:
 
 #+BEGIN_SRC clojure
 (render :sitemap {:start-at ["Content"]})
 
-; If you want to start further "down the tree", add successive items to the start-at vector:
+; If you want to start further "down the tree", add successive items to the
+; start-at vector:
 
 (render :sitemap {:start-at ["Content" "The Render Function"]})
 #+END_SRC
@@ -39,7 +45,7 @@ Similar to the [[file:table-of-contents.org][table of contents]], it is possible
 
 It is possible to sort the entries of the sitemap by various criteria. Sorting as such relies on other data being present in front matter (Dates, ordering). Any files missing the sort criteria will be automatically pushed to the end of the site map list.
 
-***  By Date
+*** By Date
 
 Sorting documents by newest or oldest requires that each file have a ~+DATE_CREATED~ front matter.
 
@@ -49,7 +55,7 @@ Sorting documents by newest or oldest requires that each file have a ~+DATE_CREA
 (render :sitemap {:sort-by :newest})
 #+END_SRC
 
-*** By "order"
+*** By Pre-determined Order
 You may also sort by an arbitrary "order" denoted by the usage of the ~#+FIRN_ORDER~ front matter. A document with a "FIRN_ORDER" value of ~1~ will come before a document with a value of ~2~.
 
 #+BEGIN_SRC clojure

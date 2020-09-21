@@ -1,6 +1,6 @@
 #+TITLE: Getting Started
 #+DATE_CREATED: <2020-03-27 Fri>
-#+DATE_UPDATED: <2020-08-14 16:45>
+#+DATE_UPDATED: <2020-09-21 18:22>
 #+FIRN_LAYOUT: docs
 #+FIRN_ORDER: 1
 
@@ -8,4 +8,4 @@
 Welcome to the Firn documentation. The Getting Started section covers the following:
 
 - [[file:tutorial.org][A step by step tutorial]] for creating a new site from scratch.
-- [[file:setup.org][Editor Setup]] - Notes on setting up your environment (ie, mostly Emacs) to best work with Firn
+- [[file:setup.org][Editor Setup]] - Notes on setting up your environment (ie, mostly Emacs) to best work with Firn.

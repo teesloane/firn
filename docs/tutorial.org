@@ -54,7 +54,7 @@ ls -l _firn/_site # take a look at resulting built files:
 # drwxr-xr-x  3 <usr>  staff   96 22 Jun 18:23 static
 #+END_SRC
 
-If you open the compiled index.html file, you should see the sample "Test heading" on the page.
+If you open the compiled ~index.html~ file, you should see the sample "Test heading" on the page.
 
 You've got yourself a plain, simple HTML page, with very little functionality. Behind the scenes, however, a few things happened.
 
@@ -103,7 +103,7 @@ Try adding another heading to the =index.org= file - it will re-compile and disp
 
 * Inspecting a Firn org-mode-file
 
-For Firn to be able to "pick-up" and transform org-mode files into html, a file will need to have something that is often known as "front-matter" in a static-site-generator. In org-mode, [[https://orgmode.org/manual/In_002dbuffer-Settings.html][in-buffer-settings]] are used to create "front-matter." All files must have at least a ~#+TITLE:~ keyword, but should also have a ~#+FIRN_LAYOUT:~ keywords as well. The keywords are documented in the [[file:configuration.org::*Reference][reference section]].
+For Firn to be able to "pick-up" and transform org-mode files into html, a file will need to have something that is often known as "front-matter" in a static-site-generator. In org-mode, [[https://orgmode.org/manual/In_002dbuffer-Settings.html][in-buffer-settings]] are used to create "front-matter." All files must have at least a ~#+TITLE:~ keyword, but should also have a ~#+FIRN_LAYOUT:~ keywords as well. The keywords are documented in the [[file:configuration.org::*Reference][reference section]] and explained in more detail in the [[file:front-matter.org][front matter]] document.
 
 * Rendering Content
 
@@ -111,15 +111,16 @@ Firn is capable of picking and choosing what parts of an org-file you want to re
 
 #+BEGIN_SRC clojure
 (defn default
-  [{:keys [render partials]}]
-  (let [{:keys [head]} partials
-        default-styles {:style "max-width: 700px; padding: 32px; margin: 0 auto"}]
-    (head
-     [:body default-styles
+  [{:keys [org-tags build-url title render partials]}]
+  (let [{:keys [head nav footer]} partials]
+    [:html
+     (head build-url)
+     [:body
       [:main
        [:article
-        [:div (render :file)] ;; < this line is important
-        ]]])))
+        [:div
+         [:h1 title]
+         (render :file)]]]]]))
 #+END_SRC
 
 The above is Clojure code, which is the language that was used to build Firn. This code uses Hiccup to render HTML. Look to the =(render ...)= function. Right now, it's indicating that the default layout for an org-mode file should render the file in it's entirety.
@@ -134,7 +135,7 @@ Change that line to the following:
 
 Where you will replace ~{My New Heading}~ with the specific headline you have created. On saving changes, the server will reload the layout and only render the specified heading and it's contents.
 
-Read more about the render function and layouts in the [[file:layout.org][layout document]].
+Read more about the render function and layouts in the [[file:layout.org][layout document]] and [[file:the-render-function.org][the render function]] document.
 
 * Understanding config.edn                                       :configuration:
 
@@ -150,10 +151,11 @@ Consider an intial config.edn file:
  :ignored-dirs     ["priv"] ; Directories to ignore org files in.
  :site-desc        ""       ; Used for RSS.
  :site-title       ""       ; Used for RSS.
- :site-url         ""}
+ :site-url         ""       ; Used for building internal links.}
+
 #+END_SRC
 
-Most of the keys and their values are self explanatory, but let's discuss an example none-the-less. Perhaps a user already has an existing folder of org-files, and these files often link to images in a directory named "attach". Rather than have to rename "attach" to "data" and painfully rename several =file=
+Most of the keys and their values are self explanatory, but let's discuss an example nonetheless. Perhaps a user already has an existing folder of org-files, and these files often link to images in a directory named "attach". Rather than have to rename "attach" to "data" and painfully rename several =file=
 links in org-files, a user can change the =dir-data= key to point to the folder that already exists.
 
 The available configuration keys are commented within the file itself, and are more heavily documented in the [[file:configuration.org][configuration documentation]]. Beyond the above example, the functionality of this file is out of scope for the getting started guide.
