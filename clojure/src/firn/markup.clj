@@ -188,7 +188,6 @@
             [:li.firn-file-tag-item
              [:a.firn-file-tag-link {:href (f :from-url)} (f :from-file)]])]])])))
 
-
 (defn render-org-tags
   "Renders markup for a list of tags and their respective links to org-headings. "
   [org-tags opts]
@@ -402,9 +401,11 @@
         parent           {:type "headline" :level level :children [v]} ; reconstruct the parent so we can pull out the content.
         ;; this let section builds the heading elements and their respective
         ;; classes; construcing a single heading element with various children..
+        tag-link         (or (str "/" (opts :org-tags-path) "#") "/tags#")
         heading-priority (u/str->keywrd "span.firn-headline-priority.firn-headline-priority__" priority)
         heading-keyword  (u/str->keywrd "span.firn-headline-keyword.firn-headline-keyword__" keywrd)
-        heading-tags     [:span.firn-org-tags (for [t tags] [:span [:a.firn-org-tag {:href (str "/tags#" t)} t]])]
+
+        heading-tags     [:span.firn-org-tags (for [t tags] [:span [:a.firn-org-tag {:href (str tag-link t)} t]])]
         heading-anchor   (org/make-headline-anchor parent)
         heading-is-folded (level-in-fold? opts level)
         heading-id+class #(u/str->keywrd "h" % heading-anchor ".firn-headline.firn-headline-" %
