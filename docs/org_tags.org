@@ -1,6 +1,6 @@
 #+TITLE: Org Tags
 #+FIRN_UNDER: Content "The Render Function"
-#+FIRN_ORDER: 1
+#+FIRN_ORDER: 5
 
 *Purpose:* This document explains how to organize your headlines with org-tags
 as well as how to render a list of org-tags on a Firn site.
