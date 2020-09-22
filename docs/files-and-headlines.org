@@ -18,22 +18,22 @@ To render an entire org-mode file:
 (defn default
   [{:keys [render partials]}]
   (let [{:keys [head]} partials]
-
-    (head
-     [:body
-       [:div (render :file)]])))
+    (head)
+    [:body
+     [:div (render :file)]]))
 #+END_SRC
+
 ** Rendering specific headlines and content
 
 #+BEGIN_SRC clojure
 (defn default
   [{:keys [render partials]}]
   (let [{:keys [head]} partials]
-    (head
-     [:body
-       [:div (render "Notes")] ; render everything in "Notes" (including the heading "Notes")
-       [:div (render "Notes" {:exclude-headline? true})] ; render the content in "Notes", excluding the heading.
-      ])))
+    (head)
+    [:body
+      [:div (render "Notes")] ; render everything in "Notes" (including the heading "Notes")
+      [:div (render "Notes" {:exclude-headline? true})] ; render the content in "Notes", excluding the heading.
+      ]))
 
 #+END_SRC
 
@@ -57,6 +57,6 @@ layout-wide, or file-specific basis:
 (render :file {:firn-fold {3 false  4 false 5}}) ; H3 through H5 will be foldable, and will start closed_
 #+END_SRC
 
-The ~:firn-fold~  value takes a *map* in which the keys correspond to heading
-levels, and the value is a boolean, indicating whether or not the details tag
-is, open or not. ~:firn-fold~ supports up to 6 headings (corresponding from ~h1~ to ~h6~)
+The ~:firn-fold~ value takes a *map* in which the keys correspond to heading levels,
+and the value is a boolean, indicating whether or not the details tag is, open
+or not. ~:firn-fold~ supports up to 6 headings (corresponding from ~h1~ to ~h6~)
