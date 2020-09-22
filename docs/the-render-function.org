@@ -7,18 +7,27 @@ The ~(render)~ function is used to render content from your org file. It's an
 important one - if you don't use it, you won't see any org-mode content.
 
 Quite a bit of data and functions are made available in your layouts. The =render=
-function you to decide what parts of your org-file you would like to display. Firn
-makes some "pre-made" content available for rendering - logbook graphs, table of
-contents, etc. It can render multiple kinds of content"
+function allows you to decide what parts of your org-file you would like to display.
 
-| Render type       | Paramaters      | Example                                                              |
-|-------------------+-----------------+----------------------------------------------------------------------|
+Firn makes some "pre-made" content available to be rendered:
+
+| Render type       | Paramaters      | Example                                                                |
+|-------------------+-----------------+------------------------------------------------------------------------|
 | Entire file       | keyword         | ~(render :file)~                                                       |
 | Specific headline | string          | ~(render "Notes")~                                                     |
 | Specific content  | string, keyword | ~(render "Notes" :content)~                                            |
-| Table of contents | keyword, map    | ~(render :toc {:depth int :exclude-headline? bool :headline "Notes"})~ |
+| [[file:table-of-contents.org][Table of contents]] | keyword, map    | ~(render :toc {:depth int :exclude-headline? bool :headline "Notes"})~ |
 | Logbook Polyline  | keyword, map    | ~(render :logbook-polyline {:stroke "#45698A" :height 60 :width 365})~ |
-|                   |                 |                                                                      |
+| [[file:sitemap.org][Sitemaps]]          | TODO            | TODO                                                                   |
+| Folding           | TODO            | TODO                                                                   |
+| [[file:backlinks.org][Backlinks]]         | TODO            | TODO                                                                   |
+| [[file:adjacent-files.org][Adjacent files]]    | TODO            | TODO                                                                   |
+| [[file:firn_tags.org][Firn Tags]]         | TODO            | TODO                                                                   |
+| [[file:org_tags.org][Org Tags]]          | TODO            | TODO                                                                   |
+| [[file:breadcrumbs.org][Breadcrumbs]]       | TODO            | TODO                                                                   |
+|                   |                 |                                                                        |
+
+TODO - migrate these.
 
 ** Render an entire file
 
@@ -82,44 +91,3 @@ Graphs all logbook entries for the current file in a polyline, generating a char
        [:div (render :logbook-polyline {:stroke "#45698A" :height 60 :width 365})]])))
 #+END_SRC
 
-** Rendering a Table of Contents
-When a file is processed, Firn collects *all* of it's headlines, whether you're
-choosing to render the entire file, or just one headline.
-
-There are several ways you can create table of contents in your files, from simple to more complex use cases.
-
-1. Render a table of contents for an entire file.
-
-  #+BEGIN_SRC clojure
-  (defn default
-    [{:keys [render partials]}]
-    (let [{:keys [head]} partials]
-
-      (head
-       [:body
-         [:div (render :toc)]
-         [:div (render :file)]])))
-  #+END_SRC
-
-2. Render a table of contents for everything within a specific headline.
-
-  #+BEGIN_SRC clojure
-  (defn default
-    [{:keys [render partials]}]
-    (let [{:keys [head]} partials]
-      (head
-       [:body
-         ;; only renders a table of contents for a single headline's children.
-         ;; `:eclusive?` means we don't render "Notes"; just headlines that fall under it dflakdjflksadjf lksadjf lkasdjf lkasdjf .
-         [:div (render :toc {:headline "Notes"
-                             :depth 4
-                             :exclude-headline? true})]
-         [:div (render "Notes")]])))
-  #+END_SRC
-
-3. From within a file, you can set the keyword ~#+FIRN_TOC~ and pass it a map with
-   the properties above to enable a table of contents specific to a single file:
-
-  #+BEGIN_SRC
-  #+FIRN_TOC: {:depth 4}
-  #+END_SRC
