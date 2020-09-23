@@ -7,6 +7,8 @@
       (nav build-url)
       [:main
        [:article.def-wrapper
+        [:aside#sidebar.def-sidebar
+         (render :sitemap {:sort-by :firn-order})]
         [:div.def-content
          [:h1 title]
          ;; [:div (render :toc)] ;; Optional; add a table of contents

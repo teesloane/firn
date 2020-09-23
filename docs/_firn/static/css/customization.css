@@ -1,5 +1,5 @@
 :root {
-  --sidebar-width: 280px;
+  --sidebar-width: 320px;
   --border-col: #dfdfdf;
   --nav-bg: #fbfbfb;
   --nav-bg-inverse: #444;
@@ -85,10 +85,17 @@ h2 {
   }
 }
 
-.hljs {
-  padding: 1.0rem !important;
+
+pre {
+  padding: 1rem;
+  padding-bottom: 0;
+  background: #2d2d2d;
+  border-radius: 4px;
 }
 
+.hljs {
+  padding: 0 0 1.0rem 0 !important;
+}
 
 /* Default Page */
 .def-wrapper {

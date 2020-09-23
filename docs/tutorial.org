@@ -135,7 +135,7 @@ Change that line to the following:
 
 #+END_SRC
 
-Where you will replace ~{My New Heading}~ with the specific headline you have created. On saving changes, the server will reload the layout and only render the specified heading and it's contents.
+Where you will replace ~{My New Heading}~ with the specific headline you have created. On saving changes, the server will reload the layout and only render the specified heading and its contents.
 
 Read more about the render function and layouts in the [[file:layout.org][layout document]] and [[file:the-render-function.org][the render function]] document.
 

@@ -18,7 +18,7 @@
      [:body
       (nav build-url)
       (header)
-      [:main.content
+      [:main.content {:style "max-width: 54em"}
        [:div.py3
         (render "Details" :content)]]
 

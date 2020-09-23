@@ -10,6 +10,7 @@
 This is a sample page intended to demonstrate which org-elements are supported by Firn as well as to show different =render= functions being called. Everything before the heading "Render function examples" is automatically built by Firn, and can be styled by the user. Most colours, fonts, and spacing can be change in the CSS variables in =firn_base.css=
 
 
+-----
 
 ** Headings
 *** TODO Heading with a keyword
@@ -212,6 +213,8 @@ A heading with properties can optionally render those properties, either by enab
 ****** [#B] An H5 Heading with Priority B
 ******* [#C] An H6 Heading with Priority C
 
+
+-----
 ** Tables
 
 Tables are converted into HTML tables:
@@ -224,13 +227,18 @@ Tables are converted into HTML tables:
 | Pacific  | 165,250,000 km2 |
 | Southern | 20, 330,000 km2 |
 
+
+-----
 ** Tags                                                         :example:
 
 Headlines with ~:tags:~ will automatically create a tag on the right of the heading that links to a ~/tags~ page. The tags.clj page can be found in ~_firn/pages/tags.clj~ and can be edited.
 
+
+-----
 ** Org Dates
 
 Org dates are rendered as plain text, but are provided with a css class ( =.firn-timestamp=  ) for optional styling: [2020-06-25 Thu] .
 
+
 * Find and render me!
-If you can see this, then the render function found this heading and rendered it and it's content.
+If you can see this, then the render function found this heading and rendered it and its content.
