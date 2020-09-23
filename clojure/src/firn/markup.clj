@@ -46,14 +46,21 @@
                (get-in sm (u/interpose+tail (opts :start-at) :children))
                sm))
 
+           ;; sort the sitemap, pushing nils to end of sort.
+           (sort-priority-map [k smn desc?]
+             (u/mapply primap/priority-map-keyfn-by (juxt #(nil? (% k)) k)
+                       (if desc?
+                         #(compare %2 %1) ; this comparator doesnt handle for nils.
+                         #(compare %1 %2)) smn))
+
            (sort-site-map [site-map-node] ;; site-map-node is a whole site-map or any :children sub maps.
              ;; (prn "site-map-node is ", site-map-node)
              (case (opts :sort-by)
                :alphabetical (into (sorted-map) site-map-node)
-               :newest       (into (sorted-map-by (sort-by-key site-map-node :date-created-ts true)) site-map-node)
-               :oldest       (into (sorted-map-by (sort-by-key site-map-node :date-created-ts false)) site-map-node)
-               ;; sort by firn-order but push nils to end using juxt.
-               :firn-order   (u/mapply primap/priority-map-keyfn (juxt #(nil? (% :firn-order)) :firn-order) site-map-node)
+               :oldest       (sort-priority-map :date-created-ts site-map-node false)
+               ;; TODO: "newest" works but it puts nils at front.
+               :newest      (sort-priority-map :date-created-ts site-map-node true) ; ????
+               :firn-order (sort-priority-map :firn-order site-map-node false)
                site-map-node))
 
            (make-child [[k v]]

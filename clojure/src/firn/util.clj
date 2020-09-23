@@ -230,6 +230,12 @@
   [f & args]
   (apply f (apply concat (butlast args) (last args))))
 
+(defn map->args
+  "Convert a map into a list of kwaargs: https://stackoverflow.com/a/19430023"
+  [m]
+  (apply concat m))
+
+
 
 ;; For interception thread macros and enabling printing the passed in value.
 (def spy #(do (println "DEBUG:" %) %))
