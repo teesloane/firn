@@ -1,5 +1,6 @@
 #+TITLE: Adjacent Files
 #+FIRN_UNDER: Content "The Render Function"
+#+FIRN_ORDER: 3
 
 *Purpose:* This document explains how to render links to "adjacent files" based on the ~#+FIRN_ORDER~ frontmatter.
 

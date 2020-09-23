@@ -1,6 +1,6 @@
 #+TITLE: Sitemap
 #+FIRN_UNDER: Content "The Render Function"
-#+FIRN_ORDER: 1
+#+FIRN_ORDER: 2
 
 *Purpose:* This document explains how to render an HTML [[https://en.wikipedia.org/wiki/Site_map][sitemap]] in your Firn
 layouts.

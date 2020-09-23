@@ -1,5 +1,6 @@
 #+TITLE: Breadcrumbs
 #+FIRN_UNDER: Content "The Render Function"
+#+FIRN_ORDER: 7
 
 *Purpose:* This document explains how to render *breadcrumbs* in your Firn layouts.
 

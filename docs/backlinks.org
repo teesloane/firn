@@ -1,5 +1,6 @@
 #+TITLE: Backlinks
 #+FIRN_UNDER: Content "The Render Function"
+#+FIRN_ORDER: 4
 
 
 *Purpose:* This document explains how to render *backlinks* in your Firn layouts.

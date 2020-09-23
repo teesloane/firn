@@ -2,6 +2,7 @@
   "Namespace responsible for converted org-edn into html."
   (:require [clojure.string :as s]
             [firn.util :as u]
+            [clojure.data.priority-map :as primap]
             [firn.org :as org]))
 
 (declare to-html)
@@ -17,7 +18,12 @@
   This is complex/featureful because a user can:
   - a) sort their map by date and `firn-order`
   - b) a user can choose to start their site-map at a specific 'node'
-  - c) we have to handle for when the user's files don't have all the necessary metadata."
+  - c) we have to handle for when the user's files don't have all the necessary metadata.
+
+  The sitemap IS a map because it enables `get-in` to render specific parts of the map.
+  This, however, makes for annoying sorting issues.
+  "
+
   ([sm]
    (render-site-map sm {}))
   ([sm opts]
@@ -40,31 +46,14 @@
                (get-in sm (u/interpose+tail (opts :start-at) :children))
                sm))
 
-           ;; NOTE: make sorting push nils to the end (for cases where say,
-           ;; firn-order is nil.) when sorting a sitemap node, the key we sort
-           ;; by might not exist. when collections with nil are sorted, nil ends
-           ;; up at the beginning of this list. Using Juxt, we can push them to
-           ;; the end.
-           ;;
-           ;; The use of `map` and `into` in the thread macro are around just
-           ;; for keeping the shape of the map since we are going from
-           ;; map -> list -> map, and the keys of the map MIGHT not exist as files,
-           ;; (due to how the site-map is built with `firn-under`
-           ;; and thus they also might not have the sorting key. ＼（＾ ＾）／
-           (sort-by-key-nil-at-end [smn k reverse]
-             (let [sort-order (fn [a b] (if reverse (compare a b) (compare b a)))]
-               (->> smn
-                    (map (fn [[k v]] (assoc v :__keyname k))) ; keep the key
-                    (sort-by (juxt #(nil? (% k)) k) sort-order)
-                    (map #(hash-map (% :__keyname) %))
-                    (into {}))))
-
            (sort-site-map [site-map-node] ;; site-map-node is a whole site-map or any :children sub maps.
+             ;; (prn "site-map-node is ", site-map-node)
              (case (opts :sort-by)
                :alphabetical (into (sorted-map) site-map-node)
                :newest       (into (sorted-map-by (sort-by-key site-map-node :date-created-ts true)) site-map-node)
                :oldest       (into (sorted-map-by (sort-by-key site-map-node :date-created-ts false)) site-map-node)
-               :firn-order   (sort-by-key-nil-at-end site-map-node :firn-order true)
+               ;; sort by firn-order but push nils to end using juxt.
+               :firn-order   (u/mapply primap/priority-map-keyfn (juxt #(nil? (% :firn-order)) :firn-order) site-map-node)
                site-map-node))
 
            (make-child [[k v]]
@@ -518,4 +507,3 @@
        "drawer"        "" ;; Don't parse
        ;; default value. NOTE: Might be ideal to have a "if dev-mode -> show unparsed block"
        ""))))
-

@@ -3,7 +3,7 @@
 #+FIRN_ORDER: 0
 
 *Purpose:* This document explains how to render org-mode files in their entirety
-or select portions. It also covers folding of headlines and their respective
+or select portions of a file. It also covers folding of headlines and their respective
 content.
 
 *Prerequistes*: an understanding of [[file:the-render-function.org][The Render Function]] and how [[file:layout.org][layouts]] work.
@@ -37,26 +37,3 @@ To render an entire org-mode file:
 
 #+END_SRC
 
-** Rendering folded headlines                                   :folding:
-
-Firn includes basic semantic HTML folding that aims to replicate org-mode
-headline folding. JavaScript is not used to accomplish folding (although this is
-certainly possible); instead Firn uses the ~details~ and ~summary~ tag to
-accomplish similar functionality.
-
-Due to how the summary and details tag work, there is some finicky styling and
-all the same features of using normal headlines (tags, keywords, properties,
-etc) may not work as well. Incorporating folding may require some user styling
-in the ~firn_base.css~ stylesheet.
-
-Similar to a table of contents, you can set Firn's folding on a site-wide,
-layout-wide, or file-specific basis:
-
-#+BEGIN_SRC clojure
-(render :file {:firn-fold {1 true 2 true}}) ; All H1 and H2's will be folded, and will be started open.
-(render :file {:firn-fold {3 false  4 false 5}}) ; H3 through H5 will be foldable, and will start closed_
-#+END_SRC
-
-The ~:firn-fold~ value takes a *map* in which the keys correspond to heading levels,
-and the value is a boolean, indicating whether or not the details tag is, open
-or not. ~:firn-fold~ supports up to 6 headings (corresponding from ~h1~ to ~h6~)

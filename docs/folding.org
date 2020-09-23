@@ -1,6 +1,7 @@
 #+TITLE: Folding
 #+FIRN_UNDER: Content "The Render Function"
 #+FIRN_FOLD: {2 true 3 true}
+#+FIRN_ORDER: 1
 
 *Purpose:* Firn has a basic implementation of headline folding, mimicking
 org-mode; this document explains how configure folding.

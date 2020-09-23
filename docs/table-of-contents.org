@@ -1,5 +1,6 @@
 #+TITLE: Table Of Contents
 #+FIRN_UNDER: Content "The Render Function"
+#+FIRN_ORDER: 5
 
 *Purpose:* This document explains how to render and customize a table of contents in your Firn layouts.
 

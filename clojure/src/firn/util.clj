@@ -225,6 +225,11 @@
                               sorted)))))
          (into {}))))
 
+(defn mapply
+  "Convert a map into a list of kwaargs: https://stackoverflow.com/a/19430023"
+  [f & args]
+  (apply f (apply concat (butlast args) (last args))))
+
 
 ;; For interception thread macros and enabling printing the passed in value.
 (def spy #(do (println "DEBUG:" %) %))

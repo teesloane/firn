@@ -1,6 +1,7 @@
 #+TITLE: Logbooks
 #+FIRN_UNDER: Content "The Render Function"
 #+FIRN_FOLD: {2 true 3 true}
+#+FIRN_ORDER: 6
 
 *Purpose:* An overview of rendering time-based data.
 
