@@ -15,12 +15,24 @@ When parsing your org-mode files, Firn collects Logbook data in the case that
 you want to render time-based visuals.
 
 * Usage
-
-** Rendering a logbook polyline chart
+** Rendering Logbook Visualizations
 
 Currently, there is limited experimentation with rendering SVG charts based on logbook data. It is likely that this render option *will be deprecated* as a better alternative is developed.
 
 Come back soon!
+
+*** Logbook Polyline
+
+Graphs all logbook entries for the current file in a polyline, generating a chart for each year.
+
+#+BEGIN_SRC clojure
+(defn default
+  [{:keys [render partials]}]
+  (let [{:keys [head]} partials]
+    (head)
+    [:body
+      [:div (render :logbook-polyline {:stroke "#45698A" :height 60 :width 365})]]))
+#+END_SRC
 
 ** Accessing raw logbook data
 

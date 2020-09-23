@@ -49,8 +49,13 @@
            ;; sort the sitemap, pushing nils to end of sort.
            (sort-priority-map [k smn desc?]
              (u/mapply primap/priority-map-keyfn-by (juxt #(nil? (% k)) k)
+                       ;; HACK: using juxt above makes the take values x, y which are vectors;
+                       ;; the first val is t/f (is it nil?), the next is the key's val, if it exists.
+                       ;; we need the juxt for pushing nil values to the end of the list.
+                       ;; and if we want to reverse the list AND still keep nil values at the end
+                       ;; ie, to sort by ":oldest" it, seems we need to compare only by the second vec value.
                        (if desc?
-                         #(compare %2 %1) ; this comparator doesnt handle for nils.
+                         #(compare (second %2) (second %1))
                          #(compare %1 %2)) smn))
 
            (sort-site-map [site-map-node] ;; site-map-node is a whole site-map or any :children sub maps.
@@ -58,7 +63,6 @@
              (case (opts :sort-by)
                :alphabetical (into (sorted-map) site-map-node)
                :oldest       (sort-priority-map :date-created-ts site-map-node false)
-               ;; TODO: "newest" works but it puts nils at front.
                :newest      (sort-priority-map :date-created-ts site-map-node true) ; ????
                :firn-order (sort-priority-map :firn-order site-map-node false)
                site-map-node))

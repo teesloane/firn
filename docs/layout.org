@@ -1,6 +1,6 @@
-#+TITLE: Layout
+#+TITLE: Layouts and Partials
 #+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-09-20 19:05>
+#+DATE_UPDATED: <2020-09-23 10:08>
 #+FIRN_UNDER: Content
 #+FIRN_ORDER: 1
 #+FIRN_FOLD: {2 true}
@@ -39,5 +39,39 @@ Let's consider a simple layout file:
 
 The above may look a little strange if you are not familiar with Clojure. The
 next document will expand on what the ~render~ function does.
-* TODO Partials
-* TODO Private / Public organization of content
+
+Your layout files *can have several functions* in them, but the *last function in the
+file* is the one that is loaded as your layout.
+
+* Partials
+
+In the example above you may have noticed the ~partials~ binding appear. Partials
+are similar to layouts: they are clojure functions that render html. Partials
+are used for rendering particularly common pieces of html that might be shared
+across several layouts (such as the ~head~ of your HTML document as in the example
+above).
+
+Using partials requires the following:
+
+1. Create a partial in the ~partials~ directory.
+   - A partial must be a clojure function, just the same as a layout file.
+   - The *last function* in your partial file /is the partial that is applied/.
+2. ~partials~ are a map of all the partial functions and is passed into layouts
+   when they are rendered:
+    #+BEGIN_SRC clojure
+    (defn default          ; 
+      [{:keys [partials]}] ; `partials` is a a map.
+    #+END_SRC
+3. You can optionally bind the partials you need in a let block so that they are
+   easily callable as functions. The name of your partial is the name of the
+   partial file. For example, the docs you are reading has a ~partials/head.clj~ file, and is accessible like so:
+
+   #+BEGIN_SRC clojure
+    (defn default                   ; define a clojure func
+      [{:keys [partials]}]          ; destructure the `partials` key.
+      (let [{:keys [head]} partials]
+          [:html                      ; => opens a `html` tag
+          (head build-url)            ; => Renders the `head` partial
+          ; ....
+   #+END_SRC
+

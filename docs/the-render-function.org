@@ -11,7 +11,7 @@ function allows you to decide what parts of your org-file you would like to disp
 
 Firn makes some "pre-made" content available to be rendered:
 
-| Render type       | Paramaters      | Example                                                              |
+| Render type       | Parameters      | Example                                                              |
 |-------------------+-----------------+----------------------------------------------------------------------|
 | [[file:files-and-headlines.org][Entire file]]       | keyword         | ~(render :file)~                                                       |
 | [[file:files-and-headlines.org][Specific headline]] | string          | ~(render "Notes")~                                                     |
@@ -22,23 +22,6 @@ Firn makes some "pre-made" content available to be rendered:
 | [[file:logbooks.org][Folding]]           | keyword, map    | ~(render :file {:firn-fold {1 true 2 true}})~                          |
 | [[file:backlinks.org][Backlinks]]         | keyword         | ~(render :backlinks)~                                                  |
 | [[file:adjacent-files.org][Adjacent files]]    | keyword, map    | ~(render :adjacent-files {:sort-by :date})~                            |
-| [[file:firn_tags.org][Firn Tags]]         | TODO            | TODO                                                                 |
-| [[file:org_tags.org][Org Tags]]          | TODO            | TODO                                                                 |
-| [[file:breadcrumbs.org][Breadcrumbs]]       | TODO            | TODO                                                                 |
-|                   |                 |                                                                      |
-
-TODO - migrate these.
-
-** Render a Logbook SVG Polyline
-
-Graphs all logbook entries for the current file in a polyline, generating a chart for each year.
-
-#+BEGIN_SRC clojure
-(defn default
-  [{:keys [render partials]}]
-  (let [{:keys [head]} partials]
-    (head
-     [:body
-       [:div (render :logbook-polyline {:stroke "#45698A" :height 60 :width 365})]])))
-#+END_SRC
-
+| [[file:firn_tags.org][Firn Tags]]         | keyword, map    | ~(render :firn-tags {:sort-by :alphabetical})~                         |
+| [[file:org_tags.org][Org Tags]]          | keyword         | ~(render :org-tags)~                                                   |
+| [[file:breadcrumbs.org][Breadcrumbs]]       | keyword         | ~(render :breadcrumbs)~                                                |

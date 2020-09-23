@@ -12,11 +12,9 @@ Firn. The author assumes the reader has a working familiarity with the command-l
 
 ** A note on Emacs                                              :emacs:
 
-It is almost a safe assumption that if you are here, then you are are already familiar with Org mode, Emacs, Lisp, or all three combined. But that's an assumption. So, for those that consider themselves quite savvy already, you should skip to the [[file:tutorial.org::*Summary][summary]].
+If you are already familiar with Org mode, Emacs, Lisp,  you might wish to skip to the [[file:tutorial.org::*Summary][summary]].
 
 For beginners: It you are not using org-mode with Emacs, or have never heard of either of these tools - you may be confused. Still, this document is tailored toward complete beginners and will not assume you are familiar with Emacs. But you might want to go do that, and come back in a few days (or weeks).
-
-Onwards.
 
 * Get the Firn binary
 
@@ -100,6 +98,10 @@ firn serve
 Your site is now being served on port 4000 - head to [[http://localhost:4000][http://localhost:4000]] to take a look.
 
 Try adding another heading to the =index.org= file - it will re-compile and display in the browser on refresh. You will also notice that page looks different. The output of a Firn site (the =_site= folder) is intended to be hosted on a server or CDN. So, running =firn build= will simply output the files as they are expected to be hosted on a server - this means that your styles and inter-linking between files will not work. Using the development server will solve this, and be used frequently for this purpose.
+
+** Server Reloading                                             :limitation:
+
+From time to time you may need to start the firn development server again, especially when you make site-wide changes to things like your site-map, or occasionally when the file-server fails to pick up a newly created or deleted org-mode file.
 
 * Inspecting a Firn org-mode-file
 
