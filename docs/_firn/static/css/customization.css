@@ -82,7 +82,7 @@ pre {
 .def-wrapper {
   width: 100%;
   display: flex;
-  height: 100vh;
+  height: calc(100vh - 54px);
   overflow: auto;
 }
 
@@ -92,20 +92,36 @@ pre {
   width: var(--sidebar-width);
   flex-direction: column;
   display: flex;
-  /* top: 8px; */
   top: 0px;
   border-right: 1px solid var(--border-col);
   overflow-y: scroll;
-  height: 100vh;
-  padding: 96px 24px 64px 24px;
+  height: 95vh;
+  padding: 24px;
 }
 
+.def-toc {
+  position: sticky;
+  min-width: var(--sidebar-width);
+  flex-direction: column;
+  display: flex;
+  top: 0px;
+  border-left: 1px solid var(--border-col);
+  overflow-y: scroll;
+  height: 100vh;
+  padding: 24px;
+  font-size: 12px;
+}
+
+.def-content-wrap {
+  max-width: 800px;
+  width: 100%;
+}
 
 .def-content {
   display: flex;
   flex-direction: column;
   width: 100%;
-  padding: 64px;
+  padding: 0 48px;
   height: 100vh;
   max-width: 48em;
 }
@@ -119,7 +135,7 @@ pre {
   justify-content: flex-end;
   padding: 8px 0px;
   height: var(--nav-height);
-  position: fixed;
+  position: sticky;
   top: 0;
   width: 100%;
   z-index: 2;
@@ -314,3 +330,5 @@ pre {
 .firn-sitemap-item--parent {
   border-left: 1px dashed var(--border-col);
 }
+
+

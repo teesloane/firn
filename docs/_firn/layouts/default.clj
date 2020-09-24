@@ -5,14 +5,12 @@
      (head build-url)
      [:body
       (nav build-url)
-      [:main
-       [:article.def-wrapper
-        [:aside#sidebar.def-sidebar
-         (render :sitemap {:sort-by :firn-order})]
+      [:main.def-wrapper
+       [:aside#sidebar.def-sidebar
+        (render :sitemap {:sort-by :firn-order})]
+       [:article.def-content-wrap
         [:div.def-content
-
          [:h1 title]
-         [:div (render :toc)] ;; Optional; add a table of contents
          [:hr]
          (render :file)
          (when-let [backlinks (render :backlinks)]
@@ -24,4 +22,11 @@
 
          [:div.adjacent-files
           [:span (render :adjacent-files)]]
-         (footer)]]]]]))
+         (footer)]]
+       (let [toc (render :toc)]
+         (when (seq toc)
+           [:aside#toc.def-toc
+            [:div
+             [:b "Contents"]
+             [:div
+              (render :toc)]]]))]]]))
