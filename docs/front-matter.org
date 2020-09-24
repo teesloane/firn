@@ -53,8 +53,7 @@ that is *evaluated* when your site is built.
 All front matter will be accessible as metadata when it comes time to render
 your layouts. That is to say, you can create your own custom keywords in your
 files, and use them in your layouts. To access your front-matter, you will have
-to dig into the data structure of your "file" in your layout. These keywords are
-*not* read in as Clojure values - they will be available just as strings.
+to dig into the data structure of your "file" in your layout. These keywords are *not* read in as Clojure values - they will be available just as strings.
 
 #+BEGIN_SRC clojure
 (defn project

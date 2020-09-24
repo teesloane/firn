@@ -12,6 +12,8 @@ A table of contents can be included in any layout that is processing an *org-fil
 
 A table of contents will by default render /every headline/ it finds in an org-mode file. This may not be ideal and so it is possible to customize which headlines are rendered, unto what depth, and more.
 
+Configuring your table of contents can happen on a site-wide basis (using ~config.edn~), in your layouts (using the render function), or through [[file:front-matter.org][front matter]]. This document will
+
 * Usage
 
 The table of contents can be complex and customizable. The usage section will cover several examples,the first of which will demonstrate the entire api of the table of contents, and the remainder will be used to provider more specific, simpler examples.
@@ -62,7 +64,10 @@ If you want to exclude "Notes" and only have its child headlines rendered, do th
 
 * Overriding values with front matter
 
-The examples above demonstrate how you would setup a table of contents in a [[file:layout.org][layout]]. If you need to customize the table of contents on a per-file basis, set the options map as a value to the ~+FIRN_TOC~ front matter at the top of an org file.
+The examples above demonstrate how you would setup a table of contents in a
+[[file:layout.org][layout]]. If you need to customize the table of contents on a per-file basis, set
+the options map as a value to the ~#+FIRN_TOC~ front matter at the top of an org
+file.
 
 Example:
 

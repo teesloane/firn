@@ -6,12 +6,11 @@
      [:body
       (nav build-url)
       [:main.def-wrapper
-       [:aside#sidebar.def-sidebar
+       [:aside#sidebar.def-sidebar.unfocused
         (render :sitemap {:sort-by :firn-order})]
        [:article.def-content-wrap
         [:div.def-content
          [:h1 title]
-         [:hr]
          (render :file)
          (when-let [backlinks (render :backlinks)]
            [:div
@@ -25,8 +24,5 @@
          (footer)]]
        (let [toc (render :toc)]
          (when (seq toc)
-           [:aside#toc.def-toc
-            [:div
-             [:b "Contents"]
-             [:div
-              (render :toc)]]]))]]]))
+           [:aside#toc.def-toc.unfocused
+            [:div [:b "Contents"] [:div (render :toc)]]]))]]]))

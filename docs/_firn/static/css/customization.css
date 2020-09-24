@@ -30,13 +30,6 @@ html {
        url('/data/fonts/ibm-plex-mono-v5-latin-regular.woff') format('woff'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 
-/* Animations */
-@keyframes fadeIn {0% {opacity:0;} 100% {opacity:1;}}
-@-moz-keyframes fadeIn {0% {opacity:0;} 100% {opacity:1;}}
-@-webkit-keyframes fadeIn {0% {opacity:0;} 100% {opacity:1;}}
-@-o-keyframes fadeIn {0% {opacity:0;} 100% {opacity:1;}}
-@-ms-keyframes fadeIn {0% {opacity:0;} 100% {opacity:1;}}
-
 
 /* Rules */
 
@@ -54,10 +47,6 @@ h2 {
   justify-content: center;
   align-items: center;
   padding: 24px;
-}
-
-.fade-in {
-  animation: fadeIn ease 2s;
 }
 
 @media(max-width: 768px) {
@@ -124,6 +113,10 @@ pre {
   padding: 0 48px;
   height: 100vh;
   max-width: 48em;
+}
+
+.def-content  a {
+  color: var(--color-primary);
 }
 
 
@@ -199,18 +192,24 @@ pre {
     left: -2000px;
     top: 52px;
     padding: 32px;
+    opacity: 1 !important;
+  }
+
+  .def-toc {
+    display: none;
   }
 
   .def-sidebar-open {
     left: 0;
     top: 52px;
     padding: 32px;
+    filter: opacity(1) !important;
+    overflow: scroll;
+    height: 90vh;
   }
 
   .def-content {
-    margin-left: 0;
-    padding: 0 16px;
-    margin-top: 32px;
+    padding: 0 32px;
   }
   /* Nav Icon */
   #nav-icon {
@@ -332,3 +331,28 @@ pre {
 }
 
 
+
+
+/* Utilities ------------------------------------------------  */
+
+/* Animations */
+@keyframes fadeIn {0% {opacity:0;} 100% {opacity:1;}}
+@-moz-keyframes fadeIn {0% {opacity:0;} 100% {opacity:1;}}
+@-webkit-keyframes fadeIn {0% {opacity:0;} 100% {opacity:1;}}
+@-o-keyframes fadeIn {0% {opacity:0;} 100% {opacity:1;}}
+@-ms-keyframes fadeIn {0% {opacity:0;} 100% {opacity:1;}}
+
+
+.fade-in {
+  animation: fadeIn ease 2s;
+}
+
+.unfocused {
+  filter: opacity(0.78);
+  transition: filter 0.2s ease;
+}
+
+.unfocused:hover {
+  filter: opacity(1);
+
+}

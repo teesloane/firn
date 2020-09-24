@@ -59,7 +59,7 @@
     --color-secondary-accent: #efefef;
     --color-text: #f7f7f7;
     --color-text-secondary: #aaa;
-    --tag-bg: #95a5a6;
+    --tag-bg: #555;
   }
 }
 
@@ -88,6 +88,8 @@ main {
 
 hr {
   margin: 2rem 0;
+  border-top: 1px solid var(--border-col);
+  border-bottom: none;
 }
 
 [hidden] {
@@ -184,8 +186,6 @@ sup {
 /* Links */
 a {
   color: var(--color-secondary);
-  display: inline-block;
-  /* font-weight: bold; */
   text-decoration: none;
 }
 
@@ -513,7 +513,7 @@ li > p {
   border-radius: var(--border-radius);
   color: var(--color-text);
   font-size: var(--tag-size);
-  font-weight: bold;
+  font-weight: 400;
   margin: 0 4px;
   padding: 0.2rem 0.4rem;
 }

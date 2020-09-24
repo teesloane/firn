@@ -9,10 +9,10 @@
    [:div.index-download-btns
     [:a.mx2 {:target "_blank" :href "https://github.com/theiceshelf/firn/releases"} "Download latest"]
     [:a.mx2 {:href "/getting-started"} "Read documentation"]]
-   [:div {:style "position: absolute; bottom: 12vh;"}
+   [:div {:style "padding-top: 48px;"}
     [:svg {:xmlns "http://www.w3.org/2000/svg", :fill "none", :viewbox "0 0 24 24", :height "24", :width "24"}
-     [:path {:xmlns "http://www.w3.org/2000/svg", :d "M17 10L12 16L7 10H17Z", :fill "#afafaf"}]]
-    ]])
+     [:path {:xmlns "http://www.w3.org/2000/svg", :d "M17 10L12 16L7 10H17Z", :fill "#afafaf"}]]]])
+
 
 (defn index
   [{:keys [render build-url partials site-url] :as data}]
@@ -22,7 +22,7 @@
      [:body
       [:div.fade-in (nav build-url)]
       (header)
-      [:main.content {:style "max-width: 54em"}
+      [:main.content {:style "max-width: 42em; padding: 32px; margin: 0 auto;"}
        [:div.py3
         (render "Details" :content)]]
 
