@@ -1,6 +1,6 @@
 #+TITLE: Org Tags
 #+FIRN_UNDER: Content "The Render Function"
-#+FIRN_ORDER: 5
+#+FIRN_ORDER: 6
 
 *Purpose:* This document explains how to organize your headlines with org-tags
 as well as how to render a list of org-tags on a Firn site.
@@ -12,10 +12,9 @@ as well as how to render a list of org-tags on a Firn site.
 Firn collects [[https://orgmode.org/manual/Tags.html][org-tags]] when it parses your org-mode files and are accessible in
 your layouts through the render function or as raw data.
 
-* Usage                                                          :foo:
+* Usage
 
-Continue using org-mode tags as you normally would. When it comes time to
-/display/ your tags you need to do two things.
+Continue using org-mode tags as you normally would. When it comes time to /display/ your tags you need to do two things.
 
 1. Setup a tag file
 2. Render your org-tags.
