@@ -7,4 +7,5 @@
  :run-build-clean? "never"  ; Whether to clean out unused attachments on build. Values: "never" | "always" | "prompt"
  :site-desc        ""       ; Used for RSS.
  :site-title       ""       ; Used for RSS.
+ :org-tags-path    "tags"   ; Path on which to structure links for org headline tags.
  :site-url         ""}       ; Used for building links / accessing site url in layouts/partials. If Left blank, internal links will start with `/`

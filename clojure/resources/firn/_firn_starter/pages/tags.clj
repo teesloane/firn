@@ -1,18 +1,14 @@
 (defn tags
-  [{:keys [org-tags build-url site-url partials]}]
+  [{:keys [build-url render partials]}]
   (let [{:keys [head]} partials]
     [:html
      (head build-url)
      [:body
       [:main
-       [:article
+       [:article.def-wrapper
         [:div.content
-         [:h1 "Tags"]
-         (for [[tag-name tags] org-tags]
-           [:div
-            [:h2 {:id tag-name :class "firn-tag-heading"} tag-name]
-            (for [tag tags]
-              [:div
-               [:a {:href (str site-url (tag :headline-link))}
-                (tag :from-file) " - "
-                (tag :from-headline)]])])]]]]]))
+         [:h1 "Org Tags"]
+         (render :org-tags)
+         [:hr]
+         [:h1 "File Tags"]
+         (render :firn-tags)]]]]]))
