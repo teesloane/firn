@@ -1,5 +1,5 @@
 (defn default
-  [{:keys [render partials build-url site-url]}]
+  [{:keys [render partials build-url]}]
   (let [{:keys [head]} partials]
     [:html
      (head build-url)

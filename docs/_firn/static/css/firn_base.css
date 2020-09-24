@@ -11,8 +11,6 @@
   box-sizing: border-box;
 }
 
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:ital,wght@0,200;0,400;1,200;1,400&display=swap');
-
 :root {
   --border-radius: 4px;
   --box-shadow: 2px 2px 10px;
@@ -33,6 +31,7 @@
   --line-height: 1.65;
   --width-card-wide: 800px;
   --width-content: 960px;
+
   /* Currently, Firn only supports 'todo | done' keywords. */
   --keyword-active: #2ecc71; /* For "active" Todo keywords. */
   --keyword-done: #bdc3c7; /* For "done type keywords" */
@@ -43,11 +42,13 @@
   --priority-b-bg: #3498db;
   --priority-c-bg: #2ecc71;
   --priority-size: xx-small;
+  
   /* Headline Tags (:my-tag: :unfinished: etc)*/
   --tag-size: x-small;
   --tag-bg: #ecf0f1;
 }
 
+/* Dark mode theme. */
 @media (prefers-color-scheme: dark) {
   :root {
     --color: #0097fc;
