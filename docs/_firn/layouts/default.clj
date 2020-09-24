@@ -12,17 +12,18 @@
         [:div.def-content
          [:h1 title]
          (render :file)
-         (when-let [backlinks (render :backlinks)]
-           [:div
-            [:hr]
-            [:div.backlinks
-             [:h4 "Backlinks to this document:"]
-             backlinks]])
 
          [:div.adjacent-files
           [:span (render :adjacent-files)]]
          (footer)]]
-       (let [toc (render :toc)]
-         (when (seq toc)
-           [:aside#toc.def-toc.unfocused
-            [:div [:b "Contents"] [:div (render :toc)]]]))]]]))
+
+       (let [toc       (render :toc)
+             backlinks (render :backlinks)]
+         [:aside#toc.def-toc.unfocused
+          (when toc
+            [:div
+             [:h4 "Contents"]
+             [:div (render :toc)]])
+          (when backlinks
+            [:div
+             [:h4 "Backlinks"] backlinks])])]]]))

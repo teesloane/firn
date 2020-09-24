@@ -302,22 +302,15 @@ pre {
 }
 
 .adjacent-files {
-  margin-top: 32px;
+  margin: 32px 0;
   padding: 16px 0;
+  border-top: 1px solid var(--border-col);
 }
 
 .firn-file-nav-prev {
-  background: var(--nav-bg);
-  padding: 12px;
-  border: 1px solid var(--border-col);
-  border-radius: 2px;
 }
 
 .firn-file-nav-next {
-  background: var(--nav-bg);
-  border: 1px solid var(--border-col);
-  padding: 12px;
-  border-radius: 2px;
 }
 
 .firn-sitemap {

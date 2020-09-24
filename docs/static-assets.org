@@ -1,5 +1,6 @@
 #+TITLE: Static Assets / Attachments
 #+FIRN_UNDER: Content
+#+FIRN_ORDER: 50
 
 This document discusses how to include static front-end assets (css, js, images) and org-mode attachments in your Firn site.
 

@@ -3,17 +3,36 @@
 
 #+FIRN_ORDER: 7
 
+* Overview
 
-Firn is not particularly picky about how you style your site. You can setup your own styling mechanisms if you want to use a style preprocessor, or you can use plain css. The simplest method would be to write css as you normally would by placing css files in the =_firn/static/css= folder and then having =firn= move them into your =_site= folder when run. Styling is applied through [[https://github.com/weavejester/hiccup#syntax][hiccup]].
+Firn is not particularly picky about how you style your site. You can setup your
+own styling mechanisms if you want to use a style preprocessor, or you can use
+plain css. The simplest method would be to write css as you normally would by
+placing css files in the =_firn/static/css= folder and then having =firn= move them
+into your =_site= folder when run. Styling is applied through [[https://github.com/weavejester/hiccup#syntax][hiccup]].
 
-With that said, Firn /does/ come out of the box with a stylesheet and some predefined styles. Because org-mode syntax is quite powerful and offers unique features over other markups, there are several "components" that you may want to target. For example, an org-mode headline might have a *priority*, or a todo *keyword*. These pieces of org syntax will come with a css class already assigned to them, so that users may style them to their liking.
 
-To use an example, when Firn parses your org-content, whenever it runs into a priority assigned to a headline, it will assign two css classes:
+*  Pre-configured styles
+
+With that said, Firn /does/ come out of the box with a stylesheet and some
+predefined styles. Because org-mode syntax is quite powerful and offers unique
+features over other markups, there are several "components" that you may want to
+target. For example, an org-mode headline might have a *priority*, or a todo *keyword*.
+These pieces of org syntax will come with a css class already assigned
+to them, so that users may style them to their liking.
+
+** An Example
+
+To use an example, when Firn parses your org-content, whenever it runs into a
+priority assigned to a headline, it will assign two css classes:
 
 - ~.firn-headline-priority~
 - ~.firn-headline-priority__A~ (Where ~A~ corresponds to a priority of ~[#A]~)
 
-Correspondingly, the "base" css layer that ships out of the box with Firn will handle assigning a style-set that you can change to your liking. You may view the inspect the file ~_firn/static/css/firn_base.css~ to see the configurable elements.
+Correspondingly, the "base" css layer that ships out of the box with Firn will
+handle assigning a style-set that you can change to your liking. You may view
+the file ~_firn/static/css/firn_base.css~ to see what elements have css classes
+already associated with them.
 
 * How do I customize the styling of my layouts?                  :FAQ:
 

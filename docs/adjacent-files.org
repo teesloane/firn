@@ -2,23 +2,27 @@
 #+FIRN_UNDER: Content "The Render Function"
 #+FIRN_ORDER: 3
 
-*Purpose:* This document explains how to render links to "adjacent files" based on the ~#+FIRN_ORDER~ frontmatter.
+*Purpose:* This document explains how to render links to "adjacent files" based on
+the ~#+FIRN_ORDER~ frontmatter.
 
-*Prerequistes*: an understanding of [[file:the-render-function.org][The Render Function]], [[file:layout.org][layouts]].
+*Prerequistes*: an understanding of [[file:the-render-function.org][The Render Function]], [[file:layout.org][layouts]], [[file:front-matter.org][front matter]].
 
 * Overview
 
-In some cases, you may wish to indicate what the "next" and "previous" page may be on your Firn site - /adjacent files/ accomplish this.
+In some cases, you may wish to indicate what the "next" and "previous" page may
+be on your Firn site (such as linking to a previous blog post) - /adjacent files/
+accomplish this.
 
-
-Constructing "adjacent files" will only work if you are using the "Firn Order" keyword:
+Constructing "adjacent files" requires your files to be using either the
+~#+FIRN_ORDER~ (for sorting based on a numeric order) or the ~#+DATE_CREATED~ (for sorting based on date) front matter.
 
 #+BEGIN_SRC
 #+TITLE: My File
 #+FIRN_ORDER: 3
 #+END_SRC
 
-When rendering ~My File~, the adjacent-files render function will look for the next biggest integer found in a #+FIRN_ORDER of a document
+Please note that if there are gaps in your ~#+FIRN_ORDER~ values across files,
+adjacent files will not work.
 
 * Usage
 
