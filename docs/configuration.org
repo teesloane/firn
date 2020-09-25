@@ -1,5 +1,9 @@
 #+TITLE: Configuration
 #+FIRN_ORDER: 1
+#+FIRN_UNDER: Reference
+#+ROAM_TAGS: language programming
+#+DATE_CREATED: <2020-06-20 Sat>
+#+DATE_UPDATED: <2020-09-23 18:45>
 
 * Overview
 
@@ -9,7 +13,11 @@ When you build or serve your site using the Firn CLI, this file is read into mem
 
 * Overriding configuration
 
-Any property that begins with =:firn-*= is a field that will /impact the rendering of your files/. Specifically, these values correspond to what are known as [[https://orgmode.org/manual/In_002dbuffer-Settings.html][in-buffer settings]] in org-mode. Any of these fields in your configuration can be overridden in a single file's in-buffer settings. For example, in your config, you might turn off property rendering:
+Any property that begins with =:firn-*= is a field that will /impact the rendering
+of your files/. Specifically, these values correspond to what are known as
+ [[https://orgmode.org/manual/In_002dbuffer-Settings.html][in-buffer settings]] in org-mode. Any of these fields in your configuration can be
+overridden in a single file's in-buffer settings. For example, in your config,
+you might turn off property rendering:
 
 #+BEGIN_SRC clojure
 {;...
@@ -18,27 +26,35 @@ Any property that begins with =:firn-*= is a field that will /impact the renderi
  }
 #+END_SRC
 
-This ensures that no property-drawers are rendered under their respective headlines. However, you may have a single file that you want to render the property drawers for, when relevant. At the top of the file in question, you would override this setting by adding this in-buffer setting:
+This ensures that no property-drawers are rendered under their respective
+headlines. However, you may have a single file that you want to render the
+property drawers for, when relevant. At the top of the file in question, you
+would override this setting by adding this in-buffer setting:
 
 #+BEGIN_SRC
 #+FIRN_PROPERTIES?: true
 #+END_SRC
 
-*NOTE:* in-buffer settings for Firn must be at the top of the file, must be in all capitals, use underscores where hyphens are used in your config, and the values must properly map to a Clojure value. The following in-buffer settings are incorrect:
+*NOTE:* in-buffer settings for Firn must be at the top of the file, must be in all
+capitals, use underscores where hyphens are used in your config, and the values
+must properly map to a Clojure value. The following in-buffer settings are
+incorrect:
 
 #+BEGIN_SRC clojure
-#+FIRN-PROPERTIES?: true ; should use an underscore
+,#+FIRN-PROPERTIES?: true ; should use an underscore
 
-#+FIRN_PROPERTIES?: True ; "True" is not a valid clojure value
+,#+FIRN_PROPERTIES?: True ; "True" is not a valid clojure value
 
-#+FIRN_PROPERTIES?: t    ; "t" is not a valid clojure value
+,#+FIRN_PROPERTIES?: t ; "t" is not a valid clojure value
 
-#+firn_properties?: t    ; "t" is not valid, and firn_properties? should be upper cased.
+,#+firn_properties?: t ; "t" is not valid, and firn_properties? should be ; upper cased.
 #+END_SRC
 
 * Usage
 
-Most values in =config.edn= are simple, scalar values - integers, strings, etc. For the sake of clarity, this section will go over settings that have compound values and the usage of which are not immediately clear.
+Most values in =config.edn= are simple, scalar values - integers, strings, etc.
+For the sake of clarity, this section will go over settings that have compound
+values and the usage of which are not immediately clear.
 
 ** Table of Contents
 
@@ -64,22 +80,5 @@ The firn table of contents is rendered in a layout. If you use the default layou
 | =:site-desc=        | string  | The description of your site, used for RSS.                                             |
 | =:site-title=       | string  | The title of your site, used for RSS.                                                   |
 | =:site-url=         | string  | The root url of your site.                                                              |
-| =:site-map-pages?=  | boolean | Whether to include custom pages in your site-map                                        |
 | =:run-build-clean?= | string  | Whether to clean out unused attachments on build. Values: "never" / "always" / "prompt" |
 
-** Per-file configuration
-
-The following in-buffer settings are processed by Firn and/or made available to layouts for processing.
-
-| Key                | Type          | Purpose                                                 |
-|--------------------+---------------+---------------------------------------------------------|
-| ~#+TITLE:~           | string        | Used in site-map, links, etc                            |
-| ~#+DATE_CREATED~     | org-mode-date | File date created                                       |
-| ~#+DATE_UPDATED~     | org-mode-date | File last updated                                       |
-| ~#+FIRN_PROPERTIES?~ | boolean       | Whether to render properties under all headings         |
-| ~#+FIRN_TOC~         | map           | Settings for any rendered table of contents             |
-| ~#+FIRN_FOLD~        | map           | Fold headings of a specified level: ex: {3 true 4 true} |
-| ~#+FIRN_ORDER~       | integer       | Enables sorting files in the site-map                   |
-| ~#+FIRN_PRIVATE~     | boolean       | Whether or not to read the file in question             |
-| ~#+FIRN_SITEMAP?~    | boolean       | Whether to include the file in the site-map.            |
-| ~#+FIRN_UNDER~       | string        | Category for which the documents falls under            |

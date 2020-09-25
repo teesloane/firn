@@ -14,6 +14,8 @@
                  [ring "1.8.0"]
                  [mount "0.1.16"]
                  [org.clojure/clojure "1.9.0"]
+                 [org.clojure/data.priority-map "1.0.0"]
+
                  [ring/ring-defaults "0.3.2"]]
 
   :jvm-opts ["-Djava.library.path=./resources"]

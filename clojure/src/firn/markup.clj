@@ -2,11 +2,216 @@
   "Namespace responsible for converted org-edn into html."
   (:require [clojure.string :as s]
             [firn.util :as u]
+            [clojure.data.priority-map :as primap]
             [firn.org :as org]))
 
 (declare to-html)
+(declare internal-link-handler)
 
-;; Feature: Table of Contents --------------------------------------------------
+;; Renderers -------------------------------------------------------------------
+
+;; R: Site-map et al. --
+
+(defn render-site-map
+  "Converts the site map data structure into html. Takes options for sorting
+  This is somewhat complex and has many nested functions for performing sorting..
+  This is complex/featureful because a user can:
+  - a) sort their map by date and `firn-order`
+  - b) a user can choose to start their site-map at a specific 'node'
+  - c) we have to handle for when the user's files don't have all the necessary metadata.
+
+  The sitemap IS a map because it enables `get-in` to render specific parts of the map.
+  This, however, makes for annoying sorting issues.
+  "
+
+  ([sm]
+   (render-site-map sm {}))
+  ([sm opts]
+   (letfn [(sort-by-key ;; used in sort-site-map
+             ([smn prop] (sort-by-key smn prop false))
+             ([smn prop flip-keys?]
+              (fn [key1 key2]
+                (let [k1 (if flip-keys? key2 key1)
+                      k2 (if flip-keys? key1 key2)]
+                  (compare
+                   ;; we have to compare on values, and because some are duplicate (nil) we have to use compare a bit differently.
+                   ;; https://clojuredocs.org/clojure.core/sorted-map-by#example-542692d5c026201cdc327094
+                   [(get-in smn [k1 prop] ) k1]
+                   [(get-in smn [k2 prop] ) k2])))))
+
+           ;; Sometimes a user might want to render the site-map at a lower
+           ;; level than from the top.
+           (starting-point [sm]
+             (if (opts :start-at)
+               (get-in sm (u/interpose+tail (opts :start-at) :children))
+               sm))
+
+           ;; sort the sitemap, pushing nils to end of sort.
+           (sort-priority-map [k smn desc?]
+             (u/mapply primap/priority-map-keyfn-by (juxt #(nil? (% k)) k)
+                       ;; HACK: using juxt above makes the take values x, y which are vectors;
+                       ;; the first val is t/f (is it nil?), the next is the key's val, if it exists.
+                       ;; we need the juxt for pushing nil values to the end of the list.
+                       ;; and if we want to reverse the list AND still keep nil values at the end
+                       ;; ie, to sort by ":oldest" it, seems we need to compare only by the second vec value.
+                       (if desc?
+                         #(compare (second %2) (second %1))
+                         #(compare %1 %2)) smn))
+
+           (sort-site-map [site-map-node] ;; site-map-node is a whole site-map or any :children sub maps.
+             ;; (prn "site-map-node is ", site-map-node)
+             (case (opts :sort-by)
+               :alphabetical (into (sorted-map) site-map-node)
+               :oldest       (sort-priority-map :date-created-ts site-map-node false)
+               :newest      (sort-priority-map :date-created-ts site-map-node true) ; ????
+               :firn-order (sort-priority-map :firn-order site-map-node false)
+               site-map-node))
+
+           (make-child [[k v]]
+             (let [children (v :children)]
+               (if-not children
+                 [:li (if (v :path)
+                        [:a.firn-sitemap-item--link {:href (v :path)} k]
+                        [:div.firn-sitemap-item--no-link k])]
+                 ;; if children
+                 [:li.firn-sitemap-item--child
+                  (if (v :path)
+                    [:a.firn-sitemap-item--link {:href (v :path)} k]
+                    [:div.firn-sitemap-item--no-link k])
+                  [:ul.firn-sitemap-item--parent
+                   (map make-child (sort-site-map children))]])))]
+     (let [starting-site-map (-> sm starting-point sort-site-map)]
+       [:ul.firn-sitemap.firn-sitemap-item--parent (map make-child starting-site-map)]))))
+
+(defn render-breadcrumbs
+  "Iterates firn-under, fetching the link to each item, constructuring a breadcrumb
+  in: firn-under: [Research Language English]
+  out             [{:name Research :path /Research} {:name Language :path /Language}]
+  :out-data       [:div [:a {:href path} name] ' > ' [:a {:href path} name]]]] etc."
+  [firn-under sitemap opts]
+  (loop [firn-under   firn-under
+         sitemap-node sitemap
+         out          []]
+    (let [head    (first firn-under)
+          tail    (rest firn-under)
+          from-sm (get sitemap-node head)
+          new-out (conj out {:title head :path (get from-sm :path)})]
+      (if (nil? head)
+        [:div.firn-breadcrumbs
+         ;; construct html
+         (->> out
+            (map #(vec (if (% :path)
+                         [:a {:href (% :path)} (% :title)]
+                         [:span (% :title)])))
+            (interpose [:span (or (opts :separator) " > ")]))]
+        ;; --
+        (recur tail (get-in sitemap [head :children]) new-out)))))
+
+(defn render-adjacent-file
+  "Renders html (or returns data) of the previous and next link in the sitemap.
+  Expects that your files are using `firn-order` or `:date-created-ts` in order to
+  properly determine what is `next` and what is `previous`."
+  [{:keys [sitemap firn-under firn-order date-created-ts as-data? order-by prev-text next-text]
+    :or   {order-by :firn-order}}]
+  (let [site-map-node (if (nil? firn-under) sitemap
+                          (get-in sitemap (u/interpose+tail firn-under :children)))
+        sort-mech     {:date       {:key :date-created-ts :file-val date-created-ts}
+                       :firn-order {:key :firn-order :file-val firn-order}}
+        sort-key      (-> sort-mech order-by :key)
+        org-file-val  (-> sort-mech order-by :file-val)
+        ordered-smn   (->> site-map-node vals (sort-by sort-key))
+        prev-text     (or prev-text "Previous: ")
+        next-text     (or next-text "Next: ")
+        out           (atom {:next nil :previous nil})]
+    (loop [lst  ordered-smn
+           prev nil]
+      (when (seq lst)
+        (let [head (first lst)]
+          ;; when firn-order equals the item we are iterative over.
+          (if (= (sort-key head) org-file-val)
+            (reset! out {:next (second lst) :previous prev})
+            (recur (rest lst) head)))))
+    (if as-data? @out
+        (let [{:keys [previous next]} @out]
+          [:div.firn-file-navigation
+           (when previous
+             [:span.firn-file-nav-prev
+              prev-text [:a {:href (previous :path)} (previous :title)]])
+           " "
+           (when next
+             [:span.firn-file-nav-next
+              next-text [:a {:href (next :path)} (next :title)]])]))))
+
+;; R: Backlinks -------
+
+(defn render-backlinks
+  "When rendering a file, filters the site-links for all links (that are not
+  private) that link to the file."
+  [{:keys [site-links file site-url site-links-private]}]
+  (let [; transform site-links-private to what their url form would be.
+        site-links-private       (map #(str site-url "/" %) site-links-private)
+        org-path-match-file-url? #(let [site-link (internal-link-handler (% :path) site-url)]
+                                    (and
+                                     (= site-link (file :path-url))
+                                     (not (u/in? site-links-private site-link))))
+        to-html                  (fn [x] [:li.firn-backlink [:a {:href (x :from-url)} (x :from-file)]])
+        backlinks                (->> site-links (filter org-path-match-file-url?))
+        backlinks-unique         (map first (vals (group-by :from-url backlinks)))]
+    (if (seq backlinks-unique)
+      (into [:ul.firn-backlinks] (map to-html backlinks-unique))
+      nil)))
+
+;; R: Tags (firn / org)
+
+(defn render-firn-tags
+  "Renders a list of tags and their respective files
+  The tag list sections themsleves renders alphabetically,
+
+  The per-tag-list can be sorted by user input:
+
+    (render :firn-tags {:sort-by :alphabetical})
+    (render :firn-tags {:sort-by :newest})
+    (render :firn-tags {:sort-by :oldest})
+
+  Provided files have a #+DATE_CREATED front matter.
+  "
+  ([firn-tags]
+   (render-firn-tags firn-tags {}))
+  ([firn-tags opts]
+   (let [x-fn      u/sort-map-of-lists-of-maps
+         firn-tags (case (opts :sort-by)
+                     :alphabetical (x-fn {:coll firn-tags :sort-key :from-file :sort-by :alphabetical})
+                     :newest       (x-fn {:coll firn-tags :sort-key :date-created-ts :sort-by :newest})
+                     :oldest       (x-fn {:coll firn-tags :sort-key :date-created-ts :sort-by :oldest})
+                     firn-tags)]
+
+     [:div.firn-file-tags
+      (for [[k lst] firn-tags]
+        [:div.firn-file-tags-container
+         [:div.firn-file-tag-name k]
+         [:ul.firn-file-tag-list
+          (for [f lst]
+            [:li.firn-file-tag-item
+             [:a.firn-file-tag-link {:href (f :from-url)} (f :from-file)]])]])])))
+
+(defn render-org-tags
+  "Renders markup for a list of tags and their respective links to org-headings. "
+  [org-tags opts]
+  [:div.firn-org-tags
+   (when (seq org-tags)
+     (for [[tag-name tags] org-tags]
+       [:div.firn-org-tag-container
+        [:div {:id tag-name :class "firn-org-tag-name"} tag-name]
+        (for [tag tags
+              :let [link (tag :headline-link)]]
+          [:ul.firn-org-tag-list
+           [:li.firn-org-tag-item
+            [:a.firn-org-tag-link
+             {:href link}
+             (tag :from-file) " - " (tag :from-headline)]]])]))])
+
+;; R: Table of Contents --------------------------------------------------
+
 
 (defn make-toc-helper-reduce
   "(ಥ﹏ಥ) Yeah. So. See the docstring for make-toc.
@@ -61,13 +266,13 @@
 (defn toc->html
   [toc kind]
   (->> toc
-       (map (fn [x]
-              (if (empty? (x :children))
-                [:li
-                 [:a {:href (x :anchor)} (x :text)]]
-                [:li
-                 [:a {:href (x :anchor)} (x :text)]
-                 [kind (toc->html (x :children) kind)]])))))
+     (map (fn [x]
+            (if (empty? (x :children))
+              [:li
+               [:a {:href (x :anchor)} (x :text)]]
+              [:li
+               [:a {:href (x :anchor)} (x :text)]
+               [kind (toc->html (x :children) kind)]])))))
 
 (defn make-toc
   "toc: a flattened list of headlines with a :level value of 1-> N:
@@ -98,7 +303,7 @@
      (if (empty? toc-cleaned) nil
          (into [list-type] (toc->html toc-cleaned list-type))))))
 
-;; General Renderers -----------------------------------------------------------
+;; General HTML Renderers ------------------------------------------------
 
 (defn date->html
   [v]
@@ -136,14 +341,14 @@
 
 (defn internal-link-handler
   "Takes an org link and converts it into an html path."
-  [org-link]
+  [org-link site-url]
   (let [regex       #"(file:)(.*)\.(org)(\:\:\*.+)?"
         res         (re-matches regex org-link)
         anchor-link (last res)
         anchor-link (when anchor-link (-> res last u/clean-anchor))]
     (if anchor-link
-      (str "/" (nth res 2) anchor-link)
-      (str "/" (nth res 2)))))
+      (str site-url "/" (nth res 2) anchor-link)
+      (str site-url "/" (nth res 2)))))
 
 (defn link->html
   "Parses links from the org-tree.
@@ -175,7 +380,7 @@
       ;; org files
       (re-matches org-file-regex link-href)
       [:a.firn-internal
-       {:href (str (opts :site-url) (internal-link-handler link-href))} link-val]
+       {:href (internal-link-handler link-href (opts :site-url))} link-val]
 
       (re-matches http-link-regex link-href)
       [:a.firn-external {:href link-href :target "_blank"} link-val]
@@ -187,7 +392,6 @@
 (defn level-in-fold?
   [opts level]
   (contains? (opts :firn-fold) level))
-
 
 (defn- title->html
   "Constructs a headline title - with possible additional values
@@ -203,9 +407,11 @@
         parent           {:type "headline" :level level :children [v]} ; reconstruct the parent so we can pull out the content.
         ;; this let section builds the heading elements and their respective
         ;; classes; construcing a single heading element with various children..
+        tag-link         (or (str "/" (opts :org-tags-path) "#") "/tags#")
         heading-priority (u/str->keywrd "span.firn-headline-priority.firn-headline-priority__" priority)
         heading-keyword  (u/str->keywrd "span.firn-headline-keyword.firn-headline-keyword__" keywrd)
-        heading-tags     [:span.firn-tags (for [t tags] [:span [:a.firn-tag {:href (str "/tags#" t)} t]])]
+
+        heading-tags     [:span.firn-org-tags (for [t tags] [:span [:a.firn-org-tag {:href (str tag-link t)} t]])]
         heading-anchor   (org/make-headline-anchor parent)
         heading-is-folded (level-in-fold? opts level)
         heading-id+class #(u/str->keywrd "h" % heading-anchor ".firn-headline.firn-headline-" %
@@ -262,7 +468,10 @@
 (defn to-html
   "Recursively Parses the org-edn into hiccup.
   Some values don't get parsed (drawers) - yet. They return empty strings.
-  Don't destructure! - with recursion, it can create uneven maps from possible nil vals on `v`"
+  Don't destructure! - with recursion, it can create uneven maps from possible nil vals on `v`
+
+  Here, `opts` is largely going to be the `config` map, with the possibility that it's values
+  are overwritten with layout or file-specific settings. This happens in layout/render"
   ([v] (to-html v {}))
   ([v opts]
    (let [type           (get v :type)

@@ -1,7 +1,8 @@
 (ns firn.util
   (:require [clojure.java.io :as io]
             [clojure.string :as s]
-            [sci.core :as sci])
+            [sci.core :as sci]
+            [clojure.string :as str])
   (:import (java.lang Integer)
            (java.time LocalDate)))
 
@@ -99,9 +100,9 @@
 (defn keyword->normal-text
   [kw]
   (-> kw name
-     (s/replace #"-" " ")
-     (s/replace #"_" " ")
-     (s/capitalize)))
+      (s/replace #"-" " ")
+      (s/replace #"_" " ")
+      (s/capitalize)))
 
 ;; File Path fns ----
 ;; Mostly for operating on paths: `file/paths/woo/hoo.org`
@@ -158,7 +159,7 @@
   [path until]
   (let [split-path (s/split path #"/")
         res        (drop-while #(not= % until) split-path)]
-   (s/join "/" res)))
+    (s/join "/" res)))
 
 (defn is-attachment?
   "Checks is a path is an attachment; a local file that is not an org file."
@@ -192,11 +193,49 @@
   [coll elm]
   (some #(= elm %) coll))
 
+(defn interpose+tail
+  "Interposes a keywords and ensures the key is at the end of the list"
+  [lst k]
+  (vec (concat (interpose k lst) [k])))
+
+(defn org-keyword->vector
+  "Reads org frontmatter and converts strings into a vector"
+  [s]
+  ;; see: https://stackoverflow.com/a/40120309
+  (let [the-beast #"\"?( |$)(?=(([^\"]*\"){2})*[^\"]*$)\"?"
+        as-vec    (-> s str/trim (str/split the-beast))
+        cleaned   (map #(str/replace % #"\"" "") as-vec)]
+    (vec cleaned)))
+
 (defn take-while-after-first
   [pred lst]
   (let [head (first lst)
         tail (take-while pred (rest lst))]
     (concat [head] tail)))
+
+(defn sort-map-of-lists-of-maps
+  [{:keys [sort-key coll] :as opts}]
+  (let [sort-method (opts :sort-by)]
+    (->> coll
+         (map (fn [[k v]]
+                (let [sorted (sort-by (juxt nil? sort-key) v)]
+                  (hash-map k
+                            (if (= sort-method :newest)
+                              (reverse sorted)
+                              sorted)))))
+         (into {}))))
+
+(defn mapply
+  "Convert a map into a list of kwaargs: https://stackoverflow.com/a/19430023"
+  [f & args]
+  (apply f (apply concat (butlast args) (last args))))
+
+(defn map->args
+  "Convert a map into a list of kwaargs: https://stackoverflow.com/a/19430023"
+  [m]
+  (apply concat m))
+
+
 
 ;; For interception thread macros and enabling printing the passed in value.
 (def spy #(do (println "DEBUG:" %) %))

@@ -1,2 +1,4 @@
 #+TITLE: File Private
 #+FIRN_PRIVATE: true
+
+Back link [[file:file-small.org][to file small]] - this should not show up in rendered-backlinks test.

@@ -2,7 +2,7 @@
 #+DATE_CREATED: 2020-03-01--09-53
 #+STATUS: active
 #+FIRN_LAYOUT: project
-#+FIRN_UNDER: project
+#+FIRN_UNDER: Project
 
 * Meta
 :PROPERTIES:

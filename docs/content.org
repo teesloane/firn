@@ -1,0 +1,14 @@
+#+TITLE: Content
+#+FIRN_ORDER: 2
+#+DATE_UPDATED: <2020-09-25 19:03>
+#+DATE_CREATED: <2020-08-14 Fri 19:03>
+
+The content subsection handles everything to do with converting org files to html.
+
+- [[file:front-matter.org][Front Matter]] - Required and optional values found at the top of each org file.
+- [[file:layout.org][Layouts & Partials]] - How to organize and present your org-mode content.
+- [[file:the-render-function.org][The Render Function]] - How and what you want to render on your site.
+- [[file:pages.org][Custom pages]] - On creating pages without org-mode.
+- [[file:styling.org][Styling]] - How to style templates and about the built-in styles
+- [[file:static-assets.org][Static Assets]] - How to work with images, CSS, JavaScript and other static assets.
+- [[file:data-and-metadata.org][Data/Metadata]] - Overview of the shape of the data representing a parsed org-file.

@@ -1,0 +1,83 @@
+#+TITLE: Folding
+#+FIRN_UNDER: Content "The Render Function"
+#+FIRN_FOLD: {2 true 3 true}
+#+FIRN_ORDER: 1
+#+DATE_CREATED: <2020-09-21 Mon>
+#+DATE_UPDATED: <2020-09-25 19:05>
+
+
+*Purpose:* Firn has a basic implementation of headline folding, mimicking
+org-mode; this document explains how configure folding.
+
+*Prerequistes*: an understanding of [[file:the-render-function.org][The Render Function]], [[file:layout.org][layouts]] and [[file:front-matter.org][front matter]].
+
+* Overview
+
+Firn includes basic semantic HTML folding that aims to replicate org-mode
+headline folding. JavaScript is not used to accomplish folding (although this is
+certainly possible); instead Firn uses the ~details~ and ~summary~ tag to
+accomplish similar functionality.
+
+Due to how the summary and details tag work, there is some finicky styling and
+all the same features of using normal headlines (tags, keywords, properties,
+etc) may not work as well. Incorporating folding may require some user styling
+in the ~firn_base.css~ stylesheet.
+
+Similar to a table of contents, you can set Firn's folding on a site-wide,
+layout-wide, or file-specific basis.
+
+Folding supports up to 6 headings (corresponding from ~h1~ to ~h6~)
+
+* Usage
+
+Folding is configured based on a Clojure map that determines which headline
+levels are folded:
+
+#+BEGIN_SRC clojure
+{1 false ; level 1 headlines start folded
+ 2 true  ; level 2 headlines start open
+ 4 true  ; level 4 headlines start open
+ }
+#+END_SRC
+
+You may have noticed in the example above that the Clojure map does not have a key for ~3~ - this is intentional - this will cause level 3 headlines (and their respective content) to not be foldable /at all/.
+
+** Site-wide
+
+In your ~config.edn~ file, add a Clojure map such as the example above under the  ~:firn-fold~ keyword:
+
+#+BEGIN_SRC clojure
+
+; ...
+ :firn-fold  {3 true 4 true}
+; ...
+#+END_SRC
+
+As such, *all* headlines of level 3 and and 4 will have fold-toggles and start open.
+
+** In-layout
+
+In your [[file:layout.org][layouts]], you can use the [[file:the-render-function.org][render function]] to determine folding on a per-layout basis.
+
+#+BEGIN_SRC clojure
+;; example 1:
+(render :file {:firn-fold {1 true 2 true}}) ; All H1 and H2's will be folded, and will be started open.
+
+;; example 2:
+(render :file {:firn-fold {3 false  4 false 5}}) ; H3 through H5 will be foldable, and will start closed.
+#+END_SRC
+
+** Per-file
+
+Using [[file:front-matter.org][Front Matter]], you can configure folding on a per file basis. The file you are reading currently uses front matter to add folding just for this file, for example purposes.
+
+The front matter of this document looks as follows:
+
+#+BEGIN_SRC org
+#+TITLE: Folding
+#+FIRN_UNDER: Content "The Render Function"
+#+FIRN_FOLD: {2 true 3 true}
+#+END_SRC
+** Styling
+
+You may need to style your headings based on what you need from folding; css rules pertinent to folding can be found in the ~firn_base.css~ file.

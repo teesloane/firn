@@ -1,9 +1,9 @@
 #+TITLE: Data and Metadata
 #+DATE_CREATED: <2020-03-25 Wed>
-#+DATE_UPDATED: <2020-07-05 17:24>
-#+FILE_UNDER: docs
+#+DATE_UPDATED: <2020-09-23 18:43>
+#+FIRN_UNDER: Content
 #+FIRN_LAYOUT: docs
-#+FIRN_ORDER: 5 
+#+FIRN_ORDER: 20
 
 🚧 This document is in flux as Firn's API shifts and changes. 🚧
 
@@ -12,7 +12,7 @@ comes time to customize the rendering of your content in your [[file:layout.org]
 more advanced topic that may require a bit of comfort with Clojure.
 
 Because Firn transforms org files into a data structure, it is possible to group
-content available to user's who want more advanced control and flexibility with
+content available to users who want more advanced control and flexibility with
 their data. The two main sections in the document provide the following:
 
 *Metadata* - a description of the opinionated choices Firn makes to organize data
@@ -25,74 +25,76 @@ you need more fine grained control of your data.
 
 * Metadata
 
-Currently, *links*, *logbook entries*, a *table of contents*, are made available to
-users. Using the =render= function in layouts you can output pre-made html for
-certain metadata. Refer to the [[file:layout.org][layout]] file to learn more about the =render=
-function.
+The following table describes all the data and functions  "passed" to a layout each time a layout is applied to the data representing an org file. If the [[file:the-render-function.org][render function]] already does everything you need in your layouts, then this section may not be valuable for you.
 
-If you would like to access the raw data in your layouts, destructure the "file"
-value into your layout. The =file= value is a Clojure map with quite a bit of
-content in it - the raw file contents, the contents as EDN, JSON, etc - too much
-so to describe in it's entirety here. Currently, the =file= map has a sub-map
-called =:meta= that provides all sorts of metadata available in your file.
 
-#+BEGIN_SRC clojure
-(defn my-layout
-  [{:keys [render file] :as data}]
-  ; ...
-  ; access meta (-> file :meta ...)
-  )
-#+END_SRC
+| Function/Data | Intent                                                | Data-type |
+|---------------+-------------------------------------------------------+-----------|
+| config        | The site wide config, containing everything!          | map       |
+| build-url     | Function to more easily construct internal urls       | function  |
+| date-created  | The ~#+DATE_CREATED~ value of the processed file        | string    |
+| date-updated  | The ~#+DATE_UPDATED~ value of the processed file        | string    |
+| file          | The file as a data structure                          | map       |
+| file-links    | A list of links per file                              | list      |
+| firn-under    | The ~#+FIRN_UNDER~ value of the file                    | string    |
+| firn-tags     | A map of tag names mapped to files.                   |           |
+| logbook       | A list of logbook entries of the processed-file.      | list      |
+| logbook-total | The sum of all the logbook entries per file           | string    |
+| meta          | A map of metadata per file (logbook, links, keywords) | map       |
+| org-tags      | A map of or org tags and associated headlines.        | map       |
+| partials      | a list of invokable partials from the =/partials= dir   | list      |
+| render        | See the [[file:the-render-function.org][Render Function document]]                      | function  |
+| site-links    | A list of all links across all documents              | vector    |
+| site-logs     | A list of all logbook entries                         | vector    |
+| site-map      | A map of all files as sorted by ~#+FIRN_UNDER~          | map       |
+| title         | The ~#+TITLE~ value of the file.                        | string    |
 
-As the API for accessing file data changes, you can keep an eye on the [[https://github.com/theiceshelf/firn/blob/master/clojure/src/firn/file.clj#L55][file.clj]],
-source code to see what content is made available at "layout-time".
-
-** Site Tags
-
-Tags are collected and are grouped by tag name. The structure of the data is as follows:
-
-#+BEGIN_SRC clojure
-{"FAQ"       [{:from-headline  "Do I have to use layouts?",
-               :headline-link  "/layout#do-i-have-to-use-layouts?",
-               :from-file      "Layout",
-               :from-file-path "layout",
-               :tag-value      "FAQ"
-              {:from-headline  "How do I customize the styling of my layouts?",
-               :headline-link  "/layout#how-do-i-customize-the-styling-of-my-layouts?",
-               :from-file      "Layout",
-               :from-file-path "layout",
-               :tag-value      "FAQ"}]
- "reference" [{:from-headline  "Data and Functions available to layouts",
-               :headline-link  "/layout#data-and-functions-available-to-layouts",
-               :from-file      "Layout",
-               :from-file-path "layout",
-               :tag-value      "reference"}]}
-
-#+END_SRC
-
-Out of the box, Firn provides a basic "Tags" page for displayings headline-tags.
-If you do not wish to have a "/tags" page, simply remove it from ~_firn/pages/tags.clj~
-
-** Logbook
-
-The logbook is collected and sorted by timestamp. The available data looks like so:
+This may seem like a lot of information to make available to a layout template.
+And that's because it is! But thanks to destructuring in Clojure, you can make
+your templates only ask for what they need:
 
 #+BEGIN_SRC clojure
-[{:duration "1:04",
-  :end {:day 23, :dayname "Tue", :hour 15, :minute 39, :month 6, :year 2020},
-  :end-ts 1592926740000,
-  :from-file "Test File",
-  :from-file-path "Test File",
-  :from-headline "Sample Heading",
-  :post_blank 0,
-  :start {:day 23, :dayname "Tue", :hour 14, :minute 35, :month 6, :year 2020},
-  :start-ts 1592922900000,
-  :type "clock"}
- ;....
- ]
+(defn project
+  [{:keys [ render partials logbook] :as data}] ; < destructuring to make available only what you need.
+  (let [{:keys [head nav main-section]} partials]
+    (head)
+    [:body
+     (nav)
+     [:main.main-container
+      (page-header data)
+      [:div.container
+       (main-section render)
+       (my-custom-logbook-chart logbook) ; passing logbook to a custom function, perhaps defined prior to the "project" function.
+       ]]]))
 #+END_SRC
 
-* Data
+The above template only needs access to =render=, =partials= and the =logbook=. Then
+functions, such as =page-header= (which must be defined above the ~project~
+function) can simply take the data map and destructure what /it/ needs again:
+
+#+BEGIN_SRC clojure
+(defn page-header
+  [{:keys [title logbook-total date-updated date-created firn-under]}]
+  (let [rndr (fn [i s]
+               (when i [:span.flex.pr2
+                        [:h4.italic.bold.pr1 s " "]
+                        [:h4.italic.thin i]]))]
+    [:div.page_meta
+     [:h1.page_meta_title title]
+     [:div.flex
+      (rndr date-created "Published: ")
+      (rndr date-updated "Last Updated: ")
+      (rndr firn-under "File Under: ")
+      (when-not (= logbook-total "0:00")
+        (rndr logbook-total "Time Logged: "))]]))
+
+#+END_SRC
+
+As per the table above, there is quite a bit of data that is made available to
+your layouts. If you want to know more about the shape of your data (such as
+[[file:logbooks.org][logbooks]], [[file:org_tags.org][org-tags]], and so on), visit these pages to learn more.
+
+* Parsed Org File Data
 
 Org files are parsed using a parser library called [[https://github.com/PoiScript/orgize][Orgize]]. When processing or
 serving your site, Firn sends your org-file as a string into Orgize, and gets
@@ -269,7 +271,7 @@ after being parsed to JSON and converted to EDN:
 #+END_SRC
 </details>
 
-** Interacting with data                                       
+** Interacting with data                                        :limitation:
 
 As you can see, lots of data. Currently, Firn is not capable of interacting with
 this data very easily while you develop your Layouts. There are tentative plans

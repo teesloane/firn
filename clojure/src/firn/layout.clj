@@ -49,14 +49,23 @@
   ([partial-map action]
    (render partial-map action {}))
   ([partial-map action opts]
-   (let [{:keys [file config]} partial-map
-         org-tree              (file :as-edn)
-         config-settings       (config :user-config) ; site-wide config: 0 precedence
-         file-settings         (file/keywords->map file) ; file-setting config: 2 precedence
-         layout-settings       (if (map? opts) opts {})
-         merged-options        (merge config-settings layout-settings file-settings)
-         is-headline?          (string? action)]
+   (let [{:keys [file config]}     partial-map
+         org-tree                  (file :as-edn)
+         config-settings           (config :user-config)     ; site-wide config: 0 precedence
+         site-map                  (config :site-map)
+         file-settings             (when (seq file) (file/keywords->map file)) ; file-setting config: 2 precedence
+         layout-settings           (if (map? opts) opts {})
+         merged-options            (merge config-settings layout-settings file-settings)
+         cached-sitemap-html       (atom nil)
+         is-headline?              (string? action)
+         {:keys [toc logbook
+                 firn-under
+                 firn-order
+                 date-created-ts]} (file :meta)]
 
+     ;; cache the site-map if it's not there already
+     (when-not @cached-sitemap-html
+       (reset! cached-sitemap-html (markup/render-site-map site-map opts)))
 
      (cond
        ;; render the whole file.
@@ -74,11 +83,47 @@
 
        ;; render a polyline graph of the logbook of the file.
        (= action :logbook-polyline)
-       (org/poly-line (-> file :meta :logbook) opts)
+       (org/poly-line logbook opts)
+
+       ;; Render the sitemap; cache it the first time it runs
+       (and (= action :sitemap) (seq site-map))
+       (if-not @cached-sitemap-html
+         (do (reset! cached-sitemap-html (markup/render-site-map site-map opts))
+             @cached-sitemap-html)
+         @cached-sitemap-html)
+
+       ;; render breadcrumbs
+       (= action :breadcrumbs)
+       (markup/render-breadcrumbs firn-under site-map opts)
+
+       ;; render a list of links that link back to the current file
+       (= action :backlinks)
+       (markup/render-backlinks {:site-links         (config :site-links)
+                                 :site-links-private (config :site-links-private)
+                                 :file               file
+                                 :site-url           (get-in config [:user-config :site-url])})
+
+       ;; render the previous file based on firn-order
+       (= action :adjacent-files)
+       (markup/render-adjacent-file
+        (merge
+         {:sitemap         site-map
+          :firn-under      firn-under
+          :firn-order      firn-order
+          :date-created-ts date-created-ts}
+         (select-keys opts [:prev-text :next-text :order-by :as-data])))
+
+       ;; render a list of file tags
+       (= action :firn-tags)
+       (markup/render-firn-tags (config :firn-tags) opts)
+
+       ;; render a list of file tags
+       (= action :org-tags)
+       (markup/render-org-tags (config :org-tags) opts)
 
        ;; render a table of contents
        (= action :toc)
-       (let [toc      (-> file :meta :toc) ; get the toc for the file.
+       (let [toc  toc ; get the toc for the file.
              ;; get configuration for toc in order of precedence
              opts (merge (config-settings :firn-toc)
                          layout-settings
@@ -101,7 +146,6 @@
   [site-url]
   (fn [& args] (apply str site-url args)))
 
-
 (defn prepare
   "Prepare functions and data to be available in layout functions.
   This is a 'public api' that a user would 'invoke' for common rendering tasks
@@ -117,6 +161,8 @@
      :site-links    (config :site-links)
      :site-logs     (config :site-logs)
      :site-url      site-url
+     :org-tags      (config :org-tags)
+     :firn-tags     (config :firn-tags)
      :build-url     (build-url site-url)
      :config        config
      ;; File wide meta --
@@ -135,4 +181,3 @@
   [config file layout]
   (let [selected-layout (get-layout config file layout)]
     (h/html (selected-layout (prepare config file)))))
-

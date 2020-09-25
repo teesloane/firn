@@ -1,0 +1,181 @@
+#+TITLE: Step by Step Tutorial
+#+DATE_CREATED: <2020-03-27 Fri>
+#+DATE_UPDATED: <2020-09-25 19:02>
+#+FIRN_LAYOUT: docs
+#+FIRN_UNDER: "Getting Started"
+#+FIRN_ORDER: 0
+#+FIRN_FOLD: {2 true}
+
+* Overview
+
+This document describes a step-by-step process to generate a static site with
+Firn. The author assumes the reader has a working familiarity with the command-line. If you are looking for a quickstart guide, refer to the [[file:index.org::*Quickstart][home page]].
+
+** A note on Emacs                                              :emacs:
+
+If you are already familiar with Org mode, Emacs, Lisp,  you might wish to skip to the [[file:tutorial.org::*Summary][summary]].
+
+For beginners: It you are not using org-mode with Emacs, or have never heard of either of these tools - you may be confused. Still, this document is tailored toward complete beginners and will not assume you are familiar with Emacs. But you might want to go do that, and come back in a few days (or weeks).
+
+* Get the Firn binary
+
+Head to GitHub to get the [[https://github.com/theiceshelf/firn/releases][latest release]] of Firn. Currently, Firn is supported on Mac and Linux. After downloading the release, unzip it and move it to =usr/local/bin= if you prefer to be able to run the binary from anywhere on your system.
+
+#+BEGIN_SRC shell
+mv ~/Downloads/firn /usr/local/bin
+#+END_SRC
+
+If you are on Linux, you may need to run =chmod +x firn= to make Firn executable on your system.
+
+* Create a new site
+
+This document assumes that you are working with a totally new directory with no org-files yet created. The below code sample will create a folder in your root directory, as well as an =index.org= file with some text redirected into it.
+
+#+BEGIN_SRC shell
+mkdir -p ~/firn-test-site # create a test directory at root
+cd ~/firn-test-site       # navigate into the new directory
+touch index.org           # create a sample org file
+
+# redirect some sample org-mode content into the new file.
+echo "#+TITLE: My Index Page \n* Test heading" >> index.org
+#+END_SRC
+
+Great! Let's see if it builds.
+
+#+BEGIN_SRC shell
+firn new          # creates a _firn directory in ~/firn-test-site
+firn build        # transform org files to html files
+ls -l _firn/_site # take a look at resulting built files:
+
+# your terminal should look something like this:
+# -rw-r--r--  1 <usr>  staff  266 22 Jun 18:23 feed.xml
+# -rw-r--r--  1 <usr>  staff  343 22 Jun 18:23 index.html
+# drwxr-xr-x  3 <usr>  staff   96 22 Jun 18:23 static
+#+END_SRC
+
+If you open the compiled ~index.html~ file, you should see the sample "Test heading" on the page.
+
+You've got yourself a plain, simple HTML page, with very little functionality. Behind the scenes, however, a few things happened.
+
+* Inspecting the _firn directory
+
+When calling the =firn new= command, a series of folders and files are created:
+
+#+BEGIN_SRC shell
+# the `tree` command, run in the firn-test-site dir shows the following:
+
+.
+├── _firn
+│   ├── _site
+│   │   ├── feed.xml
+│   │   ├── index.html
+│   │   └── static
+│   │       └── css
+│   │           └── main.css
+│   ├── config.edn
+│   ├── layouts
+│   │   └── default.clj
+│   ├── partials
+│   │   └── head.clj
+│   ├── pages
+│   │   └── tags.clj
+│   └── static
+│       └── css
+│           └── main.css
+└── index.org
+
+#+END_SRC
+
+These files are the defaults that come out of the box with Firn. They provide you with the tools to write a bit of CSS, code the layout of your files, and configure the build process and features Firn offers.
+
+* Development Server
+
+Running =firn build= every time you make a change is a bit cumbersome. This is where the development server comes in. In your terminal run the following command:
+
+#+BEGIN_SRC shell
+firn serve
+#+END_SRC
+
+Your site is now being served on port 4000 - head to [[http://localhost:4000][http://localhost:4000]] to take a look.
+
+Try adding another heading to the =index.org= file - it will re-compile and display in the browser on refresh. You will also notice that page looks different. The output of a Firn site (the =_site= folder) is intended to be hosted on a server or CDN. So, running =firn build= will simply output the files as they are expected to be hosted on a server - this means that your styles and inter-linking between files will not work. Using the development server will solve this, and be used frequently for this purpose.
+
+** Server Reloading                                             :limitation:
+
+From time to time you may need to start the firn development server again, especially when you make site-wide changes to things like your site-map, or occasionally when the file-server fails to pick up a newly created or deleted org-mode file.
+
+* Inspecting a Firn org-mode-file
+
+For Firn to be able to "pick-up" and transform org-mode files into html, a file will need to have something that is often known as "front-matter" in a static-site-generator. In org-mode, [[https://orgmode.org/manual/In_002dbuffer-Settings.html][in-buffer-settings]] are used to create "front-matter." All files must have at least a ~#+TITLE:~ keyword, but should also have a ~#+FIRN_LAYOUT:~ keywords as well. The keywords are documented in the [[file:configuration.org::*Reference][reference section]] and explained in more detail in the [[file:front-matter.org][front matter]] document.
+
+* Rendering Content
+
+Firn is capable of picking and choosing what parts of an org-file you want to render (display as HTML). Let's explore that now. In your editor, create an org mode file with several headings, and content under each heading. Following, open the file =_firn/layouts/default.clj=. It will look something like this:
+
+#+BEGIN_SRC clojure
+(defn default
+  [{:keys [org-tags build-url title render partials]}]
+  (let [{:keys [head nav footer]} partials]
+    [:html
+     (head build-url)
+     [:body
+      [:main
+       [:article
+        [:div
+         [:h1 title]
+         (render :file)]]]]]))
+#+END_SRC
+
+The above is Clojure code, which is the language that was used to build Firn. This code uses Hiccup to render HTML. Look to the =(render ...)= function. Right now, it's indicating that the default layout for an org-mode file should render the file in it's entirety.
+
+Change that line to the following:
+
+#+BEGIN_SRC clojure
+
+(render "{My New Heading}")
+
+#+END_SRC
+
+Where you will replace ~{My New Heading}~ with the specific headline you have created. On saving changes, the server will reload the layout and only render the specified heading and its contents.
+
+Read more about the render function and layouts in the [[file:layout.org][layout document]] and [[file:the-render-function.org][the render function]] document.
+
+* Understanding config.edn                                       :configuration:
+
+When generating a new site, Firn will create a =config.edn= file in the =_firn= directory. This file covers several different aspects of customization for the building of your site. Making changes to this file will largely affect the build output of Firn, as well as rendering behaviour across all files.
+
+Consider an intial config.edn file:
+
+#+BEGIN_SRC clojure
+{:dir-data         "data"   ; org-attachments/files to get copied into _site.
+ :enable-rss?      true     ; If true, creates a feed.xml in _site.
+ :firn-properties? false    ; global: whether to render properties under all headings
+ :firn-toc         nil      ; global: settings for any rendered table of contents
+ :ignored-dirs     ["priv"] ; Directories to ignore org files in.
+ :site-desc        ""       ; Used for RSS.
+ :site-title       ""       ; Used for RSS.
+ :site-url         ""       ; Used for building internal links.}
+
+#+END_SRC
+
+Most of the keys and their values are self explanatory, but let's discuss an example nonetheless. Perhaps a user already has an existing folder of org-files, and these files often link to images in a directory named "attach". Rather than have to rename "attach" to "data" and painfully rename several =file=
+links in org-files, a user can change the =dir-data= key to point to the folder that already exists.
+
+The available configuration keys are commented within the file itself, and are more heavily documented in the [[file:configuration.org][configuration documentation]]. Beyond the above example, the functionality of this file is out of scope for the getting started guide.
+
+* Adding attachments                                             :attachments:
+
+The above example largely describes how to use "attachments" (ie, a folder with images etc). Set the name of your folder where images/files are linked to, and it will copy the contents over.
+
+Attachments must be linked with a [[https://orgmode.org/manual/External-Links.html]["file" type link]]. =Attachment= links are not currently supported.
+
+*NOTE*: Currently, Firn copies the _entirety of this folder into your build output_. This means that if you have attachments which are private or simply unlinked to from org-files, they will be included in your build output.
+
+* Summary
+
+1. Download the [[https://github.com/theiceshelf/firn/releases][latest release]] (only Mac and Linux currently supported)
+2. Move the Firn binary into your path: =mv ~/Downloads/firn /usr/local/bin=
+3. Navigate to your directory of org files
+4. Run =firn new=
+5. Run =firn serve=
+6. Run =firn build= when ready to put your site online!

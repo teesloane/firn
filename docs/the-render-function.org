@@ -1,0 +1,30 @@
+#+TITLE: The Render Function
+#+FIRN_UNDER: Content
+#+FIRN_ORDER: 3
+#+DATE_UPDATED: <2020-09-25 19:04>
+#+DATE_CREATED: <2020-08-14 Fri 19:03>
+
+
+
+The ~(render)~ function is used to render content from your org file. It's an
+important one - if you don't use it, you won't see any org-mode content.
+
+Quite a bit of data and functions are made available in your layouts. The =render=
+function allows you to decide what parts of your org-file you would like to display.
+
+Firn makes some "pre-made" content available to be rendered:
+
+| Render type       | Parameters      | Example                                                              |
+|-------------------+-----------------+----------------------------------------------------------------------|
+| [[file:files-and-headlines.org][Entire file]]       | keyword         | ~(render :file)~                                                       |
+| [[file:files-and-headlines.org][Specific headline]] | string          | ~(render "Notes")~                                                     |
+| [[file:files-and-headlines.org][Specific content]]  | string, keyword | ~(render "Notes" :content)~                                            |
+| [[file:table-of-contents.org][Table of contents]] | keyword, map    | ~(render :toc {:depth int :exclude-headline? bool :headline "Notes"})~ |
+| [[file:logbooks.org][Logbook Polyline]]  | keyword, map    | ~(render :logbook-polyline {:stroke "#45698A" :height 60 :width 365})~ |
+| [[file:sitemap.org][Sitemaps]]          | keyword, map    | ~(render :sitemap {:sort-by :firn-order})~                             |
+| [[file:logbooks.org][Folding]]           | keyword, map    | ~(render :file {:firn-fold {1 true 2 true}})~                          |
+| [[file:backlinks.org][Backlinks]]         | keyword         | ~(render :backlinks)~                                                  |
+| [[file:adjacent-files.org][Adjacent files]]    | keyword, map    | ~(render :adjacent-files {:sort-by :date})~                            |
+| [[file:firn_tags.org][Firn Tags]]         | keyword, map    | ~(render :firn-tags {:sort-by :alphabetical})~                         |
+| [[file:org_tags.org][Org Tags]]          | keyword         | ~(render :org-tags)~                                                   |
+| [[file:breadcrumbs.org][Breadcrumbs]]       | keyword         | ~(render :breadcrumbs)~                                                |
