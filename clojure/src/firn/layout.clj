@@ -98,9 +98,10 @@
 
        ;; render a list of links that link back to the current file
        (= action :backlinks)
-       (markup/render-backlinks {:site-links (config :site-links)
-                                 :file       file
-                                 :site-url   (get-in config [:user-config :site-url])})
+       (markup/render-backlinks {:site-links         (config :site-links)
+                                 :site-links-private (config :site-links-private)
+                                 :file               file
+                                 :site-url           (get-in config [:user-config :site-url])})
 
        ;; render the previous file based on firn-order
        (= action :adjacent-files)

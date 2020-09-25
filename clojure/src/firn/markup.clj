@@ -145,9 +145,15 @@
 ;; R: Backlinks -------
 
 (defn render-backlinks
-  [{:keys [site-links file site-url]}]
-  (let [org-path-match-file-url? #(let [x (internal-link-handler (% :path) site-url)]
-                                    (= x (file :path-url)))
+  "When rendering a file, filters the site-links for all links (that are not
+  private) that link to the file."
+  [{:keys [site-links file site-url site-links-private]}]
+  (let [; transform site-links-private to what their url form would be.
+        site-links-private       (map #(str site-url "/" %) site-links-private)
+        org-path-match-file-url? #(let [site-link (internal-link-handler (% :path) site-url)]
+                                    (and
+                                     (= site-link (file :path-url))
+                                     (not (u/in? site-links-private site-link))))
         to-html                  (fn [x] [:li.firn-backlink [:a {:href (x :from-url)} (x :from-file)]])
         backlinks                (->> site-links (filter org-path-match-file-url?))
         backlinks-unique         (map first (vals (group-by :from-url backlinks)))]

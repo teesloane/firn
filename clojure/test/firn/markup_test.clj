@@ -234,6 +234,10 @@
           test-file     (stub/gtf :tf-small :processed)
           sample-config (-> (stub/sample-config) build/setup build/process-all)
           res           (sut/render-backlinks  {:site-links (sample-config :site-links)
+                                                :site-links-private (sample-config :site-links-private)
                                                 :site-url   ""
                                                 :file       test-file})]
-      (t/is (= res [:ul.firn-backlinks [:li.firn-backlink [:a {:href "/file1"} "Org Mode"]]])))))
+      (t/is (= res [:ul.firn-backlinks [:li.firn-backlink [:a {:href "/file1"} "Org Mode"]]]))
+      (t/is (not= res [:ul.firn-backlinks
+                       [:li.firn-backlink [:a {:href "/file1"} "Org Mode"]]
+                       [:li.firn-backlink [:a {:href "/file-private"} "File Private"]]])))))

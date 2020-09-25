@@ -138,12 +138,13 @@
   process-all -> process-one -> file/extract-metadata -> file/extract-metadata-helper"
   [config]
   (loop [org-files (config :org-files)
-         site-vals {:processed-files  {}
-                    :site-map         [] ;; < collected as list, transformed later to map.
-                    :org-tags         [] ;; org-headline tags
-                    :firn-tags        {} ;; file-specific tags (#+ROAM-TAGS or #+FIRN-TAGS)
-                    :site-links       []
-                    :site-attachments []}
+         site-vals {:processed-files    {}
+                    :site-map           [] ;; < collected as list, transformed later to map.
+                    :org-tags           [] ;; org-headline tags
+                    :firn-tags          {} ;; file-specific tags (#+ROAM-TAGS or #+FIRN-TAGS)
+                    :site-links         [] ; useful for backlinks / link graphs
+                    :site-links-private [] ; path-web links for files that are private (for removing backlinks to private files)
+                    :site-attachments   []}
          output    {}]
     (if (empty? org-files)
       ;; run one more loop on all files, and create their html,
@@ -158,7 +159,6 @@
             ;; FIXME: I think we are rendering html twice here, should prob only happen here?
             with-html (into {} (for [[k pf] output] [k (htmlify config-with-data pf)]))
             final     (assoc config-with-data :processed-files with-html)]
-        (when (seq (config :firn-tags)) (config :firn-tags))
         final)
 
       ;; Otherwise continue...
@@ -169,7 +169,8 @@
             org-files                                          (rest org-files)
             {:keys [links logbook tags attachments firn-tags]} (-> processed-file :meta)]
         (if is-private
-          (recur org-files site-vals output)
+          (let [updated-site-vals (update site-vals :site-links-private conj (processed-file :path-web))]
+            (recur org-files updated-site-vals output))
           (let [updated-output    (assoc output (processed-file :path-web) processed-file)
                 updated-site-vals (cond-> site-vals
                                     true        (update :site-links concat links)
