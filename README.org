@@ -1,6 +1,6 @@
 #+html: <h2 align="center">Firn</h2>
 #+html: <p align="center">A Static Site Generator for Org Mode</p>
-#+html: <p align="center"><a href="https://github.com/theiceshelf/firn/releases"><img alt="GitHub release (latest by date including pre-releases)" src="https://img.shields.io/github/v/release/theiceshelf/firn?color=%2316a085&include_prereleases&style=flat-square"><a/>&nbsp;<img src="https://img.shields.io/badge/Status-Alpha-%23f39c12?style=flat-square">&nbsp;<a href="https://discord.gg/TbgKxYb"><img alt="Discord" src="https://img.shields.io/discord/707754224871669770?color=%233498db&label=Discord%20Chat%20&style=flat-square"></a></p>
+#+html: <p align="center"><a href="https://github.com/theiceshelf/firn/releases"><img alt="GitHub release (latest by date including pre-releases)" src="https://img.shields.io/github/v/release/theiceshelf/firn?color=%2316a085&include_prereleases&style=flat-square"><a/>&nbsp;<img src="https://img.shields.io/badge/Status-Alpha-%23f39c12?style=flat-square">&nbsp;<a href="https://discord.gg/TbgKxYb"><img alt="Discord" src="https://img.shields.io/discord/707754224871669770?color=%233498db&label=Discord%20Chat%20&style=flat-square"></a>&nbsp;<a href="https://github.com/sponsors/teesloane"><img src="https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub"></a></p>
 
 * Overview
 

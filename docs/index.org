@@ -1,6 +1,6 @@
 #+TITLE: Home
 #+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-09-23 18:59>
+#+DATE_UPDATED: <2020-09-25 20:18>
 #+FIRN_LAYOUT: index
 #+FIRN_ORDER: 0
 
@@ -57,7 +57,7 @@ and Linux at this time.
 Keep an eye on the Github repository's [[https://github.com/theiceshelf/firn/issues][issues]] and [[https://github.com/theiceshelf/firn/projects/1][projects board]].
 *** Do I have to use Clojure in my layouts?
 For now, yes.
-*** How can I easily learn about E-macs and Org-mode?
+*** How can I easily learn about Emacs and Org-mode?
 
 An opinionated response: try [[https://github.com/hlissner/doom-emacs][Doom Emacs]], including [[https://www.youtube.com/watch?v=rCMh7srOqvw&list=PLhXZp00uXBk4np17N39WvB80zgxlZfVwj][Zaiste's tutorials]] (which
 also cover org-mode).
