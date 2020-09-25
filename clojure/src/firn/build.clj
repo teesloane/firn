@@ -74,7 +74,7 @@
     (file/change f {:as-html as-html})))
 
 (defn make-site-map
-  "Builds the site maps a tree where a file might fall under one or more files.
+  "Builds the site maps data structure - a tree where a file might fall under one or more files.
   Checks the value of `#+FIRN_UNDER` to decide under what parent to place a child."
   [processed-files]
   (loop [files processed-files

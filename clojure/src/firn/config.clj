@@ -62,10 +62,10 @@
 
 (defn prepare
   "Prepares the configuration for build/serve."
-  [{:keys [dir --server?]}]
+  [{:keys [dir --server? port]}]
   (let [ext-config   (make-external-config dir)
         int-config   (make-internal-config dir ext-config)
         final-config (assoc int-config :user-config ext-config)]
     (if --server?
-      (assoc-in final-config [:user-config :site-url] "http://localhost:4000")
+      (assoc-in final-config [:user-config :site-url] (str "http://localhost:" port))
       final-config)))
