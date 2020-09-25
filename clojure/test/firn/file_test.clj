@@ -127,7 +127,7 @@
                     :firn-order      1,
                     :firn-under      ["Research"],
                     :logbook-total   "12:27",
-                    :firn-tags       '()
+                    :firn-tags       nil
                     :path            "http://my-site-url.com/file1",
                     :title           "Org Mode"}))
 
@@ -136,8 +136,7 @@
 
 (t/deftest craft-file-tags
   (t/testing "expected output"
-    (let [test-input {:firn-tags       "foo bar"
-                      :roam-tags       nil
+    (let [test-input {:file-tags       "foo bar"
                       :date-created-ts 1592625600
                       :file-metadata   {:from-file "Configuration", :from-url "http://localhost:4000/configuration"}}
           expected   '({:date-created-ts 1592625600,
@@ -149,6 +148,4 @@
                         :from-url        "http://localhost:4000/configuration",
                         :tag-value       "bar"})
           res        (sut/craft-file-tags test-input)]
-      (t/is (= res expected))
-      )))
-
+      (t/is (= res expected)))))
