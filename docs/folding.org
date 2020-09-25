@@ -2,6 +2,9 @@
 #+FIRN_UNDER: Content "The Render Function"
 #+FIRN_FOLD: {2 true 3 true}
 #+FIRN_ORDER: 1
+#+DATE_CREATED: <2020-09-21 Mon>
+#+DATE_UPDATED: <2020-09-25 19:05>
+
 
 *Purpose:* Firn has a basic implementation of headline folding, mimicking
 org-mode; this document explains how configure folding.

@@ -1,6 +1,9 @@
 #+TITLE: The Render Function
 #+FIRN_UNDER: Content
 #+FIRN_ORDER: 3
+#+DATE_UPDATED: <2020-09-25 19:04>
+#+DATE_CREATED: <2020-08-14 Fri 19:03>
+
 
 
 The ~(render)~ function is used to render content from your org file. It's an

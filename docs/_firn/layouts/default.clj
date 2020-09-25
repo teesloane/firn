@@ -1,5 +1,5 @@
 (defn default
-  [{:keys [org-tags build-url title render partials]}]
+  [{:keys [org-tags date-updated build-url title render partials]}]
   (let [{:keys [head nav footer]} partials]
     [:html
      (head build-url)
@@ -10,7 +10,11 @@
         (render :sitemap {:sort-by :firn-order})]
        [:article.def-content-wrap
         [:div.def-content
-         [:h1 title]
+         [:h1.mb0 title]
+         (when date-updated
+           [:div.flex.h6.mb1
+            [:div.pr1 "Last updated: "]
+            [:div.italic date-updated]])
          (render :file)
 
          [:div.adjacent-files
