@@ -1,9 +1,31 @@
 #+TITLE: Changelog
-#+FIRN_ORDER: 8
+#+FIRN_ORDER: 5
 #+FIRN_TOC: {:depth 1}
+#+FIRN_UNDER: Reference
+#+DATE_UPDATED: <2020-09-25 19:09>
+#+DATE_CREATED: <2020-07-05 Wed 17:10>
+
+* V.0.0.9
+** New
+- Several new render functions, for easier preset rendering of content:
+  - Add ~(render :sitemap)~ (with options for :sort-by, :start-at )
+  - Add ~(render :breadcrumbs)~
+  - Add ~(render :adjacent-files)~
+  - Add ~(render :backlinks)~
+  - Add ~(render :firn-tags)~
+  - Add ~(render :org-tags)~
+- Ability to use ~render~ in a non-org ~page~ - only global things may be rendered, however, such as a site-map, or a firn/org tags.
+- Add ~build-url~ function for easier creation of internal urls.
+** Fixed
+** Breaking Changes
+- Custom pages are no longer added to the sitemap; they currently present too
+  much trouble as they do not have front matter and thus cannot be discerned
+  where they fit in with possible sorting mechanisms on the site-map (ie, they
+  cannot have a ~FIRN_ORDER~ value, and thus have to default to being pushed to
+  999999~ order and so remain at the "bottom" of the sitemap. Still looking for
+  a better solution to this.)
 
 * V.0.0.8
-
 ** Feature: Clean up unused attachments.
 - Adds a configuration option to config.edn: ~run-build-clean?~ - which will
   remove unused file attachments from ~_firn/_site~ after finishing building.

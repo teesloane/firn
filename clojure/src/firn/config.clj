@@ -39,7 +39,7 @@
      ;; values collected during build/process-all:
      :processed-files  []
      :site-map         []                        ; list of all pages converted for the site.
-     :site-tags        {}                        ; collected tags from all processed files
+     :org-tags        {}                        ; collected tags from all processed files
      :site-logs        []                        ; collected logs from all processed files
      :site-links       []                        ; collected links from all processed files
      :site-attachments []}))                     ; collected (paths to) attachments of all processed files.
@@ -62,10 +62,10 @@
 
 (defn prepare
   "Prepares the configuration for build/serve."
-  [{:keys [dir --server?]}]
+  [{:keys [dir --server? port]}]
   (let [ext-config   (make-external-config dir)
         int-config   (make-internal-config dir ext-config)
         final-config (assoc int-config :user-config ext-config)]
     (if --server?
-      (assoc-in final-config [:user-config :site-url] "http://localhost:4000")
+      (assoc-in final-config [:user-config :site-url] (str "http://localhost:" port))
       final-config)))

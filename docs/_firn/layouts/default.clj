@@ -1,22 +1,33 @@
-(defn render-site-map
-  [sm]
-  (->> sm
-     (sort-by :firn-order)
-     (map #(vector :div.pb1 [:a {:href (% :path)} (% :title)]))))
-
 (defn default
-  [{:keys [site-map build-url title render partials]}]
+  [{:keys [org-tags date-updated build-url title render partials]}]
   (let [{:keys [head nav footer]} partials]
     [:html
      (head build-url)
      [:body
       (nav build-url)
-      [:main
-       [:article.def-wrapper
-        [:aside#sidebar.def-sidebar
-         (render-site-map site-map)]
+      [:main.def-wrapper
+       [:aside#sidebar.def-sidebar.unfocused
+        (render :sitemap {:sort-by :firn-order})]
+       [:article.def-content-wrap
         [:div.def-content
-         [:h1 title]
-         [:div (render :toc)] ;; Optional; add a table of contents
+         [:h1.mb0 title]
+         (when date-updated
+           [:div.flex.h6.mb1
+            [:div.pr1 "Last updated: "]
+            [:div.italic date-updated]])
          (render :file)
-         (footer)]]]]]))
+
+         [:div.adjacent-files
+          [:span (render :adjacent-files)]]
+         (footer)]]
+
+       (let [toc       (render :toc)
+             backlinks (render :backlinks)]
+         [:aside#toc.def-toc.unfocused
+          (when toc
+            [:div
+             [:h4 "Contents"]
+             [:div (render :toc)]])
+          (when backlinks
+            [:div
+             [:h4 "Backlinks"] backlinks])])]]]))

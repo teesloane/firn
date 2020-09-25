@@ -1,13 +1,12 @@
 #+TITLE: Firn Setup (with Emacs)
-#+DATE_CREATED: <2020-03-27 Fri>
-#+DATE_UPDATED: <2020-07-03 18:22>
-#+FILE_UNDER: docs
+#+DATE_CREATED: <2020-03-26 Thu>
+#+DATE_UPDATED: <2020-08-27 15:57>
 #+FIRN_LAYOUT: docs
-#+FIRN_ORDER: 4
+#+FIRN_UNDER: "Getting Started" 
+#+FIRN_ORDER: 2
 
-
-The following are notes on how to best setup Emacs and your folder of org-files
-for a Firn site.
+The following are optional notes and suggestions on how to best setup Emacs and
+your folder of org-files with a few best practices for a Firn site.
 
 * Folder Structure
 
@@ -37,7 +36,6 @@ An example directory:
 
 #+END_SRC
 * Links
-
 ** Linking between files
 
 All links should be relative.

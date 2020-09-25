@@ -94,6 +94,33 @@
       (t/is (= res3 "#foo--bar"))
       (t/is (= res4 "#foo--------bar")))))
 
+(t/deftest org-keyword->vector
+  (t/testing "expected output with single word tags"
+    (let [res (sut/org-keyword->vector "foo bar")]
+      (t/is (= res ["foo" "bar"]))))
+  (t/testing "expected output"
+    (let [res (sut/org-keyword->vector "\"Single tag\"")]
+      (t/is (= res ["Single tag"])))))
+
+
+(t/deftest sort-map-of-lists-of-maps
+  (t/testing "expected output"
+    (let [input  {"Aesthetic"
+                  [{:from-file "Zirn Setup (with Emacs)", :from-url "http://localhost:4000/setup", :tag-value "Aesthetic", :date-created-ts 1585195200}
+                   {:from-file "Aayout", :from-url "http://localhost:4000/layout", :tag-value "Aesthetic", :date-created-ts 1585022400}
+                   {:from-file "Styling", :from-url "http://localhost:4000/styling", :tag-value "Aesthetic", :date-created-ts 1585108800}],
+                  "language"
+                  [{:from-file "Configuration", :from-url "http://localhost:4000/configuration", :tag-value "language", :date-created-ts 1592625600}],
+                  "programming"
+                  [{:from-file "Configuration", :from-url "http://localhost:4000/configuration", :tag-value "programming", :date-created-ts 1592625600}]}
+          res1 (sut/sort-map-of-lists-of-maps {:coll input :sort-key :from-file :sort-by :alphabetical})
+          res2 (sut/sort-map-of-lists-of-maps {:coll input :sort-key :date-created-ts :sort-by :newest})
+          res3 (sut/sort-map-of-lists-of-maps {:coll input :sort-key :date-created-ts :sort-by :oldest})]
+
+      (t/is (= res1 {"Aesthetic" '({:from-file "Aayout", :from-url "http://localhost:4000/layout", :tag-value "Aesthetic", :date-created-ts 1585022400} {:from-file "Styling", :from-url "http://localhost:4000/styling", :tag-value "Aesthetic", :date-created-ts 1585108800} {:from-file "Zirn Setup (with Emacs)", :from-url "http://localhost:4000/setup", :tag-value "Aesthetic", :date-created-ts 1585195200} ), "language" '({:from-file "Configuration", :from-url "http://localhost:4000/configuration", :tag-value "language", :date-created-ts 1592625600}), "programming" '({:from-file "Configuration", :from-url "http://localhost:4000/configuration", :tag-value "programming", :date-created-ts 1592625600})}))
+      (t/is (= res2 {"Aesthetic" '({:from-file "Zirn Setup (with Emacs)", :from-url "http://localhost:4000/setup", :tag-value "Aesthetic", :date-created-ts 1585195200} {:from-file "Styling", :from-url "http://localhost:4000/styling", :tag-value "Aesthetic", :date-created-ts 1585108800} {:from-file "Aayout", :from-url "http://localhost:4000/layout", :tag-value "Aesthetic", :date-created-ts 1585022400} ), "language" '({:from-file "Configuration", :from-url "http://localhost:4000/configuration", :tag-value "language", :date-created-ts 1592625600}), "programming" '({:from-file "Configuration", :from-url "http://localhost:4000/configuration", :tag-value "programming", :date-created-ts 1592625600})}))
+      (t/is (= res3 {"Aesthetic" '({:from-file "Aayout", :from-url "http://localhost:4000/layout", :tag-value "Aesthetic", :date-created-ts 1585022400} {:from-file "Styling", :from-url "http://localhost:4000/styling", :tag-value "Aesthetic", :date-created-ts 1585108800} {:from-file "Zirn Setup (with Emacs)", :from-url "http://localhost:4000/setup", :tag-value "Aesthetic", :date-created-ts 1585195200}), "language" '({:from-file "Configuration", :from-url "http://localhost:4000/configuration", :tag-value "language", :date-created-ts 1592625600}), "programming" '({:from-file "Configuration", :from-url "http://localhost:4000/configuration", :tag-value "programming", :date-created-ts 1592625600})})))))
+
 ;; -- Time / Date Tests --------------------------------------------------------
 
 (t/deftest timestr->hours-min

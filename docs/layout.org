@@ -1,9 +1,8 @@
-#+TITLE: Layout
+#+TITLE: Layouts and Partials
 #+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-07-16 13:00>
-#+FILE_UNDER: docs
-#+FIRN_LAYOUT: docs
-#+FIRN_ORDER: 2
+#+DATE_UPDATED: <2020-09-23 14:56>
+#+FIRN_UNDER: Content
+#+FIRN_ORDER: 1
 #+FIRN_FOLD: {2 true}
 
 * Overview
@@ -14,279 +13,65 @@ responsible for how your org-file is rendered to-html; The act of "applying" a
 template means to pass the content of the org-file through a specific [[https://github.com/weavejester/hiccup][clojure hiccup]]
 template that organizes how the content is displayed.
 
-When an org-mode file is processed by Firn it looks for the in-buffer-setting
+When an org-mode file is processed by Firn it looks for the in-buffer-setting (or what might be called "[[file:front-matter.org][Front Matter]]")
 ~#+FIRN_LAYOUT:~ to see if it uses a Layout. If none are specified, the _default
 template_ is used.
 
-* Usage
+* A simple layout file
 
-Let's walk through an example of how to use layouts.
-
-Create a sample org file; we will call it =foo.org=. Edit it to include the
-following:
-
-*NOTE*: Because the snippet below is org-mode code, you will need to remove the =\=
-preceding the =*= Headlines.
-
-#+BEGIN_SRC org
-
-#+TITLE: Layout
-#+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-03-24 14:20>
-#+FILE_UNDER: docs
-#+FIRN_LAYOUT: docs
-
-\* My project
-
- This is my project.
-
-\* Notes
-
- - [ ] Figure out how layouts work.
-#+END_SRC
-
-Now we have a file that is going to look for a layout called "docs" in the
-layouts folder. Return to the terminal.
-
-#+BEGIN_SRC sh
-cd layouts
-touch docs.clj
-#+END_SRC
-
-Inside docs.clj place the following clojure code.
+Let's consider a simple layout file:
 
 #+BEGIN_SRC clojure
-(defn project
-  [{:keys [render title partials]}]
-  (let [{:keys [head nav]} partials]
-    (head
-     [:body
-      (nav)
-      [:main
-       [:article
-        [:div (render "Notes")]]]]))) ;; Renders The notes section.
+
+(defn default                   ; define a clojure func
+  [{:keys [build-url title render partials]}] ; destructured commonly used functions and data
+  (let [{:keys [head]} partials]              ; Ignore for now, partials will be explained later
+    [:html                      ; => opens a `html` tag
+     (head build-url)           ; => Renders the `head` partial
+     [:body                     ; => opens a `body` tag
+      [:main                    ; => Ditto
+       [:article.def-wrapper    ; => opens a `article` html tag with a class of `def-wrapper`
+        [:div.def-content       ; => see above
+         [:h1 title]            ; => renders an `h1` tag with the file title.
+         (render :file) ;       ; => `render` is where the magic happens!
+         ]]]]]))                ; => all these closing brackets can be thought of as closing html tags (for now)
 #+END_SRC
 
-*NOTE:* Layouts can have multiple Clojure functions in them, however only the last
-function of the file will be applied as the layout.
+The above may look a little strange if you are not familiar with Clojure. The
+next document will expand on what the ~render~ function does.
 
-* Do I have to use layouts?                                      :FAQ:
+Your layout files *can have several functions* in them, but the *last function in the
+file* is the one that is loaded as your layout.
 
-Not exactly. When you create a new Firn site, it will have a =default.clj= file in
-the =layouts= directory. This provides a very basic out of the box formatting and
-will render the entirety of your org mode file. If you want to add any kinds of
-customization - even css, you'll need to work with layouts.
+* Partials
 
-* How do I customize the styling of my layouts?                  :FAQ:
+In the example above you may have noticed the ~partials~ binding appear. Partials
+are similar to layouts: they are clojure functions that render html. Partials
+are used for rendering particularly common pieces of html that might be shared
+across several layouts (such as the ~head~ of your HTML document as in the example
+above).
 
-As with normal HTML, you'll need to add a =head= tag with a =link= that references
-to a css file. It might make sense for you to create a partial for defining your
-html =head= tag, allowing it to be shared across layouts:
+Using partials requires the following:
 
-#+BEGIN_SRC clojure
-(defn head
-  [body]
-  [:html
-   [:head
-    [:link {:rel "stylesheet" :href "/static/css/firn_base.css"}]]
-   body])
-#+END_SRC
+1. Create a partial in the ~partials~ directory.
+   - A partial must be a clojure function, just the same as a layout file.
+   - The *last function* in your partial file /is the partial that is applied/.
+2. ~partials~ are a map of all the partial functions and is passed into layouts
+   when they are rendered:
+    #+BEGIN_SRC clojure
+    (defn default
+      [{:keys [partials]}] ; `partials` is a a map.
+    #+END_SRC
+3. You can optionally bind the partials you need in a let block so that they are
+   easily callable as functions. The name of your partial is the name of the
+   partial file. For example, the docs you are reading has a ~partials/head.clj~ file, and is accessible like so:
 
-* The Render function
+   #+BEGIN_SRC clojure
+    (defn default                   ; define a clojure func
+      [{:keys [partials]}]          ; destructure the `partials` key.
+      (let [{:keys [head]} partials]
+          [:html                      ; => opens a `html` tag
+          (head build-url)            ; => Renders the `head` partial
+          ; ....
+   #+END_SRC
 
-Render is used to render content from your org file. It's an important one - if
-you don't use it, you won't see any org-mode content.
-
-Quite a bit of data and functions are made available in your layouts. The =render=
-function you to decide what parts of your org-file you would like to display. Firn
-makes some "pre-made" content available for rendering - logbook graphs, table of
-contents, etc. It can render multiple kinds of content"
-
-| Render type       | Paramaters      | Example                                                              |
-|-------------------+-----------------+----------------------------------------------------------------------|
-| Entire file       | keyword         | ~(render :file)~                                                       |
-| Specific headline | string          | ~(render "Notes")~                                                     |
-| Specific content  | string, keyword | ~(render "Notes" :content)~                                            |
-| Table of contents | keyword, map    | ~(render :toc {:depth int :exclude-headline? bool :headline "Notes"})~ |
-| Logbook Polyline  | keyword, map    | ~(render :logbook-polyline {:stroke "#45698A" :height 60 :width 365})~ |
-|                   |                 |                                                                      |
-
-** Render an entire file
-
-#+BEGIN_SRC clojure
-(defn default
-  [{:keys [render partials]}]
-  (let [{:keys [head]} partials]
-
-    (head
-     [:body
-       [:div (render :file)]])))
-#+END_SRC
-** Rendering specific headlines and content
-
-#+BEGIN_SRC clojure
-(defn default
-  [{:keys [render partials]}]
-  (let [{:keys [head]} partials]
-    (head
-     [:body
-       [:div (render "Notes")] ; render everything in "Notes" (including the heading "Notes")
-       [:div (render "Notes" {:exclude-headline? true})] ; render the content in "Notes", excluding the heading.
-      ])))
-
-#+END_SRC
-
-** Rendering folded headlines                                   :folding:
-
-Firn includes basic semantic HTML folding that aims to replicate org-mode
-headline folding. JavaScript is not used to accomplish folding (although this is
-certainly possible); instead Firn uses the ~details~ and ~summary~ tag to
-accomplish similar functionality.
-
-Due to how the summary and details tag work, there is some finicky styling and
-all the same features of using normal headlines (tags, keywords, properties,
-etc) may not work as well. Incorporating folding may require some user styling
-in the ~firn_base.css~ stylesheet.
-
-Similar to a table of contents, you can set Firn's folding on a site-wide,
-layout-wide, or file-specific basis:
-
-#+BEGIN_SRC clojure
-(render :file {:firn-fold {1 true 2 true}}) ; All H1 and H2's will be folded, and will be started open.
-(render :file {:firn-fold {3 false  4 false 5}}) ; H3 through H5 will be foldable, and will start closed_
-#+END_SRC
-
-The ~:firn-fold~  value takes a *map* in which the keys correspond to heading
-levels, and the value is a boolean, indicating whether or not the details tag
-is, open or not. ~:firn-fold~ supports up to 6 headings (corresponding from ~h1~ to ~h6~)
-
-** Render a Logbook SVG Polyline
-
-Graphs all logbook entries for the current file in a polyline, generating a chart for each year.
-
-#+BEGIN_SRC clojure
-(defn default
-  [{:keys [render partials]}]
-  (let [{:keys [head]} partials]
-    (head
-     [:body
-       [:div (render :logbook-polyline {:stroke "#45698A" :height 60 :width 365})]])))
-#+END_SRC
-
-** Rendering a Table of Contents
-When a file is processed, Firn collects *all* of it's headlines, whether you're
-choosing to render the entire file, or just one headline.
-
-There are several ways you can create table of contents in your files, from simple to more complex use cases.
-
-1. Render a table of contents for an entire file.
-
-  #+BEGIN_SRC clojure
-  (defn default
-    [{:keys [render partials]}]
-    (let [{:keys [head]} partials]
-
-      (head
-       [:body
-         [:div (render :toc)]
-         [:div (render :file)]])))
-  #+END_SRC
-
-2. Render a table of contents for everything within a specific headline.
-
-  #+BEGIN_SRC clojure
-  (defn default
-    [{:keys [render partials]}]
-    (let [{:keys [head]} partials]
-      (head
-       [:body
-         ;; only renders a table of contents for a single headline's children.
-         ;; `:eclusive?` means we don't render "Notes"; just headlines that fall under it dflakdjflksadjf lksadjf lkasdjf lkasdjf .
-         [:div (render :toc {:headline "Notes"
-                             :depth 4
-                             :exclude-headline? true})]
-         [:div (render "Notes")]])))
-  #+END_SRC
-
-3. From within a file, you can set the keyword ~#+FIRN_TOC~ and pass it a map with
-   the properties above to enable a table of contents specific to a single file:
-
-  #+BEGIN_SRC
-  #+FIRN_TOC: {:depth 4}
-  #+END_SRC
-
-* Data and Functions available to layouts                        :reference:
-
-The following keys are made available in your layouts.
-
-| Function/Data | Intent                                              | Data-type |
-|---------------+-----------------------------------------------------+-----------|
-| config        | The site wide config.                               | map       |
-| date-created  | The #+DATE_CREATED value of the file                | string    |
-| date-updated  | The #+DATE_UPDATED value of the file                | string    |
-| file          | The file as a data structure.                       | map       |
-| file-links    | A list of links per file                            | list      |
-| firn-under    | The #+FIRN_UNDER value of the file                  | string    |
-| logbook       | A list of logbooks entries per file.                | list      |
-| logbook-total | The sum of all the logbook entries per file         | string    |
-| meta          | A map of metadata per file (logbook, links, etc)    | map       |
-| partials      | a list of invokable partials =/partials= dir          | list      |
-| render        | Enables rendering parts or entirety of an org file. | function  |
-| site-links    | A list of all links across all documents            | vector    |
-| site-logs     | A list of aLL logbook entries.                      | vector    |
-| site-map      | A list of all files on the wiki                     | vector    |
-| title         | The #+TITLE value of the file.                      | string    |
-
-This may seem like a lot of information to make available to a layout template.
-And that's because it is. But thanks to destructuring in Clojure, you can make
-your templates only ask for what they need:
-
-#+BEGIN_SRC clojure
-(defn project
-  [{:keys [ render partials logbook] :as data}] ; < destructuring to make available only what you need.
-  (let [{:keys [head nav]} partials]
-    (head
-     [:body
-      (nav)
-      [:main.main-container
-       (page-header data)
-       [:div.container
-        (main-section render)
-        (sidebar render logbook)]]])))
-#+END_SRC
-
-The above template only needs access to =render=, =partials= and the =logbook=.
-Then functions, such as =page-header= can simply take the data map and
-destructure what /it/ needs again:
-
-#+BEGIN_SRC clojure
-(defn page-header
-  [{:keys [title logbook-total date-updated date-created firn-under]}]
-  (let [rndr (fn [i s]
-               (when i [:span.flex.pr2
-                        [:h4.italic.bold.pr1 s " "]
-                        [:h4.italic.thin i]]))]
-    [:div.page_meta
-     [:h1.page_meta_title title]
-     [:div.flex
-      (rndr date-created "Published: ")
-      (rndr date-updated "Last Updated: ")
-      (rndr firn-under "File Under: ")
-      (when-not (= logbook-total "0:00")
-        (rndr logbook-total "Time Logged: "))]]))
-
-#+END_SRC
-
-* Styling Layouts                                                :styling:
-
-You can write css as you normally would by placing css files in the
-=_firn/static/css= folder and then having =firn= move them into your =_site=
-folder when run. Styling is applied through
-[[https://github.com/weavejester/hiccup#syntax][hiccup]].
-
-There are some internal styles that are applied when org-mode text is
-transformed into data. These styles are all prefaced with the keyword ~firn-~,
-(ie. =firn-headline-text= or =firn-tag=).
-
-Inspect the file ~_firn/static/css/firn_base.css~ to see the configurable
-elements.

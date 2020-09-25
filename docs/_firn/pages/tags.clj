@@ -1,11 +1,5 @@
-(defn render-site-map
-  [sm]
-  (->> sm
-     (sort-by :firn-order)
-     (map #(vector :div.pb1 [:a {:href (% :path)} (% :title)]))))
-
 (defn tags
-  [{:keys [site-map build-url site-tags partials]}]
+  [{:keys [build-url render partials]}]
   (let [{:keys [head nav footer]} partials]
     [:html
      (head build-url)
@@ -14,16 +8,11 @@
       [:main
        [:article.def-wrapper
         [:aside#sidebar.def-sidebar
-         (render-site-map site-map)]
+         (render :sitemap {:sort-by :firn-order})]
         [:div.def-content
-         [:h1 "Tags"]
-         (for [[tag-name tags] site-tags]
-           [:div
-            [:h2 {:id tag-name :class "firn-tag-heading"} tag-name]
-            (for [tag tags
-                  :let [link (build-url (tag :headline-link))]]
-              [:div
-               [:a
-                {:href link}
-                (tag :from-file) " - " (tag :from-headline)]])])
+         [:h1 "Org Tags"]
+         (render :org-tags)
+         [:hr]
+         [:h1 "File Tags"]
+         (render :firn-tags)
          (footer)]]]]]))

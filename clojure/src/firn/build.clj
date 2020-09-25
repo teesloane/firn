@@ -73,6 +73,47 @@
     ;; as-html
     (file/change f {:as-html as-html})))
 
+(defn make-site-map
+  "Builds the site maps data structure - a tree where a file might fall under one or more files.
+  Checks the value of `#+FIRN_UNDER` to decide under what parent to place a child."
+  [processed-files]
+  (loop [files processed-files
+         out   {}]
+    (if (seq files)
+      (let [head       (first files)
+            tail       (rest files)
+            firn-under (-> head :firn-under)
+            title      (-> head :title)]
+        (cond
+          ;; if there is no "firn-under" it's a top level site-map item, and
+          ;; it's not in the map yet.
+          (and (nil? firn-under) (not (contains? out title)))
+          (recur tail (assoc out title head))
+
+          ;; the item is already in `out` b/c the firn-under val created it with
+          ;; an update-in call.
+          (contains? out title)
+          (let [updated-out (update out title #(merge % head))]
+            (recur tail updated-out))
+
+          ;; if user wants to make a nested value, do that.
+          (seq firn-under)
+          (let [path-to-update (vec (concat (interpose :children firn-under) [:children]))
+                ;; NOTE: we are doing merges within an update so that parents
+                ;; don't overwrite children. basically, the merge has to happen
+                ;; at the (vals) level, and then be re-set to the existing node.
+                ;; Incoming vals are <string><map>!
+                update-fn      (fn [existing-site-map-node title head]
+                                 (let [vals1       (get existing-site-map-node title {})
+                                       merged-vals (merge vals1 head)
+                                       final       (hash-map title merged-vals)]
+                                   (merge existing-site-map-node final)))]
+            (recur tail (update-in out path-to-update update-fn title head)))
+
+          :else
+          (recur tail out)))
+      out)))
+
 (defn process-one
   "Munge the 'file' datastructure; slowly filling it up, using let-shadowing.
   Essentially, converts `org-mode file string` -> json, edn, logbook, keywords"
@@ -85,25 +126,11 @@
         file-metadata (file/extract-metadata new-file)                         ; collect the file-metadata from the edn tree.
         new-file      (file/change new-file {:meta file-metadata})             ; shadow the file and add the metadata
         ;; TODO PERF: htmlify happening as well in `process-all`.
-        ;; this is due to the dev server. There should be a conditional
-        ;; that checks if we are running in server.
+        ;; this is due to the dev server hot reload.
+        ;; There should be a conditional that checks if we are running in server.
         final-file    (htmlify config new-file)]                   ; parses the edn tree -> html.
 
     final-file))
-
-(defn process-site-map-with-pages!
-  "If a user has 'pages/*.clj' files - and their config enables it,
-  Add these to the site map."
-  [site-map config]
-  (if (-> config :user-config :site-map-pages?)
-    (into site-map (for [[k _] (config :pages)]
-                     {:path       (str (-> config :user-config :site-url) (u/keyword->web-path k))
-                      :title      (u/keyword->normal-text k)
-                      :firn-order 9999
-                      :firn-under "Page"}))
-    site-map))
-
-;; @site-map!)
 
 (defn process-all ; (ie, just org-files, not pages)
   "Receives config, processes all ORG files and builds up site-data logbooks, site-map, link-map, etc.
@@ -111,16 +138,23 @@
   process-all -> process-one -> file/extract-metadata -> file/extract-metadata-helper"
   [config]
   (loop [org-files (config :org-files)
-         site-vals {:processed-files {} :site-map [] :site-tags [] :site-links [] :site-attachments []}
+         site-vals {:processed-files    {}
+                    :site-map           [] ;; < collected as list, transformed later to map.
+                    :org-tags           [] ;; org-headline tags
+                    :firn-tags          {} ;; file-specific tags (#+ROAM-TAGS or #+FIRN-TAGS)
+                    :site-links         [] ; useful for backlinks / link graphs
+                    :site-links-private [] ; path-web links for files that are private (for removing backlinks to private files)
+                    :site-attachments   []}
          output    {}]
     (if (empty? org-files)
       ;; run one more loop on all files, and create their html,
       ;; now that we have processed everything.
       (let [config-with-data (merge config
                                     site-vals ;; contains logbook already
-                                    {:processed-files output
-                                     :site-map        (process-site-map-with-pages! (site-vals :site-map) config)
-                                     :site-tags       (into (sorted-map) (group-by :tag-value (site-vals :site-tags)))})
+                                    {:processed-files (vals output)
+                                     :site-map        (make-site-map (site-vals :site-map))
+                                     :org-tags        (into (sorted-map) (group-by :tag-value (site-vals :org-tags)))
+                                     :firn-tags       (into (sorted-map) (group-by :tag-value (site-vals :firn-tags)))})
 
             ;; FIXME: I think we are rendering html twice here, should prob only happen here?
             with-html (into {} (for [[k pf] output] [k (htmlify config-with-data pf)]))
@@ -128,20 +162,22 @@
         final)
 
       ;; Otherwise continue...
-      (let [next-file                    (first org-files)
-            processed-file               (process-one config next-file)
-            is-private                   (file/is-private? config processed-file)
-            in-sitemap?                  (file/in-site-map? processed-file)
-            org-files                    (rest org-files)
-            {:keys [links logbook tags attachments]} (-> processed-file :meta)]
+      (let [next-file                                          (first org-files)
+            processed-file                                     (process-one config next-file)
+            is-private                                         (file/is-private? config processed-file)
+            in-sitemap?                                        (file/in-site-map? processed-file)
+            org-files                                          (rest org-files)
+            {:keys [links logbook tags attachments firn-tags]} (-> processed-file :meta)]
         (if is-private
-          (recur org-files site-vals output)
+          (let [updated-site-vals (update site-vals :site-links-private conj (processed-file :path-web))]
+            (recur org-files updated-site-vals output))
           (let [updated-output    (assoc output (processed-file :path-web) processed-file)
                 updated-site-vals (cond-> site-vals
                                     true        (update :site-links concat links)
                                     true        (update :site-logs concat logbook)
                                     true        (update :site-attachments concat attachments)
-                                    true        (update :site-tags concat tags)
+                                    true        (update :org-tags concat tags)
+                                    true        (update :firn-tags concat firn-tags)
                                     in-sitemap? (update :site-map conj (file/make-site-map-item processed-file (-> config :user-config :site-url))))]
             (recur org-files updated-site-vals updated-output)))))))
 
@@ -153,38 +189,29 @@
         feed-file   (str dir-site "feed.xml")
         first-entry {:title site-title :link site-url :description site-desc}
         make-rss    (fn [[_ f]]
-                      (hash-map :title   (-> f :meta :title)
-                                :link    (str site-url "/" (-> f :path-web))
-                                :pubDate (u/org-date->java-date  (-> f :meta :date-created))
+                      (hash-map :title       (-> f :meta :title)
+                                :link        (f :path-web)
+                                :pubDate     (u/org-date->java-date  (-> f :meta :date-created))
                                 :description (str (f :as-html))))]
     (io/make-parents feed-file)
     (->> processed-files
-       (filter (fn [[_ f]] (-> f :meta :date-created)))
-       (map make-rss)
-       (sort-by :pubDate)
-       (reverse)
-       (u/prepend-vec first-entry) ; first entry must be about the site
-       (apply rss/channel-xml)
-       (spit feed-file)))
+         (filter (fn [[_ f]] (-> f :meta :date-created)))
+         (map make-rss)
+         (sort-by :pubDate)
+         (reverse)
+         (u/prepend-vec first-entry) ; first entry must be about the site
+         (apply rss/channel-xml)
+         (spit feed-file)))
   config)
 
 (defn write-pages!
   "Responsible for publishing html pages from clojure templates found in pages/
   Currently, we can only render a flat file list of .clj files in /pages.
-  FIXME: (In a later release) - do something similar to `file/get-web-path` and
+  TODO: (In a later release) - do something similar to `file/get-web-path` and
   enable `load-fns-into-map` to save filenames as :namespaced/keys, allowing
   make-parent to work on it."
-  [{:keys [dir-site pages partials site-map site-links site-logs site-tags user-config] :as config}]
-  (let [site-url (user-config :site-url)
-        user-api {:partials   partials
-                  :site-map   site-map
-                  :site-links site-links
-                  :site-logs  site-logs
-                  :site-tags  site-tags
-                  :site-url   site-url
-                  :build-url  (layout/build-url site-url)
-                  :config     config}]
-
+  [{:keys [dir-site pages] :as config}]
+  (let [user-api (layout/prepare config {})]
     (doseq [[k f] pages
             :let  [out-file (str dir-site "/" (name k) ".html")
                    out-str  (h/html (f user-api))]]
@@ -261,3 +288,4 @@
       true             write-pages!
       true             write-files
       (nil? is-server?) post-build-clean)))
+

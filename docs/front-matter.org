@@ -1,0 +1,65 @@
+#+TITLE: Front Matter
+#+FIRN_UNDER: Content
+#+FIRN_ORDER: 0
+#+DATE_UPDATED: <2020-09-25 19:04>
+#+DATE_CREATED: <2020-08-14 Fri 19:03>
+
+* Overview
+
+To use Firn, you will need to add some "Front Matter" to your org-files. Front
+Matter is common in many static-site-generators. Firn uses org-mode [[https://orgmode.org/manual/In_002dbuffer-Settings.html][in-buffer-settings]] to set Front Matter.
+
+Currently, Firn requires that each file it processes at least have a ~#+TITLE:~
+front-matter key value.
+
+* Firn Front Matter
+
+The following front-matter are processed by Firn and/or made available to
+layouts for processing.
+
+| Key                | Type          | Purpose                                                 |
+|--------------------+---------------+---------------------------------------------------------|
+| ~#+TITLE:~           | string        | Required: Used in site-map, links, etc                  |
+| ~#+DATE_CREATED~     | org-mode-date | File date created                                       |
+| ~#+DATE_UPDATED~     | org-mode-date | File last updated                                       |
+| ~#+FIRN_TAGS~        | list          | Creates [[file:firn_tags.org][file based tags]].                                |
+| ~#+FIRN_PROPERTIES?~ | boolean       | Whether to render properties under all headings         |
+| ~#+FIRN_TOC~         | map           | Settings for any rendered table of contents             |
+| ~#+FIRN_FOLD~        | map           | Fold headings of a specified level: ex: {3 true 4 true} |
+| ~#+FIRN_ORDER~       | integer       | Enables sorting files in the site-map                   |
+| ~#+FIRN_PRIVATE~     | boolean       | Whether or not to read the file in question             |
+| ~#+FIRN_SITEMAP?~    | boolean       | Whether to include the file in the site-map.            |
+| ~#+FIRN_UNDER~       | list          | Categories for which the documents falls under          |
+
+Changing some of these values from file to file will result in your files being
+rendered differently. Meanwhile, you can set the default values for certain
+front-matter in your ~config.edn~ file, as detailed in the [[file:configuration.org][configuration document]].
+
+Let's consider an example - we will enable headline [[file:folding.org][folding]] in a document.
+
+
+#+BEGIN_SRC
+#+FIRN_FOLD {1 true 2 true}
+#+END_SRC
+
+The above will result in *all* level 3 and 4 headings being /folded/. If you would
+like to render a certain file so that all level 1 headings (and no others) are
+folded, you could do by overriding the ~:firn-fold~ value in your config in your
+front matter by setting ~#+FIRN_FOLD: {1 true}~
+
+In this case, ~FIRN_FOLD~ actually takes a *clojure value* (in this case, a map)
+that is *evaluated* when your site is built.
+
+* Custom Front Matter                                            :advanced:
+
+All front matter will be accessible as metadata when it comes time to render
+your layouts. That is to say, you can create your own custom keywords in your
+files, and use them in your layouts. To access your front-matter, you will have
+to dig into the data structure of your "file" in your layout. These keywords are *not* read in as Clojure values - they will be available just as strings.
+
+#+BEGIN_SRC clojure
+(defn project
+  [{:keys [meta]}]
+  (let [my-keywords (-> meta :keywords)]
+    [:html [:body (str my-keywords)]]))
+#+END_SRC

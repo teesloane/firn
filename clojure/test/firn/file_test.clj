@@ -5,12 +5,11 @@
   (:require [firn.file :as sut]
             [firn.stubs :as stub]
             [clojure.test :as t]
-            [sci.core :as sci]))
+            [firn.util :as u]))
 
 
 ;; This represents the file "object" - a map of value that accumulate from
 ;; parsing and munging an org file.
-
 
 (t/use-fixtures :each stub/test-wrapper)
 
@@ -50,7 +49,15 @@
   (t/testing "A list of keywords gets converted into a map. "
     (let [file-1 (stub/gtf :tf-1 :processed)
           res    (sut/keywords->map file-1)]
-      (t/is (= res {:title "Sample File!" :firn-layout "default" :firn-toc {:headline "Notes", :depth 5}})))))
+      (t/is (= res
+               {:date-created "<2020-08-17 Mon>",
+                :date-updated "<2020-08-17 Mon>",
+                :firn-layout "default",
+                :firn-order 1,
+                :firn-toc {:depth 5, :headline "Notes"},
+                :firn-under "Research",
+                :title "Org Mode"}
+               )))))
 
 (t/deftest is-private?
   (t/testing "Returns true when a file has a private keywords"
@@ -88,14 +95,12 @@
       ;; a clever way (I borrowed) to check if vals in a list are sorted.
       (t/is (apply >= start-times)))))
 
-
 (t/deftest sum-logbook
   (t/testing "It returns the expected output"
     (let [file (stub/gtf :tf-metadata :processed)
           res  (sut/sum-logbook (-> file :meta :logbook))]
       (t/is (= res "4:44"))
       (t/is (= (type res) java.lang.String)))))
-
 
 (t/deftest get-keywords
   (t/testing "A file with keywords returns a vector where each item is a map with a key of :type 'keyword'"
@@ -109,3 +114,38 @@
     (let [file-1 (stub/gtf :tf-1 :processed)
           res    (sut/get-keyword file-1 "FIRN_LAYOUT")]
       (t/is (= "default" res)))))
+
+;; TODO: flakey test on CI.
+;; (t/deftest make-site-map-item
+;;   (t/testing "Proper data is discarded from a file"
+;;     (let [pf             (stub/gtf :tf-1 :processed)
+;;           res            (sut/make-site-map-item pf "http://my-site-url.com")
+;;           forbidden-keys '(:logbook :links :toc :keywords :tags :attachments) ]
+;;       (t/is (= res {:date-created    "2020-08-17 Mon",
+;;                     :date-created-ts 1597636800,
+;;                     :date-updated    "2020-08-17 Mon",
+;;                     :date-updated-ts 1597636800,
+;;                     :firn-order      1,
+;;                     :firn-under      ["Research"],
+;;                     :logbook-total   "12:27",
+;;                     :firn-tags       nil
+;;                     :path            "http://my-site-url.com/file1",
+;;                     :title           "Org Mode"}))
+;;       (doseq [k forbidden-keys]
+;;         (t/is (not (u/in? res k)))))))
+
+(t/deftest craft-file-tags
+  (t/testing "expected output"
+    (let [test-input {:file-tags       "foo bar"
+                      :date-created-ts 1592625600
+                      :file-metadata   {:from-file "Configuration", :from-url "http://localhost:4000/configuration"}}
+          expected   '({:date-created-ts 1592625600,
+                        :from-file       "Configuration",
+                        :from-url        "http://localhost:4000/configuration",
+                        :tag-value       "foo"}
+                       {:date-created-ts 1592625600,
+                        :from-file       "Configuration",
+                        :from-url        "http://localhost:4000/configuration",
+                        :tag-value       "bar"})
+          res        (sut/craft-file-tags test-input)]
+      (t/is (= res expected)))))

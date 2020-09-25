@@ -1,6 +1,10 @@
-#+TITLE: Sample File!
+#+TITLE: Org Mode
 #+FIRN_LAYOUT: default
 #+FIRN_TOC: {:depth 5 :headline "Notes"}
+#+FIRN_UNDER: Research
+#+FIRN_ORDER: 1
+#+DATE_CREATED: <2020-08-17 Mon>
+#+DATE_UPDATED: <2020-08-17 Mon>
 
 
 * Meta
@@ -74,7 +78,7 @@ and some stuff with a date: <2020-03-27 Fri>
 ****** Headline 6
 ******* Headline 7
 * Some Links
-A =file:= link [[file:file2.org][File 2]]
+A =file:= link [[file:file2.org][File 2]] , and another [[file:file-small.org][file link]].
 * Tables
 
 Some tables with texte markup in them
