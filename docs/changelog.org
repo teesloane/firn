@@ -2,7 +2,7 @@
 #+FIRN_ORDER: 5
 #+FIRN_TOC: {:depth 1}
 #+FIRN_UNDER: Reference
-#+DATE_UPDATED: <2020-09-25 20:00>
+#+DATE_UPDATED: <2020-09-28 06:35>
 #+DATE_CREATED: <2020-07-05 Wed 17:10>
 
 * V.0.0.9
@@ -16,6 +16,8 @@
   - Add ~(render :org-tags)~
 - Ability to use ~render~ in a non-org ~page~ - only global things may be rendered, however, such as a site-map, or a firn/org tags.
 - Add ~build-url~ function for easier creation of internal urls.
+- Ability to customize where an org-mode ~:tag:~ links to, by default they would link to a "{my-domain}/tags" page. To change this, you must add a key ~:org-tags-path~ to your ~config.edn~.
+- Add new function: ~build-url~ to layouts, allowing you to construct root domain urls more easily (for example, linking to a static css file.)
 ** Breaking Changes
 - Custom pages are no longer added to the sitemap; they currently present too
   much trouble as they do not have front matter and thus cannot be discerned
@@ -23,6 +25,19 @@
   cannot have a ~FIRN_ORDER~ value, and thus have to default to being pushed to
   999999~ order and so remain at the "bottom" of the sitemap. Still looking for
   a better solution to this.)
+- In org files, The ~#+FIRN_UNDER~ front matter no longer needs to be a Clojure vector, and can instead just be a plain text, space delimited value (with multiple word values being wrapped in quotes.) Example:
+  
+  Before:
+  #+BEGIN_SRC
+  #+FIRN_UNDER: ["Projects" "Audio Compositions"]
+  #+END_SRC
+
+  Now:
+
+  #+BEGIN_SRC
+  #+FIRN_UNDER Projects "Audio Compositions"
+  #+END_SRC
+
 * V.0.0.8
 ** Feature: Clean up unused attachments.
 - Adds a configuration option to config.edn: ~run-build-clean?~ - which will
