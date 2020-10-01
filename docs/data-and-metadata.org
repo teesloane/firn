@@ -1,6 +1,6 @@
 #+TITLE: Data and Metadata
 #+DATE_CREATED: <2020-03-25 Wed>
-#+DATE_UPDATED: <2020-09-23 18:43>
+#+DATE_UPDATED: <2020-09-29 22:26>
 #+FIRN_UNDER: Content
 #+FIRN_LAYOUT: docs
 #+FIRN_ORDER: 20
@@ -25,29 +25,32 @@ you need more fine grained control of your data.
 
 * Metadata
 
-The following table describes all the data and functions  "passed" to a layout each time a layout is applied to the data representing an org file. If the [[file:the-render-function.org][render function]] already does everything you need in your layouts, then this section may not be valuable for you.
-
+The following table describes all the data and functions "passed" to a layout each time a layout is applied to the data representing an org file. If the [[file:the-render-function.org][render function]] already does everything you need in your layouts, then this section may not be valuable for you.
 
 | Function/Data | Intent                                                | Data-type |
 |---------------+-------------------------------------------------------+-----------|
-| config        | The site wide config, containing everything!          | map       |
 | build-url     | Function to more easily construct internal urls       | function  |
-| date-created  | The ~#+DATE_CREATED~ value of the processed file        | string    |
-| date-updated  | The ~#+DATE_UPDATED~ value of the processed file        | string    |
+| config        | The site wide config, containing everything!          | map       |
+| date-created  | The ~#+DATE_CREATED~ value of the processed file      | string    |
+| date-updated  | The ~#+DATE_UPDATED~ value of the processed file      | string    |
 | file          | The file as a data structure                          | map       |
 | file-links    | A list of links per file                              | list      |
-| firn-under    | The ~#+FIRN_UNDER~ value of the file                    | string    |
-| firn-tags     | A map of tag names mapped to files.                   |           |
+| firn-tags     | A map of tag names mapped to files.                   | map       |
+| firn-under    | The ~#+FIRN_UNDER~ value of the file                  | string    |
 | logbook       | A list of logbook entries of the processed-file.      | list      |
 | logbook-total | The sum of all the logbook entries per file           | string    |
 | meta          | A map of metadata per file (logbook, links, keywords) | map       |
 | org-tags      | A map of or org tags and associated headlines.        | map       |
-| partials      | a list of invokable partials from the =/partials= dir   | list      |
+| partials      | a list of invokable partials from the =/partials= dir | list      |
 | render        | See the [[file:the-render-function.org][Render Function document]]                      | function  |
+| site-author   | The site author used for SEO.                         | string    |
+| site-desc     | The site description used for RSS and SEO.            | string    |
 | site-links    | A list of all links across all documents              | vector    |
 | site-logs     | A list of all logbook entries                         | vector    |
-| site-map      | A map of all files as sorted by ~#+FIRN_UNDER~          | map       |
-| title         | The ~#+TITLE~ value of the file.                        | string    |
+| site-map      | A map of all files as sorted by ~#+FIRN_UNDER~        | map       |
+| site-title    | The site title used for RSS and SEO.                  | string    |
+| site-url      | The site url used to build link in templates.         | string    |
+| title         | The ~#+TITLE~ value of the file.                      | string    |
 
 This may seem like a lot of information to make available to a layout template.
 And that's because it is! But thanks to destructuring in Clojure, you can make
