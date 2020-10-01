@@ -160,6 +160,9 @@
      :site-map      (config :site-map)
      :site-links    (config :site-links)
      :site-logs     (config :site-logs)
+     :site-title    (-> config :user-config :site-title)
+     :site-author   (-> config :user-config :site-author)
+     :site-desc     (-> config :user-config :site-desc)
      :site-url      site-url
      :org-tags      (config :org-tags)
      :firn-tags     (config :firn-tags)
