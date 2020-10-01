@@ -4,10 +4,8 @@
   Which are created by the rust binary."
   (:require [clojure.java.shell :as sh]
             [clojure.string :as s]
-            [firn.util :as u]
-            [firn.org :as org])
-  (:import iceshelf.clojure.rust.ClojureRust)
-  (:import (java.time LocalDate)))
+            [firn.util :as u])
+  (:import iceshelf.clojure.rust.ClojureRust))
 
 (defn parse!
   "Parse the org-mode file-string.
