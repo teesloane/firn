@@ -9,6 +9,7 @@
 (def sample-links {:img-file     {:type "link", :path "file:test-img.png"}
                    :img-rel-file {:type "link", :path "./static/images/test-img.png"}
                    :file-link    {:type "link", :path "file:file2.org", :desc "File 2"}
+                   :mail-link    {:type "link", :path "mailto:foo@example.com", :desc "I am an email link."}
                    :http-img     {:type "link",
                                   :path "https://www.fillmurray.com/g/200/300.jpg",
                                   :desc "Fill murray"}
@@ -42,6 +43,10 @@
   (t/testing "img-link"
     (t/is (= (sut/link->html (sample-links :img-file) {:site-url "http://foo.com"})
              [:img {:src "http://foo.com/test-img.png"}])))
+
+  (t/testing "mail-link"
+    (t/is (= (sut/link->html (sample-links :mail-link) {:site-url "http://foo.com"})
+             [:a.firn-mail {:href "mailto:foo@example.com"} "I am an email link."])))
 
   (t/testing "internal-link"
     (t/is (= (sut/link->html (sample-links :file-link) {:site-url ""})
