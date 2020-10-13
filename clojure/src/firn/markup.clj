@@ -359,6 +359,7 @@
         ;; img regexs / ctor fns.
         img-file-regex  #"(file:)(.*)\.(jpg|JPG|gif|GIF|png)"
         img-http-regex  #"(http:\/\/|https:\/\/)(.*)\.(jpg|JPG|gif|GIF|png)"
+        mailto-regex    #"(mailto:)(.*)"
         img-make-url    #(->> (re-matches img-file-regex link-href)
                               (take-last 2)
                               (s/join "."))
@@ -366,6 +367,7 @@
         org-file-regex  #"(file:)(.*)\.(org)(\:\:\*.+)?"
         http-link-regex #"https?:\/\/(?![^\" ]*(?:jpg|png|gif))[^\" ]+"]
 
+    ;; I wonder if pattern matching makes more sense here.
     (cond
       ;; Images ---
       ;; img file or attach: `file:`
@@ -385,6 +387,11 @@
       (re-matches http-link-regex link-href)
       [:a.firn-external {:href link-href :target "_blank"} link-val]
 
+      ;; a mail link
+      (re-matches mailto-regex link-href)
+      [:a.firn-mail
+       {:href link-href} link-val]
+      
       ;; Otherwise, assume it's an internal anchor link.
       :else
       [:a {:href (u/clean-anchor link-href)} link-val])))
