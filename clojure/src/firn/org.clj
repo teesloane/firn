@@ -21,6 +21,15 @@
         (prn "Orgize failed to parse file." stripped res)
         (res :out)))))
 
+(defn parse-dev!
+  "Parses a string and returns it as edn. Useful for "
+  [s]
+  (let [parser   (str (u/get-cwd) "/resources/parser")
+        stripped (s/trim-newline s)
+        res      (sh/sh parser stripped)]
+    (if-not (= (res :exit) 0)
+      (prn "Orgize failed to parse file." stripped res)
+      (json/parse-string (res :out) true))))
 (defn get-headline-helper
   "Sanitizes a heading of links and just returns text.
   Necessary because org leafs of :type `link` have a `:desc` and not a `:value`
