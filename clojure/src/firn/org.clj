@@ -4,7 +4,9 @@
   Which are created by the rust binary."
   (:require [clojure.java.shell :as sh]
             [clojure.string :as s]
-            [firn.util :as u])
+            [firn.util :as u]
+            [cheshire.core :as json]
+            [firn.org :as org])
   (:import iceshelf.clojure.rust.ClojureRust))
 
 (defn parse!
@@ -13,7 +15,7 @@
   When compiled to a native image, it uses JNI to talk to the rust .dylib."
   [file-str]
   (if (u/native-image?)
-    (ClojureRust/getFreeMemory file-str)
+    (ClojureRust/getFreeMemory file-str) ;; TODO: get free memory should be renamed to "parse-org" or something else.
     (let [parser   (str (u/get-cwd) "/resources/parser")
           stripped (s/trim-newline file-str)
           res      (sh/sh parser stripped)]
@@ -30,6 +32,16 @@
     (if-not (= (res :exit) 0)
       (prn "Orgize failed to parse file." stripped res)
       (json/parse-string (res :out) true))))
+
+(defn get-headline-tags
+  "Takes a headline structure and returns it's tags."
+  [hl]
+  (-> hl :children first :tags))
+
+(defn headline-exported?
+  [v]
+  (u/in? (org/get-headline-tags v) "noexport"))
+
 (defn get-headline-helper
   "Sanitizes a heading of links and just returns text.
   Necessary because org leafs of :type `link` have a `:desc` and not a `:value`
