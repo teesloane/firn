@@ -4,8 +4,7 @@
   required contents for testing."
   (:require [firn.file :as sut]
             [firn.stubs :as stub]
-            [clojure.test :as t]
-            [firn.util :as u]))
+            [clojure.test :as t]))
 
 
 ;; This represents the file "object" - a map of value that accumulate from

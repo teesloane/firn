@@ -169,29 +169,40 @@
   - eventually... a plugin for custom file collection?"
   [tree-data file-metadata]
   (loop [tree-data     tree-data
-         out           {:logbook       []
-                        :logbook-total nil
-                        :links         []
-                        :tags          []
-                        :toc           []
-                        :attachments   []}
+         out           {:logbook            []
+                        :logbook-total      nil
+                        :links              []
+                        :tags               []
+                        :toc                []
+                        :attachments        []
+                        :__last-no-export__ nil}
          last-headline nil]  ; the most recent headline we've encountered.
     (if (empty? tree-data)
 
       ;; << The final formatting pre-return >>
       (let [out (update out :logbook #(sort-logbook % (file-metadata :from-file)))
             out (assoc out :logbook-total (sum-logbook (out :logbook)))]
-        out)
+        (dissoc out :__last-no-export__))
 
       ;; << The Loop >>
       (let [x  (first tree-data)
             xs (rest tree-data)]
         (case (:type x)
           "headline" ; if headline, collect data, push into toc, and set as "last-headline"
-          (let [toc-item {:level  (x :level)
+          (let [lvl      (x :level)
+                last-ex  (out :__last-no-export__)
+                toc-item {:level  lvl
                           :text   (org/get-headline-helper x)
                           :anchor (org/make-headline-anchor x)}
-                out      (update out :toc conj toc-item)]
+                ;; only add an item to the toc IF it is not a node or child of a headline tagged with :noexport:
+                out      (if (org/headline-exported? x) ;;
+                            (assoc out :__last-no-export__ x)
+                            (if (and (not (nil? last-ex)) (> lvl (get last-ex :level)))
+                              out     
+                              (-> out
+                                  (update :toc conj toc-item)
+                                  (assoc :__last-no-export__ nil))))]
+
             (recur xs out x))
 
           "title" ; if title, collect tags, map with metadata, push into out :tags
@@ -199,7 +210,7 @@
                                     (org/make-headline-anchor last-headline))
                 headline-meta  {:from-headline (org/get-headline-helper last-headline)
                                 :headline-link headline-link}
-                tags           (x :tags)
+                tags           (filter #(not= % "noexport") (x :tags)) ;; remove "noexport", all other tags are eligible.
                 tags-with-meta (map #(merge headline-meta file-metadata {:tag-value %}) tags)
                 add-tags       #(vec (concat % tags-with-meta))
                 out            (update out :tags add-tags)]

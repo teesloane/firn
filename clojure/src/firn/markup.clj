@@ -59,7 +59,6 @@
                          #(compare %1 %2)) smn))
 
            (sort-site-map [site-map-node] ;; site-map-node is a whole site-map or any :children sub maps.
-             ;; (prn "site-map-node is ", site-map-node)
              (case (opts :sort-by)
                :alphabetical (into (sorted-map) site-map-node)
                :oldest       (sort-priority-map :date-created-ts site-map-node false)
@@ -396,9 +395,34 @@
       :else
       [:a {:href (u/clean-anchor link-href)} link-val])))
 
+;; Headlines --
+
 (defn level-in-fold?
   [opts level]
   (contains? (opts :firn-fold) level))
+
+(defn handle-headline
+  "Determines if and how a headline should be rendered
+  - renders folded or not
+  - does not render if healine is tagged with :noexport:"
+  [v opts make-child]
+  (let [headline-level (get v :level)
+        headline-fold? (level-in-fold? opts headline-level)
+        firn-fold      (opts :firn-fold)
+        headline-el    (if headline-fold?
+                         (u/str->keywrd "div.firn-headline-section-folded.firn-headline-section-" headline-level)
+                         (u/str->keywrd "div.firn-headline-section.firn-headline-section-" headline-level))]
+
+    (when-not (org/headline-exported? v)
+      (if-not headline-fold?
+        (make-child headline-el)
+        ;; Render it folded.
+        [(u/str->keywrd "details.firn-fold.firn-fold-" headline-level)
+         {:style (str "margin-left: " (* (- headline-level 1) 12) "px")
+          :open  (firn-fold headline-level)}
+         [(u/str->keywrd "summary.firn-headline-summary-" headline-level) (org/get-headline-helper v)]
+         (make-child headline-el)]))))
+
 
 (defn- title->html
   "Constructs a headline title - with possible additional values
@@ -463,15 +487,6 @@
      [:a {:href (str "#fn-" (v :label))
           :style "padding-left: 4px"} "↩"]]))
 
-(defn headline-fold->html
-  "Handles rendering a heading+section folded in a details+summary tag."
-  [v {:keys [firn-fold headline-level make-child headline-el]}]
-  [(u/str->keywrd "details.firn-fold.firn-fold-" headline-level)
-   {:style (str "margin-left: " (* (- headline-level 1) 12) "px")
-    :open  (firn-fold headline-level)}
-   [(u/str->keywrd "summary.firn-headline-summary-" headline-level) (org/get-headline-helper v)]
-   (make-child headline-el)])
-
 (defn to-html
   "Recursively Parses the org-edn into hiccup.
   Some values don't get parsed (drawers) - yet. They return empty strings.
@@ -486,24 +501,13 @@
          value          (get v :value)
          value          (if value (s/trim-newline value) value)
          ordered        (get v :ordered) ;; for lists
-         headline-level (get v :level)
          ;; Since this is recursive, I wonder if performance matters for cases where we KNOW type is NOT a headline.
-         headline-fold? (level-in-fold? opts headline-level)
-         headline-el    (if headline-fold?
-                          (u/str->keywrd "div.firn-headline-section-folded.firn-headline-section-" headline-level)
-                          (u/str->keywrd "div.firn-headline-section.firn-headline-section-" headline-level))
-         make-child     #(into [%] (map (fn [c] (to-html c opts)) children))
-         handle-fold    #(headline-fold->html v (merge opts {:headline-level headline-level
-                                                             :make-child make-child
-                                                             :headline-el headline-el}))]
-
+         make-child     #(into [%] (map (fn [c] (to-html c opts)) children))]
 
      (case type
        "document"      (make-child :div)
        ;; if folding is turned on for a headline, render title+section from within.
-       "headline"      (if headline-fold?
-                         (handle-fold)
-                         (make-child headline-el))
+       "headline"      (handle-headline v opts make-child)
        "title"         (title->html v opts)
        "section"       (make-child :section)
        "paragraph"     (make-child :p)
