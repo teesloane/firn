@@ -44,10 +44,10 @@
       (t/is (= (new-file :path)    (.getPath ^java.io.File test-file)))
       (t/is (= (new-file :path-web) "file1")))))
 
-(t/deftest keywords->map
+(t/deftest parse-front-matter->map
   (t/testing "A list of keywords gets converted into a map. "
     (let [file-1 (stub/gtf :tf-1 :processed)
-          res    (sut/keywords->map file-1)]
+          res    (sut/parse-front-matter->map file-1)]
       (t/is (= res
                {:date-created "<2020-08-17 Mon>",
                 :date-updated "<2020-08-17 Mon>",

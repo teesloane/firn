@@ -83,32 +83,39 @@
   "Returns a list of org-keywords from a file. All files must have keywords."
   [f]
   (let [expected-keywords (get-in f [:as-edn :children 0 :children])]
-    (if (= "keyword" (:type (first expected-keywords)))
-      expected-keywords
-      (u/print-err! :error "The org file <<" (f :name) ">> does not have 'front-matter' Please set at least the #+TITLE keyword for your file."))))
+    (when (= "keyword" (:type (first expected-keywords)))
+      expected-keywords)))
 
 (defn get-keyword
   "Fetches a(n org) #+keyword from a file, if it exists."
   [f keywrd]
   (->> f get-keywords (u/find-first #(= keywrd (:key %))) :value))
 
-(defn keywords->map
+(defn parse-front-matter->map
   "Converts an org-file's keywords into a map, evaling values as necessary.
    [{:type keyword, :key TITLE, :value Firn, :post_blank 0}
     {:type keyword, :key DATE_CREATED, :value <2020-03-01--09-53>, :post_blank 0}]
                                Becomes 
    {:title Firn, :date-created <2020-03-01--09-53>, :status active, :firn-layout project}"
   [f]
-  (let [kw               (get-keywords f)
-        lower-case-it    #(when % (s/lower-case %))
-        dash-it          #(when % (s/replace % #"_" "-"))
-        key->keyword     (fn [k] (-> k :key lower-case-it dash-it keyword))
-        eval-it          (fn [kw]
-                           (let [k (key->keyword kw) v (kw :value)]
-                             (if (u/in? keywords-to-eval k)
-                               {k (sci/eval-string v)}
-                               {k v})))]
+  (let [kw                  (get-keywords f)
+        lower-case-it       #(when % (s/lower-case %))
+        dash-it             #(when % (s/replace % #"_" "-"))
+        key->keyword        (fn [k] (-> k :key lower-case-it dash-it keyword))
+        has-req-frontmatter (some #(= (:key %) "TITLE") kw)
+        eval-it             (fn [kw]
+                              (let [k (key->keyword kw) v (kw :value)]
+                                (if (u/in? keywords-to-eval k)
+                                  {k (sci/eval-string v)}
+                                  {k v})))]
+
+    (when-not has-req-frontmatter
+      (u/print-err! :warning "File <<" (f :name) ">> does not have 'front-matter'. \nIt is recommended to set at least the #+TITLE keyword for your file."))
     (->> kw (map eval-it) (into {}))))
+
+
+
+
 
 (defn is-private?
   "Returns true if a file meets the conditions of being 'private'
@@ -248,7 +255,7 @@
   [file]
   (let [org-tree       (file :as-edn)
         tree-data      (tree-seq map? :children org-tree)
-        keywords       (keywords->map file) ; keywords are "in-buffer-settings" - things that start with #+<MY_KEYWORD>
+        keywords       (parse-front-matter->map file) ; keywords are "in-buffer-settings" - things that start with #+<MY_KEYWORD>
         {:keys [date-updated date-created title firn-under firn-order firn-tags roam-tags]} keywords
         file-tags      (or firn-tags roam-tags)
         file-metadata  {:from-file title

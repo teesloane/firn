@@ -53,7 +53,7 @@
          org-tree                  (file :as-edn)
          config-settings           (config :user-config)     ; site-wide config: 0 precedence
          site-map                  (config :site-map)
-         file-settings             (when (seq file) (file/keywords->map file)) ; file-setting config: 2 precedence
+         file-settings             (when (seq file) (-> file :meta :keywords)) ; file-setting config: 2 precedence
          layout-settings           (if (map? opts) opts {})
          merged-options            (merge config-settings layout-settings file-settings)
          cached-sitemap-html       (atom nil)
