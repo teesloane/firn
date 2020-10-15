@@ -32,6 +32,8 @@
       (prn "Orgize failed to parse file." stripped res)
       (json/parse-string (res :out) true))))
 
+;; -- Headlines
+
 (defn get-headline-tags
   "Takes a headline structure and returns it's tags."
   [hl]
@@ -90,6 +92,8 @@
   [node]
   (-> node get-headline-helper u/clean-anchor))
 
+;; -- Dates / Time
+
 (defn parsed-org-date->unix-time
   "Converts the parsed org date (ex: [2020-04-27 Mon 15:39] -> 1588003740000)
   and turns it into a unix timestamp."
@@ -102,6 +106,18 @@
       (catch Exception e
         (u/print-err! :warning  (str "Failed to parse the logbook for file:" "<<" file-name ">>" "\nThe logbook may be incorrectly formatted.\nError value:" e))
         "???"))))
+
+;; -- Links
+(defn get-link-parts
+  "Converts `file:my_link.org` -> data of it's representative parts.
+  file:my_link.org -> {:anchor nil :slug 'my_link'} "
+  [org-link]
+  (let [regex       #"(file:)(.*)\.(org)(\:\:\*.+)?"
+        res          (re-matches regex org-link)
+        anchor-link  (last res)
+        anchor-link  (when anchor-link (-> res last u/clean-anchor))
+        file-slug   (nth res 2)]
+    {:anchor anchor-link :slug file-slug}))
 
 ;; -- stats --
 
