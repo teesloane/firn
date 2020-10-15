@@ -55,7 +55,10 @@
          site-map                  (config :site-map)
          file-settings             (when (seq file) (-> file :meta :keywords)) ; file-setting config: 2 precedence
          layout-settings           (if (map? opts) opts {})
-         merged-options            (merge config-settings layout-settings file-settings)
+         ;; the big merged options map! This is used across various render fns,
+         ;; essentially a refined config object with user specific (and some
+         ;; internal data)
+         merged-options            (merge config-settings layout-settings file-settings {:site-links-private (config :site-links-private)})
          cached-sitemap-html       (atom nil)
          is-headline?              (string? action)
          {:keys [toc logbook

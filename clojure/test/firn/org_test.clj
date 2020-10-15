@@ -1,7 +1,8 @@
 (ns firn.org-test
   (:require [firn.org :as sut]
             [clojure.test :as t]
-            [firn.stubs :as stub]))
+            [firn.stubs :as stub]
+            [firn.org :as org]))
 
 (def sample-logentry
   {:type "clock", :start {:year 2020, :month 3, :day 31, :dayname "Tue", :hour 19, :minute 36}, :end {:year 2020, :month 3, :day 31, :dayname "Tue", :hour 19, :minute 46}, :duration "0:10", :post_blank 0})
@@ -43,6 +44,13 @@
 
       (t/is (= res1 "Image Tests"))
       (t/is (= res2 "Headlines")))))
+
+(t/deftest get-link-parts
+  (t/testing "Expected output"
+    (let [res1 (sut/get-link-parts "file:foo_bar.org")
+          res2 (sut/get-link-parts "file:foo_bar.org::*a heading")]
+      (t/is (={:anchor nil, :slug "foo_bar"} res1))
+      (t/is (={:anchor "#a-heading", :slug "foo_bar"} res2)))))
 
 (t/deftest parsed-org-date->unix-time
   (t/testing "returns the expected value."

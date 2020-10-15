@@ -146,10 +146,10 @@
 (defn render-backlinks
   "When rendering a file, filters the site-links for all links (that are not
   private) that link to the file."
-  [{:keys [site-links file site-url site-links-private]}]
+  [{:keys [site-links file site-url site-links-private] :as opts}]
   (let [; transform site-links-private to what their url form would be.
         site-links-private       (map #(str site-url "/" %) site-links-private)
-        org-path-match-file-url? #(let [site-link (internal-link-handler (% :path) site-url)]
+        org-path-match-file-url? #(let [site-link (internal-link-handler (% :path) opts)]
                                     (and
                                      (= site-link (file :path-url))
                                      (not (u/in? site-links-private site-link))))
@@ -340,31 +340,28 @@
 
 (defn internal-link-handler
   "Takes an org link and converts it into an html path."
-  [org-link site-url]
-  (let [regex       #"(file:)(.*)\.(org)(\:\:\*.+)?"
-        res         (re-matches regex org-link)
-        anchor-link (last res)
-        anchor-link (when anchor-link (-> res last u/clean-anchor))]
-    (if anchor-link
-      (str site-url "/" (nth res 2) anchor-link)
-      (str site-url "/" (nth res 2)))))
+  [org-link {:keys [site-url]}]
+  (let [{:keys [anchor slug]} (org/get-link-parts org-link)]
+    (if anchor
+      (str site-url "/" slug anchor)
+      (str site-url "/" slug))))
 
 (defn link->html
   "Parses links from the org-tree.
   Checks if a link is an HTTP link or File link."
   [v opts]
-  (let [link-val        (get v :desc)
-        link-href       (get v :path "Missing HREF attribute.")
+  (let [link-val           (get v :desc)
+        link-href          (get v :path "Missing HREF attribute.")
         ;; img regexs / ctor fns.
-        img-file-regex  #"(file:)(.*)\.(jpg|JPG|gif|GIF|png|jpeg)"
-        img-http-regex  #"(http:\/\/|https:\/\/)(.*)\.(jpg|JPG|gif|GIF|png|jpeg)"
-        mailto-regex    #"(mailto:)(.*)"
-        img-make-url    #(->> (re-matches img-file-regex link-href)
+        img-file-regex     #"(file:)(.*)\.(jpg|JPG|gif|GIF|png|jpeg)"
+        img-http-regex     #"(http:\/\/|https:\/\/)(.*)\.(jpg|JPG|gif|GIF|png|jpeg)"
+        mailto-regex       #"(mailto:)(.*)"
+        img-make-url       #(->> (re-matches img-file-regex link-href)
                               (take-last 2)
                               (s/join "."))
         ;; file regexs / ctor fns
-        org-file-regex  #"(file:)(.*)\.(org)(\:\:\*.+)?"
-        http-link-regex #"https?:\/\/(?![^\" ]*(?:jpg|png|gif))[^\" ]+"]
+        org-file-regex     #"(file:)(.*)\.(org)(\:\:\*.+)?"
+        http-link-regex    #"https?:\/\/(?![^\" ]*(?:jpg|png|gif))[^\" ]+"]
 
     ;; I wonder if pattern matching makes more sense here.
     (cond
@@ -378,10 +375,14 @@
       (re-matches img-http-regex link-href)
       (img-link->figure {:desc link-val :path link-href})
 
-      ;; org files
+      ;; org files (if it's not a private link.)
       (re-matches org-file-regex link-href)
-      [:a.firn-internal
-       {:href (internal-link-handler link-href (opts :site-url))} link-val]
+      (let [{:keys [slug]} (org/get-link-parts link-href)
+            is-priv-link? (u/in? (opts :site-links-private) slug)]
+        (if is-priv-link?
+          [:span.firn-link-disabled link-val]
+          [:a.firn-internal
+           {:href (internal-link-handler link-href opts)} link-val]))
 
       (re-matches http-link-regex link-href)
       [:a.firn-external {:href link-href :target "_blank"} link-val]
@@ -422,7 +423,6 @@
           :open  (firn-fold headline-level)}
          [(u/str->keywrd "summary.firn-headline-summary-" headline-level) (org/get-headline-helper v)]
          (make-child headline-el)]))))
-
 
 (defn- title->html
   "Constructs a headline title - with possible additional values

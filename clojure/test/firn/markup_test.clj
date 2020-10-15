@@ -54,8 +54,8 @@
 
 (t/deftest internal-link-handler
   (t/testing "Expected results."
-    (let [res1 (sut/internal-link-handler "file:foo.org" "http://mysite.com")
-          res2 (sut/internal-link-handler "file:foo.org::*my headline link" "http://mysite.com")]
+    (let [res1 (sut/internal-link-handler "file:foo.org" {:site-url "http://mysite.com"})
+          res2 (sut/internal-link-handler "file:foo.org::*my headline link" {:site-url "http://mysite.com"})]
       (t/is (= res1 "http://mysite.com/foo"))
       (t/is (= res2 "http://mysite.com/foo#my-headline-link")))))
 
