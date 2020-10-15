@@ -5,8 +5,7 @@
   (:require [clojure.java.shell :as sh]
             [clojure.string :as s]
             [firn.util :as u]
-            [cheshire.core :as json]
-            [firn.org :as org])
+            [cheshire.core :as json])
   (:import iceshelf.clojure.rust.ClojureRust))
 
 (defn parse!
@@ -40,7 +39,7 @@
 
 (defn headline-exported?
   [v]
-  (u/in? (org/get-headline-tags v) "noexport"))
+  (u/in? (get-headline-tags v) "noexport"))
 
 (defn get-headline-helper
   "Sanitizes a heading of links and just returns text.
