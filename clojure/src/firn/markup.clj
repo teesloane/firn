@@ -323,9 +323,9 @@
   "Formats a org-mode src block.
   NOTE: Has additional :keys `language` and `arguments`
   that could be used for syntax highlighting"
-  [{:keys [contents _language _arguments] :as _src-block}]
-  [:pre
-   [:code contents]])
+  [{:keys [contents language _arguments] :as _src-block}]
+  [(u/str->keywrd "pre.language-" language)
+   [(u/str->keywrd "code.language-" language) contents]])
 
 (defn img-link->figure
   "Renders an image with a figure if the link has a :desc, otherwise, :img"
