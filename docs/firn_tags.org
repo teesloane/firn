@@ -1,8 +1,8 @@
 #+TITLE: Firn Tags
 #+FIRN_UNDER: Content "The Render Function"
-#+FIRN_ORDER: 5
+#+FIRN_ORDER: 6
 #+DATE_CREATED: <2020-08-27 Thu>
-#+DATE_UPDATED: <2020-09-24 00:08>
+#+DATE_UPDATED: <2020-10-16 15:35>
 
 
 *Purpose:* This document explains how to organize your documents with "Firn tags"
@@ -11,7 +11,14 @@
 *Prerequistes*: an understanding of [[file:the-render-function.org][The Render Function]],  [[file:layout.org][layouts]] and [[file:front-matter.org][front matter]].
 
 * Overview
-Firn is able to tag files using the front matter ~#+FIRN_TAGS~ or ~#+ROAM_TAGS~. Firn tags are for categorizing information on a file to file basis. Please note this is different from using org-mode tags (referred to as "org-tags" throughout this documentation.)
+
+Firn is able to tag files using the front matter ~#+FIRN_TAGS~ or ~#+ROAM_TAGS~.
+Firn tags are for categorizing information on a file to file basis. Please note
+this is different from using org-mode tags (referred to as "org-tags" throughout
+this documentation.)
+
+
+Move on to learn how you might use these tags.
 
 * Usage
 
@@ -19,20 +26,24 @@ Firn's file tagging functionality is partially based on how Org Roam [[https://w
 tagging]]. Tag values are space delimited. Multi-word tags must be wrapped in
 quotations marks.
 
-Example:
+** Example
+An example usage might be to tag this file you are reading as such:
 
 #+BEGIN_SRC
-#+TITLE: "My File"
-#+FIRN_TAGS: "Programming Languages" Research Development
+#+TITLE: "Firn Tags"
+#+FIRN_TAGS: Taxonomy Organization "Information Architecture"
 #+END_SRC
 
-Firn automatically reads in the ~ROAM_TAGS~ front matter, allowing you to make use
-of whatever tags you might already have if you are an org-roam user. If you have
-both ~FIRN_TAGS~ and ~ROAM_TAGS~ in your front-matter, ~FIRN_TAGS~ will be given
-precedence for providing the tag values for a file when building your site.
+The above will create three tags: =Taxonomy=, =Organization= and =Information Architecture=.
+
+** Rendering Tags in your Layouts
 
 When it comes time to render your list of accumulated tags and their
-respectively tagged files use the following in your layouts:
+respectively tagged files you may do one of the following:
+
+*** Render ALL tags across your Firn site.
+
+This is useful for displaying your entire site's set of tags. It will create a list of lists, where the parent list is the tag name, and it's children are all the files that are make use of that tag.
 
 #+BEGIN_SRC clojure
 (render :firn-tags)
@@ -40,3 +51,23 @@ respectively tagged files use the following in your layouts:
 ;; It is possible to sort your tags by :alphabetical | :newest | :oldest
 (render :firn-tags {:sort-by :alphabetical})
 #+END_SRC
+
+*** Render the list of tags for a specific file.
+
+It is common to list the tags that a file has on the rendered output of that file.
+
+If you are using tags, it is likely that you would want each file to display
+what tags it may have. These tags are then clickable; clicking on a tag will
+take you to your ~firn-tags-path~ - a web path that you designate in your
+config.edn. For specific details on how to set up a tags page, view [[file:org_tags.org::*Setup a tag file]["set up a
+tags file"]] on the org-tags page.
+
+#+BEGIN_SRC clojure
+(render :firn-file-tags)
+#+END_SRC
+
+** Using Org Roam's Tagging
+Firn automatically reads in the ~ROAM_TAGS~ front matter, allowing you to make use
+of whatever tags you might already have if you are an org-roam user. If you have
+both ~FIRN_TAGS~ and ~ROAM_TAGS~ in your front-matter, ~FIRN_TAGS~ will be given
+precedence for providing the tag values for a file when building your site.

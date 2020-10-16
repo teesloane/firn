@@ -7,7 +7,8 @@
   (:require [firn.markup :as markup]
             [firn.org :as org]
             [hiccup.core :as h]
-            [firn.file :as file]))
+            [firn.file :as file]
+            [firn.util :as u]))
 
 (defn internal-default-layout
   "The default template if no `layout` key and no default.clj layout is specified."
@@ -51,14 +52,14 @@
   ([partial-map action opts]
    (let [{:keys [file config]}     partial-map
          org-tree                  (file :as-edn)
-         config-settings           (config :user-config)     ; site-wide config: 0 precedence
+         config-settings           (config :user-config)                       ; site-wide config: 0 precedence
          site-map                  (config :site-map)
-         file-settings             (when (seq file) (-> file :meta :keywords)) ; file-setting config: 2 precedence
+         front-matter-settings     (when (seq file) (-> file :meta :keywords)) ; file-setting config: 2 precedence
          layout-settings           (if (map? opts) opts {})
-         ;; the big merged options map! This is used across various render fns,
+         ;; the big merged options! This is used across various render fns,
          ;; essentially a refined config object with user specific (and some
          ;; internal data)
-         merged-options            (merge config-settings layout-settings file-settings {:site-links-private (config :site-links-private)})
+         merged-options            (merge config-settings layout-settings front-matter-settings {:site-links-private (config :site-links-private)})
          cached-sitemap-html       (atom nil)
          is-headline?              (string? action)
          {:keys [toc logbook
@@ -116,11 +117,17 @@
           :date-created-ts date-created-ts}
          (select-keys opts [:prev-text :next-text :order-by :as-data])))
 
-       ;; render a list of file tags
+       ;; render a list of all file tags across the site.
        (= action :firn-tags)
        (markup/render-firn-tags (config :firn-tags) opts)
 
-       ;; render a list of file tags
+       (= action :firn-file-tags)
+       (let [{:keys [firn-tags roam-tags] } front-matter-settings
+             tags (or firn-tags roam-tags)
+             tags (when tags (u/org-keyword->vector tags))]
+         (markup/render-firn-file-tags tags merged-options))
+
+       ;; render a list of org tags
        (= action :org-tags)
        (markup/render-org-tags (config :org-tags) opts)
 
@@ -130,7 +137,7 @@
              ;; get configuration for toc in order of precedence
              opts (merge (config-settings :firn-toc)
                          layout-settings
-                         (file-settings :firn-toc))]
+                         (front-matter-settings :firn-toc))]
          (when (seq toc)
            (markup/make-toc toc opts)))
 

@@ -164,7 +164,7 @@
 
 (defn render-firn-tags
   "Renders a list of tags and their respective files
-  The tag list sections themsleves renders alphabetically,
+  The tag list sections renders alphabetically,
 
   The per-tag-list can be sorted by user input:
 
@@ -187,11 +187,21 @@
      [:div.firn-file-tags
       (for [[k lst] firn-tags]
         [:div.firn-file-tags-container
-         [:div.firn-file-tag-name k]
+         [:div.firn-file-tag-name {:id k :class "firn-file-tag-name"} k]
          [:ul.firn-file-tag-list
           (for [f lst]
             [:li.firn-file-tag-item
              [:a.firn-file-tag-link {:href (f :from-url)} (f :from-file)]])]])])))
+
+(defn render-firn-file-tags
+  "Renders a single list of tags for the file being rendered."
+  [file-tags opts]
+  (when (seq file-tags)
+    [:div.firn-file-tags
+     (for [tag file-tags
+           :let [href (or (str "/" (opts :firn-tags-path) "#" tag))]]
+       [:li.firn-file-tag-item
+        [:a.firn-file-tag-link {:href href} tag] ])]))
 
 (defn render-org-tags
   "Renders markup for a list of tags and their respective links to org-headings. "
