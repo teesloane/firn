@@ -24,7 +24,7 @@ To display breadcrumbs on a page there are two requirements:
 
 ** Setting frontmatter
 
-The org document to be rendered must have a ~#+FIRN_UNDER:~ front matter; the value should be the title of another file, of a list of file titles (in a list scenario, the first item is the greatest/oldest ancestor, and the last item in the list is the direct parent of the file.)
+The org document to be rendered must have a ~#+FIRN_UNDER:~ front matter; the value should be the title of another file, or of a list of file titles (in a list scenario, the first item is the greatest/oldest ancestor, and the last item in the list is the direct parent of the file.)
 
 #+BEGIN_SRC text
 # Examples 1: nest a file under another single file.
