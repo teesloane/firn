@@ -53,7 +53,7 @@
 /* CSS Variables (dark mode) */
 @media (prefers-color-scheme: dark) {
   :root {
-    --color: #0097fc;
+    --color-primary: #0097fc;
     --color-primary-accent: #555;
     --color-bg: #333;
     --color-bg-secondary: #555;
