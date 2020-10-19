@@ -353,8 +353,8 @@
   (let [link-val           (get v :desc)
         link-href          (get v :path "Missing HREF attribute.")
         ;; img regexs / ctor fns.
-        img-file-regex     #"(file:)(.*)\.(jpg|JPG|gif|GIF|png|jpeg)"
-        img-http-regex     #"(http:\/\/|https:\/\/)(.*)\.(jpg|JPG|gif|GIF|png|jpeg)"
+        img-file-regex     #"(file:)(.*)\.(jpg|JPG|gif|GIF|png|PNG|jpeg|JPEG|svg|SVG)"
+        img-http-regex     #"(http:\/\/|https:\/\/)(.*)\.(jpg|JPG|gif|GIF|png|PNG|jpeg|JPEG|svg|SVG)"
         mailto-regex       #"(mailto:)(.*)"
         img-make-url       #(->> (re-matches img-file-regex link-href)
                               (take-last 2)
