@@ -1,7 +1,7 @@
 #+TITLE: Backlinks
 #+FIRN_UNDER: Content "The Render Function"
 #+FIRN_ORDER: 4
-#+DATE_UPDATED: <2020-09-25 19:06>
+#+DATE_UPDATED: <2020-10-19 07:50>
 #+DATE_CREATED: <2020-09-20 Sun 19:05>
 
 
@@ -22,10 +22,10 @@ A document has backlinks if an org-mode file links to another org-mode file usin
 (render :backlinks)
 #+END_SRC
 
-The above will render a list of backlinks. However, you may want to check first /if/ backlinks exist. The below code samples creates a backlinks section, with a bit of styling and a headline to indicate the sections intent:
+The above will render a list of backlinks. However, you may want to check first /if/ backlinks exist. The below code samples creates a backlinks section, with a bit of styling and a headline to indicate the section's intent:
 
 #+BEGIN_SRC clojure
-(when-let [backlinks (render :backlinks)] ; if backlinks exist, store them in a let bindings.
+(when-let [backlinks (render :backlinks)] ; if backlinks exist, store them in a let binding.
   [:div
    [:hr]
    [:div.backlinks
