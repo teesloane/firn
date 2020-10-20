@@ -193,6 +193,10 @@
   [coll elm]
   (some #(= elm %) coll))
 
+(defn distinct-by
+  [coll key]
+  (map first (vals (group-by key coll))))
+
 (defn interpose+tail
   "Interposes a keywords and ensures the key is at the end of the list"
   [lst k]

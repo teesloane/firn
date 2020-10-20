@@ -122,10 +122,12 @@
        (markup/render-firn-tags (config :firn-tags) opts)
 
        (= action :firn-file-tags)
-       (let [{:keys [firn-tags roam-tags] } front-matter-settings
-             tags (or firn-tags roam-tags)
-             tags (when tags (u/org-keyword->vector tags))]
-         (markup/render-firn-file-tags tags merged-options))
+       (markup/render-firn-file-tags (file/get-firn-tags file) merged-options)
+
+       (= action :related-files)
+       (markup/render-related-files (-> file :meta :title)
+                                    (file/get-firn-tags file)
+                                    (config :firn-tags))
 
        ;; render a list of org tags
        (= action :org-tags)
