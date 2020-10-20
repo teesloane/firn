@@ -1,6 +1,6 @@
 (defn header
   []
-  [:header.index-nav.fade-in
+  [:header.index-nav
    [:div.flex.align-start
     [:h1.h2.m0 "Firn"]
     [:a {:target "_blank" :href "https://github.com/theiceshelf/firn/releases"}
@@ -20,7 +20,7 @@
     [:html
      (head build-url)
      [:body
-      [:div.fade-in (nav build-url)]
+      [:div (nav build-url)]
       (header)
       [:main.content {:style "max-width: 42em; padding: 32px; margin: 0 auto;"}
        [:div.py3

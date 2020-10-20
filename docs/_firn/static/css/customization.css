@@ -1,5 +1,5 @@
 :root {
-  --sidebar-width: 260px;
+  --sidebar-width: 280px;
   --border-col: #dfdfdf;
   --nav-bg: #fdfdfd;
   --nav-bg-inverse: #444;
@@ -328,17 +328,6 @@ pre {
 
 /* Utilities ------------------------------------------------  */
 
-/* Animations */
-@keyframes fadeIn {0% {opacity:0;} 100% {opacity:1;}}
-@-moz-keyframes fadeIn {0% {opacity:0;} 100% {opacity:1;}}
-@-webkit-keyframes fadeIn {0% {opacity:0;} 100% {opacity:1;}}
-@-o-keyframes fadeIn {0% {opacity:0;} 100% {opacity:1;}}
-@-ms-keyframes fadeIn {0% {opacity:0;} 100% {opacity:1;}}
-
-
-.fade-in {
-  animation: fadeIn ease 2s;
-}
 
 .unfocused {
   filter: opacity(0.78);
