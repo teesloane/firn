@@ -39,6 +39,20 @@
   (let [f-name (.getName ^java.io.File f)]
     (-> f-name (s/split #"\.") (first))))
 
+(defn get-frontmatter [f]
+  (-> f :meta :keywords))
+
+
+(defn get-firn-tags
+  "Gets tags out of the front matter
+  Exects key"
+  [file]
+  (let [fm (get-frontmatter file)
+        {:keys [firn-tags roam-tags] } fm
+        tags (or firn-tags roam-tags)
+        tags (when tags (u/org-keyword->vector tags))]
+    tags))
+
 (defn read-clj
   "Reads a folder full of clj files, such as partials or layouts.
   pass a symbol for dir to request a specific folder."

@@ -1,3 +1,24 @@
+##  (2020-10-16)
+
+* Refactor!: Firn file-based tag renderer and docs. ([1cd42dc](https://github.com/theiceshelf/firn/commit/1cd42dc))
+* Add: changelog. ([d104da0](https://github.com/theiceshelf/firn/commit/d104da0))
+* Add: contributing and changelog fixes. ([77d896e](https://github.com/theiceshelf/firn/commit/77d896e))
+* Add: dev parser utility for easier parsing. ([16e145c](https://github.com/theiceshelf/firn/commit/16e145c))
+* Add: expected css classes for prism js ([986102f](https://github.com/theiceshelf/firn/commit/986102f))
+* Add: respect :noexport: tag ([ba14ba9](https://github.com/theiceshelf/firn/commit/ba14ba9))
+* Add: support for "mailto:" links. ([586372f](https://github.com/theiceshelf/firn/commit/586372f))
+* Fix: add site title, author, and description to layouts (#41) ([a2a6b40](https://github.com/theiceshelf/firn/commit/a2a6b40)), closes [#41](https://github.com/theiceshelf/firn/issues/41)
+* Fix: Don't exit on files without frontmatter. ([bbd715c](https://github.com/theiceshelf/firn/commit/bbd715c))
+* Fix: include `jpeg` as possible image type. ([9bf21ec](https://github.com/theiceshelf/firn/commit/9bf21ec))
+* Fix: remove firn.org circular dependency (#42) ([6cf34f7](https://github.com/theiceshelf/firn/commit/6cf34f7)), closes [#42](https://github.com/theiceshelf/firn/issues/42)
+* Fix: render links to private files as plaintext. ([0f05fc4](https://github.com/theiceshelf/firn/commit/0f05fc4))
+* Fix: site-url change for self-host. ([4892808](https://github.com/theiceshelf/firn/commit/4892808))
+* Clean: bump docs version on docs page. ([44c5511](https://github.com/theiceshelf/firn/commit/44c5511))
+* Clean: remove org circular dependency. ([d2375c6](https://github.com/theiceshelf/firn/commit/d2375c6))
+* Docs: fix incorrect echo redirect. ([9473a6a](https://github.com/theiceshelf/firn/commit/9473a6a))
+
+
+
 ##  (2020-10-01)
 
 * Fix: add site title, author, and description to layouts (#41) ([a2a6b40](https://github.com/theiceshelf/firn/commit/a2a6b40)), closes [#41](https://github.com/theiceshelf/firn/issues/41)
