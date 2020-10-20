@@ -3,17 +3,17 @@ reading. A document has backlinks if an org-mode file links to another org-mode 
 using a "</span><a class="firn-external" href="https://orgmode.org/manual/External-Links.html" target="_blank">file</a><span>" link.</span></p><p><em><span>Related Files</span></em><span> are files that </span><em><span>might</span></em><span> be related because they share a tag with the
 file being rendered.</span></p><p><span>Generally, these render functions make exploring a large wiki-type site more
 easily navigatable. These render functions were largely inspired by </span><a class="firn-external" href="https://github.com/org-roam/org-roam" target="_blank">org-roam</a><span>,
-which Firn tries to integrate with on a basic level (see: </span><a class="firn-internal" href="https://firn.theiceshelf.com/firn_tags">firn tags</a><span>).</span></p></section></div><div class="firn-headline-section firn-headline-section-1"><h1 class="firn-headline firn-headline-1" id="usage"><span class="firn-headline-text"><span>Usage</span></span></h1><div class="firn-headline-section firn-headline-section-2"><h2 class="firn-headline firn-headline-2" id="backlinks"><span class="firn-headline-text"><span>Backlinks</span></span></h2><section><pre><code>(render :backlinks)
+which Firn tries to integrate with on a basic level (see: </span><a class="firn-internal" href="https://firn.theiceshelf.com/firn_tags">firn tags</a><span>).</span></p></section></div><div class="firn-headline-section firn-headline-section-1"><h1 class="firn-headline firn-headline-1" id="usage"><span class="firn-headline-text"><span>Usage</span></span></h1><div class="firn-headline-section firn-headline-section-2"><h2 class="firn-headline firn-headline-2" id="backlinks"><span class="firn-headline-text"><span>Backlinks</span></span></h2><section><pre class="language-clojure"><code class="language-clojure">(render :backlinks)
 </code></pre><p><span>The above will render a list of backlinks. However, you may want to check first</span><em><span>if</span></em><span> backlinks exist. The below code samples creates a backlinks section, with a
-bit of styling and a headline to indicate the section's intent:</span></p><pre><code>(when-let [backlinks (render :backlinks)] ; if backlinks exist, store them in a let binding.
+bit of styling and a headline to indicate the section's intent:</span></p><pre class="language-clojure"><code class="language-clojure">(when-let [backlinks (render :backlinks)] ; if backlinks exist, store them in a let binding.
   [:div
    [:hr]
    [:div.backlinks
     [:h4 "Backlinks to this document:"]
     backlinks]])
-</code></pre></section></div><div class="firn-headline-section firn-headline-section-2"><h2 class="firn-headline firn-headline-2" id="related-files"><span class="firn-headline-text"><span>Related Files</span></span></h2><section><pre><code>(render :related-files)
+</code></pre></section></div><div class="firn-headline-section firn-headline-section-2"><h2 class="firn-headline firn-headline-2" id="related-files"><span class="firn-headline-text"><span>Related Files</span></span></h2><section><pre class="language-clojure"><code class="language-clojure">(render :related-files)
 </code></pre><p><span>The above will render a list of related files. Same as Backlinks above, you may
-want to check first </span><em><span>if</span></em><span> related files exist before rendering them.</span></p><pre><code>(when-let [related-files (render :related-files)]
+want to check first </span><em><span>if</span></em><span> related files exist before rendering them.</span></p><pre class="language-clojure"><code class="language-clojure">(when-let [related-files (render :related-files)]
   [:div
    [:hr]
    [:div.related-files

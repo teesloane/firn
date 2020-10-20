@@ -2,7 +2,7 @@
 responsible for how your org-file is rendered to-html; The act of "applying" a
 template means to pass the content of the org-file through a specific </span><a class="firn-external" href="https://github.com/weavejester/hiccup" target="_blank">clojure hiccup</a><span>
 template that organizes how the content is displayed.</span></p><p><span>When an org-mode file is processed by Firn it looks for the in-buffer-setting (or what might be called "</span><a class="firn-internal" href="https://firn.theiceshelf.com/front-matter">Front Matter</a><span>")</span><code>#+FIRN_LAYOUT:</code><span> to see if it uses a Layout. If none are specified, the </span><u><span>default
-template</span></u><span> is used.</span></p></section></div><div class="firn-headline-section firn-headline-section-1"><h1 class="firn-headline firn-headline-1" id="a-simple-layout-file"><span class="firn-headline-text"><span>A simple layout file</span></span></h1><section><p><span>Let's consider a simple layout file:</span></p><pre><code>
+template</span></u><span> is used.</span></p></section></div><div class="firn-headline-section firn-headline-section-1"><h1 class="firn-headline firn-headline-1" id="a-simple-layout-file"><span class="firn-headline-text"><span>A simple layout file</span></span></h1><section><p><span>Let's consider a simple layout file:</span></p><pre class="language-clojure"><code class="language-clojure">
 (defn default                   ; define a clojure func
   [{:keys [build-url title render partials]}] ; destructured commonly used functions and data
   (let [{:keys [head]} partials]              ; Ignore for now, partials will be explained later
@@ -22,11 +22,11 @@ are similar to layouts: they are clojure functions that render html. Partials
 are used for rendering particularly common pieces of html that might be shared
 across several layouts (such as the </span><code>head</code><span> of your HTML document as in the example
 above).</span></p><p><span>Using partials requires the following:</span></p><ol><li><p><span>Create a partial in the </span><code>partials</code><span> directory.</span></p><ul><li><p><span>A partial must be a clojure function, just the same as a layout file.</span></p></li><li><p><span>The </span><strong><span>last function</span></strong><span> in your partial file </span><em><span>is the partial that is applied</span></em><span>.</span></p></li></ul></li><li><p><code>partials</code><span> are a map of all the partial functions and is passed into layouts
-   when they are rendered:</span></p><pre><code>    (defn default
+   when they are rendered:</span></p><pre class="language-clojure"><code class="language-clojure">    (defn default
       [{:keys [partials]}] ; `partials` is a a map.
 </code></pre></li><li><p><span>You can optionally bind the partials you need in a let block so that they are
    easily callable as functions. The name of your partial is the name of the
-   partial file. For example, the docs you are reading has a </span><code>partials/head.clj</code><span> file, and is accessible like so:</span></p><pre><code>    (defn default                   ; define a clojure func
+   partial file. For example, the docs you are reading has a </span><code>partials/head.clj</code><span> file, and is accessible like so:</span></p><pre class="language-clojure"><code class="language-clojure">    (defn default                   ; define a clojure func
       [{:keys [partials]}]          ; destructure the `partials` key.
       (let [{:keys [head]} partials]
           [:html                      ; => opens a `html` tag
