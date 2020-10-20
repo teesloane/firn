@@ -3,7 +3,7 @@
 #+FIRN_UNDER: Reference
 #+ROAM_TAGS: language programming
 #+DATE_CREATED: <2020-06-20 Sat>
-#+DATE_UPDATED: <2020-09-23 18:45>
+#+DATE_UPDATED: <2020-10-16 15:23>
 
 * Overview
 
@@ -76,6 +76,8 @@ The firn table of contents is rendered in a layout. If you use the default layou
 | =:firn-properties?= | boolean | Files: whether to render properties under all headings                                  |
 | =:firn-toc=         | map     | Files: settings for any rendered table of contents.                                     |
 | =:firn-fold=        | map     | Renders folded headlines. Ex: ~{2 true}~ - all level 2 headlines will be folded.          |
+| =:firn-tags-path=   | string  | The path that a tag (in a file) will link to.                                           |
+| =:org-tags-path=    | string  | Path on which to structure links for org headline tags.                                 |
 | =:ignored-dirs=     | vector  | Dirs of org files to ignore at build time.                                              |
 | =:site-desc=        | string  | The description of your site, used for RSS.                                             |
 | =:site-title=       | string  | The title of your site, used for RSS.                                                   |

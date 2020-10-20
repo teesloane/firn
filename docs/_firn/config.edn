@@ -5,6 +5,7 @@
  :firn-fold        nil         ; global: fold headlines. Example: fold all headings of level 3 and 4: `{3 true 4 true}`
  :ignored-dirs     ["priv"]    ; Directories to ignore org files in.
  :org-tags-path    "tags"      ; Path on which to structure links for org headline tags.
+ :firn-tags-path   "tags"      ; Path on which to structure clickable file tags.
  :run-build-clean? nil
  :site-desc        "Documentation for the Firn Static Sight Generator" ; Used for RSS.
  :site-title       "Firn - The Ice Shelf"                              ; Used for RSS.
