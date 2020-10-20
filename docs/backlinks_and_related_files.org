@@ -1,0 +1,61 @@
+#+TITLE: Backlinks and Related Files
+#+FIRN_UNDER: Content "The Render Function"
+#+FIRN_ORDER: 4
+#+DATE_UPDATED: <2020-10-20 11:13>
+#+DATE_CREATED: <2020-09-20 Sun 19:05>
+
+
+*Purpose:* This document explains how to render a list of *backlinks*  or *related files* in your Firn layouts.
+
+*Prerequistes*: an understanding of [[file:the-render-function.org][The Render Function]] and how [[file:layout.org][layouts]] work.
+
+* Overview
+
+/Backlinks/ are used to display a list of links to the /current/ document you are
+reading. A document has backlinks if an org-mode file links to another org-mode file
+using a "[[https://orgmode.org/manual/External-Links.html][file]]" link.
+
+/Related Files/ are files that /might/ be related because they share a tag with the
+file being rendered.
+
+Generally, these render functions make exploring a large wiki-type site more
+easily navigatable. These render functions were largely inspired by [[https://github.com/org-roam/org-roam][org-roam]],
+which Firn tries to integrate with on a basic level (see: [[file:firn_tags.org][firn tags]]).
+
+* Usage
+
+** Backlinks
+#+BEGIN_SRC clojure
+(render :backlinks)
+#+END_SRC
+
+The above will render a list of backlinks. However, you may want to check first
+/if/ backlinks exist. The below code samples creates a backlinks section, with a
+bit of styling and a headline to indicate the section's intent:
+
+#+BEGIN_SRC clojure
+(when-let [backlinks (render :backlinks)] ; if backlinks exist, store them in a let binding.
+  [:div
+   [:hr]
+   [:div.backlinks
+    [:h4 "Backlinks to this document:"]
+    backlinks]])
+#+END_SRC
+
+
+** Related Files
+#+BEGIN_SRC clojure
+(render :related-files)
+#+END_SRC
+
+The above will render a list of related files. Same as Backlinks above, you may
+want to check first /if/ related files exist before rendering them.
+
+#+BEGIN_SRC clojure
+(when-let [related-files (render :related-files)]
+  [:div
+   [:hr]
+   [:div.related-files
+    [:h4 "Possibly related files:"]
+    related-files]])
+#+END_SRC
