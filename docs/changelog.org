@@ -2,71 +2,8 @@
 #+FIRN_ORDER: 5
 #+FIRN_TOC: {:depth 1}
 #+FIRN_UNDER: Reference
-#+DATE_UPDATED: <2020-09-28 06:35>
+#+DATE_UPDATED: <2020-10-20 13:30>
 #+DATE_CREATED: <2020-07-05 Wed 17:10>
 
-* V.0.0.9
-** New
-- Several new render functions, for easier preset rendering of content:
-  - Add ~(render :sitemap)~ (with options for :sort-by, :start-at )
-  - Add ~(render :breadcrumbs)~
-  - Add ~(render :adjacent-files)~
-  - Add ~(render :backlinks)~
-  - Add ~(render :firn-tags)~
-  - Add ~(render :org-tags)~
-- Ability to use ~render~ in a non-org ~page~ - only global things may be rendered, however, such as a site-map, or a firn/org tags.
-- Add ~build-url~ function for easier creation of internal urls.
-- Ability to customize where an org-mode ~:tag:~ links to, by default they would link to a "{my-domain}/tags" page. To change this, you must add a key ~:org-tags-path~ to your ~config.edn~.
-- Add new function: ~build-url~ to layouts, allowing you to construct root domain urls more easily (for example, linking to a static css file.)
-** Breaking Changes
-- Custom pages are no longer added to the sitemap; they currently present too
-  much trouble as they do not have front matter and thus cannot be discerned
-  where they fit in with possible sorting mechanisms on the site-map (ie, they
-  cannot have a ~FIRN_ORDER~ value, and thus have to default to being pushed to
-  999999~ order and so remain at the "bottom" of the sitemap. Still looking for
-  a better solution to this.)
-- In org files, The ~#+FIRN_UNDER~ front matter no longer needs to be a Clojure vector, and can instead just be a plain text, space delimited value (with multiple word values being wrapped in quotes.) Example:
-  
-  Before:
-  #+BEGIN_SRC
-  #+FIRN_UNDER: ["Projects" "Audio Compositions"]
-  #+END_SRC
 
-  Now:
-
-  #+BEGIN_SRC
-  #+FIRN_UNDER Projects "Audio Compositions"
-  #+END_SRC
-
-* V.0.0.8
-** Feature: Clean up unused attachments.
-- Adds a configuration option to config.edn: ~run-build-clean?~ - which will
-  remove unused file attachments from ~_firn/_site~ after finishing building.
-  - if "always" -> always remove unusued attachments from final _site output.
-  - if "prompt" -> CLI will prompt user to delete files.
-  - if "never" -> CLI will never delete unusued attachments.
-
-** Feature: Exclude files from site-map.
-- User's can exclude org files from showing in the site-map by using the ~#+FIRN_SITEMAP?~ in-buffer-setting.
-** Refactor: site-link ([[https://github.com/theiceshelf/firn/pull/33][33]])
-- Enables Firn sites to be hosted at non-root addresses.
-- Before, all internal href links were relative. Now they are absolute and based off the ~:site-url~ value in a user's ~config.edn~
-** Feature: Folding ([[https://github.com/theiceshelf/firn/pull/34][34]])
-- headlines and their content can be folded on a site-wide, layout-wide, or file-specific basis.
-** Breaking Changes
-- when rendering a table of contents, the options map has renamed a key from "exclusive?" to "exclude-headline?". As such:
-
-#+BEGIN_SRC clojure
-(render :toc {:headline "Headings" :depth 1 :exclude-headline? true}) ; is now valid
-(render :toc {:headline "Headings" :depth 1 :exclusive? true}) ; no longer works.
-#+END_SRC
-
-* V.0.0.7
-** Feature: Pages
-- user's can create "Pages" now.
-- Creating a [[file:pages.org][page]] in ~_firn/pages/my_page.clj~ will similar to layouts, convert hiccup to html.
-** Feature: Tags and Tag Page
-- tags are now displaying in headlines.
-- tags in headlines are links to a /tags page, anchored to the respective tag clicked.
-- The "tags.clj" page is created out of the box with a new Firn site.
-- The tags page lists all tags across all headlines in all files; each a link that jumps to the respective heading.
+An automated changelog is visible at the Firn repository on [[https://github.com/theiceshelf/firn/blob/master/CHANGELOG.md][GitHub]].
