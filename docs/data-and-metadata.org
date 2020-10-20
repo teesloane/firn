@@ -1,13 +1,13 @@
 #+TITLE: Data and Metadata
 #+DATE_CREATED: <2020-03-25 Wed>
-#+DATE_UPDATED: <2020-09-29 22:26>
+#+DATE_UPDATED: <2020-10-19 08:26>
 #+FIRN_UNDER: Content
 #+FIRN_LAYOUT: docs
 #+FIRN_ORDER: 20
 
 🚧 This document is in flux as Firn's API shifts and changes. 🚧
 
-This document describe the data and metadata made available in Firn when it
+This document describes the data and metadata made available in Firn when it
 comes time to customize the rendering of your content in your [[file:layout.org][layouts]]. This is a
 more advanced topic that may require a bit of comfort with Clojure.
 
@@ -19,7 +19,7 @@ their data. The two main sections in the document provide the following:
 for end-users.
 
 *Data* - the raw data available when a file is parsed - and how to access it if
-you need more fine grained control of your data.
+you need more fine-grained control of your data.
 
 -----
 
@@ -29,8 +29,8 @@ The following table describes all the data and functions "passed" to a layout ea
 
 | Function/Data | Intent                                                | Data-type |
 |---------------+-------------------------------------------------------+-----------|
-| build-url     | Function to more easily construct internal urls       | function  |
-| config        | The site wide config, containing everything!          | map       |
+| build-url     | Function to more easily construct internal URLs       | function  |
+| config        | The site-wide config, containing everything!          | map       |
 | date-created  | The ~#+DATE_CREATED~ value of the processed file      | string    |
 | date-updated  | The ~#+DATE_UPDATED~ value of the processed file      | string    |
 | file          | The file as a data structure                          | map       |
@@ -47,9 +47,9 @@ The following table describes all the data and functions "passed" to a layout ea
 | site-desc     | The site description used for RSS and SEO.            | string    |
 | site-links    | A list of all links across all documents              | vector    |
 | site-logs     | A list of all logbook entries                         | vector    |
-| site-map      | A map of all files as sorted by ~#+FIRN_UNDER~        | map       |
+| site-map      | A map of all files sorted by ~#+FIRN_UNDER~           | map       |
 | site-title    | The site title used for RSS and SEO.                  | string    |
-| site-url      | The site url used to build link in templates.         | string    |
+| site-url      | The site URL used to build link in templates.         | string    |
 | title         | The ~#+TITLE~ value of the file.                      | string    |
 
 This may seem like a lot of information to make available to a layout template.
@@ -103,7 +103,7 @@ Org files are parsed using a parser library called [[https://github.com/PoiScrip
 serving your site, Firn sends your org-file as a string into Orgize, and gets
 back a data structure representing the contents of your file.
 
-Currently, the raw parsed output of Orgize is stored in in the =file= map under
+Currently, the raw parsed output of Orgize is stored in the =file= map under
 =:as-edn=. As per using your layouts as described in the Metadata section above,
 you can access the file map in your layouts.
 
@@ -278,6 +278,6 @@ after being parsed to JSON and converted to EDN:
 
 As you can see, lots of data. Currently, Firn is not capable of interacting with
 this data very easily while you develop your Layouts. There are tentative plans
-to include a repl, or at least the ability to =println debug= in future releases.
+to include a REPL, or at least the ability to =println debug= in future releases.
 For now, it is possible to independently use the [[https://orgize.herokuapp.com][Orgize parser online]] to see
 test results as JSON.
