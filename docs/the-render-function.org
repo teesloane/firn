@@ -1,7 +1,7 @@
 #+TITLE: The Render Function
 #+FIRN_UNDER: Content
 #+FIRN_ORDER: 3
-#+DATE_UPDATED: <2020-09-25 19:04>
+#+DATE_UPDATED: <2020-10-20 10:53>
 #+DATE_CREATED: <2020-08-14 Fri 19:03>
 
 
@@ -23,7 +23,8 @@ Firn makes some "pre-made" content available to be rendered:
 | [[file:logbooks.org][Logbook Polyline]]  | keyword, map    | ~(render :logbook-polyline {:stroke "#45698A" :height 60 :width 365})~ |
 | [[file:sitemap.org][Sitemaps]]          | keyword, map    | ~(render :sitemap {:sort-by :firn-order})~                             |
 | [[file:logbooks.org][Folding]]           | keyword, map    | ~(render :file {:firn-fold {1 true 2 true}})~                          |
-| [[file:backlinks.org][Backlinks]]         | keyword         | ~(render :backlinks)~                                                  |
+| [[file:backlinks_and_related_files.org][Related Files]]     | keyword         | ~(render :related-files)~                                              |
+| [[file:backlinks_and_related_files.org][Backlinks]]         | keyword         | ~(render :backlinks)~                                                  |
 | [[file:adjacent-files.org][Adjacent files]]    | keyword, map    | ~(render :adjacent-files {:sort-by :date})~                            |
 | [[file:firn_tags.org][Firn Tags]]         | keyword, map    | ~(render :firn-tags {:sort-by :alphabetical})~                         |
 | [[file:org_tags.org][Org Tags]]          | keyword         | ~(render :org-tags)~                                                   |
