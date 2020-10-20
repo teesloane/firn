@@ -103,5 +103,5 @@
 ;; Repl Land -
 
 (comment
-  (mount/stop) (-main "serve" "-d" "/Users/tees/Sync/wiki")
+  (mount/stop) (-main "serve" "-d" "/Users/tees/Projects/firn/firn/docs")
   )
