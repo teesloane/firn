@@ -3,7 +3,8 @@
 
 #### ⚠ BREAKING CHANGES
 
-* Firn file-based tag renderer and docs.
+* Firn file-based tag renderer and docs. 
+  - There is a new property in `config.edn` - the key `:firn-tags-path`, which is required if you want to specify what page is linked to when clicking on a firn-file-tag.
 
 #### Bug Fixes
 
