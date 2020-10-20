@@ -1,7 +1,7 @@
 #+TITLE: Table Of Contents
 #+FIRN_UNDER: Content "The Render Function"
 #+FIRN_ORDER: 7
-#+DATE_UPDATED: <2020-09-25 19:07>
+#+DATE_UPDATED: <2020-10-19 07:46>
 #+DATE_CREATED: <2020-09-20 Sun 07:05>
 
 *Purpose:* This document explains how to render and customize a table of contents in your Firn layouts.
@@ -18,7 +18,7 @@ Configuring your table of contents can happen on a site-wide basis (using ~confi
 
 * Usage
 
-The table of contents can be complex and customizable. The usage section will cover several examples,the first of which will demonstrate the entire api of the table of contents, and the remainder will be used to provider more specific, simpler examples.
+The table of contents can be complex and customizable. The usage section will cover several examples, the first of which will demonstrate the entire API of the table of contents, and the remainder will be used to provide more specific, simpler examples.
 
 To follow any of the examples below, you will need to be editing a [[file:layout.org][layout]] file.
 
@@ -35,7 +35,7 @@ To follow any of the examples below, you will need to be editing a [[file:layout
 
 ** Every headline
 
-To have render *every* headline in a layout add the following:
+To render *every* headline in a layout add the following:
 
 #+BEGIN_SRC clojure
 (render :toc)
@@ -43,7 +43,7 @@ To have render *every* headline in a layout add the following:
 
 ** Render only level N headings.
 
-To have render *every* headline in a layout add the following:
+To render *every* headline in a layout add the following:
 
 #+BEGIN_SRC clojure
 (render :toc {:depth 1})
@@ -66,7 +66,7 @@ If you want to exclude "Notes" and only have its child headlines rendered, do th
 
 * Overriding values with front matter
 
-The examples above demonstrate how you would setup a table of contents in a
+The examples above demonstrate how you would set up a table of contents in a
 [[file:layout.org][layout]]. If you need to customize the table of contents on a per-file basis, set
 the options map as a value to the ~#+FIRN_TOC~ front matter at the top of an org
 file.
