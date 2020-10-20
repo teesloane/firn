@@ -1,7 +1,7 @@
 #+TITLE: Breadcrumbs
 #+FIRN_UNDER: Content "The Render Function"
 #+FIRN_ORDER: 9
-#+DATE_UPDATED: <2020-09-25 19:08>
+#+DATE_UPDATED: <2020-10-19 07:52>
 #+DATE_CREATED: <2020-09-20 Sun 17:10>
 
 *Purpose:* This document explains how to render *breadcrumbs* in your Firn layouts.
@@ -10,7 +10,7 @@
 
 * Overview
 
-/Breadcrumbs/ are a navigational tool that indicate where a file falls in a parent-child heirarchy. For example, this document you are reading right now falls under a parent document ("The Render Function"), which falls under another parent document ("Content").
+/Breadcrumbs/ are a navigational tool that indicate where a file falls in a parent-child hierarchy. For example, this document you are reading right now falls under a parent document ("The Render Function"), which falls under another parent document ("Content").
 
 #+BEGIN_SRC txt
 $ Content > The Render Function > Breadcrumbs
@@ -52,4 +52,4 @@ The org document to be rendered must have a ~#+FIRN_UNDER:~ front matter; the va
 #+END_SRC
 
 
-Changes you make to the ~#+FIRN_UNDER~ keyword *also affect the sitemap*. The breadcrumbs is, in essence,  a small slice of the [[file:sitemap.org][sitemap]].
+Changes you make to the ~#+FIRN_UNDER~ keyword *also affect the sitemap*. The breadcrumbs are, in essence,  a small slice of the [[file:sitemap.org][sitemap]].

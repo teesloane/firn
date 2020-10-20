@@ -1,11 +1,11 @@
 #+TITLE: Files And Headlines
 #+FIRN_UNDER: Content "The Render Function"
 #+FIRN_ORDER: 0
-#+DATE_UPDATED: <2020-10-14 18:13>
+#+DATE_UPDATED: <2020-10-19 08:15>
 #+DATE_CREATED: <2020-09-21 Mon 17:03>
 
 *Purpose:* This document explains how to render org-mode files in their entirety
-or select portions of a file. It also covers folding of headlines and their respective
+or select portions of a file. It also covers the folding of headlines and their respective
 content.
 
 *Prerequistes*: an understanding of [[file:the-render-function.org][The Render Function]] and how [[file:layout.org][layouts]] work.
@@ -40,4 +40,4 @@ To render an entire org-mode file:
 #+END_SRC
 ** Exclude a headline
 
-Similar to org-export, you can add the ~:noexport:~ tag to a headline. Doing so will exclude the headline and all it's children from being rendered.
+Similar to org-export, you can add the ~:noexport:~ tag to a headline. Doing so will exclude the headline and all its children from being rendered.
