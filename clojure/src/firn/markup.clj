@@ -452,8 +452,7 @@
         (make-child headline-el)
         ;; Render it folded.
         [(u/str->keywrd "details.firn-fold.firn-fold-" headline-level)
-         {:style (str "margin-left: " (* (- headline-level 1) 12) "px")
-          :open  (firn-fold headline-level)}
+         {:open  (firn-fold headline-level)}
          [(u/str->keywrd "summary.firn-headline-summary-" headline-level) (org/get-headline-helper v)]
          (make-child headline-el)]))))
 

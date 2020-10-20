@@ -121,7 +121,7 @@ details {
 details summary {
   font-weight: bold;
   cursor: pointer;
-  padding: 0 8px;
+  padding: 0px;
 }
 
 h1,
