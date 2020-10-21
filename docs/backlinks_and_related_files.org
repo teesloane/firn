@@ -1,7 +1,7 @@
 #+TITLE: Backlinks and Related Files
 #+FIRN_UNDER: Content "The Render Function"
 #+FIRN_ORDER: 4
-#+DATE_UPDATED: <2020-10-20 11:13>
+#+DATE_UPDATED: <2020-10-21 13:47>
 #+DATE_CREATED: <2020-09-20 Sun 19:05>
 
 
@@ -24,38 +24,19 @@ which Firn tries to integrate with on a basic level (see: [[file:firn_tags.org][
 
 * Usage
 
-** Backlinks
 #+BEGIN_SRC clojure
 (render :backlinks)
-#+END_SRC
+;; output =>
+[:ul.firn-backlinks
+ [:li.firn-backlink
+  [:a {:href "/file1"} "Org Mode"]]]
 
-The above will render a list of backlinks. However, you may want to check first
-/if/ backlinks exist. The below code samples creates a backlinks section, with a
-bit of styling and a headline to indicate the section's intent:
-
-#+BEGIN_SRC clojure
-(when-let [backlinks (render :backlinks)] ; if backlinks exist, store them in a let binding.
-  [:div
-   [:hr]
-   [:div.backlinks
-    [:h4 "Backlinks to this document:"]
-    backlinks]])
-#+END_SRC
-
-
-** Related Files
-#+BEGIN_SRC clojure
 (render :related-files)
+;; output =>
+[:ul.firn-related-files
+ [:li.firn-related-file
+  [:a.firn-related-file-link {:href "/file-small"} "Firn"]]]
 #+END_SRC
 
-The above will render a list of related files. Same as Backlinks above, you may
-want to check first /if/ related files exist before rendering them.
-
-#+BEGIN_SRC clojure
-(when-let [related-files (render :related-files)]
-  [:div
-   [:hr]
-   [:div.related-files
-    [:h4 "Possibly related files:"]
-    related-files]])
-#+END_SRC
+The above will render a list of backlinks and related-files. If a file has
+neither backlinks or related files these functions will return ~nil~.

@@ -2,7 +2,9 @@
   (:require [firn.markup :as sut]
             [clojure.test :as t]
             [firn.stubs :as stub]
-            [firn.build :as build]))
+            [firn.build :as build]
+            [firn.org :as org]
+            [firn.file :as file]))
 
 ;; Mocks
 
@@ -176,41 +178,41 @@
       (t/is (= res expected-out)))))
 
 (t/deftest render-breadcrumbs
-(t/testing "expected output"
-  (let [res (sut/render-breadcrumbs ["Research" "Writing"] sample-sitemap {})]
-    (t/is (= res [:div.firn-breadcrumbs '([:a {:href "http://localhost:4000/research"} "Research"] [:span " > "] [:span "Writing"])]))))
+  (t/testing "expected output"
+    (let [res (sut/render-breadcrumbs ["Research" "Writing"] sample-sitemap {})]
+      (t/is (= res [:div.firn-breadcrumbs '([:a {:href "http://localhost:4000/research"} "Research"] [:span " > "] [:span "Writing"])]))))
 
-(t/testing "Separator works"
-  (let [res (sut/render-breadcrumbs ["Research" "Writing"] sample-sitemap {:separator " | "})]
-    (t/is (= res [:div.firn-breadcrumbs '([:a {:href "http://localhost:4000/research"} "Research"] [:span " | "] [:span "Writing"])]))))
+  (t/testing "Separator works"
+    (let [res (sut/render-breadcrumbs ["Research" "Writing"] sample-sitemap {:separator " | "})]
+      (t/is (= res [:div.firn-breadcrumbs '([:a {:href "http://localhost:4000/research"} "Research"] [:span " | "] [:span "Writing"])]))))
 
-(t/testing "Value not found in sitemap returns a plain text span"
-  (let [res (sut/render-breadcrumbs ["Foobar"] sample-sitemap {})]
-    (t/is (= res [:div.firn-breadcrumbs '([:span "Foobar"])])))))
+  (t/testing "Value not found in sitemap returns a plain text span"
+    (let [res (sut/render-breadcrumbs ["Foobar"] sample-sitemap {})]
+      (t/is (= res [:div.firn-breadcrumbs '([:span "Foobar"])])))))
 
 (t/deftest render-adjacent-file
-;; In these tests the "params" map is mimicking what would have been pulled off the file map in a render call.
-(t/testing "Defaults to return prev/next html tags by firn-order"
-  (let [params   {:sitemap sample-sitemap :firn-under ["Research"] :firn-order 3}
-        res      (sut/render-adjacent-file params)
-        expected [:div.firn-file-navigation
-                  [:span.firn-file-nav-prev "Previous: " [:a {:href "http://localhost:4000/generative_art"} "Generative Art"]]
-                  " "
-                  [:span.firn-file-nav-next "Next: " [:a {:href "http://localhost:4000/open_frameworks"} "Open Frameworks"]]]]
-    (t/is (= res expected))))
+  ;; In these tests the "params" map is mimicking what would have been pulled off the file map in a render call.
+  (t/testing "Defaults to return prev/next html tags by firn-order"
+    (let [params   {:sitemap sample-sitemap :firn-under ["Research"] :firn-order 3}
+          res      (sut/render-adjacent-file params)
+          expected [:div.firn-file-navigation
+                    [:span.firn-file-nav-prev "Previous: " [:a {:href "http://localhost:4000/generative_art"} "Generative Art"]]
+                    " "
+                    [:span.firn-file-nav-next "Next: " [:a {:href "http://localhost:4000/open_frameworks"} "Open Frameworks"]]]]
+      (t/is (= res expected))))
 
 
-(t/testing "When passed options for order-by date, it returns next and prev by proper date."
-  (let [params   {:sitemap         sample-sitemap :firn-under ["Research"]
-                  :firn-order      3
-                  :date-created-ts 1591070400
-                  :order-by        :date}
-        res      (sut/render-adjacent-file params)
-        expected [:div.firn-file-navigation
-                  [:span.firn-file-nav-prev "Previous: " [:a {:href "http://localhost:4000/org-mode"} "Org Mode"]]
-                  " "
-                  [:span.firn-file-nav-next "Next: " [:a {:href "http://localhost:4000/open_frameworks"} "Open Frameworks"]]]]
-    (t/is (= res expected))))
+  (t/testing "When passed options for order-by date, it returns next and prev by proper date."
+    (let [params   {:sitemap         sample-sitemap :firn-under ["Research"]
+                    :firn-order      3
+                    :date-created-ts 1591070400
+                    :order-by        :date}
+          res      (sut/render-adjacent-file params)
+          expected [:div.firn-file-navigation
+                    [:span.firn-file-nav-prev "Previous: " [:a {:href "http://localhost:4000/org-mode"} "Org Mode"]]
+                    " "
+                    [:span.firn-file-nav-next "Next: " [:a {:href "http://localhost:4000/open_frameworks"} "Open Frameworks"]]]]
+      (t/is (= res expected))))
 
 
   (t/testing "When passed options for changing prev/next text, it does so."
@@ -237,12 +239,68 @@
   (t/testing "Expected results"
     (let [
           test-file     (stub/gtf :tf-small :processed)
+          file-no-bl    (stub/gtf :tf-footnotes :processed)
           sample-config (-> (stub/sample-config) build/setup build/process-all)
-          res           (sut/render-backlinks  {:site-links (sample-config :site-links)
+          res           (sut/render-backlinks  {:site-links         (sample-config :site-links)
                                                 :site-links-private (sample-config :site-links-private)
-                                                :site-url   ""
-                                                :file       test-file})]
+                                                :site-url           ""
+                                                :file               test-file})
+          res2           (sut/render-backlinks  {:site-links         (sample-config :site-links)
+                                                 :site-links-private (sample-config :site-links-private)
+                                                 :site-url           ""
+                                                 :file               file-no-bl})]
       (t/is (= res [:ul.firn-backlinks [:li.firn-backlink [:a {:href "/file1"} "Org Mode"]]]))
       (t/is (not= res [:ul.firn-backlinks
                        [:li.firn-backlink [:a {:href "/file1"} "Org Mode"]]
-                       [:li.firn-backlink [:a {:href "/file-private"} "File Private"]]])))))
+                       [:li.firn-backlink [:a {:href "/file-private"} "File Private"]]]))
+      (t/is (= res2 nil)))))
+
+(t/deftest render-firn-file-tags
+  (t/testing "Expected results"
+    (let [tf         (stub/gtf :tf-small :processed)
+          tf-no-tags (stub/gtf :tf-footnotes :processed) ;;footnoes should have no tags.
+          opts       {:firn-tags-path "foo"}
+          res        (sut/render-firn-file-tags (file/get-firn-tags tf) opts)
+          res2       (sut/render-firn-file-tags (file/get-firn-tags tf-no-tags) opts)]
+      (t/is (= res[:ul.firn-file-tags
+                   '([:li.firn-file-tag-item
+                      [:a.firn-file-tag-link {:href "/foo#foo"} "foo"]]
+                     [:li.firn-file-tag-item
+                      [:a.firn-file-tag-link {:href "/foo#baz"} "baz"]]
+                     [:li.firn-file-tag-item
+                      [:a.firn-file-tag-link {:href "/foo#bo"} "bo"]])] ))
+      (t/is (= res2 nil)))))
+
+(t/deftest render-firn-tags
+  (t/testing "Expected results"
+    (let [opts           {}
+          sample-config  (-> (stub/sample-config) build/setup build/process-all)
+          ;; res            (sut/render-firn-tags (sample-config :firn-tags) opts)
+          res-alpha-sort (sut/render-firn-tags (sample-config :firn-tags) {:sort-by :alphabetical})
+          res-new-sort   (sut/render-firn-tags (sample-config :firn-tags) {:sort-by :newest})
+          res-old-sort   (sut/render-firn-tags (sample-config :firn-tags) {:sort-by :oldest})
+          res-no-tags    (sut/render-firn-tags [] opts)]
+
+      (t/is (= res-no-tags nil))
+      (t/is (= res-alpha-sort [:div.firn-file-tags '([:div.firn-file-tags-container [:div.firn-file-tag-name {:id "bar", :class "firn-file-tag-name"} "bar"] [:ul.firn-file-tag-list ([:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file1"} "Org Mode"]])]] [:div.firn-file-tags-container [:div.firn-file-tag-name {:id "baz", :class "firn-file-tag-name"} "baz"] [:ul.firn-file-tag-list ([:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file-small"} "Firn"]] [:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file2"} "Firn"]])]] [:div.firn-file-tags-container [:div.firn-file-tag-name {:id "bo", :class "firn-file-tag-name"} "bo"] [:ul.firn-file-tag-list ([:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file-small"} "Firn"]])]] [:div.firn-file-tags-container [:div.firn-file-tag-name {:id "foo", :class "firn-file-tag-name"} "foo"] [:ul.firn-file-tag-list ([:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file-small"} "Firn"]] [:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file2"} "Firn"]] [:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file1"} "Org Mode"]])]])]))
+      (t/is (= res-new-sort [:div.firn-file-tags '([:div.firn-file-tags-container [:div.firn-file-tag-name {:id "bar", :class "firn-file-tag-name"} "bar"] [:ul.firn-file-tag-list ([:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file1"} "Org Mode"]])]] [:div.firn-file-tags-container [:div.firn-file-tag-name {:id "baz", :class "firn-file-tag-name"} "baz"] [:ul.firn-file-tag-list ([:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file2"} "Firn"]] [:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file-small"} "Firn"]])]] [:div.firn-file-tags-container [:div.firn-file-tag-name {:id "bo", :class "firn-file-tag-name"} "bo"] [:ul.firn-file-tag-list ([:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file-small"} "Firn"]])]] [:div.firn-file-tags-container [:div.firn-file-tag-name {:id "foo", :class "firn-file-tag-name"} "foo"] [:ul.firn-file-tag-list ([:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file1"} "Org Mode"]] [:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file2"} "Firn"]] [:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file-small"} "Firn"]])]])]))
+      (t/is (= res-old-sort [:div.firn-file-tags '([:div.firn-file-tags-container [:div.firn-file-tag-name {:id "bar", :class "firn-file-tag-name"} "bar"] [:ul.firn-file-tag-list ([:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file1"} "Org Mode"]])]] [:div.firn-file-tags-container [:div.firn-file-tag-name {:id "baz", :class "firn-file-tag-name"} "baz"] [:ul.firn-file-tag-list ([:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file-small"} "Firn"]] [:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file2"} "Firn"]])]] [:div.firn-file-tags-container [:div.firn-file-tag-name {:id "bo", :class "firn-file-tag-name"} "bo"] [:ul.firn-file-tag-list ([:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file-small"} "Firn"]])]] [:div.firn-file-tags-container [:div.firn-file-tag-name {:id "foo", :class "firn-file-tag-name"} "foo"] [:ul.firn-file-tag-list ([:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file-small"} "Firn"]] [:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file2"} "Firn"]] [:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file1"} "Org Mode"]])]])]))
+      )))
+
+  (t/deftest render-related-files
+    (t/testing "Expected results"
+      (let [tf1           (stub/gtf :tf-small :processed)
+            tf2           (stub/gtf :tf-footnotes :processed)
+            gts           file/get-firn-tags
+            sample-config (-> (stub/sample-config) build/setup build/process-all)
+            site-tags     (sample-config :firn-tags)
+            res1          (sut/render-related-files  (tf1 :title) (gts tf1) site-tags)
+            res2          (sut/render-related-files  (tf2 :title) (gts tf2) site-tags)]
+        ;; renders a list when there are shared tags between files.
+        (t/is (= res1 [:ul.firn-related-files
+                       [[:li.firn-related-file
+                         [:a.firn-related-file-link {:href "/file-small"} "Firn"]]
+                        [:li.firn-related-file
+                         [:a.firn-related-file-link {:href "/file1"} "Org Mode"]]]]))
+        ;; renders nil when no shared files are found.
+        (t/is (= res2 nil)))))
