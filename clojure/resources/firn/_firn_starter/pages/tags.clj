@@ -1,8 +1,8 @@
 (defn tags
-  [{:keys [build-url render partials]}]
+  [{:keys [render partials build-url site-title site-author site-desc] :as config}]
   (let [{:keys [head]} partials]
     [:html
-     (head build-url)
+     (head config)
      [:body
       [:main
        [:article.def-wrapper
