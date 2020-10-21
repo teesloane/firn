@@ -1,7 +1,7 @@
 #+TITLE: The Render Function
 #+FIRN_UNDER: Content
 #+FIRN_ORDER: 3
-#+DATE_UPDATED: <2020-10-20 10:53>
+#+DATE_UPDATED: <2020-10-21 13:44>
 #+DATE_CREATED: <2020-08-14 Fri 19:03>
 
 
@@ -19,10 +19,10 @@ Firn makes some "pre-made" content available to be rendered:
 | [[file:files-and-headlines.org][Entire file]]       | keyword         | ~(render :file)~                                                       |
 | [[file:files-and-headlines.org][Specific headline]] | string          | ~(render "Notes")~                                                     |
 | [[file:files-and-headlines.org][Specific content]]  | string, keyword | ~(render "Notes" :content)~                                            |
+| [[file:folding.org][Folding]]           | keyword, map    | ~(render :file {:firn-fold {1 true 2 true}})~                          |
 | [[file:table-of-contents.org][Table of contents]] | keyword, map    | ~(render :toc {:depth int :exclude-headline? bool :headline "Notes"})~ |
 | [[file:logbooks.org][Logbook Polyline]]  | keyword, map    | ~(render :logbook-polyline {:stroke "#45698A" :height 60 :width 365})~ |
 | [[file:sitemap.org][Sitemaps]]          | keyword, map    | ~(render :sitemap {:sort-by :firn-order})~                             |
-| [[file:logbooks.org][Folding]]           | keyword, map    | ~(render :file {:firn-fold {1 true 2 true}})~                          |
 | [[file:backlinks_and_related_files.org][Related Files]]     | keyword         | ~(render :related-files)~                                              |
 | [[file:backlinks_and_related_files.org][Backlinks]]         | keyword         | ~(render :backlinks)~                                                  |
 | [[file:adjacent-files.org][Adjacent files]]    | keyword, map    | ~(render :adjacent-files {:sort-by :date})~                            |

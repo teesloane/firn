@@ -183,21 +183,21 @@
                      :newest       (x-fn {:coll firn-tags :sort-key :date-created-ts :sort-by :newest})
                      :oldest       (x-fn {:coll firn-tags :sort-key :date-created-ts :sort-by :oldest})
                      firn-tags)]
-
-     [:div.firn-file-tags
-      (for [[k lst] firn-tags]
-        [:div.firn-file-tags-container
-         [:div.firn-file-tag-name {:id k :class "firn-file-tag-name"} k]
-         [:ul.firn-file-tag-list
-          (for [f lst]
-            [:li.firn-file-tag-item
-             [:a.firn-file-tag-link {:href (f :from-url)} (f :from-file)]])]])])))
+     (when (seq firn-tags)
+       [:div.firn-file-tags
+        (for [[k lst] firn-tags]
+          [:div.firn-file-tags-container
+           [:div.firn-file-tag-name {:id k :class "firn-file-tag-name"} k]
+           [:ul.firn-file-tag-list
+            (for [f lst]
+              [:li.firn-file-tag-item
+               [:a.firn-file-tag-link {:href (f :from-url)} (f :from-file)]])]])]))))
 
 (defn render-firn-file-tags
   "Renders a single list of tags for the file being rendered."
   [file-tags opts]
   (when (seq file-tags)
-    [:div.firn-file-tags
+    [:ul.firn-file-tags
      (for [tag file-tags
            :let [href (or (str "/" (opts :firn-tags-path) "#" tag))]]
        [:li.firn-file-tag-item
@@ -223,23 +223,26 @@
   "For each tag in the file, get all files that fall under that tag site-wide.
   HACK: This function is not efficient."
   [curr-file-title file-tags firn-tags]
-  [:ul.firn-related-files
-   (let [out (atom [])]
-     ;; loop through the files tags
-     (doseq [file-tag file-tags
-           :let [related-files (get firn-tags file-tag)]]
-       ;; for each file tag, get the related files from the site-wide-tags
-       (doseq [f related-files
-               ;; don't process the global tag for the file we are already processing.
-               ;; ie, don't show the current file itself as a "related file"
-             :when (not= (f :from-file) curr-file-title)]
-         ;; add to the processing out atom.
-           (swap! out conj f)))
-     ;; loop through the final collection and render the markup.
-     (for [f (u/distinct-by @out :from-file)]
-       [:li.firn-related-file
+  (let [out (atom [])]
+    ;; loop through the files tags
+    (doseq [file-tag file-tags
+            :let [related-files (get firn-tags file-tag)]]
+      ;; for each file tag, get the related files from the site-wide-tags
+      (doseq [f related-files
+              ;; don't process the global tag for the file we are already processing.
+              ;; ie, don't show the current file itself as a "related file"
+              :when (not= (f :from-file) curr-file-title)]
+        ;; add to the processing out atom.
+        (swap! out conj f)))
+    ;; loop through the final collection and render the markup.
+
+    (if (empty? @out)
+      nil
+      [:ul.firn-related-files
+       (for [f (u/distinct-by @out :from-file)]
+         [:li.firn-related-file
           [:a.firn-related-file-link {:href (f :from-url)}
-           (f :from-file)]]))])
+           (f :from-file)]])])))
 
 
 ;; R: Table of Contents --------------------------------------------------

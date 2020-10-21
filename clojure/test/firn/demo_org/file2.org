@@ -3,6 +3,7 @@
 #+STATUS: active
 #+FIRN_LAYOUT: project
 #+FIRN_UNDER: Project
+#+ROAM_TAGS: foo baz
 
 * Meta
 :PROPERTIES:

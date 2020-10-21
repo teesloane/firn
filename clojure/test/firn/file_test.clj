@@ -55,6 +55,7 @@
                 :firn-order 1,
                 :firn-toc {:depth 5, :headline "Notes"},
                 :firn-under "Research",
+                :roam-tags "foo bar"
                 :title "Org Mode"}
                )))))
 

@@ -5,6 +5,7 @@
 #+FIRN_ORDER: 1
 #+DATE_CREATED: <2020-08-17 Mon>
 #+DATE_UPDATED: <2020-08-17 Mon>
+#+ROAM_TAGS: foo bar
 
 
 * Meta
