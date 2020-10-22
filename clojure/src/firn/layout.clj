@@ -184,9 +184,9 @@
      :file          file
      :meta          (file :meta)
      :logbook       (-> file :meta :logbook)
-     :file-links    (-> file :meta :links)
+     :file-links    (-> file :meta :links) ;; TODO - possible re/move this too.
      :title         (-> file :meta :title)
-     :firn-under    (-> file :meta :firn-under)
+     :firn-under    (-> file :meta :firn-under) ;; TODO this should be removed; should be handled by the render function.
      :logbook-total (-> file :meta :logbook-total)
      :date-updated  (-> file :meta :date-updated)
      :date-created  (-> file :meta :date-created)}))
