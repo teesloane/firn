@@ -60,7 +60,19 @@ pre {
   padding: 1rem;
   padding-bottom: 0;
   background: #2d2d2d;
-  border-radius: 4px;
+  border-radius: 2px;
+}
+
+pre code {
+  display: block;
+  overflow-x: auto;
+  line-height: 1.8 !important;
+  border: none;
+  font-size: 0.85em !important;
+  font-family: "IBM Plex Mono" !important;
+  color: #fdfdfd;
+  border: 0;
+  border-radius: 0;
 }
 
 .hljs {
@@ -81,11 +93,13 @@ pre {
   width: var(--sidebar-width);
   flex-direction: column;
   display: flex;
-  top: 0px;
+  top: -54px;
+  margin-top: -54px;
   border-right: 1px solid var(--border-col);
   overflow-y: scroll;
-  height: 95vh;
+  height: 100vh;
   padding: 24px;
+  padding-top: 72px;
 }
 
 .def-toc {
@@ -93,11 +107,13 @@ pre {
   min-width: var(--sidebar-width);
   flex-direction: column;
   display: flex;
-  top: 0px;
+  top: -54px;
+  margin-top: -54px;
   border-left: 1px solid var(--border-col);
   overflow-y: scroll;
   height: 100vh;
   padding: 24px;
+  padding-top: 64px;
   font-size: 12px;
 }
 
