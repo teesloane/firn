@@ -386,18 +386,21 @@
   "Parses links from the org-tree.
   Checks if a link is an HTTP link or File link."
   [v opts]
-  (let [link-val           (get v :desc)
-        link-href          (get v :path "Missing HREF attribute.")
+  (let [link-val       (get v :desc)
+        link-href      (get v :path "Missing HREF attribute.")
         ;; img regexs / ctor fns.
-        img-file-regex     #"(file:)(.*)\.(jpg|JPG|gif|GIF|png|PNG|jpeg|JPEG|svg|SVG)"
-        img-http-regex     #"(http:\/\/|https:\/\/)(.*)\.(jpg|JPG|gif|GIF|png|PNG|jpeg|JPEG|svg|SVG)"
-        mailto-regex       #"(mailto:)(.*)"
-        img-make-url       #(->> (re-matches img-file-regex link-href)
-                              (take-last 2)
-                              (s/join "."))
+        img-file-regex #"(file:)(.*)(\.(jpg|JPG|gif|GIF|png|PNG|jpeg|JPEG|svg|SVG))"
+        img-http-regex #"(http:\/\/|https:\/\/)(.*)\.(jpg|JPG|gif|GIF|png|PNG|jpeg|JPEG|svg|SVG)"
+        mailto-regex   #"(mailto:)(.*)"
         ;; file regexs / ctor fns
-        org-file-regex     #"(file:)(.*)\.(org)(\:\:\*.+)?"
-        http-link-regex    #"https?:\/\/(?![^\" ]*(?:jpg|png|gif))[^\" ]+"]
+        org-file-regex  #"(file:)(.*)\.(org)(\:\:\*.+)?"
+        ext-file-regex  #"(file:)(.*)(\.[^.]+$)" ; match any: file:my_file.biz
+        http-link-regex #"https?:\/\/(?![^\" ]*(?:jpg|png|gif))[^\" ]+"
+        ;; breaks link into a list and cleans it: `file:my_img.jpg` => `my_img.jpg`
+        attach-make-url #(->> (re-matches % link-href)
+                              (drop 2)
+                              (take 2)
+                              (s/join ""))]
 
     ;; I wonder if pattern matching makes more sense here.
     (cond
@@ -405,7 +408,7 @@
       ;; img file or attach: `file:`
       (re-matches img-file-regex link-href)
       (img-link->figure {:desc link-val
-                         :path (str (opts :site-url) "/" (img-make-url))})
+                         :path (str (opts :site-url) "/" (attach-make-url img-file-regex))})
 
       ;; a normal http image.
       (re-matches img-http-regex link-href)
@@ -414,7 +417,7 @@
       ;; org files (if it's not a private link.)
       (re-matches org-file-regex link-href)
       (let [{:keys [slug]} (org/get-link-parts link-href)
-            is-priv-link? (u/in? (opts :site-links-private) slug)]
+            is-priv-link?  (u/in? (opts :site-links-private) slug)]
         (if is-priv-link?
           [:span.firn-link-disabled link-val]
           [:a.firn-internal
@@ -427,6 +430,9 @@
       (re-matches mailto-regex link-href)
       [:a.firn-mail
        {:href link-href} link-val]
+
+      (re-matches ext-file-regex link-href)
+      [:a.firn-internal-file {:href (str (opts :site-url) "/" (attach-make-url ext-file-regex))} link-val]
       
       ;; Otherwise, assume it's an internal anchor link.
       :else
