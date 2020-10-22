@@ -107,7 +107,6 @@ main header {
 /* Typography */
 code,
 samp {
-  background-color: var(--color-primary-accent);
   border-radius: var(--border-radius);
   color: var(--color-text);
   display: inline-block;
