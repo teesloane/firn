@@ -162,8 +162,13 @@
     (println "Building site...")
     (if-not (fs/exists? path-to-site)
       (println "Couldn't find a _firn/ folder. Have you run `Firn new` and created a site yet?")
-      (do (println "\n🏔  Starting Firn development server on:" (str "http://localhost:" port))
-          (http/run-server (handler config!) {:port port}))))
+
+      (try
+        (println "\n🏔  Starting Firn development server on:" (str "http://localhost:" port))
+        (http/run-server (handler config!) {:port port})
+
+        (catch Exception e
+          (u/print-err! :error "A service is already running on port" port "." "\nYou can specify a different port for Firn to run on with the '-p' flag.")))))
 
   :stop
   (do
