@@ -195,4 +195,19 @@
   "If a file has a template, render the file with it, or use the default layout"
   [config file layout]
   (let [selected-layout (get-layout config file layout)]
-    (h/html (selected-layout (prepare config file)))))
+    (h/html
+     (let [ulm (prepare config file)
+           fn-name #(-> % meta :name)] ;; ulm => user-layout-map
+       (try
+         (selected-layout ulm)
+         (catch Exception e
+           ;; NOTE: My Hacky take on cleaning up a stack trace.
+           (u/print-err! :error
+                         (str "A layout function <" (fn-name selected-layout) "> failed when parsing <" (ulm :title) ">")
+                         (str "\nThe Small Clojure Interpreter found this error:\n")
+                         (let [er (Throwable->map e)
+                               sci-err (-> er :via first :data) ]
+                           (str
+                            "\n  | Cause: " (sci-err :message)
+                            "\n  | Layout Function: "  (fn-name selected-layout)
+                            "\n")))))))))
