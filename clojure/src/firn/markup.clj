@@ -21,66 +21,73 @@
   - c) we have to handle for when the user's files don't have all the necessary metadata.
 
   The sitemap IS a map because it enables `get-in` to render specific parts of the map.
-  This, however, makes for annoying sorting issues.
-  "
-
+  This, however, makes for annoying sorting issues. "
   ([sm]
    (render-site-map sm {}))
   ([sm opts]
-   (letfn [(sort-by-key ;; used in sort-site-map
-             ([smn prop] (sort-by-key smn prop false))
-             ([smn prop flip-keys?]
-              (fn [key1 key2]
-                (let [k1 (if flip-keys? key2 key1)
-                      k2 (if flip-keys? key1 key2)]
-                  (compare
-                   ;; we have to compare on values, and because some are duplicate (nil) we have to use compare a bit differently.
-                   ;; https://clojuredocs.org/clojure.core/sorted-map-by#example-542692d5c026201cdc327094
-                   [(get-in smn [k1 prop] ) k1]
-                   [(get-in smn [k2 prop] ) k2])))))
+   (let [depth-counter (atom 0)]
+     (letfn [(sort-by-key ;; used in sort-site-map
+               ([smn prop] (sort-by-key smn prop false))
+               ([smn prop flip-keys?]
+                (fn [key1 key2]
+                  (let [k1 (if flip-keys? key2 key1)
+                        k2 (if flip-keys? key1 key2)]
+                    (compare
+                     ;; we have to compare on values, and because some are duplicate (nil) we have to use compare a bit differently.
+                     ;; https://clojuredocs.org/clojure.core/sorted-map-by#example-542692d5c026201cdc327094
+                     [(get-in smn [k1 prop] ) k1]
+                     [(get-in smn [k2 prop] ) k2])))))
 
-           ;; Sometimes a user might want to render the site-map at a lower
-           ;; level than from the top.
-           (starting-point [sm]
-             (if (opts :start-at)
-               (get-in sm (u/interpose+tail (opts :start-at) :children))
-               sm))
+             ;; Sometimes a user might want to render the site-map at a lower
+             ;; level than from the top.
+             (starting-point [sm]
+               (if (opts :start-at)
+                 (get-in sm (u/interpose+tail (opts :start-at) :children))
+                 sm))
 
-           ;; sort the sitemap, pushing nils to end of sort.
-           (sort-priority-map [k smn desc?]
-             (u/mapply primap/priority-map-keyfn-by (juxt #(nil? (% k)) k)
-                       ;; HACK: using juxt above makes the take values x, y which are vectors;
-                       ;; the first val is t/f (is it nil?), the next is the key's val, if it exists.
-                       ;; we need the juxt for pushing nil values to the end of the list.
-                       ;; and if we want to reverse the list AND still keep nil values at the end
-                       ;; ie, to sort by ":oldest" it, seems we need to compare only by the second vec value.
-                       (if desc?
-                         #(compare (second %2) (second %1))
-                         #(compare %1 %2)) smn))
+             ;; sort the sitemap, pushing nils to end of sort.
+             (sort-priority-map [k smn desc?]
+               (u/mapply primap/priority-map-keyfn-by (juxt #(nil? (% k)) k)
+                         ;; HACK: using juxt above makes the take values x, y which are vectors;
+                         ;; the first val is t/f (is it nil?), the next is the key's val, if it exists.
+                         ;; we need the juxt for pushing nil values to the end of the list.
+                         ;; and if we want to reverse the list AND still keep nil values at the end
+                         ;; ie, to sort by ":oldest" it, seems we need to compare only by the second vec value.
+                         (if desc?
+                           #(compare (second %2) (second %1))
+                           #(compare %1 %2)) smn))
 
-           (sort-site-map [site-map-node] ;; site-map-node is a whole site-map or any :children sub maps.
-             (case (opts :sort-by)
-               :alphabetical (into (sorted-map) site-map-node)
-               :oldest       (sort-priority-map :date-created-ts site-map-node false)
-               :newest      (sort-priority-map :date-created-ts site-map-node true) ; ????
-               :firn-order (sort-priority-map :firn-order site-map-node false)
-               site-map-node))
+             (sort-site-map [site-map-node] ;; site-map-node is a whole site-map or any :children sub maps.
+               (case (opts :sort-by)
+                 :alphabetical (into (sorted-map) site-map-node)
+                 :oldest       (sort-priority-map :date-created-ts site-map-node false)
+                 :newest      (sort-priority-map :date-created-ts site-map-node true) ; ????
+                 :firn-order (sort-priority-map :firn-order site-map-node false)
+                 site-map-node))
 
-           (make-child [[k v]]
-             (let [children (v :children)]
-               (if-not children
-                 [:li (if (v :path)
-                        [:a.firn-sitemap-item--link {:href (v :path)} k]
-                        [:div.firn-sitemap-item--no-link k])]
-                 ;; if children
-                 [:li.firn-sitemap-item--child
-                  (if (v :path)
-                    [:a.firn-sitemap-item--link {:href (v :path)} k]
-                    [:div.firn-sitemap-item--no-link k])
-                  [:ul.firn-sitemap-item--parent
-                   (map make-child (sort-site-map children))]])))]
-     (let [starting-site-map (-> sm starting-point sort-site-map)]
-       [:ul.firn-sitemap.firn-sitemap-item--parent (map make-child starting-site-map)]))))
+             ;; The recursive renderering function.
+             (make-child [[k v]]
+               (let [children (v :children)]
+                 ;; If no children on the site map node, just render a single li element.
+                 (if-not children
+                   [:li (if (v :path)
+                          [:a.firn-sitemap-item--link {:href (v :path)} k]
+                          [:div.firn-sitemap-item--no-link k])]
+                   ;; if children render recursively (unless it exceeds the optional :depth value)
+                   (do
+                     (swap! depth-counter inc)
+                     (if (< @depth-counter (get opts :depth (+ @depth-counter 1)))
+                       [:li.firn-sitemap-item--child
+                        (if (v :path)
+                          [:a.firn-sitemap-item--link {:href (v :path)} k]
+                          [:div.firn-sitemap-item--no-link k])
+                        [:ul.firn-sitemap-item--parent
+                         (map make-child (sort-site-map children))]]
+                       [:li (if (v :path)
+                              [:a.firn-sitemap-item--link {:href (v :path)} k]
+                              [:div.firn-sitemap-item--no-link k])])))))]
+       (let [site-map (-> sm starting-point sort-site-map)]
+         [:ul.firn-sitemap.firn-sitemap-item--parent (map make-child site-map)])))))
 
 (defn render-breadcrumbs
   "Iterates firn-under, fetching the link to each item, constructuring a breadcrumb
@@ -244,9 +251,7 @@
           [:a.firn-related-file-link {:href (f :from-url)}
            (f :from-file)]])])))
 
-
-;; R: Table of Contents --------------------------------------------------
-
+;; R: Table of Contents --------------------------------------------------------
 
 (defn make-toc-helper-reduce
   "(ಥ﹏ಥ) Yeah. So. See the docstring for make-toc.
@@ -338,7 +343,7 @@
      (if (empty? toc-cleaned) nil
          (into [list-type] (toc->html toc-cleaned list-type))))))
 
-;; General HTML Renderers ------------------------------------------------
+;; General HTML Renderers ------------------------------------------------------
 
 (defn date->html
   [v]

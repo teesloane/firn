@@ -60,16 +60,11 @@
          ;; essentially a refined config object with user specific (and some
          ;; internal data)
          merged-options            (merge config-settings layout-settings front-matter-settings {:site-links-private (config :site-links-private)})
-         cached-sitemap-html       (atom nil)
          is-headline?              (string? action)
          {:keys [toc logbook
                  firn-under
                  firn-order
                  date-created-ts]} (file :meta)]
-
-     ;; cache the site-map if it's not there already
-     (when-not @cached-sitemap-html
-       (reset! cached-sitemap-html (markup/render-site-map site-map opts)))
 
      (cond
        ;; render the whole file.
@@ -89,12 +84,9 @@
        (= action :logbook-polyline)
        (org/poly-line logbook opts)
 
-       ;; Render the sitemap; cache it the first time it runs
+       ;; NOTE: / PERF: we could cache the sitemap PER LAYOUT; making it an atom outside of this function.
        (and (= action :sitemap) (seq site-map))
-       (if-not @cached-sitemap-html
-         (do (reset! cached-sitemap-html (markup/render-site-map site-map opts))
-             @cached-sitemap-html)
-         @cached-sitemap-html)
+       (markup/render-site-map site-map opts)
 
        ;; render breadcrumbs
        (= action :breadcrumbs)
