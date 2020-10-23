@@ -192,7 +192,8 @@
                      firn-tags)]
      (when (seq firn-tags)
        [:div.firn-file-tags
-        (for [[k lst] firn-tags]
+        (for [[k lst] firn-tags
+              :when (not (u/in? (opts :exclude) k))]
           [:div.firn-file-tags-container
            [:div.firn-file-tag-name {:id k :class "firn-file-tag-name"} k]
            [:ul.firn-file-tag-list
