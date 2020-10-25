@@ -55,6 +55,11 @@ h2 {
   }
 }
 
+code {
+  border: 1px solid var(--border-col);
+  background: var(--color-bg-secondary);
+
+}
 
 pre {
   padding: 1rem;

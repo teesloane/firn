@@ -382,11 +382,13 @@
 
 (defn internal-link-handler
   "Takes an org link and converts it into an html path."
-  [org-link {:keys [site-url]}]
-  (let [{:keys [anchor slug]} (org/get-link-parts org-link)]
+  [org-link {:keys [site-url file] :as opts}]
+  (let [{:keys [anchor slug]} (org/get-link-parts org-link)
+        curr-file-path        (-> file :path-web)
+        path                  (or (u/build-web-path curr-file-path slug) slug)]
     (if anchor
-      (str site-url "/" slug anchor)
-      (str site-url "/" slug))))
+      (str site-url "/" path anchor)
+      (str site-url "/" path))))
 
 (defn link->html
   "Parses links from the org-tree.

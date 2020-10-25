@@ -102,6 +102,18 @@
     (let [res (sut/org-keyword->vector "\"Single tag\"")]
       (t/is (= res ["Single tag"])))))
 
+(t/deftest build-web-path
+  (t/testing "expected results"
+    (let [res-sibling          (sut/build-web-path "the/file/we/are/on" "target-link")
+          res-up-2             (sut/build-web-path "the/file/we/are/on" "../../target-link")
+          res-up-1             (sut/build-web-path "the/file/we/are/on" "../target-link")
+          res-top-level-origin (sut/build-web-path "file-a" "nested/target-link")
+          ]
+      (t/is (= res-sibling "the/file/we/are/target-link"))
+      (t/is (= res-up-2 "the/file/target-link"))
+      (t/is (= res-up-1 "the/file/we/target-link"))
+      (t/is (= res-top-level-origin "nested/target-link"))
+      )))
 
 (t/deftest sort-map-of-lists-of-maps
   (t/testing "expected output"
