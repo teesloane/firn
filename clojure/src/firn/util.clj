@@ -161,6 +161,39 @@
         res        (drop-while #(not= % until) split-path)]
     (s/join "/" res)))
 
+(defn build-web-path
+  "A highly specific link builder (ಥ﹏ಥ)
+  Builds links between files, has to handle links between parent (ie, `../../`)
+  directories, as well as flat level links.
+
+  the `file-path` is a string where the last item following the trailing slash
+  is the current path that is being visited (and is thus truncated.)
+
+  `file-path` -> bar/foo/test
+  `org-link`  -> test
+  `(build-web-path 'foo/boo/bar' '../test')`
+
+  or
+
+  `file-path` -> bar/foo/test ;
+  `org-link`  -> my-file ==> bar/foo/my-file
+  (build-web-path 'foo/boo/bar' 'test') =>  foo/boo/test
+  "
+  [file-path org-link]
+  (when (and file-path org-link)
+    (let [split-file     (drop-last (s/split file-path #"/"))
+          split-org-link (s/split org-link #"/")]
+      (loop [a split-file
+             b split-org-link]
+        (let [y  (first b)
+              ys (rest b)]
+          (if (= y "..")
+            (recur (drop-last a) ys)
+            (if (seq a)
+              (str (s/join "/" a) "/" (s/join "/" b))
+              (s/join "/" b))))))))
+
+
 (defn is-attachment?
   "Checks is a path is an attachment; a local file that is not an org file."
   [path]

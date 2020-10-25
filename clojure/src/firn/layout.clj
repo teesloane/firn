@@ -59,7 +59,8 @@
          ;; the big merged options! This is used across various render fns,
          ;; essentially a refined config object with user specific (and some
          ;; internal data)
-         merged-options            (merge config-settings layout-settings front-matter-settings {:site-links-private (config :site-links-private)})
+         merged-options            (merge config-settings layout-settings front-matter-settings {:site-links-private (config :site-links-private)
+                                                                                                 :file file})
          is-headline?              (string? action)
          {:keys [toc logbook
                  firn-under
