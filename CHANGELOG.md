@@ -1,3 +1,40 @@
+## [](https://github.com/theiceshelf/firn/compare/v0.0.11...v) (2020-10-25)
+
+### [0.0.11](https://github.com/theiceshelf/firn/compare/v0.0.9...v0.0.11) (2020-10-25)
+
+#### ⚠ BREAKING CHANGES
+
+* render fns should return nil if no content.
+  - a render function such as `(render :backlinks)` would return an empty [:ul] element rather than nil if there were no backlinks.
+  - this made conditionally rendering sections difficult.
+* Firn file-based tag renderer and docs.
+  - this release adds a render function: `(render :firn-file-tags) (see: "firn tags"` in documentation).
+
+#### Features
+
+* Add :depth filtering to render :site-map ([c44a521](https://github.com/theiceshelf/firn/commit/c44a521ac71e460621f72cbedde66624864e5f3a))
+* exclude tags in (render :firn-tags) ([83e226a](https://github.com/theiceshelf/firn/commit/83e226a6414c58d876e226bd40c889cfb213c325))
+
+
+#### Bug Fixes
+
+* add site title, author, and description to layouts ([#41](https://github.com/theiceshelf/firn/issues/41)) ([a2a6b40](https://github.com/theiceshelf/firn/commit/a2a6b4037a30daab27822a27371e3f7f3ad50dd2))
+* declare primary color css property for starter ([#50](https://github.com/theiceshelf/firn/issues/50)) ([3a9c10f](https://github.com/theiceshelf/firn/commit/3a9c10f2bff0120909442821fd06e83908024a21))
+* Don't exit on files without frontmatter. ([bbd715c](https://github.com/theiceshelf/firn/commit/bbd715c4ccc2ef41ec3c569459edd6072a4d9276))
+* Fix head-partial  [#54](https://github.com/theiceshelf/firn/issues/54) ([ba56116](https://github.com/theiceshelf/firn/commit/ba5611638bb1de08367fbd7b0dea80b0e2836757))
+* include `jpeg` as possible image type. ([9bf21ec](https://github.com/theiceshelf/firn/commit/9bf21ec578d5ac09bbbd37736977aafd4247e84e))
+* Enable: linking between parent directories from child ([05160b2](https://github.com/theiceshelf/firn/commit/05160b2991fa4cee4f48a1b669db42bad688cf27))
+* remove firn.org circular dependency ([#42](https://github.com/theiceshelf/firn/issues/42)) ([6cf34f7](https://github.com/theiceshelf/firn/commit/6cf34f78d2f672a09d90722f1e48ae3596875619))
+* remove opinionated padding on folded headlines. ([8d9318f](https://github.com/theiceshelf/firn/commit/8d9318feea974bebf017decc15c9ba685638396e))
+* render fns should return nil if no content. ([5c370be](https://github.com/theiceshelf/firn/commit/5c370bedebc1444a8797d057b61fa18ebc77fc35))
+* render links to private files as plaintext. ([0f05fc4](https://github.com/theiceshelf/firn/commit/0f05fc4baf6b3d391f569aef6db3e3a5d1ceff5b))
+* site-url change for self-host. ([4892808](https://github.com/theiceshelf/firn/commit/4892808af78f60bb142e387aa364fa03f8110e43))
+
+
+#### Code Refactoring
+
+* Firn file-based tag renderer and docs. ([91dec43](https://github.com/theiceshelf/firn/commit/91dec43bf068201f2fea6c338f92d47ecd8a836a))
+
 ### [0.0.10](https://github.com/theiceshelf/firn/compare/v0.0.9...v0.0.10) (2020-10-20)
 
 
