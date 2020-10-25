@@ -1,7 +1,7 @@
 #+TITLE: Sitemap
 #+FIRN_UNDER: Content "The Render Function"
 #+FIRN_ORDER: 2
-#+DATE_UPDATED: <2020-09-25 19:06>
+#+DATE_UPDATED: <2020-10-25 11:57>
 #+DATE_CREATED: <2020-09-20 Sun 19:05>
 
 *Purpose:* This document explains how to render an HTML [[https://en.wikipedia.org/wiki/Site_map][sitemap]] in your Firn
@@ -28,7 +28,7 @@ Simple usage:
 
 By default, the sitemap will render without being sorted in any manner.
 
-** Start at a specific node
+** "Limiting" the site map.
 
 Similar to the [[file:table-of-contents.org][table of contents]], it is possible to render the sitemap /starting/
 at a sepcific file "parent". This is useful, for example, if you group a handful
@@ -42,6 +42,9 @@ to render a list of links to all projects:
 ; start-at vector:
 
 (render :sitemap {:start-at ["Content" "The Render Function"]})
+
+; similarly, you can limit to which depth you would like to render site map nodes.
+(render :sitemap {:start-at ["Content"] :depth 1})
 #+END_SRC
 
 ** Sorting entries
