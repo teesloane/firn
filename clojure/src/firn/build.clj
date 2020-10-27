@@ -65,7 +65,7 @@
     (assoc config :org-files org-files :layouts layouts :partials partials :pages pages)))
 
 (defn htmlify
-  "Renders files according to their `layout` keyword."
+  "Render the html of a file using the layout specified. Stores results in file map :as-html."
   [config f]
   (let [layout   (keyword (file/get-keyword f "FIRN_LAYOUT"))
         as-html  (when-not (file/is-private? config f)
@@ -117,8 +117,8 @@
 (defn process-one
   "Munge the 'file' datastructure; slowly filling it up, using let-shadowing.
   Essentially, converts `org-mode file string` -> json, edn, logbook, keywords"
-  [config f]
-
+  ([config f] (process-one config f false))
+  ([config f live-reload?]
   (let [new-file      (file/make config f)                                     ; make an empty "file" map.
         as-json       (->> f slurp org/parse!)                                 ; slurp the contents of a file and parse it to json.
         as-edn        (-> as-json (json/parse-string true))                    ; convert the json to edn.
@@ -128,9 +128,9 @@
         ;; TODO PERF: htmlify happening as well in `process-all`.
         ;; this is due to the dev server hot reload.
         ;; There should be a conditional that checks if we are running in server.
-        final-file    (htmlify config new-file)]                   ; parses the edn tree -> html.
+        final-file    (if live-reload? (htmlify config new-file) new-file)]                   ; parses the edn tree -> html.
 
-    final-file))
+    final-file)))
 
 (defn process-all ; (ie, just org-files, not pages)
   "Receives config, processes all ORG files and builds up site-data logbooks, site-map, link-map, etc.
@@ -147,17 +147,22 @@
                     :site-attachments   []}
          output    {}]
     (if (empty? org-files)
-      ;; run one more loop on all files, and create their html,
-      ;; now that we have processed everything.
+      ;; NOTE: run one more loop on all files, and create their html now that
+      ;; _everything is processed_. HTML is NOT added in the "process-one"
+      ;; function (unless in server mode) because the data in layouts that a
+      ;; user might need (say accessing the config map as a whole does not yet
+      ;; full exist.)
       (let [config-with-data (merge config
                                     site-vals ;; contains logbook already
-                                    {:processed-files (vals output)
+                                    {:processed-files output
                                      :site-map        (make-site-map (site-vals :site-map))
                                      :org-tags        (into (sorted-map) (group-by :tag-value (site-vals :org-tags)))
                                      :firn-tags       (into (sorted-map) (group-by :tag-value (site-vals :firn-tags)))})
 
-            ;; FIXME: I think we are rendering html twice here, should prob only happen here?
-            with-html (into {} (for [[k pf] output] [k (htmlify config-with-data pf)]))
+            ;; Here we make the final pass, adding html to every file, now that
+            ;; the config is full populated.
+            with-html (into {} (for [[k pf] output]
+                                 [k (htmlify config-with-data pf)]))
             final     (assoc config-with-data :processed-files with-html)]
         final)
 
