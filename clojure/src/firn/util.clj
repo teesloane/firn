@@ -8,6 +8,11 @@
 
 (set! *warn-on-reflection* true)
 
+
+(def sci-bindings {:bindings {'println println
+                              'prn prn
+                              }})
+
 ;; Some of these are borrowed from me.raynes.fs because I need to add ;; type hints for GraalVM
 
 (def dev? (if (= (System/getenv "DEV") "TRUE") true false))
@@ -121,7 +126,7 @@
 (defn read-and-eval-clj
   [io-file]
   (let [file-path (.getPath ^java.io.File io-file)
-        eval-file (-> file-path slurp sci/eval-string)]
+        eval-file (-> file-path slurp (sci/eval-string sci-bindings))]
     eval-file))
 
 (defn load-fns-into-map
@@ -134,7 +139,7 @@
 
   [file-list]
   (let [file-path #(.getPath ^java.io.File %)
-        eval-file #(-> % file-path slurp sci/eval-string)]
+        eval-file #(-> % file-path slurp (sci/eval-string sci-bindings))]
     (into {} (map #(hash-map (io-file->keyword %) (eval-file %)) file-list))))
 
 (defn dupe-name-in-dir-path?
