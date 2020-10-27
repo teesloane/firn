@@ -27,7 +27,7 @@
   grabs the path of the original file, reslurps it and reprocesses"
   [file config]
   (let [re-slurped (-> file :path io/file)
-        re-processed (build/process-one config re-slurped)]
+        re-processed (build/process-one config re-slurped true)]
     re-processed))
 
 
