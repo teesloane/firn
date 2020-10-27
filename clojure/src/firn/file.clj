@@ -277,7 +277,7 @@
                         :file-tags (when file-tags (u/org-keyword->vector file-tags))}
         metadata       (extract-metadata-helper tree-data file-metadata)
         date-parser    #(try
-                          (when % (u/org-date->ts date-created))
+                          (when % (u/org-date->ts %))
                           (catch Exception e
                             (u/print-err! :error  (str "Could not parse date for file: " (or title "<unknown file>") "\nPlease confirm that you have correctly set the #+DATE_CREATED: and #+DATE_UPDATED values in your org file."))))
         file-tags      (craft-file-tags {:file-tags       file-tags
