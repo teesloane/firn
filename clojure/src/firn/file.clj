@@ -10,7 +10,7 @@
             [sci.core :as sci]))
 
 ;; #+ORG_KEYWORDS that we want to evaluate into real clojure values.
-(def keywords-to-eval [:firn-toc :firn-properties? :firn-order :firn-fold :firn-sitemap?])
+(def keywords-to-eval [:firn-toc :firn-properties? :firn-order :firn-fold :firn-sitemap? :firn-private])
 
 ;; -- Getters
 
@@ -124,23 +124,22 @@
                                   {k v})))]
 
     (when-not has-req-frontmatter
-      (u/print-err! :warning "File <<" (f :name) ">> does not have 'front-matter'. \nIt is recommended to set at least the #+TITLE keyword for your file."))
+      (u/print-err! :warning "File <<" (f :name) ">> does not have 'front-matter' and will not be processed."))
     (->> kw (map eval-it) (into {}))))
 
 
-
-
-
 (defn is-private?
-  "Returns true if a file meets the conditions of being 'private'
-  Assumes the files has been read into memory and parsed to edn."
+  "Returns true if a file meets the conditions of being 'private' Assumes the
+  files has been read into memory and parsed to edn. A file is private (read:
+  excluded) when it is in a private folder marked in :ignored-dirs in
+  config.edn, when there is no #+TITLE keyword, or when #+FIRN_PRIVATE is true."
   [config f]
-  (let [is-private?     (get-keyword f "FIRN_PRIVATE")
-        file-path       (-> f :path (s/split #"/"))
-        in-priv-folder? (some (set file-path) (-> config :user-config :ignored-dirs))]
-    (or
-     (some? in-priv-folder?)
-     (some? is-private?))))
+  (let [{:keys [title firn-private]} (-> f :meta :keywords)
+        file-path                    (-> f :path (s/split #"/"))
+        in-priv-folder?              (some (set file-path) (-> config :user-config :ignored-dirs))]
+    (or (some? in-priv-folder?)
+        (nil? title)
+        firn-private)))
 
 (defn in-site-map?
   "Checks if the processed file is in the site-map

@@ -64,8 +64,6 @@
     (let [config             (stub/sample-config)
           file-priv-1        (stub/gtf :tf-private :processed)
           file-priv-2        (stub/gtf :tf-private-subfolder :processed)
-          ;; file               stub/test-file-private-processed
-          ;; file-2             stub/test-file-private-subfolder-processed
           is-priv?           (sut/is-private? config file-priv-1)
           is-priv-subfolder? (sut/is-private? config file-priv-2)]
       (t/is (= is-priv? true))
