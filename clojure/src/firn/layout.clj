@@ -7,7 +7,6 @@
   (:require [firn.markup :as markup]
             [firn.org :as org]
             [hiccup.core :as h]
-            [firn.file :as file]
             [firn.util :as u]))
 
 (defn internal-default-layout
@@ -83,7 +82,7 @@
 
        ;; render a polyline graph of the logbook of the file.
        (= action :logbook-polyline)
-       (org/poly-line logbook opts)
+       (markup/poly-line logbook opts)
 
        ;; NOTE: / PERF: we could cache the sitemap PER LAYOUT; making it an atom outside of this function.
        (and (= action :sitemap) (seq site-map))
@@ -115,11 +114,11 @@
        (markup/render-firn-tags (config :firn-tags) opts)
 
        (= action :firn-file-tags)
-       (markup/render-firn-file-tags (file/get-firn-tags file) merged-options)
+       (markup/render-firn-file-tags (org/get-firn-tags file) merged-options)
 
        (= action :related-files)
        (markup/render-related-files (-> file :meta :title)
-                                    (file/get-firn-tags file)
+                                    (org/get-firn-tags file)
                                     (config :firn-tags))
 
        ;; render a list of org tags

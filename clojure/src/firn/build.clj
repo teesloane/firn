@@ -3,7 +3,6 @@
   Mostly to do with the processing of files / new site."
   (:require [clojure.java.io :as io]
             [firn.config :as config]
-            [firn.file :as file]
             [clj-rss.core :as rss]
             [firn.org :as org]
             [firn.layout :as layout]
@@ -59,19 +58,19 @@
   (fs/copy-dir dir-static dir-site-static)
 
   (let [org-files (u/find-files-by-ext dir-files "org")
-        layouts   (file/read-clj :layouts config)
-        pages     (file/read-clj :pages config)
-        partials  (file/read-clj :partials config)]
+        layouts   (u/read-clj :layouts config)
+        pages     (u/read-clj :pages config)
+        partials  (u/read-clj :partials config)]
     (assoc config :org-files org-files :layouts layouts :partials partials :pages pages)))
 
 (defn htmlify
   "Render the html of a file using the layout specified. Stores results in file map :as-html."
   [config f]
-  (let [layout   (keyword (file/get-keyword f "FIRN_LAYOUT"))
-        as-html  (when-not (file/is-private? config f)
+  (let [layout   (keyword (org/get-keyword f "FIRN_LAYOUT")) ;; TODO - replace this with "get-frontmatter"
+        as-html  (when-not (org/is-private? config f)
                    (layout/apply-layout config f layout))]
     ;; as-html
-    (file/change f {:as-html as-html})))
+    (assoc f :as-html as-html)))
 
 (defn make-site-map
   "Builds the site maps data structure - a tree where a file might fall under one or more files.
@@ -119,23 +118,14 @@
   Essentially, converts `org-mode file string` -> json, edn, logbook, keywords"
   ([config f] (process-one config f false))
   ([config f live-reload?]
-  (let [new-file      (file/make config f)                                     ; make an empty "file" map.
-        as-json       (->> f slurp org/parse!)                                 ; slurp the contents of a file and parse it to json.
-        as-edn        (-> as-json (json/parse-string true))                    ; convert the json to edn.
-        new-file      (file/change new-file {:as-json as-json :as-edn as-edn}) ; shadow the new-file to add the json and edn.
-        file-metadata (file/extract-metadata new-file)                         ; collect the file-metadata from the edn tree.
-        new-file      (file/change new-file {:meta file-metadata})             ; shadow the file and add the metadata
-        ;; TODO PERF: htmlify happening as well in `process-all`.
-        ;; this is due to the dev server hot reload.
-        ;; There should be a conditional that checks if we are running in server.
+  (let [new-file       (org/make-file config f)
         final-file    (if live-reload? (htmlify config new-file) new-file)]                   ; parses the edn tree -> html.
-
     final-file)))
 
 (defn process-all ; (ie, just org-files, not pages)
   "Receives config, processes all ORG files and builds up site-data logbooks, site-map, link-map, etc.
   This is where the magic happens for collecting metadata. Follow the chain:
-  process-all -> process-one -> file/extract-metadata -> file/extract-metadata-helper"
+  process-all -> process-one -> org/extract-metadata -> org/extract-metadata-helper"
   [config]
   (loop [org-files (config :org-files)
          site-vals {:processed-files    {}
@@ -147,11 +137,8 @@
                     :site-attachments   []}
          output    {}]
     (if (empty? org-files)
-      ;; NOTE: run one more loop on all files, and create their html now that
-      ;; _everything is processed_. HTML is NOT added in the "process-one"
-      ;; function (unless in server mode) because the data in layouts that a
-      ;; user might need (say accessing the config map as a whole does not yet
-      ;; full exist.)
+      ;; NOTE: we run one more loop on ALL files.
+      ;; This is when html is rendered since all data has been parsed and prepared.
       (let [config-with-data (merge config
                                     site-vals ;; contains logbook already
                                     {:processed-files output
@@ -168,9 +155,9 @@
 
       ;; Otherwise continue...
       (let [next-file                                          (first org-files)
-            processed-file                                     (process-one config next-file)
-            is-private                                         (file/is-private? config processed-file)
-            in-sitemap?                                        (file/in-site-map? processed-file)
+            processed-file                                     (org/make-file config next-file)
+            is-private                                         (org/is-private? config processed-file)
+            in-sitemap?                                        (org/in-site-map? processed-file)
             org-files                                          (rest org-files)
             {:keys [links logbook tags attachments firn-tags]} (-> processed-file :meta)]
         (if is-private
@@ -183,7 +170,7 @@
                                     true        (update :site-attachments concat attachments)
                                     true        (update :org-tags concat tags)
                                     true        (update :firn-tags concat firn-tags)
-                                    in-sitemap? (update :site-map conj (file/make-site-map-item processed-file (-> config :user-config :site-url))))]
+                                    in-sitemap? (update :site-map conj (org/make-site-map-item processed-file (-> config :user-config :site-url))))]
             (recur org-files updated-site-vals updated-output)))))))
 
 (defn write-rss-file!
@@ -212,7 +199,7 @@
 (defn write-pages!
   "Responsible for publishing html pages from clojure templates found in pages/
   Currently, we can only render a flat file list of .clj files in /pages.
-  TODO: (In a later release) - do something similar to `file/get-web-path` and
+  TODO: (In a later release) - do something similar to `org/get-web-path` and
   enable `load-fns-into-map` to save filenames as :namespaced/keys, allowing
   make-parent to work on it."
   [{:keys [dir-site pages] :as config}]
@@ -231,7 +218,7 @@
   [config]
   (doseq [[_ f] (config :processed-files)]
     (let [out-file-name (str (config :dir-site) (f :path-web) ".html")]
-      (when-not (file/is-private? config f)
+      (when-not (org/is-private? config f)
         (io/make-parents out-file-name)
         (spit out-file-name (f :as-html)))))
   config)

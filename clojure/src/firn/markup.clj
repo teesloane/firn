@@ -344,6 +344,73 @@
      (if (empty? toc-cleaned) nil
          (into [list-type] (toc->html toc-cleaned list-type))))))
 
+;; R: Charts -------------------------------------------------------------------
+
+(defn- find-day-to-update
+  [calendar-year log-entry]
+  (let [{:keys [day month year]} (log-entry :start)
+        logbook-date             (u/date-str (u/date-make year month day))]
+    (u/find-index-of #(= (% :date-str) logbook-date) calendar-year)))
+
+(defn- update-logbook-day
+  "Updates a day in a calander from build-year with logbook data."
+  [{:keys [duration] :as log-entry}]
+  (fn [{:keys [log-count logs-raw log-sum] :as cal-day}]
+    (let [log-count (inc log-count)
+          logs-raw  (conj logs-raw log-entry)
+          log-sum   (u/timestr->add-time log-sum duration)]
+      (merge
+       cal-day
+       {:log-count log-count
+        :logs-raw  logs-raw
+        :log-sum   log-sum
+        :hour-sum  (u/timestr->hour-float log-sum)}))))
+
+(defn logbook-year-stats
+  "Takes a logbook and pushes it's data into a year calendar.
+  Returns a map that looks like:
+  2020 = [ { :day 1, ... } { :day 2, ... } { :day 3, ... } { :day 4, ... } ... ]
+  2019 = [ { :day 1, ... } { :day 2, ... } { :day 3, ... } { :day 4, ... } ... ]
+  "
+  [logbook]
+  (loop [logbook logbook
+         output  {}]
+    (if (empty? logbook)
+      output
+      (let [x             (first logbook)
+            xs            (rest logbook)
+            log-year      (-> x :start :year)
+            output        (if (contains? output log-year) output
+                              (assoc output log-year (u/build-year log-year))) ; make year if there isn't one already.
+            day-to-update (find-day-to-update (get output log-year) x)
+            output        (update-in output [log-year day-to-update] (update-logbook-day x))]
+        (recur xs output)))))
+
+(defn poly-line
+  "Takes a logbook, formats it so that it can be plotted along a polyline."
+  ([logbook]
+   (poly-line logbook {}))
+  ([logbook
+    {:keys [width height stroke stroke-width]
+     :or   {width 365 height 100 stroke "#0074d9" stroke-width 1}}]
+   [:div
+    (for [[year year-of-logs] (logbook-year-stats logbook)
+          :let [; max-log     (apply max-key :hour-sum year-of-logs) ;; Don't need this yet.
+                ;; This should be measured against the height and whatever the max-log is.
+                g-multiplier (/ height 8) ;; 8 - max hours we expect someone to log in a day
+                fmt-points  #(str %1 "," (* g-multiplier (%2 :hour-sum)))
+                points      (s/join " " (->> year-of-logs (map-indexed fmt-points)))]]
+
+      [:div
+       [:h5.firn-headline.firn-headline-5 year]
+       [:svg {:viewbox (format "0 0 %s %s" width height)
+              :class   "chart"}
+        [:g {:transform (format "translate(0, %s) scale(1, -1)", (- height (* stroke-width 1.25)))}
+         [:polyline {:fill         "none"
+                     :stroke       stroke
+                     :stroke-width "1"
+                     :points points}]]]])]))
+
 ;; General HTML Renderers ------------------------------------------------------
 
 (defn date->html

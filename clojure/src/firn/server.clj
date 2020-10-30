@@ -3,7 +3,7 @@
             [clojure.string :as s]
             [firn.build :as build]
             [firn.dirwatch :refer [close-watcher watch-dir]]
-            [firn.file :as file]
+            [firn.org :as org]
             [firn.util :as u]
             [me.raynes.fs :as fs]
             [mount.core :as mount :refer [defstate]]
@@ -26,16 +26,18 @@
   "Take a request to a file, pulls the file out of memory
   grabs the path of the original file, reslurps it and reprocesses"
   [file config]
-  (let [re-slurped (-> file :path io/file)
-        re-processed (build/process-one config re-slurped true)]
-    re-processed))
+  (let [re-slurped        (-> file :path io/file)]
+        (->> re-slurped
+             (org/make-file config)
+             (build/htmlify config))
+        ))
 
 
 (defn reload-requested-page
   "When user requests a non-org-file page (pages/*.clj), we reslurp the clj files
   into the config and then re-write them to html."
   [config!]
-  (let [pages (file/read-clj :pages @config!)]
+  (let [pages (u/read-clj :pages @config!)]
     (swap! config! assoc :pages pages)
     (build/write-pages! @config!)))
 

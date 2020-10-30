@@ -4,7 +4,7 @@
             [firn.stubs :as stub]
             [firn.build :as build]
             [firn.org :as org]
-            [firn.file :as file]))
+            ))
 
 ;; Mocks
 
@@ -264,8 +264,8 @@
     (let [tf         (stub/gtf :tf-small :processed)
           tf-no-tags (stub/gtf :tf-footnotes :processed) ;;footnoes should have no tags.
           opts       {:firn-tags-path "foo"}
-          res        (sut/render-firn-file-tags (file/get-firn-tags tf) opts)
-          res2       (sut/render-firn-file-tags (file/get-firn-tags tf-no-tags) opts)]
+          res        (sut/render-firn-file-tags (org/get-firn-tags tf) opts)
+          res2       (sut/render-firn-file-tags (org/get-firn-tags tf-no-tags) opts)]
       (t/is (= res[:ul.firn-file-tags
                    '([:li.firn-file-tag-item
                       [:a.firn-file-tag-link {:href "/foo#foo"} "foo"]]
@@ -295,7 +295,7 @@
     (t/testing "Expected results"
       (let [tf1           (stub/gtf :tf-small :processed)
             tf2           (stub/gtf :tf-footnotes :processed)
-            gts           file/get-firn-tags
+            gts           org/get-firn-tags
             sample-config (-> (stub/sample-config) build/setup build/process-all)
             site-tags     (sample-config :firn-tags)
             res1          (sut/render-related-files  (tf1 :title) (gts tf1) site-tags)

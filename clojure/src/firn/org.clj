@@ -1,16 +1,49 @@
 (ns firn.org
-  "Functions for managing org-related things.
-  Most of these functions are for operating on EDN-fied org-file
-  Which are created by the rust binary."
+  "The org namespace handles all data-related to the parsing of an org file.
+  When an org file is parsed it is organized into a map of data.
+
+  Functions are either associated with:
+  - a) parsing and organizing a new file into data
+  - b) querying the parsed file to determine various things such as:
+    - is the file private?
+    - is this headline exported?
+
+  "
   (:require [clojure.java.shell :as sh]
             [clojure.string :as s]
             [firn.util :as u]
+            [sci.core :as sci]
             [cheshire.core :as json])
   (:import iceshelf.clojure.rust.ClojureRust))
 
+;; -- Consts ----
+;;
+;; #+ORG_KEYWORDS that we want to evaluate into real clojure values.
+(def keywords-to-eval [:firn-toc :firn-properties? :firn-order :firn-fold :firn-sitemap? :firn-private])
+
+;; -- Data ----
+
+(defn empty-file
+  "The shape of a new org file.
+  Describes what an org file will look like after it's parsed."
+  []
+  {:as-edn   nil ; JSON of org file -> converted to a map.
+   :as-html  nil ; the html output
+   :as-json  nil ; The org file, read as json and spat out by the rust binary.
+   :keywords nil ; list of keywords at top of org file: #+TITLE:, #+CATEGORY, etc.
+   :name     ""  ; the file name
+   :path     ""  ; dir path to the file.
+   :meta     {}  ; is filled when process-file / extract-metadata is run.
+   :path-web ""  ; path to file from cwd: some/dirs/to/the/file - not well named.
+   :path-url ""
+   :original nil}
+  )
+
+;; -- Parsing ----
+
 (defn parse!
   "Parse the org-mode file-string.
-  NOTE: When developing with a REPL, this shells out to the rust bin.
+  When developing with a REPL, this shells out to the rust bin.
   When compiled to a native image, it uses JNI to talk to the rust .dylib."
   [file-str]
   (if (u/native-image?)
@@ -23,7 +56,7 @@
         (res :out)))))
 
 (defn parse-dev!
-  "Parses a string and returns it as edn. Useful for "
+  "DevXp func: Useful for testing org strings in the repl."
   [s]
   (let [parser   (str (u/get-cwd) "/resources/parser")
         stripped (s/trim-newline s)
@@ -32,16 +65,21 @@
       (prn "Orgize failed to parse file." stripped res)
       (json/parse-string (res :out) true))))
 
-;; -- Headlines
+(defn parsed-org-date->unix-time
+  "Converts the parsed org date (ex: [2020-04-27 Mon 15:39] -> 1588003740000)
+  and turns it into a unix timestamp."
+  [{:keys [year month day hour minute]} file-name]
 
-(defn get-headline-tags
-  "Takes a headline structure and returns it's tags."
-  [hl]
-  (-> hl :children first :tags))
+  (let [pod->str    (str year "-" month "-" day "T" hour ":" minute ":00.000-0000")
+        sdf         (java.text.SimpleDateFormat. "yyyy-MM-dd'T'HH:mm:ss.SSSZ")]
+    (try
+      (.getTime (.parse sdf pod->str))
+      (catch Exception e
+        (u/print-err! :warning  (str "Failed to parse the logbook for file:" "<<" file-name ">>" "\nThe logbook may be incorrectly formatted.\nError value:" e))
+        "???"))))
 
-(defn headline-exported?
-  [v]
-  (u/in? (get-headline-tags v) "noexport"))
+;; -- Getters ----
+;; Functions that pull data out of the org edn structure.
 
 (defn get-headline-helper
   "Sanitizes a heading of links and just returns text.
@@ -87,27 +125,36 @@
   (let [headline (get-headline tree name)]
     (update headline :children (fn [d] (filter #(not= (:type %) "title") d)))))
 
-(defn make-headline-anchor
-  "Takes a headline data structure and returns the id 'anchored' for slugifying"
-  [node]
-  (-> node get-headline-helper u/clean-anchor))
+(defn get-headline-tags
+  "Takes a headline structure and returns it's tags."
+  [hl]
+  (-> hl :children first :tags))
 
-;; -- Dates / Time
+(defn get-frontmatter [f]
+  (-> f :meta :keywords))
 
-(defn parsed-org-date->unix-time
-  "Converts the parsed org date (ex: [2020-04-27 Mon 15:39] -> 1588003740000)
-  and turns it into a unix timestamp."
-  [{:keys [year month day hour minute]} file-name]
+(defn get-firn-tags
+  "Gets tags out of the front matter
+  Exects key"
+  [file]
+  (let [fm (get-frontmatter file)
+        {:keys [firn-tags roam-tags] } fm
+        tags (or firn-tags roam-tags)
+        tags (when tags (u/org-keyword->vector tags))]
+    tags))
 
-  (let [pod->str    (str year "-" month "-" day "T" hour ":" minute ":00.000-0000")
-        sdf         (java.text.SimpleDateFormat. "yyyy-MM-dd'T'HH:mm:ss.SSSZ")]
-    (try
-      (.getTime (.parse sdf pod->str))
-      (catch Exception e
-        (u/print-err! :warning  (str "Failed to parse the logbook for file:" "<<" file-name ">>" "\nThe logbook may be incorrectly formatted.\nError value:" e))
-        "???"))))
+(defn get-keywords
+  "Returns a list of org-keywords from a file. All files must have keywords."
+  [f]
+  (let [expected-keywords (get-in f [:as-edn :children 0 :children])]
+    (when (= "keyword" (:type (first expected-keywords)))
+      expected-keywords)))
 
-;; -- Links
+(defn get-keyword
+  "Fetches a(n org) #+keyword from a file, if it exists."
+  [f keywrd]
+  (->> f get-keywords (u/find-first #(= keywrd (:key %))) :value))
+
 (defn get-link-parts
   "Converts `file:my_link.org` -> data of it's representative parts.
   file:my_link.org -> {:anchor nil :slug 'my_link'} "
@@ -119,72 +166,226 @@
         file-slug   (nth res 2)]
     {:anchor anchor-link :slug file-slug}))
 
-;; -- stats --
 
-(defn- find-day-to-update
-  [calendar-year log-entry]
-  (let [{:keys [day month year]} (log-entry :start)
-        logbook-date             (u/date-str (u/date-make year month day))]
-    (u/find-index-of #(= (% :date-str) logbook-date) calendar-year)))
+(defn parse-front-matter->map
+  "Converts an org-file's keywords into a map, evaling values as necessary.
+   [{:type keyword, :key TITLE, :value Firn, :post_blank 0}
+    {:type keyword, :key DATE_CREATED, :value <2020-03-01--09-53>, :post_blank 0}]
+                               Becomes 
+   {:title Firn, :date-created <2020-03-01--09-53>, :status active, :firn-layout project}"
+  [f]
+  (let [kw                  (get-keywords f)
+        lower-case-it       #(when % (s/lower-case %))
+        dash-it             #(when % (s/replace % #"_" "-"))
+        key->keyword        (fn [k] (-> k :key lower-case-it dash-it keyword))
+        has-req-frontmatter (some #(= (:key %) "TITLE") kw)
+        eval-it             (fn [kw]
+                              (let [k (key->keyword kw) v (kw :value)]
+                                (if (u/in? keywords-to-eval k)
+                                  {k (sci/eval-string v)}
+                                  {k v})))]
 
-(defn- update-logbook-day
-  "Updates a day in a calander from build-year with logbook data."
-  [{:keys [duration] :as log-entry}]
-  (fn [{:keys [log-count logs-raw log-sum] :as cal-day}]
-    (let [log-count (inc log-count)
-          logs-raw  (conj logs-raw log-entry)
-          log-sum   (u/timestr->add-time log-sum duration)]
-      (merge
-       cal-day
-       {:log-count log-count
-        :logs-raw  logs-raw
-        :log-sum   log-sum
-        :hour-sum  (u/timestr->hour-float log-sum)}))))
+    (when-not has-req-frontmatter
+      (u/print-err! :warning "File <<" (f :name) ">> does not have 'front-matter' and will not be processed."))
+    (->> kw (map eval-it) (into {}))))
 
-(defn logbook-year-stats
-  "Takes a logbook and pushes it's data into a year calendar.
-  Returns a map that looks like:
-  2020 = [ { :day 1, ... } { :day 2, ... } { :day 3, ... } { :day 4, ... } ... ]
-  2019 = [ { :day 1, ... } { :day 2, ... } { :day 3, ... } { :day 4, ... } ... ]
-  "
+
+;; -- Queries ----
+;; Functions that return a boolean based on the contents of org-file map.
+
+(defn headline-exported?
+  [v]
+  (u/in? (get-headline-tags v) "noexport"))
+
+(defn is-private?
+  "Returns true if a file meets the conditions of being 'private' Assumes the
+  files has been read into memory and parsed to edn. A file is private (read:
+  excluded) when it is in a private folder marked in :ignored-dirs in
+  config.edn, when there is no #+TITLE keyword, or when #+FIRN_PRIVATE is true."
+  [config f]
+  (let [{:keys [title firn-private]} (-> f :meta :keywords)
+        file-path                    (-> f :path (s/split #"/"))
+        in-priv-folder?              (some (set file-path) (-> config :user-config :ignored-dirs))]
+    (or (some? in-priv-folder?)
+        (nil? title)
+        firn-private)))
+
+(defn in-site-map?
+  "Checks if the processed file is in the site-map
+  By default, all files are in the sitemap, so we check that the keywords is nil."
+  [processed-file]
+  (nil? (-> processed-file :meta :keywords :firn-sitemap?)))
+
+
+;; -- Creators ----
+;; Functions that construct strings, data from other data.
+
+(defn make-headline-anchor
+  "Takes a headline data structure and returns the id 'anchored' for slugifying"
+  [node]
+  (-> node get-headline-helper u/clean-anchor))
+
+(defn make-file-tags
+  "A file tag includes must-have-metadata attached on create"
+  [{:keys [file-tags date-created-ts file-metadata]}]
+  (let [file-tags (when file-tags (u/org-keyword->vector file-tags))]
+    (when (seq file-tags)
+      (map #(merge file-metadata {:tag-value % :date-created-ts date-created-ts}) file-tags))))
+
+(defn make-site-map-item
+  "When processing a file, we generate a site-map item that receives the pertinent
+  metadata, and discards anything not needed."
+  [processed-file site-url]
+  (merge
+   (dissoc (processed-file :meta) :logbook :links :toc :keywords :tags :attachments)
+   {:path (str site-url "/" (processed-file :path-web))}))
+
+;; -- Dates / Time
+
+
+(defn sum-logbook
+  "Iterates over a logbook and parses logbook :duration's and sums 'em up"
   [logbook]
-  (loop [logbook logbook
-         output  {}]
-    (if (empty? logbook)
-      output
-      (let [x             (first logbook)
-            xs            (rest logbook)
-            log-year      (-> x :start :year)
-            output        (if (contains? output log-year) output
-                              (assoc output log-year (u/build-year log-year))) ; make year if there isn't one already.
-            day-to-update (find-day-to-update (get output log-year) x)
-            output        (update-in output [log-year day-to-update] (update-logbook-day x))]
-        (recur xs output)))))
+  (let [hours-minutes [0 0]
+        ;; Reduce ain't pretty. Should clean this up someday.
+        reduce-fn     (fn [[acc-hours acc-minutes] log-entry]
+                        (let [[hour min] (u/timestr->hours-min (:duration log-entry))
+                              new-res    [(+ acc-hours hour) (+ acc-minutes min)]]
+                          new-res))]
+    (->> logbook
+       (reduce reduce-fn hours-minutes)
+       (u/timevec->time-str))))
 
-;; Rendered charts:
+(defn- sort-logbook
+  "Loops over all logbooks, adds start and end unix timestamps."
+  [logbook file-name]
+  (let [mf #(parsed-org-date->unix-time %1 file-name)]
+    (->> logbook
+       ;; Filter out timestamps if they don't have a start or end.
+       (filter #(and (% :start) (% :end) (% :duration)))
+       ;; adds a unix timestamp for the :start and :end time so that's sortable.
+       (map #(assoc % :start-ts (mf (:start %)) :end-ts (mf (:end %))))
+       (sort-by :start-ts #(> %1 %2)))))
 
-;; TODO This should be in markup, as it's spitting out html
-(defn poly-line
-  "Takes a logbook, formats it so that it can be plotted along a polyline."
-  ([logbook]
-   (poly-line logbook {}))
-  ([logbook
-    {:keys [width height stroke stroke-width]
-     :or   {width 365 height 100 stroke "#0074d9" stroke-width 1}}]
-   [:div
-    (for [[year year-of-logs] (logbook-year-stats logbook)
-          :let [; max-log     (apply max-key :hour-sum year-of-logs) ;; Don't need this yet.
-                ;; This should be measured against the height and whatever the max-log is.
-                g-multiplier (/ height 8) ;; 8 - max hours we expect someone to log in a day
-                fmt-points  #(str %1 "," (* g-multiplier (%2 :hour-sum)))
-                points      (s/join " " (->> year-of-logs (map-indexed fmt-points)))]]
+(defn extract-metadata-helper
+  "There are lots of things we want to extract when iterating over the AST.
+  Rather than filter/loop/map over it several times, it all happens here.
+  Collects:
+  - Logbooks
+  - Links
+  - Headings for TOC.
+  - eventually... a plugin for custom file collection?"
+  [tree-data file-metadata]
+  (loop [tree-data     tree-data
+         out           {:logbook            []
+                        :logbook-total      nil
+                        :links              []
+                        :tags               []
+                        :toc                []
+                        :attachments        []
+                        :__last-no-export__ nil}
+         last-headline nil]  ; the most recent headline we've encountered.
+    (if (empty? tree-data)
 
-      [:div
-       [:h5.firn-headline.firn-headline-5 year]
-       [:svg {:viewbox (format "0 0 %s %s" width height)
-              :class   "chart"}
-        [:g {:transform (format "translate(0, %s) scale(1, -1)", (- height (* stroke-width 1.25)))}
-         [:polyline {:fill         "none"
-                     :stroke       stroke
-                     :stroke-width "1"
-                     :points points}]]]])]))
+      ;; << The final formatting pre-return >>
+      (let [out (update out :logbook #(sort-logbook % (file-metadata :from-file)))
+            out (assoc out :logbook-total (sum-logbook (out :logbook)))]
+        (dissoc out :__last-no-export__))
+
+      ;; << The Loop >>
+      (let [x  (first tree-data)
+            xs (rest tree-data)]
+        (case (:type x)
+          "headline" ; if headline, collect data, push into toc, and set as "last-headline"
+          (let [lvl      (x :level)
+                last-ex  (out :__last-no-export__)
+                toc-item {:level  lvl
+                          :text   (get-headline-helper x)
+                          :anchor (make-headline-anchor x)}
+                ;; only add an item to the toc IF it is not a node or child of a headline tagged with :noexport:
+                out      (if (headline-exported? x) ;;
+                            (assoc out :__last-no-export__ x)
+                            (if (and (not (nil? last-ex)) (> lvl (get last-ex :level)))
+                              out
+                              (-> out
+                                  (update :toc conj toc-item)
+                                  (assoc :__last-no-export__ nil))))]
+
+            (recur xs out x))
+
+          "title" ; if title, collect tags, map with metadata, push into out :tags
+          (let [headline-link  (str (file-metadata :from-url)
+                                    (make-headline-anchor last-headline))
+                headline-meta  {:from-headline (get-headline-helper last-headline)
+                                :headline-link headline-link}
+                tags           (filter #(not= % "noexport") (x :tags)) ;; remove "noexport", all other tags are eligible.
+                tags-with-meta (map #(merge headline-meta file-metadata {:tag-value %}) tags)
+                add-tags       #(vec (concat % tags-with-meta))
+                out            (update out :tags add-tags)]
+            (recur xs out last-headline))
+
+          "clock" ; if clock, merge headline-data into it, and push/recurse into out
+          (let [headline-meta {:from-headline (-> last-headline :children first :raw)}
+                new-log-item  (merge headline-meta file-metadata x)
+                out           (update out :logbook conj new-log-item)]
+            (recur xs out last-headline))
+
+          "link" ; if link, also merge file metadata and push into new-links and recurse.
+          (let [link-item (merge x file-metadata)
+                out       (update out :links conj link-item)
+                ;; if link starts with `file:` an ends with .png|.jpg|etc
+                out       (if (u/is-attachment? (link-item :path))
+                            (update out :attachments conj (link-item :path))
+                            out)]
+            (recur xs out last-headline))
+
+          ;; default case, recur.
+          (recur xs out last-headline))))))
+
+(defn get-metadata
+  "Iterates over a tree, and returns metadata for site-wide usage such as
+  links (for graphing between documents, tbd) and logbook entries.
+  Many of the values in the map are also contained in `keywords`"
+  [file]
+  (let [org-tree       (file :as-edn)
+        tree-data      (tree-seq map? :children org-tree)
+        keywords       (parse-front-matter->map file) ; keywords are "in-buffer-settings" - things that start with #+<MY_KEYWORD>
+        {:keys [date-updated date-created title firn-under firn-order firn-tags roam-tags]} keywords
+        file-tags      (or firn-tags roam-tags)
+        file-metadata  {:from-file title
+                        :from-url  (file :path-url)
+                        :file-tags (when file-tags (u/org-keyword->vector file-tags))}
+        metadata       (extract-metadata-helper tree-data file-metadata)
+        date-parser    #(try
+                          (when % (u/org-date->ts %))
+                          (catch Exception e
+                            (u/print-err! :error  (str "Could not parse date for file: " (or title "<unknown file>") "\nPlease confirm that you have correctly set the #+DATE_CREATED: and #+DATE_UPDATED values in your org file."))))
+        file-tags      (make-file-tags {:file-tags       file-tags
+                                         :file-metadata   file-metadata
+                                         :date-created-ts (date-parser date-created)})]
+
+    (merge metadata
+           {:keywords        keywords
+            :title           title
+            :firn-under      (when firn-under (u/org-keyword->vector firn-under))
+            :firn-order      firn-order
+            :firn-tags       file-tags
+            :date-updated    (when date-updated (u/strip-org-date date-updated))
+            :date-created    (when date-created (u/strip-org-date date-created))
+            :date-updated-ts (date-parser date-updated)
+            :date-created-ts (date-parser date-created)})))
+
+(defn make-file
+  [config io-file]
+  (let [name     (u/get-file-io-name io-file)
+        path-abs (.getPath ^java.io.File io-file)
+        path-web (u/get-web-path (config :dirname-files) path-abs)
+        path-url (str (get-in config [:user-config :site-url]) "/"  path-web)
+        as-json  (->> io-file slurp parse!)                     ; slurp the contents of a file and parse it to json.
+        as-edn   (-> as-json (json/parse-string true))          ; convert the json to edn.
+        ;; attach parsed data into a new file:
+        new-file (assoc (empty-file) :name name :path path-abs :path-url path-web :path-web path-web :path-url path-url :as-json as-json :as-edn as-edn)
+        new-file (assoc new-file :meta (get-metadata new-file)) ;; attach metadata
+        ;; new-file (if render-html?)
+        ]
+    new-file))
