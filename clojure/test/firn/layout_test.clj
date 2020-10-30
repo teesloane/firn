@@ -15,6 +15,6 @@
   (t/testing "The tf-layout file returns a sci function.")
   (let [test-file     (stub/gtf :tf-layout :processed)
         sample-config (build/setup (stub/sample-config))
-        layout        (keyword (org/get-keyword test-file "FIRN_LAYOUT"))
+        layout        (keyword (org/get-frontmatter test-file :firn-layout))
         res           (sut/get-layout sample-config test-file layout)]
     (t/is (= sci.impl.vars.SciVar (type res)))))

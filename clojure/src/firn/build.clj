@@ -66,10 +66,9 @@
 (defn htmlify
   "Render the html of a file using the layout specified. Stores results in file map :as-html."
   [config f]
-  (let [layout   (keyword (org/get-keyword f "FIRN_LAYOUT")) ;; TODO - replace this with "get-frontmatter"
+  (let [layout   (keyword (org/get-frontmatter f :firn-layout))
         as-html  (when-not (org/is-private? config f)
                    (layout/apply-layout config f layout))]
-    ;; as-html
     (assoc f :as-html as-html)))
 
 (defn make-site-map

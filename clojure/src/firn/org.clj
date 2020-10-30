@@ -130,8 +130,11 @@
   [hl]
   (-> hl :children first :tags))
 
-(defn get-frontmatter [f]
-  (-> f :meta :keywords))
+(defn get-frontmatter
+  ([file]
+   (-> file :meta :keywords))
+  ([file k]
+   (-> file :meta :keywords k)))
 
 (defn get-firn-tags
   "Gets tags out of the front matter
@@ -149,11 +152,6 @@
   (let [expected-keywords (get-in f [:as-edn :children 0 :children])]
     (when (= "keyword" (:type (first expected-keywords)))
       expected-keywords)))
-
-(defn get-keyword
-  "Fetches a(n org) #+keyword from a file, if it exists."
-  [f keywrd]
-  (->> f get-keywords (u/find-first #(= keywrd (:key %))) :value))
 
 (defn get-link-parts
   "Converts `file:my_link.org` -> data of it's representative parts.
@@ -190,7 +188,7 @@
     (->> kw (map eval-it) (into {}))))
 
 
-;; -- Queries ----
+;; -- Questions ----
 ;; Functions that return a boolean based on the contents of org-file map.
 
 (defn headline-exported?
@@ -342,7 +340,7 @@
           ;; default case, recur.
           (recur xs out last-headline))))))
 
-(defn get-metadata
+(defn extract-metadata
   "Iterates over a tree, and returns metadata for site-wide usage such as
   links (for graphing between documents, tbd) and logbook entries.
   Many of the values in the map are also contained in `keywords`"
@@ -385,7 +383,7 @@
         as-edn   (-> as-json (json/parse-string true))          ; convert the json to edn.
         ;; attach parsed data into a new file:
         new-file (assoc (empty-file) :name name :path path-abs :path-url path-web :path-web path-web :path-url path-url :as-json as-json :as-edn as-edn)
-        new-file (assoc new-file :meta (get-metadata new-file)) ;; attach metadata
+        new-file (assoc new-file :meta (extract-metadata new-file)) ;; attach metadata
         ;; new-file (if render-html?)
         ]
     new-file))

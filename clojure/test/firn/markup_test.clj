@@ -291,7 +291,7 @@
       (t/is (= res-old-sort [:div.firn-file-tags '([:div.firn-file-tags-container [:div.firn-file-tag-name {:id "bar", :class "firn-file-tag-name"} "bar"] [:ul.firn-file-tag-list ([:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file1"} "Org Mode"]])]] [:div.firn-file-tags-container [:div.firn-file-tag-name {:id "baz", :class "firn-file-tag-name"} "baz"] [:ul.firn-file-tag-list ([:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file-small"} "Firn"]] [:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file2"} "Firn"]])]] [:div.firn-file-tags-container [:div.firn-file-tag-name {:id "bo", :class "firn-file-tag-name"} "bo"] [:ul.firn-file-tag-list ([:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file-small"} "Firn"]])]] [:div.firn-file-tags-container [:div.firn-file-tag-name {:id "foo", :class "firn-file-tag-name"} "foo"] [:ul.firn-file-tag-list ([:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file-small"} "Firn"]] [:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file2"} "Firn"]] [:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file1"} "Org Mode"]])]])]))
       )))
 
-  (t/deftest render-related-files
+(t/deftest render-related-files
     (t/testing "Expected results"
       (let [tf1           (stub/gtf :tf-small :processed)
             tf2           (stub/gtf :tf-footnotes :processed)
@@ -308,3 +308,26 @@
                          [:a.firn-related-file-link {:href "/file1"} "Org Mode"]]]]))
         ;; renders nil when no shared files are found.
         (t/is (= res2 nil)))))
+
+(t/deftest logbook-year-stats
+  (let [logbook        (-> (stub/gtf :tf-metadata :processed) :meta :logbook)
+        res            (sut/logbook-year-stats logbook)
+        first-of-2020  (first (get res 2020))
+        second-of-2020 (second (get res 2020))]
+
+    ;; the sample logbook has dates from 2017 and 2020.
+    (t/is (contains? res 2020))
+    (t/is (contains? res 2017))
+
+    ;; there is no log entry for 2020-01-01 so we expect
+    ;; to it be an unaltered map, as produced by build-year
+    (t/is (= (first-of-2020 :log-sum) "00:00"))
+    (t/is (= (first-of-2020 :log-count) 0))
+    (t/is (= (-> first-of-2020 :logs-raw count) 0))
+    (t/is (= (first-of-2020 :hour-sum) 0))
+
+    ;; however, the second day, DOES have a log entry, (see file-metadata.org)
+    (t/is (= (second-of-2020 :log-sum) "0:11"))
+    (t/is (= (second-of-2020 :log-count) 1))
+    (t/is (= (second-of-2020 :hour-sum) 0.18))
+    (t/is (= (-> second-of-2020 :logs-raw count) 1))))
