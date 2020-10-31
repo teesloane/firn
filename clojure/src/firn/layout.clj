@@ -7,7 +7,8 @@
   (:require [firn.markup :as markup]
             [firn.org :as org]
             [hiccup.core :as h]
-            [firn.util :as u]))
+            [firn.util :as u]
+            [firn.config :as cfg]))
 
 (defn internal-default-layout
   "The default template if no `layout` key and no default.clj layout is specified."
@@ -97,7 +98,7 @@
        (markup/render-backlinks {:site-links         (config :site-links)
                                  :site-links-private (config :site-links-private)
                                  :file               file
-                                 :site-url           (get-in config [:user-config :site-url])})
+                                 :site-url           (cfg/prop config :site-url)})
 
        ;; render the previous file based on firn-order
        (= action :adjacent-files)
@@ -156,7 +157,7 @@
   made available in user layouts.
   NOTE | PERF:  This might be being called twice."
   [config file]
-  (let [site-url (-> config :user-config :site-url)]
+  (let [site-url (cfg/prop config :site-url)]
     {;; Layout stuff --
      :render        (partial render {:file file :config config})
      :partials      (config :partials)
@@ -164,9 +165,9 @@
      :site-map      (config :site-map)
      :site-links    (config :site-links)
      :site-logs     (config :site-logs)
-     :site-title    (-> config :user-config :site-title)
-     :site-author   (-> config :user-config :site-author)
-     :site-desc     (-> config :user-config :site-desc)
+     :site-title    (cfg/prop config :site-title)
+     :site-author   (cfg/prop config :site-author)
+     :site-desc     (cfg/prop config :site-desc)
      :site-url      site-url
      :org-tags      (config :org-tags)
      :firn-tags     (config :firn-tags)
@@ -178,7 +179,7 @@
      :logbook       (-> file :meta :logbook)
      :file-links    (-> file :meta :links) ;; TODO - possible re/move this too.
      :title         (-> file :meta :title)
-     :firn-under    (-> file :meta :firn-under) ;; TODO this should be removed; should be handled by the render function.
+     :firn-under    (-> file :meta :firn-under) ;; TODO this should be removed; should be handled by the render function...?
      :logbook-total (-> file :meta :logbook-total)
      :date-updated  (-> file :meta :date-updated)
      :date-created  (-> file :meta :date-created)}))

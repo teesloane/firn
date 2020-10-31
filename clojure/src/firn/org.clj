@@ -13,7 +13,9 @@
             [clojure.string :as s]
             [firn.util :as u]
             [sci.core :as sci]
-            [cheshire.core :as json])
+            [cheshire.core :as json]
+            [firn.config :as cfg]
+            [clojure.string :as str])
   (:import iceshelf.clojure.rust.ClojureRust))
 
 ;; -- Consts ----
@@ -164,7 +166,6 @@
         file-slug   (nth res 2)]
     {:anchor anchor-link :slug file-slug}))
 
-
 (defn parse-front-matter->map
   "Converts an org-file's keywords into a map, evaling values as necessary.
    [{:type keyword, :key TITLE, :value Firn, :post_blank 0}
@@ -187,7 +188,6 @@
       (u/print-err! :warning "File <<" (f :name) ">> does not have 'front-matter' and will not be processed."))
     (->> kw (map eval-it) (into {}))))
 
-
 ;; -- Questions ----
 ;; Functions that return a boolean based on the contents of org-file map.
 
@@ -203,7 +203,7 @@
   [config f]
   (let [{:keys [title firn-private]} (-> f :meta :keywords)
         file-path                    (-> f :path (s/split #"/"))
-        in-priv-folder?              (some (set file-path) (-> config :user-config :ignored-dirs))]
+        in-priv-folder?              (some (set file-path) (cfg/prop config :ignored-dirs))]
     (or (some? in-priv-folder?)
         (nil? title)
         firn-private)))
@@ -214,8 +214,23 @@
   [processed-file]
   (nil? (-> processed-file :meta :keywords :firn-sitemap?)))
 
+(defn is-file-link?
+  "Tests if an org link is a file link."
+  [org-link]
+  (let [regex #"(file:)(.*)\.(org)(\:\:\*.+)?"
+        res (re-matches regex org-link)]
+    (some? res)))
 
-;; -- Creators ----
+(defn is-nested-file-link?
+  "Tests if an org link looks like this: `file:my/nested/link.org`"
+  [org-link]
+  (when (is-file-link? org-link)
+    (-> org-link
+        get-link-parts
+        :slug
+        (str/includes? "/"))))
+
+;; -- Makers ----
 ;; Functions that construct strings, data from other data.
 
 (defn make-headline-anchor
@@ -238,8 +253,15 @@
    (dissoc (processed-file :meta) :logbook :links :toc :keywords :tags :attachments)
    {:path (str site-url "/" (processed-file :path-web))}))
 
-;; -- Dates / Time
-
+(defn internal-link-handler
+  "Takes an org link and converts it into an html path."
+  [org-link {:keys [site-url file]}]
+  (let [{:keys [anchor slug]} (get-link-parts org-link)
+        curr-file-path        (-> file :path-web)
+        path                  (or (u/build-web-path curr-file-path slug) slug)]
+    (if anchor
+      (str site-url "/" path anchor)
+      (str site-url "/" path))))
 
 (defn sum-logbook
   "Iterates over a logbook and parses logbook :duration's and sums 'em up"
@@ -273,7 +295,7 @@
   - Links
   - Headings for TOC.
   - eventually... a plugin for custom file collection?"
-  [tree-data file-metadata]
+  [config tree-data file-metadata]
   (loop [tree-data     tree-data
          out           {:logbook            []
                         :logbook-total      nil
@@ -329,7 +351,8 @@
             (recur xs out last-headline))
 
           "link" ; if link, also merge file metadata and push into new-links and recurse.
-          (let [link-item (merge x file-metadata)
+          (let [site-url (cfg/prop config :site-url)
+                link-item (merge x file-metadata)
                 out       (update out :links conj link-item)
                 ;; if link starts with `file:` an ends with .png|.jpg|etc
                 out       (if (u/is-attachment? (link-item :path))
@@ -344,7 +367,7 @@
   "Iterates over a tree, and returns metadata for site-wide usage such as
   links (for graphing between documents, tbd) and logbook entries.
   Many of the values in the map are also contained in `keywords`"
-  [file]
+  [config file]
   (let [org-tree       (file :as-edn)
         tree-data      (tree-seq map? :children org-tree)
         keywords       (parse-front-matter->map file) ; keywords are "in-buffer-settings" - things that start with #+<MY_KEYWORD>
@@ -353,7 +376,7 @@
         file-metadata  {:from-file title
                         :from-url  (file :path-url)
                         :file-tags (when file-tags (u/org-keyword->vector file-tags))}
-        metadata       (extract-metadata-helper tree-data file-metadata)
+        metadata       (extract-metadata-helper config tree-data file-metadata)
         date-parser    #(try
                           (when % (u/org-date->ts %))
                           (catch Exception e
@@ -363,7 +386,7 @@
                                          :date-created-ts (date-parser date-created)})]
 
     (merge metadata
-           {:keywords        keywords
+           {:keywords        keywords ;; FIXME this ... should be called "frontmatter"
             :title           title
             :firn-under      (when firn-under (u/org-keyword->vector firn-under))
             :firn-order      firn-order
@@ -378,12 +401,12 @@
   (let [name     (u/get-file-io-name io-file)
         path-abs (.getPath ^java.io.File io-file)
         path-web (u/get-web-path (config :dirname-files) path-abs)
-        path-url (str (get-in config [:user-config :site-url]) "/"  path-web)
+        path-url (str (cfg/prop config :site-url)  "/"  path-web)
         as-json  (->> io-file slurp parse!)                     ; slurp the contents of a file and parse it to json.
         as-edn   (-> as-json (json/parse-string true))          ; convert the json to edn.
         ;; attach parsed data into a new file:
         new-file (assoc (empty-file) :name name :path path-abs :path-url path-web :path-web path-web :path-url path-url :as-json as-json :as-edn as-edn)
-        new-file (assoc new-file :meta (extract-metadata new-file)) ;; attach metadata
+        new-file (assoc new-file :meta (extract-metadata config new-file)) ;; attach metadata
         ;; new-file (if render-html?)
         ]
     new-file))

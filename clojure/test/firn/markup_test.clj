@@ -54,17 +54,6 @@
     (t/is (= (sut/link->html (sample-links :file-link) {:site-url ""})
              [:a.firn-internal {:href "/file2"} "File 2"]))))
 
-(t/deftest internal-link-handler
-  (t/testing "Expected results."
-    (let [res1                 (sut/internal-link-handler "file:foo.org" {:site-url "http://mysite.com" })
-          res2                 (sut/internal-link-handler "file:foo.org::*my headline link" {:site-url "http://mysite.com"})
-          res-from-nested-file (sut/internal-link-handler "file:foo.org::*my headline link" {:site-url "http://mysite.com" :file {:path-web "bar/test"}})
-          res-up-dir           (sut/internal-link-handler "file:../foo.org" {:site-url "http://mysite.com" :file {:path-web "lvl1/lvl2/lvl3"}})]
-      (t/is (= res1 "http://mysite.com/foo"))
-      (t/is (= res2 "http://mysite.com/foo#my-headline-link"))
-      (t/is (= res-up-dir "http://mysite.com/lvl1/foo"))
-      (t/is (= res-from-nested-file "http://mysite.com/bar/foo#my-headline-link")))))
-
 (t/deftest make-toc
   (let [ex1     [{:level 1, :text "Process" :anchor "#process"}
                  {:level 2, :text "Relevance" :anchor "#relevance"}]

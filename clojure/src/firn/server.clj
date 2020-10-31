@@ -21,7 +21,6 @@
   (let [stripped (s/join "" (-> req :uri rest))]
     (u/remove-ext stripped "html")))
 
-
 (defn reload-requested-file
   "Take a request to a file, pulls the file out of memory
   grabs the path of the original file, reslurps it and reprocesses"
@@ -29,9 +28,7 @@
   (let [re-slurped        (-> file :path io/file)]
         (->> re-slurped
              (org/make-file config)
-             (build/htmlify config))
-        ))
-
+             (build/htmlify config))))
 
 (defn reload-requested-page
   "When user requests a non-org-file page (pages/*.clj), we reslurp the clj files

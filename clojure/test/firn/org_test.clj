@@ -66,6 +66,16 @@
           res (sut/make-headline-anchor sample-headline)]
       (t/is (= res "#my-headline")))))
 
+(t/deftest internal-link-handler
+  (t/testing "Expected results."
+    (let [res1                 (sut/internal-link-handler "file:foo.org" {:site-url "http://mysite.com" })
+          res2                 (sut/internal-link-handler "file:foo.org::*my headline link" {:site-url "http://mysite.com"})
+          res-from-nested-file (sut/internal-link-handler "file:foo.org::*my headline link" {:site-url "http://mysite.com" :file {:path-web "bar/test"}})
+          res-up-dir           (sut/internal-link-handler "file:../foo.org" {:site-url "http://mysite.com" :file {:path-web "lvl1/lvl2/lvl3"}})]
+      (t/is (= res1 "http://mysite.com/foo"))
+      (t/is (= res2 "http://mysite.com/foo#my-headline-link"))
+      (t/is (= res-up-dir "http://mysite.com/lvl1/foo"))
+      (t/is (= res-from-nested-file "http://mysite.com/bar/foo#my-headline-link")))))
 
 ;;;;;;;;;; MIGRATED TESTS -------------------------------------
 
@@ -90,7 +100,7 @@
 (t/deftest make
   (t/testing "Has correct values with the dummy io-file"
     (let [test-file (stub/gtf :tf-1 :io)
-          new-file (sut/make (stub/sample-config) test-file)]
+          new-file (sut/make-file (stub/sample-config) test-file)]
 
       (t/is (= (new-file :name)    "file1"))
       (t/is (= (new-file :path)    (.getPath ^java.io.File test-file)))
@@ -158,12 +168,6 @@
           res    (sut/get-keywords file-1)]
       (doseq [keywrd res]
         (t/is (= "keyword" (:type keywrd)))))))
-
-(t/deftest get-keyword
-  (t/testing "It returns a keyword"
-    (let [file-1 (stub/gtf :tf-1 :processed)
-          res    (sut/get-keyword file-1 "FIRN_LAYOUT")]
-      (t/is (= "default" res)))))
 
 ;; TODO: flakey test on CI.
 ;; (t/deftest make-site-map-item

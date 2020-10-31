@@ -6,7 +6,6 @@
             [firn.org :as org]))
 
 (declare to-html)
-(declare internal-link-handler)
 
 ;; Renderers -------------------------------------------------------------------
 
@@ -156,7 +155,7 @@
   [{:keys [site-links file site-url site-links-private] :as opts}]
   (let [; transform site-links-private to what their url form would be.
         site-links-private       (map #(str site-url "/" %) site-links-private)
-        org-path-match-file-url? #(let [site-link (internal-link-handler (% :path) opts)]
+        org-path-match-file-url? #(let [site-link (org/internal-link-handler (% :path) opts)]
                                     (and
                                      (= site-link (file :path-url))
                                      (not (u/in? site-links-private site-link))))
@@ -447,15 +446,7 @@
      [:span.firn-img-caption desc]]
     [:img {:src path}]))
 
-(defn internal-link-handler
-  "Takes an org link and converts it into an html path."
-  [org-link {:keys [site-url file] :as opts}]
-  (let [{:keys [anchor slug]} (org/get-link-parts org-link)
-        curr-file-path        (-> file :path-web)
-        path                  (or (u/build-web-path curr-file-path slug) slug)]
-    (if anchor
-      (str site-url "/" path anchor)
-      (str site-url "/" path))))
+
 
 (defn link->html
   "Parses links from the org-tree.
@@ -496,7 +487,7 @@
         (if is-priv-link?
           [:span.firn-link-disabled link-val]
           [:a.firn-internal
-           {:href (internal-link-handler link-href opts)} link-val]))
+           {:href (org/internal-link-handler link-href opts)} link-val]))
 
       (re-matches http-link-regex link-href)
       [:a.firn-external {:href link-href :target "_blank"} link-val]

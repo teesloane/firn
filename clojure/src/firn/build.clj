@@ -10,7 +10,8 @@
             [firn.util :as u]
             [me.raynes.fs :as fs]
             [hiccup.core :as h]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [firn.config :as cfg]))
 
 (set! *warn-on-reflection* true)
 
@@ -112,19 +113,10 @@
           (recur tail out)))
       out)))
 
-(defn process-one
-  "Munge the 'file' datastructure; slowly filling it up, using let-shadowing.
-  Essentially, converts `org-mode file string` -> json, edn, logbook, keywords"
-  ([config f] (process-one config f false))
-  ([config f live-reload?]
-  (let [new-file       (org/make-file config f)
-        final-file    (if live-reload? (htmlify config new-file) new-file)]                   ; parses the edn tree -> html.
-    final-file)))
-
 (defn process-all ; (ie, just org-files, not pages)
   "Receives config, processes all ORG files and builds up site-data logbooks, site-map, link-map, etc.
   This is where the magic happens for collecting metadata. Follow the chain:
-  process-all -> process-one -> org/extract-metadata -> org/extract-metadata-helper"
+  process-all -> org/extract-metadata -> org/extract-metadata-helper"
   [config]
   (loop [org-files (config :org-files)
          site-vals {:processed-files    {}
@@ -169,7 +161,7 @@
                                     true        (update :site-attachments concat attachments)
                                     true        (update :org-tags concat tags)
                                     true        (update :firn-tags concat firn-tags)
-                                    in-sitemap? (update :site-map conj (org/make-site-map-item processed-file (-> config :user-config :site-url))))]
+                                    in-sitemap? (update :site-map conj (org/make-site-map-item processed-file (cfg/prop config :site-url) )))]
             (recur org-files updated-site-vals updated-output)))))))
 
 (defn write-rss-file!
