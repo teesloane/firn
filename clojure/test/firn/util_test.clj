@@ -204,3 +204,14 @@
       (t/is (= 365 (count year-2019))))
     (t/testing "The day has expected keys"
       (t/is (= sample-day expected-day)))))
+
+
+(t/deftest get-web-path
+  (t/testing "It properly builds webpath"
+    (t/is
+     (= "baz/foo/test"
+        (sut/get-web-path "my-files" "foo/bar/my-files/baz/foo/test.org")))))
+
+(t/deftest get-file-io-name
+  (t/testing "Get a file name extension from a java io object"
+    (t/is (= "file1" (sut/get-file-io-name (stub/gtf :tf-1 :io))))))

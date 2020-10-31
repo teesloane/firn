@@ -1,9 +1,8 @@
 #+TITLE: Getting Started
 #+DATE_CREATED: <2020-03-27 Fri>
-#+DATE_UPDATED: <2020-09-21 18:22>
+#+DATE_UPDATED: <2020-10-30 14:53>
 #+FIRN_LAYOUT: docs
 #+FIRN_ORDER: 1
-
 
 Welcome to the Firn documentation. The Getting Started section covers the following:
 
