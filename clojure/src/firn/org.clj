@@ -255,7 +255,7 @@
 
 (defn internal-link-handler
   "Takes an org link and converts it into an html path."
-  [org-link {:keys [site-url file]}]
+  [{:keys [org-link site-url file]}]
   (let [{:keys [anchor slug]} (get-link-parts org-link)
         curr-file-path        (-> file :path-web)
         path                  (or (u/build-web-path curr-file-path slug) slug)]
@@ -324,12 +324,12 @@
                           :anchor (make-headline-anchor x)}
                 ;; only add an item to the toc IF it is not a node or child of a headline tagged with :noexport:
                 out      (if (headline-exported? x) ;;
-                            (assoc out :__last-no-export__ x)
-                            (if (and (not (nil? last-ex)) (> lvl (get last-ex :level)))
-                              out
-                              (-> out
-                                  (update :toc conj toc-item)
-                                  (assoc :__last-no-export__ nil))))]
+                           (assoc out :__last-no-export__ x)
+                           (if (and (not (nil? last-ex)) (> lvl (get last-ex :level)))
+                             out
+                             (-> out
+                                 (update :toc conj toc-item)
+                                 (assoc :__last-no-export__ nil))))]
 
             (recur xs out x))
 
@@ -351,8 +351,11 @@
             (recur xs out last-headline))
 
           "link" ; if link, also merge file metadata and push into new-links and recurse.
-          (let [site-url (cfg/prop config :site-url)
-                link-item (merge x file-metadata)
+          (let [
+                link-url  (internal-link-handler {:org-link (x :path)
+                                                  :site-url (cfg/prop config :site-url)
+                                                  :file     {:path-web (file-metadata :path-web)} })
+                link-item (merge x file-metadata {:path-url link-url})
                 out       (update out :links conj link-item)
                 ;; if link starts with `file:` an ends with .png|.jpg|etc
                 out       (if (u/is-attachment? (link-item :path))
@@ -375,6 +378,7 @@
         file-tags      (or firn-tags roam-tags)
         file-metadata  {:from-file title
                         :from-url  (file :path-url)
+                        :path-web  (file :path-web)
                         :file-tags (when file-tags (u/org-keyword->vector file-tags))}
         metadata       (extract-metadata-helper config tree-data file-metadata)
         date-parser    #(try

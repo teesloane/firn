@@ -59,8 +59,9 @@
          ;; the big merged options! This is used across various render fns,
          ;; essentially a refined config object with user specific (and some
          ;; internal data)
-         merged-options            (merge config-settings layout-settings front-matter-settings {:site-links-private (config :site-links-private)
-                                                                                                 :file file})
+         merged-options            (merge config-settings layout-settings front-matter-settings
+                                          {:site-links-private (config :site-links-private)
+                                           :file               file})
          is-headline?              (string? action)
          {:keys [toc logbook
                  firn-under
@@ -95,10 +96,8 @@
 
        ;; render a list of links that link back to the current file
        (= action :backlinks)
-       (markup/render-backlinks {:site-links         (config :site-links)
-                                 :site-links-private (config :site-links-private)
-                                 :file               file
-                                 :site-url           (cfg/prop config :site-url)})
+       (markup/render-backlinks (merge merged-options {:site-links (config :site-links)
+                                                       :site-url   (cfg/prop config :site-url)}))
 
        ;; render the previous file based on firn-order
        (= action :adjacent-files)

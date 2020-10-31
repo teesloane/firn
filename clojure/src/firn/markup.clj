@@ -153,9 +153,8 @@
   "When rendering a file, filters the site-links for all links (that are not
   private) that link to the file."
   [{:keys [site-links file site-url site-links-private] :as opts}]
-  (let [; transform site-links-private to what their url form would be.
-        site-links-private       (map #(str site-url "/" %) site-links-private)
-        org-path-match-file-url? #(let [site-link (org/internal-link-handler (% :path) opts)]
+  (let [site-links-private       (map #(str site-url "/" %) site-links-private)
+        org-path-match-file-url? #(let [site-link (% :path-url)]
                                     (and
                                      (= site-link (file :path-url))
                                      (not (u/in? site-links-private site-link))))
@@ -487,7 +486,7 @@
         (if is-priv-link?
           [:span.firn-link-disabled link-val]
           [:a.firn-internal
-           {:href (org/internal-link-handler link-href opts)} link-val]))
+           {:href (org/internal-link-handler (assoc opts :org-link link-href))} link-val]))
 
       (re-matches http-link-regex link-href)
       [:a.firn-external {:href link-href :target "_blank"} link-val]
