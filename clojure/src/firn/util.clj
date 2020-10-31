@@ -8,7 +8,6 @@
 
 (set! *warn-on-reflection* true)
 
-
 (def sci-bindings {:bindings {'println println
                               'prn prn
                               }})
@@ -57,6 +56,12 @@
   "Find files matching given `pattern`."
   [path pattern]
   (find-files* path #(re-matches pattern (.getName ^java.io.File %))))
+
+(defn get-file-io-name
+  "Returns the name of a file from the Java ioFile object w/o an extension."
+  [f]
+  (let [f-name (.getName ^java.io.File f)]
+    (-> f-name (s/split #"\.") (first))))
 
 (defn find-files-by-ext
   "Traverses a directory for all files of a specific extension."
@@ -142,6 +147,22 @@
         eval-file #(-> % file-path slurp (sci/eval-string sci-bindings))]
     (into {} (map #(hash-map (io-file->keyword %) (eval-file %)) file-list))))
 
+(defn read-clj
+  "Reads a folder full of clj files, such as partials or layouts.
+  pass a symbol for dir to request a specific folder."
+  [dir {:keys [dir-partials dir-layouts dir-pages]}]
+  (case dir
+    :layouts
+    (-> dir-layouts (find-files-by-ext "clj") (load-fns-into-map))
+
+    :partials
+    (-> dir-partials (find-files-by-ext "clj") (load-fns-into-map))
+
+    :pages
+    (-> dir-pages (find-files-by-ext "clj") (load-fns-into-map))
+
+    (throw (Exception. "Ensure you are passing the right possible keywords to read-clj."))))
+
 (defn dupe-name-in-dir-path?
   "Takes a str path of a directory and checks if a folder name appears more than
   once in the path"
@@ -197,7 +218,6 @@
             (if (seq a)
               (str (s/join "/" a) "/" (s/join "/" b))
               (s/join "/" b))))))))
-
 
 (defn is-attachment?
   "Checks is a path is an attachment; a local file that is not an org file."
@@ -336,6 +356,25 @@
                (s/replace #" " "-")
                (s/lower-case))))
 
+;; -- String Functions ----
+(defn get-web-path
+  "Determines the web path of the file from the cwd.
+  `dirname-files`: demo_org
+  `file-path-abs`: /Users/tees/Projects/firn/firn/test/firn/demo_org/jam/jo/foo/file2.org
+  `returns`      : jam/jo/foo/file2
+
+  NOTE: currently, you cannot have the `name` of your folder of org
+  files appear earlier in the path to those files.
+  invalid example: `/users/foo/my-wiki/another-dir/my-wiki/file1.org`"
+
+  [dirname-files file-path-abs]
+  (if (dupe-name-in-dir-path? file-path-abs dirname-files)
+    (print-err! :error "\nWell, well, well. You've stumbled into one of weird edge cases of using Firn. \nCongrats on getting here! Let's look at what's happening. \n\nThe directory of your org files appears twice in it's path:\n\n<<" file-path-abs ">>\n\nIn order to properly build web-paths for your files, Firn needs to know where your 'web-root' is. \nWe cannot currently detect which folder is your file root. \nTo solve this, either rename your directory of org files: \n\n<<" dirname-files ">>\n\nor rename the earlier instance in the path of the same name.")
+    (->> (s/split file-path-abs #"/")
+       (drop-while #(not (= % dirname-files)))
+       rest
+       (s/join "/")
+       (remove-ext))))
 
 ;; Time ------------------------------------------------------------------------
 ;; NOTE: timestr->hours-min + timevec->time-str could use better input testing?

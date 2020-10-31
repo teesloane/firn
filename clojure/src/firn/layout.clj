@@ -7,8 +7,8 @@
   (:require [firn.markup :as markup]
             [firn.org :as org]
             [hiccup.core :as h]
-            [firn.file :as file]
-            [firn.util :as u]))
+            [firn.util :as u]
+            [firn.config :as cfg]))
 
 (defn internal-default-layout
   "The default template if no `layout` key and no default.clj layout is specified."
@@ -59,8 +59,9 @@
          ;; the big merged options! This is used across various render fns,
          ;; essentially a refined config object with user specific (and some
          ;; internal data)
-         merged-options            (merge config-settings layout-settings front-matter-settings {:site-links-private (config :site-links-private)
-                                                                                                 :file file})
+         merged-options            (merge config-settings layout-settings front-matter-settings
+                                          {:site-links-private (config :site-links-private)
+                                           :file               file})
          is-headline?              (string? action)
          {:keys [toc logbook
                  firn-under
@@ -83,7 +84,7 @@
 
        ;; render a polyline graph of the logbook of the file.
        (= action :logbook-polyline)
-       (org/poly-line logbook opts)
+       (markup/poly-line logbook opts)
 
        ;; NOTE: / PERF: we could cache the sitemap PER LAYOUT; making it an atom outside of this function.
        (and (= action :sitemap) (seq site-map))
@@ -95,10 +96,8 @@
 
        ;; render a list of links that link back to the current file
        (= action :backlinks)
-       (markup/render-backlinks {:site-links         (config :site-links)
-                                 :site-links-private (config :site-links-private)
-                                 :file               file
-                                 :site-url           (get-in config [:user-config :site-url])})
+       (markup/render-backlinks (merge merged-options {:site-links (config :site-links)
+                                                       :site-url   (cfg/prop config :site-url)}))
 
        ;; render the previous file based on firn-order
        (= action :adjacent-files)
@@ -115,11 +114,11 @@
        (markup/render-firn-tags (config :firn-tags) opts)
 
        (= action :firn-file-tags)
-       (markup/render-firn-file-tags (file/get-firn-tags file) merged-options)
+       (markup/render-firn-file-tags (org/get-firn-tags file) merged-options)
 
        (= action :related-files)
        (markup/render-related-files (-> file :meta :title)
-                                    (file/get-firn-tags file)
+                                    (org/get-firn-tags file)
                                     (config :firn-tags))
 
        ;; render a list of org tags
@@ -157,7 +156,7 @@
   made available in user layouts.
   NOTE | PERF:  This might be being called twice."
   [config file]
-  (let [site-url (-> config :user-config :site-url)]
+  (let [site-url (cfg/prop config :site-url)]
     {;; Layout stuff --
      :render        (partial render {:file file :config config})
      :partials      (config :partials)
@@ -165,9 +164,9 @@
      :site-map      (config :site-map)
      :site-links    (config :site-links)
      :site-logs     (config :site-logs)
-     :site-title    (-> config :user-config :site-title)
-     :site-author   (-> config :user-config :site-author)
-     :site-desc     (-> config :user-config :site-desc)
+     :site-title    (cfg/prop config :site-title)
+     :site-author   (cfg/prop config :site-author)
+     :site-desc     (cfg/prop config :site-desc)
      :site-url      site-url
      :org-tags      (config :org-tags)
      :firn-tags     (config :firn-tags)
@@ -179,7 +178,7 @@
      :logbook       (-> file :meta :logbook)
      :file-links    (-> file :meta :links) ;; TODO - possible re/move this too.
      :title         (-> file :meta :title)
-     :firn-under    (-> file :meta :firn-under) ;; TODO this should be removed; should be handled by the render function.
+     :firn-under    (-> file :meta :firn-under) ;; TODO this should be removed; should be handled by the render function...?
      :logbook-total (-> file :meta :logbook-total)
      :date-updated  (-> file :meta :date-updated)
      :date-created  (-> file :meta :date-created)}))

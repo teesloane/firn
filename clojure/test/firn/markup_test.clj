@@ -4,7 +4,7 @@
             [firn.stubs :as stub]
             [firn.build :as build]
             [firn.org :as org]
-            [firn.file :as file]))
+            ))
 
 ;; Mocks
 
@@ -53,17 +53,6 @@
   (t/testing "internal-link"
     (t/is (= (sut/link->html (sample-links :file-link) {:site-url ""})
              [:a.firn-internal {:href "/file2"} "File 2"]))))
-
-(t/deftest internal-link-handler
-  (t/testing "Expected results."
-    (let [res1                 (sut/internal-link-handler "file:foo.org" {:site-url "http://mysite.com" })
-          res2                 (sut/internal-link-handler "file:foo.org::*my headline link" {:site-url "http://mysite.com"})
-          res-from-nested-file (sut/internal-link-handler "file:foo.org::*my headline link" {:site-url "http://mysite.com" :file {:path-web "bar/test"}})
-          res-up-dir           (sut/internal-link-handler "file:../foo.org" {:site-url "http://mysite.com" :file {:path-web "lvl1/lvl2/lvl3"}})]
-      (t/is (= res1 "http://mysite.com/foo"))
-      (t/is (= res2 "http://mysite.com/foo#my-headline-link"))
-      (t/is (= res-up-dir "http://mysite.com/lvl1/foo"))
-      (t/is (= res-from-nested-file "http://mysite.com/bar/foo#my-headline-link")))))
 
 (t/deftest make-toc
   (let [ex1     [{:level 1, :text "Process" :anchor "#process"}
@@ -264,8 +253,8 @@
     (let [tf         (stub/gtf :tf-small :processed)
           tf-no-tags (stub/gtf :tf-footnotes :processed) ;;footnoes should have no tags.
           opts       {:firn-tags-path "foo"}
-          res        (sut/render-firn-file-tags (file/get-firn-tags tf) opts)
-          res2       (sut/render-firn-file-tags (file/get-firn-tags tf-no-tags) opts)]
+          res        (sut/render-firn-file-tags (org/get-firn-tags tf) opts)
+          res2       (sut/render-firn-file-tags (org/get-firn-tags tf-no-tags) opts)]
       (t/is (= res[:ul.firn-file-tags
                    '([:li.firn-file-tag-item
                       [:a.firn-file-tag-link {:href "/foo#foo"} "foo"]]
@@ -291,11 +280,11 @@
       (t/is (= res-old-sort [:div.firn-file-tags '([:div.firn-file-tags-container [:div.firn-file-tag-name {:id "bar", :class "firn-file-tag-name"} "bar"] [:ul.firn-file-tag-list ([:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file1"} "Org Mode"]])]] [:div.firn-file-tags-container [:div.firn-file-tag-name {:id "baz", :class "firn-file-tag-name"} "baz"] [:ul.firn-file-tag-list ([:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file-small"} "Firn"]] [:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file2"} "Firn"]])]] [:div.firn-file-tags-container [:div.firn-file-tag-name {:id "bo", :class "firn-file-tag-name"} "bo"] [:ul.firn-file-tag-list ([:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file-small"} "Firn"]])]] [:div.firn-file-tags-container [:div.firn-file-tag-name {:id "foo", :class "firn-file-tag-name"} "foo"] [:ul.firn-file-tag-list ([:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file-small"} "Firn"]] [:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file2"} "Firn"]] [:li.firn-file-tag-item [:a.firn-file-tag-link {:href "/file1"} "Org Mode"]])]])]))
       )))
 
-  (t/deftest render-related-files
+(t/deftest render-related-files
     (t/testing "Expected results"
       (let [tf1           (stub/gtf :tf-small :processed)
             tf2           (stub/gtf :tf-footnotes :processed)
-            gts           file/get-firn-tags
+            gts           org/get-firn-tags
             sample-config (-> (stub/sample-config) build/setup build/process-all)
             site-tags     (sample-config :firn-tags)
             res1          (sut/render-related-files  (tf1 :title) (gts tf1) site-tags)
@@ -308,3 +297,26 @@
                          [:a.firn-related-file-link {:href "/file1"} "Org Mode"]]]]))
         ;; renders nil when no shared files are found.
         (t/is (= res2 nil)))))
+
+(t/deftest logbook-year-stats
+  (let [logbook        (-> (stub/gtf :tf-metadata :processed) :meta :logbook)
+        res            (sut/logbook-year-stats logbook)
+        first-of-2020  (first (get res 2020))
+        second-of-2020 (second (get res 2020))]
+
+    ;; the sample logbook has dates from 2017 and 2020.
+    (t/is (contains? res 2020))
+    (t/is (contains? res 2017))
+
+    ;; there is no log entry for 2020-01-01 so we expect
+    ;; to it be an unaltered map, as produced by build-year
+    (t/is (= (first-of-2020 :log-sum) "00:00"))
+    (t/is (= (first-of-2020 :log-count) 0))
+    (t/is (= (-> first-of-2020 :logs-raw count) 0))
+    (t/is (= (first-of-2020 :hour-sum) 0))
+
+    ;; however, the second day, DOES have a log entry, (see file-metadata.org)
+    (t/is (= (second-of-2020 :log-sum) "0:11"))
+    (t/is (= (second-of-2020 :log-count) 1))
+    (t/is (= (second-of-2020 :hour-sum) 0.18))
+    (t/is (= (-> second-of-2020 :logs-raw count) 1))))

@@ -55,14 +55,6 @@
       (t/testing "has :as-html config"
         (t/is (contains? htmlified :as-html)))))
 
-(t/deftest process-one
-  (let [test-file     (stub/gtf :tf-1 :io)
-        sample-config (stub/sample-config)
-        processed     (sut/process-one sample-config test-file)]
-    (t/is (every? #(contains? processed %)
-                  [:path :as-json  :meta     :as-html
-                   :name :original :path-web :keywords  :as-edn]))))
-
 (t/deftest make-site-map
   (let [files [{:title      "Home"
                 :firn-order 1000
