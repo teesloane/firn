@@ -60,6 +60,15 @@
         (catch Exception ex
           (println "Failed to read 'config.edn' file - is it properly formatted?"))))))
 
+(defn prop
+  [config kwrd]
+  (case kwrd
+    :site-url     (-> config :user-config :site-url)
+    :site-title   (-> config :user-config :site-title)
+    :site-author  (-> config :user-config :site-author)
+    :site-desc    (-> config :user-config :site-desc)
+    :ignored-dirs (-> config :user-config :ignored-dirs)))
+
 (defn prepare
   "Prepares the configuration for build/serve."
   [{:keys [dir --server? port]}]
