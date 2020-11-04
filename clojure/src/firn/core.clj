@@ -53,6 +53,7 @@
    ;; A boolean option defaulting to nil
    ["-h" "--help"]
    ["-v" "--version"]
+   ["-r" "--repl" "" "Enable REPL in live-server."]
    ["-d" "--dir PATH" "Absolute path of directory to build/serve"
     :default (u/get-cwd)]])
 
@@ -103,5 +104,5 @@
 ;; Repl Land -
 
 (comment
-  (mount/stop) (-main "serve" "-d" "/Users/tees/Projects/firn/firn/docs")
+  (mount/stop) (-main "serve" "-d" "/Users/tees/Projects/firn/firn/docs" "-r")
   )

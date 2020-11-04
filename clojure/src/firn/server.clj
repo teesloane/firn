@@ -5,11 +5,13 @@
             [firn.dirwatch :refer [close-watcher watch-dir]]
             [firn.org :as org]
             [firn.util :as u]
+            [firn.repl :as repl]
             [me.raynes.fs :as fs]
             [mount.core :as mount :refer [defstate]]
             [org.httpkit.server :as http]
             [ring.middleware.file :as r-file]
-            [ring.util.response :refer [response]]))
+            [ring.util.response :refer [response]]
+            ))
 
 (declare server)
 (def file-watcher  (atom nil))
@@ -147,7 +149,7 @@
 
 (defstate server
   :start
-  (let [{:keys [dir port]
+  (let [{:keys [dir port repl]
          :or   {dir (u/get-cwd)
                 port 4000}}           (mount/args)
         path-to-site                  (str dir "/_firn/_site")
@@ -165,6 +167,13 @@
       (try
         (println "\n🏔  Starting Firn development server on:" (str "http://localhost:" port))
         (http/run-server (handler config!) {:port port})
+        ;; if repl, start SCI repl.
+        (repl/init)
+        (when repl
+          (println "\nWelcome to the (experimental) Firn REPL.\n")
+          (println "Available functions and API visible here: <insert_docs_link>\n")
+          (repl/init))
+
 
         (catch Exception e
           (u/print-err! :error "A service is already running on port" port "." "\nYou can specify a different port for Firn to run on with the '-p' flag.")))))
