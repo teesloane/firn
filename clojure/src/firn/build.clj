@@ -43,7 +43,7 @@
 
   NOTE: should slurp/mkdir/copy-dir be wrapped in try-catches? if-err handling?"
   [{:keys [dir-site
-           dir-files
+           dir
            dir-site-data
            dir-data
            dir-site-static
@@ -58,7 +58,7 @@
   (fs/delete-dir dir-site-static)
   (fs/copy-dir dir-static dir-site-static)
 
-  (let [org-files (u/find-files-by-ext dir-files "org")
+  (let [org-files (u/find-files-by-ext dir "org")
         layouts   (u/read-clj :layouts config)
         pages     (u/read-clj :pages config)
         partials  (u/read-clj :partials config)]
@@ -218,12 +218,12 @@
   "Deletes all attachments in the _site/<dir-data> that aren't found in the
   site-wide collected attachment paths."
   [{:keys [attachments dir run-build-clean?]}]
-  (let [dir-files             (u/find-files dir #"(.*)\.(jpg|JPG|gif|GIF|png)")
+  (let [dir                   (u/find-files dir #"(.*)\.(jpg|JPG|gif|GIF|png)")
         clean-file-link-regex #"(file:)((.*\.)\.\/?)?"
         attachments           (map #(str/replace-first % clean-file-link-regex "") attachments)
         unused                (atom [])]
     ;; find unused files.
-    (doseq [f    dir-files
+    (doseq [f    dir
             :let [f-path (.getPath ^java.io.File f)
                   match (u/find-first #(str/includes? f-path %) attachments)]]
       (when (nil? match)
