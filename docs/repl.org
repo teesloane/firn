@@ -1,9 +1,10 @@
 #+TITLE: Repl
 #+FIRN_ORDER: 5
 #+FIRN_UNDER: Reference
-#+DATE_UPDATED: <2020-11-04 20:10>
+#+DATE_UPDATED: <2020-11-04 20:19>
 #+DATE_CREATED: <2020-11-04 Wed>
 
+* Overview
 
 *Purpose:* This document explains how you may use a REPL to help understand the
 shape of data that represents your org files and a Firn site more largely.
@@ -19,7 +20,9 @@ firn serve -r
 #+END_SRC
 
 The above will start a REPL that provides access to what is internally known as
-the "config" object; an object passed through most functions, containing the parsed org-files, links, logbooks, etc. *When running the repl, the config is wrapped in a Clojure atom* and must be accordingly dereferenced.
+the "config" object; an object passed through most functions, containing the
+parsed org-files, links, logbooks, etc. *When running the repl, the config is
+wrapped in a Clojure atom* and must be accordingly dereferenced.
 
 ⚠️ Note: The data within the ~config~ object, specifically processed org-files, can
 be quite large and may slow down your terminal (at least they do in Cider when
@@ -33,3 +36,8 @@ developing Firn!).
 And so on. Accessing this data can be useful for gaining insight into how you
 might build your partials and layouts; especially in that the config object
 itself is within the map passed to all [[file:layout.org][layout functions]].
+
+* Limitations
+
+- Live reloading may not work with the repl.
+- There are no functions yet for inspecting / changing the config data (if this is useful, they will show up in a later release)
