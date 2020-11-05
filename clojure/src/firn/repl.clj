@@ -10,19 +10,20 @@
 (defn help
   []
   (println
-   (->> ["The repl can help you learn about the data moving around a Firn site when it runs."
-         ""
+   (->> [""
+         "The repl can help you learn about the data moving around a Firn site when it runs."
          "The following functions are available to you:"
          ""
-         "# Bound Clojure functions --"
+         "# -- Bound Clojure functions ----------------------"
          "(pprint m)    ; pretty print a clojure value"
 
          ""
-         "# Available Data --"
+         "# -- Available Data -------------------------------"
          "@config       ; de-reference and view the config atom (it's large!)"
          ""
-         "# Custom Functions --"
-         "(help)        ; print this message"]
+         "# -- Custom Functions -----------------------------"
+         "(help)        ; print this message"
+         ""]
         (s/join \newline)
         )))
 
