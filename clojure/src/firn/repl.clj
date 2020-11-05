@@ -1,11 +1,14 @@
 (ns firn.repl
   (:require [sci.core :as sci]
             [clojure.pprint :as pprint]
-            [clojure.string :as s]))
+            [clojure.string :as s]
+            [firn.build :as build]))
 
 ;; -- REPL Functions (The Repl "API") --
 
-;; TODO: reload!
+(defn reload!
+  [config]
+  (build/all-files config))
 
 (defn help
   []
@@ -44,6 +47,7 @@
   [config]
   {'config  config
    'help    help
+   'reload! reload!
    'pprint  pprint/pprint})
 
 (defn init [config]
