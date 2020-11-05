@@ -20,15 +20,16 @@
          "The repl can help you learn about the data moving around a Firn site when it runs."
          "The following functions are available to you:"
          ""
-         "# -- Bound Clojure functions ----------------------"
-         "(pprint m)    ; pretty print a clojure value"
+         "# -- Bound Clojure functions:"
+         "(pprint m)       ; pretty print a clojure value"
 
          ""
-         "# -- Available Data -------------------------------"
-         "@config       ; de-reference and view the config atom (it's large!)"
+         "# -- Available Data:"
+         "@config          ; de-reference and view the config atom (it's large!)"
          ""
-         "# -- Custom Functions -----------------------------"
-         "(help)        ; print this message"
+         "# -- Custom Functions:"
+         "(help)           ; print this message"
+         "(reload! config) ; reload the config and rebuild your site."
          ""]
         (s/join \newline)
         )))
