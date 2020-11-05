@@ -20,7 +20,7 @@
                   file-string-length (-> file-path-full slurp count)]]
       (t/is (= true (fs/exists? file-path-full)))
       ;; each file should have a string of contents > 0
-      (t/is (> file-string-length 0))))
+      (t/is (> file-string-length 0)))))
 
 (t/deftest setup
   ;; setup requires that you have the _firn site in place; so:
