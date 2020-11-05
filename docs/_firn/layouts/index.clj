@@ -15,10 +15,10 @@
 
 
 (defn index
-  [{:keys [render build-url partials site-url] :as data}]
+  [{:keys [render build-url partials site-url site-title] :as data}]
   (let [{:keys [head nav footer]} partials]
     [:html
-     (head build-url)
+     (head data)
      [:body
       [:div (nav build-url)]
       (header)

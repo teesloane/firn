@@ -7,8 +7,11 @@
 ;; -- REPL Functions (The Repl "API") --
 
 (defn reload!
-  [config]
-  (build/all-files config))
+  "Takes the config atom, and requests it to build all files."
+  [config!]
+  (let [new-config (-> config! deref (build/all-files))]
+    (reset! config! new-config)
+    "Reloaded files."))
 
 (defn help
   []

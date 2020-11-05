@@ -22,10 +22,6 @@
       ;; each file should have a string of contents > 0
       (t/is (> file-string-length 0))))
 
-  ;; NOTE: I'm not sure how to test System/exit yet -
-  #_(t/testing "Trying to create again when _firn already exists should return false"
-      (t/is (= ????? (sut/new-site {:dir-files stub/test-dir})))))
-
 (t/deftest setup
   ;; setup requires that you have the _firn site in place; so:
   (sut/new-site {:dir stub/test-dir})

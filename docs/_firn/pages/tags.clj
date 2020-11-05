@@ -1,8 +1,8 @@
 (defn tags
-  [{:keys [build-url render partials]}]
+  [{:keys [build-url render partials] :as cfg}]
   (let [{:keys [head nav footer]} partials]
     [:html
-     (head build-url)
+     (head cfg)
      [:body
       (nav build-url)
       [:main

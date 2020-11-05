@@ -1,8 +1,8 @@
 (defn default
-  [{:keys [org-tags date-updated build-url title render partials]}]
+  [{:keys [org-tags date-updated build-url site-title title render partials] :as data}]
   (let [{:keys [head nav footer]} partials]
     [:html
-     (head build-url)
+     (head data)
      [:body
       (nav build-url)
       [:main.def-wrapper
