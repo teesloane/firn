@@ -1,3 +1,18 @@
+## [](https://github.com/theiceshelf/firn/compare/v0.0.12...v) (2020-11-05)
+
+### [0.0.12](https://github.com/theiceshelf/firn/compare/v0.0.11...v0.0.12) (2020-11-05)
+
+
+#### Features
+
+* Add server repl. ([#59](https://github.com/theiceshelf/firn/issues/59)) ([10c0af9](https://github.com/theiceshelf/firn/commit/10c0af96b29de5159de298ab27460456e8669ce4))
+* Enable println and prn in layouts/partials. ([2a487ed](https://github.com/theiceshelf/firn/commit/2a487ed8bddf5d2ea73dfd00cad2b6cd2b793ec2))
+
+
+#### Bug Fixes
+
+* date-parser was only making date-created. ([645fdbc](https://github.com/theiceshelf/firn/commit/645fdbceefb9e9b8ff646aa869ffd05c3a459f92))
+
 ## [](https://github.com/theiceshelf/firn/compare/v0.0.11...v) (2020-10-25)
 
 ### [0.0.11](https://github.com/theiceshelf/firn/compare/v0.0.9...v0.0.11) (2020-10-25)
