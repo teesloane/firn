@@ -1,7 +1,7 @@
 #+TITLE: Repl
 #+FIRN_ORDER: 5
 #+FIRN_UNDER: Reference
-#+DATE_UPDATED: <2020-11-04 20:19>
+#+DATE_UPDATED: <2020-11-05 17:27>
 #+DATE_CREATED: <2020-11-04 Wed>
 
 * Overview
@@ -12,6 +12,8 @@ shape of data that represents your org files and a Firn site more largely.
 ⚠️ This feature experimental and may be removed in future versions of Firn.
 
 *Prerequistes*: A familiarity with Clojure.
+
+* Usage
 
 The REPL can be accessed when using the development server.
 
@@ -29,13 +31,17 @@ be quite large and may slow down your terminal (at least they do in Cider when
 developing Firn!).
 
 #+BEGIN_SRC clojure
-(-> @config :keys) ; view all the clojure keys in the config map.
+(-> @config :keys)    ; view all the clojure keys in the config map.
 (@config :site-links) ; view all the links collected across your site.
 #+END_SRC
 
 And so on. Accessing this data can be useful for gaining insight into how you
 might build your partials and layouts; especially in that the config object
 itself is within the map passed to all [[file:layout.org][layout functions]].
+
+You may also run ~(help)~ to view a description of what functions and data are
+available in the Firn REPL.
+
 
 * Limitations
 
