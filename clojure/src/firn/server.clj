@@ -168,11 +168,11 @@
         (println "\n🏔  Starting Firn development server on:" (str "http://localhost:" port))
         (http/run-server (handler config!) {:port port})
         ;; if repl, start SCI repl.
-        (repl/init)
         (when repl
-          (println "\nWelcome to the (experimental) Firn REPL.\n")
-          (println "Available functions and API visible here: <insert_docs_link>\n")
-          (repl/init))
+          (println "\nWelcome to the (experimental) Firn REPL.")
+          (println "Live reloading may not work in the repl; use `(reload!)` to reprocess your site.")
+          (println "Other available functions and API visible here: <TODO: insert_docs_link>.")
+          (repl/init config!))
 
 
         (catch Exception e
