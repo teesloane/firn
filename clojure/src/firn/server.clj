@@ -170,8 +170,7 @@
         ;; if repl, start SCI repl.
         (when repl
           (println "\nWelcome to the (experimental) Firn REPL.")
-          (println "Live reloading may not work in the repl; use `(reload!)` to reprocess your site.")
-          (println "Other available functions and API visible here: <TODO: insert_docs_link>.")
+          (println "Learn more about the REPL here: https://firn.theiceshelf.com/repl")
           (repl/init config!))
 
 
