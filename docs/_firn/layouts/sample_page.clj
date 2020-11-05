@@ -1,8 +1,8 @@
 (defn default
-  [{:keys [title render build-url partials site-url]}]
+  [{:keys [title render build-url site-title partials site-url] :as data}]
   (let [{:keys [head nav footer]} partials]
     [:html
-     (head build-url)
+     (head data)
      [:body
       (nav build-url)
       [:main

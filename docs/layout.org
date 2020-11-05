@@ -1,6 +1,6 @@
 #+TITLE: Layouts and Partials
 #+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-09-23 14:56>
+#+DATE_UPDATED: <2020-11-04 20:12>
 #+FIRN_UNDER: Content
 #+FIRN_ORDER: 1
 #+FIRN_FOLD: {2 true}
@@ -74,4 +74,34 @@ Using partials requires the following:
           (head build-url)            ; => Renders the `head` partial
           ; ....
    #+END_SRC
+* The user layout map                                            :advanced:
 
+The following is a description of the map that gets passed to all user layouts. As such, all of these keys may be destructured as mentioned above. Some values may be removed / added.
+
+#+BEGIN_SRC clojure
+{;; Layout stuff --
+ :render        (partial render {:file file :config config})
+ :partials      (config :partials)
+ ;; Site-side stuff --
+ :site-map      (config :site-map)
+ :site-links    (config :site-links)
+ :site-logs     (config :site-logs)
+ :site-title    (cfg/prop config :site-title)
+ :site-author   (cfg/prop config :site-author)
+ :site-desc     (cfg/prop config :site-desc)
+ :site-url      site-url
+ :org-tags      (config :org-tags)
+ :firn-tags     (config :firn-tags)
+ :build-url     (build-url site-url)
+ :config        config
+ ;; File wide meta --
+ :file          file
+ :meta          (file :meta)
+ :logbook       (-> file :meta :logbook)
+ :file-links    (-> file :meta :links)      ;; TODO - possible re/move this too?
+ :title         (-> file :meta :title)
+ :firn-under    (-> file :meta :firn-under) ;; TODO this should be removed; should be handled by the render function...?
+ :logbook-total (-> file :meta :logbook-total)
+ :date-updated  (-> file :meta :date-updated)
+ :date-created  (-> file :meta :date-created)}
+#+END_SRC
