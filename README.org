@@ -46,6 +46,7 @@ Options:
   -p, --port PORT  4000                            Port number
   -h, --help
   -v, --version
+  -r, --repl
   -d, --dir PATH   /Users/tees/Projects/firn/firn  Absolute path of directory to build/serve
 
 Actions:
