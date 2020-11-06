@@ -79,14 +79,6 @@ bin/compile
 - to package up a new version of the rust binary for development (a binary we
   can shell out to) run the script =bin/build-dev-parser=
 - NOTE: Some of the functions from the =me.raynes.fs= have been duplicated in the util.clj namespace; largely, the functions that have issues with reflection.
-** Release order/check-list
-- [ ] Create a tag locally and push it.
-- [ ] run `make release`
-- [ ] check the changelog and make sure it is correct.
-- [ ] update docs and FIRN_VERSION.
-- [ ] push
-- [ ] update release page with latest binaries built on master.
-
 * Thank-you's
 
 - Thank you to [[https://github.com/borkdude][@borkdude]] for building some awesome libraries ([[https://github.com/borkdude/sci][sci]] is used in
