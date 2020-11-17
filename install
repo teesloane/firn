@@ -24,5 +24,5 @@ curl -o "firn-$latest_release-$platform.zip" -sL $download_url
 unzip -qqo "firn-$latest_release-$platform.zip"
 chmod +x firn
 rm "firn-$latest_release-$platform.zip"
-mv firn /usr/local/bin
-echo "Installed Firn to usr/local/bin"
+mv firn $install_dir
+echo "Installed Firn to" $install_dir
