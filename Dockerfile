@@ -3,16 +3,19 @@ COPY rust /app/rust
 WORKDIR /app/rust
 RUN cargo build --release
 
+FROM clojure:openjdk-15-lein-2.9.3-slim-buster as clojure
+COPY clojure /app/clojure
+WORKDIR /app/clojure
+RUN lein do clean, uberjar
+
 FROM oracle/graalvm-ce:20.2.0-java11 as graalvm
 ENV GRAALVM_VERSION=20.2.0 \
   JAVA_VERSION=11
 RUN gu install native-image
-
-FROM clojure:openjdk-15-lein-2.9.3-slim-buster as clojurebuild
 COPY clojure /app/clojure
 COPY --from=rustbuild /app/rust/target/release/libmylib.so /app/clojure/resources/
+COPY --from=clojure /app/clojure/target /app/clojure/target
 WORKDIR /app/clojure
-COPY --from=graalvm /opt/graalvm-ce-java11-20.2.0/bin/native-image /usr/local/bin/native-image
 RUN native-image -jar target/firn-0.0.5-SNAPSHOT-standalone.jar \
   -H:Name=firn \
   -H:+ReportExceptionStackTraces \
@@ -30,4 +33,8 @@ RUN native-image -jar target/firn-0.0.5-SNAPSHOT-standalone.jar \
   --allow-incomplete-classpath \
   --no-server
 
-FROM ubuntu:20.04 as final
+FROM openjdk:7 as final
+WORKDIR /app/bin
+COPY --from=graalvm /app/clojure/firn /app/bin/firn
+ENV PATH=$PATH:/app/bin
+ENTRYPOINT ["/app/bin/firn"]
