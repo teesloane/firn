@@ -3,7 +3,7 @@ COPY rust /app/rust
 WORKDIR /app/rust
 RUN cargo build --release
 
-FROM clojure:openjdk-15-lein-2.9.3-slim-buster as clojure
+FROM clojure:openjdk-11-lein-2.9.3-slim-buster as clojure
 COPY clojure /app/clojure
 WORKDIR /app/clojure
 RUN lein do clean, uberjar
@@ -33,7 +33,7 @@ RUN native-image -jar target/firn-0.0.5-SNAPSHOT-standalone.jar \
   --allow-incomplete-classpath \
   --no-server
 
-FROM openjdk:7 as final
+FROM openjdk:11 as final
 WORKDIR /app/bin
 COPY --from=graalvm /app/clojure/firn /app/bin/firn
 ENV PATH=$PATH:/app/bin
