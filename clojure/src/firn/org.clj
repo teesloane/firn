@@ -177,7 +177,7 @@
         lower-case-it       #(when % (s/lower-case %))
         dash-it             #(when % (s/replace % #"_" "-"))
         key->keyword        (fn [k] (-> k :key lower-case-it dash-it keyword))
-        has-req-frontmatter (some #(= (:key %) "TITLE") kw)
+        has-req-frontmatter (some #(= (str/lower-case (:key %)) "title") kw)
         eval-it             (fn [kw]
                               (let [k (key->keyword kw) v (kw :value)]
                                 (if (u/in? keywords-to-eval k)
