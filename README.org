@@ -55,6 +55,21 @@ Actions:
   serve    Runs a development server for processed org files.
 #+END_SRC
 
+** Docker
+
+Firn can also be used in Docker.
+
+#+begin_src
+docker run \
+  -it \
+  --rm \
+  -p 4000:4000 \
+  -v "$PWD":"$PWD" \
+  --workdir "$PWD" \
+  theiceshelf/firn \
+    --help
+#+end_src
+
 * Development
 ** Prerequisites:
 - Download [[https://www.graalvm.org/downloads/][GraalVM]] and set =GRAALVM_HOME=.
@@ -71,6 +86,14 @@ git clone git@github.com:theiceshelf/firn.git && cd firn
 # compile Rust, Clojure and the GraalVM Native Image.
 bin/compile
 #+END_SRC
+
+*** Container image
+
+Firn can be built as a container image, using
+#+begin_src sh
+docker build -t theiceshelf/firn .
+#+end_src
+
 ** Developing
 - From the directory you run your repl, set an environment variable of: =DEV=TRUE=
 - If you use Emacs, you can set the environment variable to =M-x setenv=
