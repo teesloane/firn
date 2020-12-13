@@ -34,7 +34,10 @@ RUN native-image -jar target/firn-0.0.5-SNAPSHOT-standalone.jar \
   --no-server
 
 FROM openjdk:11 as final
+RUN useradd -m user
 WORKDIR /app/bin
 COPY --from=graalvm /app/clojure/firn /app/bin/firn
+COPY --from=rustbuild /app/rust/target/release/libmylib.so /home/user/.firn/libmylib.so
+USER user
 ENV PATH=$PATH:/app/bin
 ENTRYPOINT ["/app/bin/firn"]
