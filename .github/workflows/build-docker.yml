@@ -2,9 +2,12 @@ name: ci
 
 on:
   push:
-    branches: master
-  pull_request:
-    branches: [ master ]
+    types: [published]
+    tags:
+      - 'v*.*.*'
+    # branches: master
+  # pull_request:
+  #   branches: [ master ]
 
 jobs:
   main:
@@ -27,11 +30,10 @@ jobs:
         id: docker_build
         uses: docker/build-push-action@v2
         with:
-          push: true
-          tags: theiceshelf/firn:latest
-          build-args: |
-            arg1=value1
-            arg2=value2
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          # push: true
+          # tags: theiceshelf/firn:latest
       -
         name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
