@@ -13,7 +13,7 @@ ENV GRAALVM_VERSION=20.2.0 \
   JAVA_VERSION=11
 RUN gu install native-image
 COPY clojure /app/clojure
-COPY --from=rustbuild /app/rust/target/release/libmylib.so /app/clojure/resources/
+COPY --from=rustbuild /app/rust/target/release/libfirnparser.so /app/clojure/resources/
 COPY --from=clojure /app/clojure/target /app/clojure/target
 WORKDIR /app/clojure
 RUN native-image -jar target/firn-0.0.5-SNAPSHOT-standalone.jar \
@@ -23,8 +23,8 @@ RUN native-image -jar target/firn-0.0.5-SNAPSHOT-standalone.jar \
   -J-Dclojure.compiler.direct-linking=true \
   --initialize-at-build-time \
   --report-unsupported-elements-at-runtime \
-  -H:IncludeResources=libmylib.dylib \
-  -H:IncludeResources=libmylib.so \
+  -H:IncludeResources=libfirnparser.dylib \
+  -H:IncludeResources=libfirnparser.so \
   -H:IncludeResources=firn/.* \
   -H:Log=registerResource: \
   -H:ReflectionConfigurationFiles=reflection.json \
@@ -37,7 +37,7 @@ FROM openjdk:11 as final
 RUN useradd -m user
 WORKDIR /app/bin
 COPY --from=graalvm /app/clojure/firn /app/bin/firn
-COPY --from=rustbuild /app/rust/target/release/libmylib.so /home/user/.firn/libmylib.so
+COPY --from=rustbuild /app/rust/target/release/libfirnparser.so /home/user/.firn/libfirnparser.so
 USER user
 ENV PATH=$PATH:/app/bin
 ENTRYPOINT ["/app/bin/firn"]
