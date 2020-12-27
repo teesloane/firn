@@ -12,9 +12,9 @@ cargo build --release
 
 # move rust artifact into clojure resources.
 if [ "$(uname)" == "Darwin" ]; then
-    cp target/release/libmylib.dylib ../clojure/resources/ # mac
+    cp target/release/libfirnparser.dylib ../clojure/resources/ # mac
 elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-    cp target/release/libmylib.so ../clojure/resources/ # linux
+    cp target/release/libfirnparser.so ../clojure/resources/ # linux
 fi
 
 # check graalvm settings and use its java compiler
@@ -31,6 +31,7 @@ export JAVA_HOME=$GRAALVM_HOME
 
 # build clojure uberjar
 cd ../clojure
+echo  "--> Start: compiling clojure code."
 lein do clean, uberjar
 
 # build the GraalVM compiled executable
@@ -41,8 +42,8 @@ args=( -jar target/firn-0.0.5-SNAPSHOT-standalone.jar \
             "-J-Dclojure.compiler.direct-linking=true" \
             "--initialize-at-build-time" \
             "--report-unsupported-elements-at-runtime" \
-            "-H:IncludeResources=libmylib.dylib" \
-            "-H:IncludeResources=libmylib.so" \
+            "-H:IncludeResources=libfirnparser.dylib" \
+            "-H:IncludeResources=libfirnparser.so" \
             "-H:IncludeResources=firn/.*" \
             "-H:Log=registerResource:" \
             "-H:ReflectionConfigurationFiles=reflection.json"
@@ -53,8 +54,8 @@ args=( -jar target/firn-0.0.5-SNAPSHOT-standalone.jar \
             "--no-server" )
 
 
-echo  " ---------------------------------------- "
-
+echo  "--> Finish: compiling clojure code."
+echo  "--> Start: compiling native code with native-image."
 $GRAALVM_HOME/bin/native-image "${args[@]}"
 
 lein clean
@@ -68,7 +69,7 @@ pwd
 
 # move rust library into target folder.
 # if [ "$(uname)" == "Darwin" ]; then
-    # cp target/release/libmylib.dylib target # mac
+    # cp target/release/libfirnparser.dylib target # mac
 # elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-#     cp target/release/libmylib.so target # linux
+#     cp target/release/libfirnparser.so target # linux
 # fi
