@@ -23,7 +23,6 @@ RUN native-image -jar target/firn-0.0.5-SNAPSHOT-standalone.jar \
   -J-Dclojure.compiler.direct-linking=true \
   --initialize-at-build-time \
   --report-unsupported-elements-at-runtime \
-  -H:IncludeResources=libfirnparser.dylib \
   -H:IncludeResources=libfirnparser.so \
   -H:IncludeResources=firn/.* \
   -H:Log=registerResource: \
