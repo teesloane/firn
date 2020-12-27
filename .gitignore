@@ -29,9 +29,7 @@ clojure/_firn
 clojure/clojure-rust
 clojure/.nrepl-port
 clojure/test/firn/demo_org/_firn
-clojure/resources/firn/libmylib.dylib
 clojure/firn
-clojure/resources/libmylib.dylib
 rust/target
 target
 docs/_firn/_site
