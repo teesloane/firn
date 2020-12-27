@@ -94,8 +94,8 @@
     (if exit-message
       (exit (if ok? 0 1) exit-message)
       (do
-        (init!)
-        (clojure.lang.RT/loadLibrary "firnparser")
+        ;; (init!)
+        ;; (clojure.lang.RT/loadLibrary "firnparser")
         (case action
           "serve"  (server/serve    options)
           "build"  (build/all-files options)
