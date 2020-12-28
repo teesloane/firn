@@ -49,7 +49,7 @@
   When compiled to a native image, it uses JNI to talk to the rust .dylib."
   [file-str]
   (if (u/native-image?)
-    (ClojureRust/getFreeMemory file-str) ;; TODO: get free memory should be renamed to "parse-org" or something else.
+    (ClojureRust/parseOrg file-str)
     (let [parser   (str (u/get-cwd) "/resources/parser")
           stripped (s/trim-newline file-str)
           res      (sh/sh parser stripped)]

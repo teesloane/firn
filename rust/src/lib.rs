@@ -19,7 +19,7 @@ use jni::sys::jstring;
 // This keeps Rust from "mangling" the name and making it unique for this
 // crate.
 #[no_mangle]
-pub extern "system" fn Java_iceshelf_clojure_rust_ClojureRust_getFreeMemoryRust(env: JNIEnv,
+pub extern "system" fn Java_iceshelf_clojure_rust_ClojureRust_parseOrgRust(env: JNIEnv,
 // This is the class that owns our static method. It's not going to be used,
 // but still must be present to match the expected signature of a static
 // native method.
