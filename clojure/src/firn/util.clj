@@ -84,6 +84,11 @@
   []
   (System/getProperty "user.dir"))
 
+(defn get-os
+  "Return the name of the host operating system."
+  []
+  (System/getProperty "os.name"))
+
 (defn snake->kebab
   "Convert strings with underscores to hyphens."
   ([s]
