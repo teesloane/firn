@@ -1,4 +1,6 @@
 (ns firn.org
+
+
   "The org namespace handles all data-related to the parsing of an org file.
   When an org file is parsed it is organized into a map of data.
 
@@ -50,7 +52,7 @@
   [file-str]
   (if (u/native-image?)
     (ClojureRust/parseOrg file-str)
-    (let [parser   (str (u/get-cwd) "/resources/parser")
+    (let [parser   (str (u/get-cwd) "/resources/parser-dev-" (str/lower-case (u/get-os)))
           stripped (s/trim-newline file-str)
           res      (sh/sh parser stripped)]
       (if-not (= (res :exit) 0)
@@ -60,7 +62,7 @@
 (defn parse-dev!
   "DevXp func: Useful for testing org strings in the repl."
   [s]
-  (let [parser   (str (u/get-cwd) "/resources/parser")
+  (let [parser   (str (u/get-cwd) "/resources/parser-dev-" (str/lower-case (u/get-os)))
         stripped (s/trim-newline s)
         res      (sh/sh parser stripped)]
     (if-not (= (res :exit) 0)
