@@ -80,7 +80,7 @@ When it comes to attachments:
 - Somewhere in your config, add a hook to run emacs' time-stamp function on save:
 
 #+BEGIN_SRC elisp
-(add-hook 'write-file-hooks 'time-stamp) ; update timestamp, if it exists, when saving
+(add-hook 'before-save-hook 'time-stamp) ; update timestamp, if it exists, when saving
 #+END_SRC
 ** Ignoring certain files or directories
 
