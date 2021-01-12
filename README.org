@@ -95,14 +95,32 @@ docker build -t theiceshelf/firn .
 #+end_src
 
 ** Developing
-- From the directory you run your repl, set an environment variable of: =DEV=TRUE=
-- If you use Emacs, you can set the environment variable to =M-x setenv=
-- There is a directory for testing Firn on a set of dummy org files, located at
-  =clojure/test/firn/demo_org=
-- You can run test / build commands inside the =core-test= namespace.
-- to package up a new version of the rust binary for development (a binary we
-  can shell out to) run the script =bin/build-dev-parser=
-- NOTE: Some of the functions from the =me.raynes.fs= have been duplicated in the util.clj namespace; largely, the functions that have issues with reflection.
+
+Firn is a Clojure code base that reaches out to a library compiled with Rust.
+You won't necessarily need to compile any rust code as the rust artifacts have
+been vendored into the clojure/resources folders.
+
+*** Clojure setup / Emacs use.
+
+This is my personal workflow for developing, it may or may not be useful.
+
+- I open ~core.clj~ and boot up a Cider REPL in Emacs.
+- I eval the CLI functions (new, serve, build) in ~core.clj~ under the ~(comment ..)~
+  block at the end of the file.
+- When building a feature, I write the code, evaluate it, and then eval the CLI
+  commands again in ~core.clj~. I use ~cider-eval-region~ to both stop mount (if the server is running) and to re-run the CLI command.
+- I usually run the tests on the docs folder that is bundled in the repo:
+  + ~(mount/stop) (-main "serve" "-d" "<path_to_repo>/firn/docs")~
+- In emacs, I use ~m-x setenv~ and at the prompt enter ~DEV~ > ~TRUE~
+  - this prevents CLI exit codes from ending the REPL process.
+- *Note*: some of the functions from the =me.raynes.fs= namespace have been
+  duplicated in the ~util.clj~ namespace; largely, the functions that have issues
+  with reflection.
+
+*** Rust Parser
+- In development, we have a binary version of the Rust parser functionality that the Clojure code shells out to.
+- To package up a new version of the rust binary for development (a binary we
+  can shell out to) run the script =bin/build-dev-parser=.
 * Thank-you's
 
 - Thank you to [[https://github.com/borkdude][@borkdude]] for building some awesome libraries ([[https://github.com/borkdude/sci][sci]] is used in
