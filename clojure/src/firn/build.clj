@@ -167,7 +167,6 @@
 (defn write-rss-file!
   "Build an rss file. It sorts files by file:meta:date-created, writes to feed.xml"
   [{:keys [processed-files dir-site user-config] :as config}]
-  (println "Building rss file...")
   (let [{:keys [site-title site-url site-desc]} user-config
         feed-file   (str dir-site "feed.xml")
         first-entry {:title site-title :link site-url :description site-desc}
