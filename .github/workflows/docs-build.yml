@@ -32,6 +32,8 @@ jobs:
         uses: actions/download-artifact@v1
         with:
           name: public
+      - name: Add CNAME file
+        run: echo "firn.theiceshelf.com" >> public/CNAME
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
