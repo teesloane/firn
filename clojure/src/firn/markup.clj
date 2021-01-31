@@ -560,7 +560,7 @@
                            4 (heading-id+class 4)
                            5 (heading-id+class 5)
                            (heading-id+class 6))
-        make-child       #(into [%] (map to-html children))
+        make-child       #(into [%] (map (fn [child] (to-html child opts)) children))
         render-headline  [h-level
                           (when keywrd [heading-keyword (str keywrd " ")])
                           (when priority [heading-priority (str priority " ")])
