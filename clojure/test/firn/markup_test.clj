@@ -320,3 +320,9 @@
     (t/is (= (second-of-2020 :log-count) 1))
     (t/is (= (second-of-2020 :hour-sum) 0.18))
     (t/is (= (-> second-of-2020 :logs-raw count) 1))))
+
+(t/deftest render-headline-with-link
+  (t/testing "Uses site-url to generate file link"
+      (let [parsed-headline {:type "headline" :level 1 :children [{:type "title" :level 1 :children [{:type "link" :path "file:somefile.org" :desc "Some file"}]}]}]
+        (t/is (= "http://foo.com/somefile"
+                 (get-in (sut/to-html parsed-headline {:site-url "http://foo.com"}) [1 3 1 1 :href]))))))
