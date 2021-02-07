@@ -164,7 +164,9 @@
     (if-not (fs/exists? path-to-site)
       (println "Couldn't find a _firn/ folder. Have you run `Firn new` and created a site yet?")
       (if-not (u/native-image?)
-        (http/run-server (handler config!) {:port port})
+        (do
+          (println "\n🏔  Starting Firn development server on:" (str "http://localhost:" port))
+          (http/run-server (handler config!) {:port port}))
 
         ;; Native image try/catch for port in use
         (try
