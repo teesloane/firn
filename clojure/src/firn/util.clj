@@ -2,7 +2,8 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as s]
             [sci.core :as sci]
-            [clojure.string :as str])
+            [clojure.string :as str]
+            [me.raynes.fs :as fs])
   (:import (java.lang Integer)
            (java.time LocalDate)))
 
@@ -64,14 +65,11 @@
     (-> f-name (s/split #"\.") (first))))
 
 (defn find-files-by-ext
-  "Traverses a directory for all files of a specific extension."
+  "Traverses a directory and returns a list of files of a specific extension."
   [dir ext]
   (let [ext-regex (re-pattern (str "^.*\\.(" ext ")$"))
         files     (find-files dir ext-regex)]
-    (if (= 0 (count files))
-      ;; NOTE: taking out this notifications - not sure it's necessary.
-      (do #_(print-err! :warning "No" ext "files found at " dir) files)
-      files)))
+    (filter fs/file? files)))
 
 (defn file-name-no-ext
   "Removes an extension from a filename"
