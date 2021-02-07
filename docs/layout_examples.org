@@ -9,7 +9,7 @@ to achieve specific effect.
 
 * Recently Updated / Published
 
-This snipped demonstrates how to display a list of most recent recently published or updated org-files.
+This snippet demonstrates how to display a list of most recent recently published or updated org-files.
 
 #+begin_src clojure
 
