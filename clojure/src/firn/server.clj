@@ -10,8 +10,8 @@
             [mount.core :as mount :refer [defstate]]
             [org.httpkit.server :as http]
             [ring.middleware.file :as r-file]
-            [ring.util.response :refer [response]]
-            ))
+            [ring.util.response :refer [response]]))
+
 
 (declare server)
 (def file-watcher  (atom nil))
@@ -28,9 +28,9 @@
   grabs the path of the original file, reslurps it and reprocesses"
   [file config]
   (let [re-slurped        (-> file :path io/file)]
-        (->> re-slurped
-             (org/make-file config)
-             (build/htmlify config))))
+    (->> re-slurped
+         (org/make-file config)
+         (build/htmlify config))))
 
 (defn reload-requested-page
   "When user requests a non-org-file page (pages/*.clj), we reslurp the clj files
@@ -151,31 +151,36 @@
   :start
   (let [{:keys [dir port repl]
          :or   {dir (u/get-cwd)
-                port 4000}}           (mount/args)
-        path-to-site                  (str dir "/_firn/_site")
-        config!                       (atom (-> (mount/args) build/all-files))
+                port 4000}}      (mount/args)
+        path-to-site             (str dir "/_firn/_site")
+        _                        (println "Building site...")
+        config!                  (atom (-> (mount/args) build/all-files))
         {:keys [dir-layouts dir-partials dir-static dir-data dir-pages]} @config!
-        watch-list                    (map io/file [dir-layouts dir-partials dir-static dir-data dir-pages])]
+        watch-list               (map io/file [dir-layouts dir-partials dir-static dir-data dir-pages])]
 
     ;; start watchers
     (reset! file-watcher (apply watch-dir (partial handle-watcher config!) watch-list))
 
-    (println "Building site...")
     (if-not (fs/exists? path-to-site)
       (println "Couldn't find a _firn/ folder. Have you run `Firn new` and created a site yet?")
+      (if-not (u/native-image?)
+        (do
+          (println "\n🏔  Starting Firn development server on:" (str "http://localhost:" port))
+          (http/run-server (handler config!) {:port port}))
 
-      (try
-        (println "\n🏔  Starting Firn development server on:" (str "http://localhost:" port))
-        (http/run-server (handler config!) {:port port})
-        ;; if repl, start SCI repl.
-        (when repl
-          (println "\nWelcome to the (experimental) Firn REPL.")
-          (println "Learn more about the REPL here: https://firn.theiceshelf.com/repl")
-          (repl/init config!))
+        ;; Native image try/catch for port in use
+        (try
+          (println "\n🏔  Starting Firn development server on:" (str "http://localhost:" port))
+          (http/run-server (handler config!) {:port port})
+          ;; if repl, start SCI repl.
+          (when repl
+            (println "\nWelcome to the (experimental) Firn REPL.")
+            (println "Learn more about the REPL here: https://firn.theiceshelf.com/repl")
+            (repl/init config!))
 
 
-        (catch Exception e
-          (u/print-err! :error "A service is already running on port" port "." "\nYou can specify a different port for Firn to run on with the '-p' flag.")))))
+          (catch Exception e
+            (u/print-err! :error "A service is already running on port" port "." "\nYou can specify a different port for Firn to run on with the '-p' flag."))))))
 
   :stop
   (do
