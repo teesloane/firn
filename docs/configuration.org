@@ -57,7 +57,7 @@ values and the usage of which are not immediately clear.
 
 ** Table of Contents
 
-The firn table of contents is rendered in a layout. If you use the default layout in Firn, it will be at the top of the file. See [[file:layout.org][layouts]] for more information. =:firn-toc= is configured as a map with possible values of =depth=, =headline=, and =exclusive?=
+The firn table of contents is rendered in a layout. If you use the default layout in Firn, it will be at the top of the file. See [[file:layout.org][layouts]] for more information. =:firn-toc= is configured as a map with possible values of =depth=, =headline=, and =exclude-headline?=
 
 #+BEGIN_SRC clojure
 {:depth 3          ; render only headlines that are of level 3 and below in the table of contents.
