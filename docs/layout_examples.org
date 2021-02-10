@@ -51,7 +51,7 @@ The following layout formats an individual blog entry that will be
 added to the list described above.
 
 #+begin_src clojure
-(defn update
+(defn blog-update
   [{:keys [render partials title meta date-created build-url]}]
   (let [{:keys [head]} partials]
     [:html
