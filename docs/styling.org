@@ -1,4 +1,4 @@
-#+TITLE: Styling
+#+TITLE: Styling and third-party Javascript
 #+FIRN_UNDER: Content
 #+FIRN_ORDER: 7
 #+DATE_UPDATED: <2020-09-25 19:08>
@@ -47,3 +47,28 @@ html =head= tag, allowing it to be shared across layouts:
   [:head
     [:link {:rel "stylesheet" :href "/static/css/firn_base.css"}]])
 #+END_SRC
+
+* How do I add Javascript across the site?                             :FAQ:
+
+Similarly, you can define the =head= function to bring in third-party
+Javascript dependencies. Here, for example, an instance of Firn is set
+up to import and use [[https://www.mathjax.org/][MathJax]], enabling LaTeX markup for equations and
+in-line mathematical expressions across the site.
+#+begin_src clojure
+(defn head
+  [build-url]
+  [:doctype :html5]
+   [:head
+    [:meta {:charset "UTF-8"}]
+    [:meta {:name "viewport" :content "width=device-width, initial-scale=1.0"}]
+    [:script {:type "text/x-mathjax-config"}
+     (str "MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ['\\\\(','\\\\)'] ],
+      processEscapes: true
+    }
+  });")]
+    [:script {:src "https://polyfill.io/v3/polyfill.min.js?features=es6"}]
+    [:script {:type "text/javascript" :async "async" :src "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"}]
+    [:link {:rel "stylesheet" :href (build-url "/static/css/firn_base.css")}]])
+#+end_src
