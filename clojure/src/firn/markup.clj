@@ -434,6 +434,22 @@
   [(u/str->keywrd "pre.language-" language)
    [(u/str->keywrd "code.language-" language) contents]])
 
+;; Currently — Destructure to get parameters, name, and children
+;; Future — We could process parameters in some intelligent way
+;; In particular, we could allow a case function to assign some special
+;; blocks to a div and some to a span instead
+;;
+;; Example data:
+;; {:type special-block, :parameters :firn span,
+;;  :name monoblock, :pre_blank 0, :post_blank 0,
+;;  :children [{:type paragraph, :post_blank 0, :children [{:type text, :value hello}]}]}
+;;
+(defn- special-block->html
+  "Formats a org-mode special block."
+  [{:keys [parameters name children language _arguments] :as _special-block} opts]
+  (let [rec #(map (fn [child] (to-html child opts)) %)]
+    [:div {:class name} (rec children)]))
+
 (defn img-link->figure
   "Renders an image with a figure if the link has a :desc, otherwise, :img"
   [{:keys [desc path]}]
@@ -626,6 +642,7 @@
        "table"         (make-child :table)
        "table-row"     (make-child :tr)
        "table-cell"    (make-child :td)
+       "special-block" (special-block->html v opts)
        "source-block"  (src-block->html v)
        "link"          (link->html v opts)
        "fn-ref"        (footnote-ref v)
