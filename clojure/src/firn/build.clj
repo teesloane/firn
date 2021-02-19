@@ -10,6 +10,7 @@
             [firn.util :as u]
             [me.raynes.fs :as fs]
             [hiccup.core :as h]
+            [hiccup-find.core :as hf]
             [clojure.string :as str]
             [firn.config :as cfg]))
 
@@ -64,13 +65,21 @@
         partials  (u/read-clj :partials config)]
     (assoc config :org-files org-files :layouts layouts :partials partials :pages pages)))
 
+(defn hiccupify
+  "Builds the hiccup form of a file using the specified layout. Stores the result in file map :as-hiccup"
+  [config f]
+  (let [layout   (keyword (org/get-frontmatter f :firn-layout))
+        as-hiccup  (when-not (org/is-private? config f)
+                     (layout/apply-layout config f layout))]
+    (assoc f :as-hiccup as-hiccup)))
+
 (defn htmlify
   "Render the html of a file using the layout specified. Stores results in file map :as-html."
   [config f]
-  (let [layout   (keyword (org/get-frontmatter f :firn-layout))
-        as-html  (when-not (org/is-private? config f)
-                   (layout/apply-layout config f layout))]
-    (assoc f :as-html as-html)))
+  (let [hiccupified (cond->> f (nil? (:as-hiccup f)) (hiccupify config))
+        as-html (when-not (org/is-private? config hiccupified)
+                  (h/html (:as-hiccup hiccupified)))]
+    (assoc hiccupified :as-html as-html)))
 
 (defn make-site-map
   "Builds the site maps data structure - a tree where a file might fall under one or more files.
@@ -140,7 +149,9 @@
             ;; Here we make the final pass, adding html to every file, now that
             ;; the config is full populated.
             with-html (into {} (for [[k pf] output]
-                                 [k (htmlify config-with-data pf)]))
+                                 [k (->> pf
+                                         (hiccupify config-with-data)
+                                         (htmlify config-with-data))]))
             final     (assoc config-with-data :processed-files with-html)]
         final)
 
@@ -174,7 +185,10 @@
                       (hash-map :title       (-> f :meta :title)
                                 :link        (f :path-web)
                                 :pubDate     (u/org-date->java-date  (-> f :meta :date-created))
-                                :description (str (f :as-html))))]
+                                :description (->> (:as-hiccup f)
+                                                  (hf/hiccup-find [:article.rss])
+                                                  first
+                                                  h/html)))]
     (io/make-parents feed-file)
     (->> processed-files
          (filter (fn [[_ f]] (-> f :meta :date-created)))
@@ -270,4 +284,3 @@
       true             write-pages!
       true             write-files
       (nil? is-server?) post-build-clean)))
-
