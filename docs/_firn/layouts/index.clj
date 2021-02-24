@@ -4,7 +4,7 @@
    [:div.flex.align-start
     [:h1.h2.m0 "Firn"]
     [:a {:target "_blank" :href "https://github.com/theiceshelf/firn/releases"}
-     [:sup.self-start "v.0.0.12"]]]
+     [:sup.self-start "v.0.0.13"]]]
    [:div.h4.my2.italics "A static site generator for org-mode."]
    [:div.index-download-btns
     [:a.mx2 {:target "_blank" :href "https://github.com/theiceshelf/firn/releases"} "Download latest"]

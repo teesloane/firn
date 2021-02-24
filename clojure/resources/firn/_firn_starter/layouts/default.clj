@@ -5,6 +5,5 @@
      (head config)
      [:body
       [:main
-       [:article.content
-        ;; [:div (render :toc)] ;; Optional; add a table of contents
+       [:article.content.rss ;; `.rss` is required for targeting what content you wish your feed to contain
         [:div (render :file)]]]]]))

@@ -1,3 +1,25 @@
+## [](https://github.com/theiceshelf/firn/compare/v0.0.13...v) (2021-02-24)
+
+### [0.0.13](https://github.com/theiceshelf/firn/compare/v0.0.12...v0.0.13) (2021-02-24)
+
+
+#### ⚠ BREAKING CHANGES
+
+* Using a sub-part of the generated HTML as the RSS description (#90)
+
+#### Features
+
+* Adjust parser CLI for compatibility with Linux dev ([#75](https://github.com/theiceshelf/firn/issues/75)) ([53c0b99](https://github.com/theiceshelf/firn/commit/53c0b9934757ba4c26ba87ce4a5905bd5157b9dc))
+* Adjust parser CLI for compatibility with Linux dev ([#75](https://github.com/theiceshelf/firn/issues/75)) ([cbf774a](https://github.com/theiceshelf/firn/commit/cbf774a1b07f485d97512be8f2fcb7e9a610d54d))
+
+
+#### Bug Fixes
+
+* [#66](https://github.com/theiceshelf/firn/issues/66) - .org in firn directory name. ([c820a7f](https://github.com/theiceshelf/firn/commit/c820a7fd732c35a503757830e8122903287f54b4))
+* changelog cmd should use `npx` ([13e3af2](https://github.com/theiceshelf/firn/commit/13e3af227682e9a5ad8b70db6862882ef16e0f9d))
+* enable lowercase #+title frontmatter. ([7053b5b](https://github.com/theiceshelf/firn/commit/7053b5bf80b3336e2175e4bbd2424ebfc61d4186))
+* Using a sub-part of the generated HTML as the RSS description ([#90](https://github.com/theiceshelf/firn/issues/90)) ([5c51e99](https://github.com/theiceshelf/firn/commit/5c51e99f101d7a52c3961a20d2681d210d43153d))
+
 ## [](https://github.com/theiceshelf/firn/compare/v0.0.12...v) (2020-11-05)
 
 ### [0.0.12](https://github.com/theiceshelf/firn/compare/v0.0.11...v0.0.12) (2020-11-05)
