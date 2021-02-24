@@ -7,7 +7,7 @@ set -euo pipefail
 # - conventional-changelog (https://www.npmjs.com/package/conventional-changelog-cli)
 # - trash (brew install trash)
 
-conventional-changelog -p conventionalcommits -i CHANGELOG.md -s -r 2
+npx conventional-changelog -p conventionalcommits -i CHANGELOG.md -s -r 2
 
 # This script indents the `### Bug Fixes` and `### Features` lines because I think they should be level 4 headings.
 sed -i'.original' -e 's/^### Bug Fixes$/#### Bug Fixes/g' CHANGELOG.md

@@ -1,0 +1,49 @@
+#+TITLE: Rss
+#+FIRN_UNDER: Content
+#+FIRN_ORDER: 10
+#+DATE_CREATED: <2021-02-24 Wed>
+#+DATE_UPDATED: <2021-02-24 19:02>
+
+
+*Purpose:* Firn is able to provide basic RSS functionality. This document provides information for setting up RSS for your Firn site.
+
+*Prerequistes*: an understanding of [[file:layout.org][layouts]].
+
+* Overview
+
+*Note*: RSS is still a feature in development, and so there may be breaking changes to how it's developed.
+
+* Usage
+
+In your [[file:configuration.org][config.edn file]] you can enable RSS like so:
+
+#+begin_src  clojure
+
+{;...
+ :enable-rss?      true        ; If true, creates a feed.xml in _site.
+ ;...
+#+end_src
+
+
+Then, in your [[file:layout.org][layouts]], you will need to specify a css class of ~rss~ *for the container of which represents the content to be part of your feed*.
+
+The following example represents a simple layout of a site and where the rss class might be applied.
+
+#+begin_src clojure
+(defn default
+  [{:keys [render partials] :as data}]
+  (let [{:keys [head nav footer]} partials]
+    [:html
+     (head data)
+     [:body
+      [:main
+       ;; this should not be in the Rss feed
+       [:aside#sidebar.def-sidebar.unfocused
+        (render :sitemap {:sort-by :firn-order})]
+
+       ;; ! - This [:article ...] class is the only thing that should constitute a RSS feed's content.
+       ;; and so we add a `.rss` class to it so that firn can collect this content specifically for your feed.
+       [:article.def-content-wrap.rss
+        (render :file)]
+       ]]]))
+#+end_src
