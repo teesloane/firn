@@ -1,6 +1,4 @@
 (ns firn.org
-
-
   "The org namespace handles all data-related to the parsing of an org file.
   When an org file is parsed it is organized into a map of data.
 
@@ -8,9 +6,7 @@
   - a) parsing and organizing a new file into data
   - b) querying the parsed file to determine various things such as:
     - is the file private?
-    - is this headline exported?
-
-  "
+    - is this headline exported? "
   (:require [clojure.java.shell :as sh]
             [clojure.string :as s]
             [firn.util :as u]
@@ -151,11 +147,12 @@
     tags))
 
 (defn get-keywords
-  "Returns a list of org-keywords from a file. All files must have keywords."
+  "Returns a list of org-keywords from a file (effectively, `frontmatter`.
+  All files must at least have a `#+title` keyword to beprocessed."
   [f]
   (let [expected-keywords (get-in f [:as-edn :children 0 :children])]
     (when (= "keyword" (:type (first expected-keywords)))
-      expected-keywords)))
+      (filter #(= "keyword" (:type %)) expected-keywords))))
 
 (defn get-link-parts
   "Converts `file:my_link.org` -> data of it's representative parts.
