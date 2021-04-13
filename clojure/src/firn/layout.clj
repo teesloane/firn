@@ -127,9 +127,8 @@
 
        ;; render a table of contents
        (= action :toc)
-       (let [toc  toc ; get the toc for the file.
-             ;; get configuration for toc in order of precedence
-             opts (merge (config-settings :firn-toc)
+        ;; get configuration for toc in order of precedence
+       (let [opts (merge (config-settings :firn-toc)
                          layout-settings
                          (front-matter-settings :firn-toc))]
          (when (seq toc)

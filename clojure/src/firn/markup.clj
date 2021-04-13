@@ -300,9 +300,10 @@
           (assoc :prev with-meta)))
 
     :else
-    (do (println "Something has gone wrong. ") acc)))
+    (do (println "Internal error: something has gone wrong while building the table of contents. ") acc)))
 
 (defn toc->html
+  "Responsible for the actual converting of the datastructure of a toc into html."
   [toc kind]
   (->> toc
      (map (fn [x]
