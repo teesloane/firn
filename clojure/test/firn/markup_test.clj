@@ -54,7 +54,7 @@
     (t/is (= (sut/link->html (sample-links :file-link) {:site-url ""})
              [:a.firn-internal {:href "/file2"} "File 2"]))))
 
-(t/deftest make-toc
+(t/deftest render-toc
   (let [ex1     [{:level 1, :text "Process" :anchor "#process"}
                  {:level 2, :text "Relevance" :anchor "#relevance"}]
         ex1-res [:ol [:li
@@ -79,13 +79,13 @@
                       [:ol ([:li [:a {:href "#foo"} "Foo"]])]])]]]]
 
     (t/testing "expected results, no options."
-      (let [res  (sut/make-toc ex1)
-            res2 (sut/make-toc ex2)]
+      (let [res  (sut/render-toc ex1)
+            res2 (sut/render-toc ex2)]
         (t/is (= res ex1-res))
         (t/is (= res2 ex2-res))))
     (t/testing "Depth limits work."
-      (let [res-d1      (sut/make-toc ex2 {:depth 1})
-            res-d2      (sut/make-toc ex2 {:depth 2})
+      (let [res-d1      (sut/render-toc ex2 {:depth 1})
+            res-d2      (sut/render-toc ex2 {:depth 2})
             expected-d1 [:ol [:li [:a {:href "#process"} "Process"]]]
             expected-d2 [:ol
                          [:li [:a {:href "#process"} "Process"]
@@ -96,7 +96,7 @@
         (t/is (= res-d2 expected-d2))))
 
     (t/testing "headline select works"
-      (let [res-1 (sut/make-toc ex2 {:headline "Relevance"})
+      (let [res-1 (sut/render-toc ex2 {:headline "Relevance"})
             expected [:ol
                       [:li
                        [:a {:href "#relevance"} "Relevance"]

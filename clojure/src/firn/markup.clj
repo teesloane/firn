@@ -252,8 +252,8 @@
 
 ;; R: Table of Contents --------------------------------------------------------
 
-(defn make-toc-helper-reduce
-  "(ಥ﹏ಥ) Yeah. So. See the docstring for make-toc.
+(defn render-toc-helper-reduce
+  "(ಥ﹏ಥ) Yeah. So. See the docstring for render-toc.
   Basically, this is a bit of a nightmare. This turns a flat list into a tree
   So that we can property create nested table of contents."
   [{:keys [out prev min-level] :as acc} curr]
@@ -313,7 +313,7 @@
                [:a {:href (x :anchor)} (x :text)]
                [kind (toc->html (x :children) kind)]])))))
 
-(defn make-toc
+(defn render-toc
   "toc: a flattened list of headlines with a :level value of 1-> N:
   [{:level 1, :text 'Process', :anchor '#process'}  {:level 2, :text 'Relevance', :anchor '#relevance'}]
 
@@ -321,7 +321,7 @@
   where to start the table of contents (at a specific headline?)
   or unto what depth we want the headings to render."
   ([toc]
-   (make-toc toc {}))
+   (render-toc toc {}))
   ([toc {:keys [headline depth list-type exclude-headline?]
          :or   {depth nil list-type :ol}
          :as   opts}]
@@ -336,7 +336,7 @@
          min-level   (if (seq toc) (:level (apply min-key :level toc)) 1) ; get the min level for calibrating the reduce.
          toc-cleaned (->> toc
                           (map #(assoc % :children []))  ; create a "children" key on every item.)
-                          (reduce make-toc-helper-reduce {:out [] :prev nil :min-level min-level})
+                          (reduce render-toc-helper-reduce {:out [] :prev nil :min-level min-level})
                           :out)]
 
      (if (empty? toc-cleaned) nil
