@@ -435,6 +435,14 @@
   [(u/str->keywrd "pre.language-" language)
    [(u/str->keywrd "code.language-" language) contents]])
 
+
+(defn- fixed-width->html
+  "Renders a 'fixed-width' block (a line that starts with `:`.
+  Because orgize leaves the `:` at the start of the line, this trims it off.)"
+  [node]
+  [(u/str->keywrd "pre.fixed-width" )
+   (subs (node :value) 1)])
+
 ;; Currently — Destructure to get parameters, name, and children
 ;; Future — We could process parameters in some intelligent way
 ;; In particular, we could allow a case function to assign some special
@@ -654,6 +662,7 @@
        "cookie"        [:span.firn-cookie value]
        "text"          [:span value]
        "timestamp"     (date->html v)
+       "fixed-width"   (fixed-width->html v)
        "keyword"       "" ;; Don't parse
        "comment-block" "" ;; Don't parse
        "drawer"        "" ;; Don't parse
