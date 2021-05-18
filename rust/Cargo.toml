@@ -10,7 +10,5 @@ crate_type = ["cdylib"]
 
 [dependencies]
 jni = "0.14.0"
-heim = "0.0.11"
-futures = "0.3.1"
 orgize = "0.8.3"
 serde_json = "1.0.48"
