@@ -9,7 +9,7 @@
 :PROPERTIES:
 :date_completed: ?
 :date_started: <2020-03-01 Sun>
-:file_under: shit
+:file_under: bar
 :intent: Wiki
 :links: ?
 :slug: firn
