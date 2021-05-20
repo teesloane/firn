@@ -28,7 +28,6 @@ fn main() {
         }
 
         3 => {
-            // let keywords = &args[1];
             let keywords = &args[1];
             let kws: Vec<String> = keywords.split_whitespace().map(|s| s.to_string()).collect();
 

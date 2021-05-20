@@ -12,8 +12,9 @@
   [dir]
   (str dir "/_firn"))
 
-;; internal configuration for the operation of firn.
 (defn make-internal-config
+  "Creates a map of internal configuration. These values should not be changeable
+  by the user."
   [dir ext-config]
   (let [mdp             #(str dir "/_firn" %)
         parent-dir-name (-> dir (s/split #"/") last)
@@ -38,11 +39,11 @@
 
      ;; values collected during build/process-all:
      :processed-files  []
-     :site-map         []                        ; list of all pages converted for the site.
-     :org-tags        {}                        ; collected tags from all processed files
-     :site-logs        []                        ; collected logs from all processed files
-     :site-links       []                        ; collected links from all processed files
-     :site-attachments []}))                     ; collected (paths to) attachments of all processed files.
+     :site-map         []                    ; list of all pages converted for the site.
+     :org-tags         {}                    ; collected tags from all processed files
+     :site-logs        []                    ; collected logs from all processed files
+     :site-links       []                    ; collected links from all processed files
+     :site-attachments []}))                 ; collected (paths to) attachments of all processed files.
 
 ;; Values that a user can contribute/change via their config.edn
 (defn make-external-config
@@ -60,6 +61,7 @@
         (catch Exception ex
           (println "Failed to read 'config.edn' file - is it properly formatted?"))))))
 
+;; TODO - can this be removed? What even is this?
 (defn prop
   [config kwrd]
   (case kwrd

@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+# This should only really be run on CI.
+# GraalVM, run locally, takes a while and uses quite a bit of memory.
+# If you are looking to hack on this project locally, it is recommended to:
+# a) Run make install to create a local version of the parser
+# b) Boot into a repl and test commands in your editor, which will use the development parser
+# If you are developing locally, it's assumed that you have Rust and Clojure already installed.
 
 set -eo pipefail
 
@@ -66,10 +72,3 @@ mkdir -p target
 cp clojure/firn target
 
 pwd
-
-# move rust library into target folder.
-# if [ "$(uname)" == "Darwin" ]; then
-    # cp target/release/libfirnparser.dylib target # mac
-# elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-#     cp target/release/libfirnparser.so target # linux
-# fi

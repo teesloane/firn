@@ -1,4 +1,4 @@
-use orgize::Org;
+use orgize::{Org, ParseConfig};
 use serde_json::to_string;
 // This is the interface to the JVM that we'll call the majority of our
 // methods on.
@@ -23,6 +23,7 @@ pub extern "system" fn Java_iceshelf_clojure_rust_ClojureRust_parseOrgRust(
     // but still must be present to match the expected signature of a static
     // native method.
     _class: JClass,
+    keywords: JString,
     unit: JString,
 ) -> jstring {
     // First, we have to get the string out of Java. Check out the `strings`
@@ -32,9 +33,29 @@ pub extern "system" fn Java_iceshelf_clojure_rust_ClojureRust_parseOrgRust(
         .expect("Couldn't get java string!")
         .into();
 
+    let keywords: String = env
+        .get_string(keywords)
+        .expect("Couldn't get keywords string from java")
+        .into();
+
+    println!("keywords are {:?}", keywords);
+
+
+    // let keywords = &args[1];
+    let kws: Vec<String> = keywords.split_whitespace().map(|s| s.to_string()).collect();
+
+    let org = Org::parse_custom(
+        &unit[..],
+        &ParseConfig {
+            // custom todo keywords
+            todo_keywords: (kws, vec![]),
+            ..Default::default()
+        },
+    );
+
     // Then we have to create a new Java string to return. Again, more info
     // in the `strings` module.
-    let org = Org::parse(&unit[..]);
+    // let org = Org::parse(&unit[..]);
     let org_string = to_string(&org).unwrap();
     let output = env
         .new_string(format!("{}", org_string))

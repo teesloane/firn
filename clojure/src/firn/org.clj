@@ -44,16 +44,25 @@
 (defn parse!
   "Parse the org-mode file-string.
   When developing with a REPL, this shells out to the rust bin.
-  When compiled to a native image, it uses JNI to talk to the rust .dylib."
-  [file-str]
-  (if (u/native-image?)
-    (ClojureRust/parseOrg file-str)
-    (let [parser   (str (u/get-cwd) "/resources/parser-dev-" (u/get-os))
-          stripped (s/trim-newline file-str)
-          res      (sh/sh parser stripped)]
-      (if-not (= (res :exit) 0)
-        (prn "Orgize failed to parse file." stripped res)
-        (res :out)))))
+  When compiled to a native image, it uses JNI to talk to the rust .dylib.
+
+  If user supplies custom org todo keywords in their config.edn, these will get
+  passed into orgize."
+  ([file-str]
+   (parse! nil file-str))
+  ([todo-kwrds file-str]
+   (let [todo-kwrds-as-string (str/join " " todo-kwrds)]
+     (if (u/native-image?)
+       (ClojureRust/parseOrg todo-kwrds file-str) ;; TODO - still need to figure out how to pass data across to rust dylib.
+       (let [parser   (str (u/get-cwd) "/resources/parser-dev-" (u/get-os))
+             stripped (s/trim-newline file-str)
+             res      (if (empty? todo-kwrds-as-string)
+                        (sh/sh parser stripped)
+                        (sh/sh parser todo-kwrds-as-string stripped))]
+         (if-not (= (res :exit) 0)
+           (prn "Orgize failed to parse file." stripped res)
+           (res :out)))))))
+
 
 (defn parse-dev!
   "DevXp func: Useful for testing org strings in the repl."
@@ -385,15 +394,16 @@
 
 (defn make-file
   [config io-file]
-  (let [name     (u/get-file-io-name io-file)
-        path-abs (.getPath ^java.io.File io-file)
-        path-web (u/get-web-path (config :dirname-files) path-abs)
-        path-url (str (cfg/prop config :site-url)  "/"  path-web)
-        as-json  (->> io-file slurp parse!)                     ; slurp the contents of a file and parse it to json.
-        as-edn   (-> as-json (json/parse-string true))          ; convert the json to edn.
+  (let [name       (u/get-file-io-name io-file)
+        path-abs   (.getPath ^java.io.File io-file)
+        path-web   (u/get-web-path (config :dirname-files) path-abs)
+        path-url   (str (cfg/prop config :site-url)  "/"  path-web)
+        todo-kwrds (-> config :user-config :todo-keywords)
+        as-json    (->> io-file slurp #(parse! todo-kwrds %))                ; slurp the contents of a file and parse it to json.
+        as-edn     (-> as-json (json/parse-string true))                     ; convert the json to edn.
         ;; attach parsed data into a new file:
-        new-file (assoc (empty-file) :name name :path path-abs :path-url path-web :path-web path-web :path-url path-url :as-json as-json :as-edn as-edn)
-        new-file (assoc new-file :meta (extract-metadata config new-file)) ;; attach metadata
+        new-file   (assoc (empty-file) :name name :path path-abs :path-url path-web :path-web path-web :path-url path-url :as-json as-json :as-edn as-edn)
+        new-file   (assoc new-file :meta (extract-metadata config new-file)) ;; attach metadata
         ;; new-file (if render-html?)
         ]
     new-file))
