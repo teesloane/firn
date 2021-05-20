@@ -399,7 +399,7 @@
         path-web   (u/get-web-path (config :dirname-files) path-abs)
         path-url   (str (cfg/prop config :site-url)  "/"  path-web)
         todo-kwrds (-> config :user-config :todo-keywords)
-        as-json    (->> io-file slurp #(parse! todo-kwrds %))                ; slurp the contents of a file and parse it to json.
+        as-json    (parse! todo-kwrds (slurp io-file))                       ; slurp the contents of a file and parse it to json.
         as-edn     (-> as-json (json/parse-string true))                     ; convert the json to edn.
         ;; attach parsed data into a new file:
         new-file   (assoc (empty-file) :name name :path path-abs :path-url path-web :path-web path-web :path-url path-url :as-json as-json :as-edn as-edn)
