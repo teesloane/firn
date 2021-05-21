@@ -53,7 +53,7 @@
   ([todo-kwrds file-str]
    (let [todo-kwrds-as-string (str/join " " todo-kwrds)]
      (if (u/native-image?)
-       (ClojureRust/parseOrg todo-kwrds file-str) ;; TODO - still need to figure out how to pass data across to rust dylib.
+       (ClojureRust/parseOrg todo-kwrds-as-string file-str)
        (let [parser   (str (u/get-cwd) "/resources/parser-dev-" (u/get-os))
              stripped (s/trim-newline file-str)
              res      (if (empty? todo-kwrds-as-string)
