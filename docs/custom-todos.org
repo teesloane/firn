@@ -1,0 +1,37 @@
+#+TITLE: Custom Todos
+#+FIRN_UNDER: Content
+#+FIRN_ORDER: 11
+#+DATE_CREATED: <2021-05-21 Fri>
+#+DATE_UPDATED: <2021-05-21 08:46>
+
+
+
+*Purpose:* This document details how to configure Firn to recognize different org todo types, similar to ~org-todo-keywords~.
+
+
+* Overview
+
+If you customize org-mode to use different "Todo types", you may wish Firn to also recognize these todos. When Firn parses your org mode content, if you customize your todo-keywords, it enables you to style your keywords.
+
+(In future versions of Firn, we may also enable the collecting of all todo-types, which will enable access to a complete list of all todo-types across all files.)
+
+* Usage
+
+In your [[file:configuration.org][config.edn file]] you can set your custom todo types like so:
+
+#+begin_src  clojure
+
+{;...
+ :todo-keywords     ["TODO" "START" "HOLD" "WAIT" "DONE"]
+ ;...
+#+end_src
+
+Now, whenever Firn encounters a headline with one of these keywords, it will apply *two* css classes to it. For example, the headline below:
+
+=* TASK Finish application=
+
+Will have these two css classes applied to it:
+
+=firn-headline-keyword firn-headline-keyword__TASK=
+
+This way, /all/ todo types can be generically styled with the =firn-headline-keyword= and each individual keywords can be styled with =firn-headline-keyword__${keyword}=

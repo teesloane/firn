@@ -15,7 +15,8 @@ This is a sample page intended to demonstrate which org-elements are supported b
 ** Headings
 *** TODO Heading with a keyword
 
-Currently, =TODO= and =DONE= and rendered specifically in headlines. This will be improved to include user-input keywords in a future release.
+By default, =TODO= and =DONE= are rendered specifically in headlines.
+See the [[file:custom-todos.org][custom todos]] page for how to change todo-keyword types.
 
 *** Headings with a logbook
 :LOGBOOK:

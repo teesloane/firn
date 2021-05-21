@@ -2,7 +2,7 @@
 #+FIRN_ORDER: 1
 #+FIRN_UNDER: Reference
 #+DATE_CREATED: <2020-06-20 Sat>
-#+DATE_UPDATED: <2020-11-04 20:12>
+#+DATE_UPDATED: <2021-05-21 08:24>
 
 * Overview
 
@@ -40,13 +40,13 @@ must properly map to a Clojure value. The following in-buffer settings are
 incorrect:
 
 #+BEGIN_SRC clojure
-,#+FIRN-PROPERTIES?: true ; should use an underscore
+#+FIRN-PROPERTIES?: true ; should use an underscore
 
-,#+FIRN_PROPERTIES?: True ; "True" is not a valid clojure value
+#+FIRN_PROPERTIES?: True ; "True" is not a valid clojure value
 
-,#+FIRN_PROPERTIES?: t ; "t" is not a valid clojure value
+#+FIRN_PROPERTIES?: t ; "t" is not a valid clojure value
 
-,#+firn_properties?: t ; "t" is not valid, and firn_properties? should be ; upper cased.
+#+firn_properties?: t ; "t" is not valid, and firn_properties? should be ; upper cased.
 #+END_SRC
 
 * Usage
@@ -68,18 +68,18 @@ The firn table of contents is rendered in a layout. If you use the default layou
 * Reference                                                      :reference:
 ** config.edn
 
-| Key               | Type    | Purpose                                                                                 |
-|-------------------+---------+-----------------------------------------------------------------------------------------|
-| =:dir-data=         | string  | org-attachments/files to get copied into _site.                                         |
-| =:enable-rss?=      | boolean | If true, creates a feed.xml in _site.                                                   |
-| =:firn-properties?= | boolean | Files: whether to render properties under all headings                                  |
-| =:firn-toc=         | map     | Files: settings for any rendered table of contents.                                     |
-| =:firn-fold=        | map     | Renders folded headlines. Ex: ~{2 true}~ - all level 2 headlines will be folded.          |
-| =:firn-tags-path=   | string  | The path that a tag (in a file) will link to.                                           |
-| =:org-tags-path=    | string  | Path on which to structure links for org headline tags.                                 |
-| =:ignored-dirs=     | vector  | Dirs of org files to ignore at build time.                                              |
-| =:site-desc=        | string  | The description of your site, used for RSS.                                             |
-| =:site-title=       | string  | The title of your site, used for RSS.                                                   |
-| =:site-url=         | string  | The root url of your site.                                                              |
-| =:run-build-clean?= | string  | Whether to clean out unused attachments on build. Values: "never" / "always" / "prompt" |
-
+| Key               | Type           | Purpose                                                                                 |
+|-------------------+----------------+-----------------------------------------------------------------------------------------|
+| =:dir-data=         | string         | org-attachments/files to get copied into _site.                                         |
+| ~:enable-rss?~      | boolean        | If true, creates a feed.xml in _site.                                                   |
+| ~:firn-properties?~ | boolean        | Files: whether to render properties under all headings                                  |
+| ~:todo-keywords~    | vector[string] | Override default org todo keywords, ex: ~["STRT" "TODO" "DONE" "STOP"]~.                  |
+| =:firn-toc=         | map            | Files: settings for any rendered table of contents.                                     |
+| =:firn-fold=        | map            | Renders folded headlines. Ex: ~{2 true}~ - all level 2 headlines will be folded.          |
+| =:firn-tags-path=   | string         | The path that a tag (in a file) will link to.                                           |
+| =:org-tags-path=    | string         | Path on which to structure links for org headline tags.                                 |
+| =:ignored-dirs=     | vector         | Dirs of org files to ignore at build time.                                              |
+| =:site-desc=        | string         | The description of your site, used for RSS.                                             |
+| =:site-title=       | string         | The title of your site, used for RSS.                                                   |
+| =:site-url=         | string         | The root url of your site.                                                              |
+| ~:run-build-clean?~ | string         | Whether to clean out unused attachments on build. Values: "never" / "always" / "prompt" |
