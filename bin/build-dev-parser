@@ -1,7 +1,25 @@
 #!/usr/bin/env bash
 
-# expects script to be called from bin/
-cd ../rust
+# this scrip create the dev parser, for when developing with a REPL. Firn
+# processes org content using a development binary which is just a rust bin
+# wrapping orgize functionality. This way, one doesn't have to compile the
+# entire graalvm firn binary just to run tests.
+#
+# The output binary goes into clojure/resources as well as firn/bin, in the case
+# that someone wants quick access to the binary.
+#
+# NOTE: this is not currently setup to cross compile.
+# NOTE: This script should be called via firn/makefile command: `make dev-parser`
+
+cd rust
 cargo build
-cp target/debug/dev-parser ../bin/parser
-cp target/debug/dev-parser ../clojure/resources/parser
+
+
+if [ "$(uname)" == "Darwin" ]; then
+    cp target/debug/dev-parser ../bin/parser-dev-macosx
+    cp target/debug/dev-parser ../clojure/resources/parser-dev-macosx
+
+elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+    cp target/debug/dev-parser ../bin/parser-dev-linux
+    cp target/debug/dev-parser ../clojure/resources/parser-dev-macosx
+fi

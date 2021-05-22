@@ -58,28 +58,25 @@ Actions:
 ** Docker
 
 Firn can also be used in Docker.
-
 #+begin_src
-docker run \
-  -it \
-  --rm \
-  -p 4000:4000 \
-  -v "$PWD":"$PWD" \
-  --workdir "$PWD" \
-  theiceshelf/firn \
-    --help
+docker run -it --rm -p 4000:4000 -v "$PWD":"$PWD" --workdir "$PWD" theiceshelf/firn --help
 #+end_src
+
+I do not use docker commonly, so please do not rely on this image being always up to date.
 
 * Development
 ** Prerequisites:
 - Download [[https://www.graalvm.org/downloads/][GraalVM]] and set =GRAALVM_HOME=.
 - Use =gu= to install the =native-image= executable.
-- Install [[https://github.com/technomancy/leiningen][lein]]
-- Install [[https://doc.rust-lang.org/cargo/getting-started/installation.html][cargo]] (we use 1.41.1)
+- Install Clojure +  [[https://github.com/technomancy/leiningen][lein]]
+- Install Rust + [[https://doc.rust-lang.org/cargo/getting-started/installation.html][cargo]] (we use 1.51.0)
 
 ** Building
 
-This creates a single binary called =firn=.
+*** Clojure Repl + Local Rust Binary
+1. Run ~make install~
+*** Final Binary
+This creates a single binary called =firn=. (Not recommended for local development).
 
 #+BEGIN_SRC sh
 git clone git@github.com:theiceshelf/firn.git && cd firn
@@ -94,37 +91,32 @@ Firn can be built as a container image, using
 docker build -t theiceshelf/firn .
 #+end_src
 
-** Developing
+*Note*: I personally do not use this method, so I cannot confirm that this works / will always work.
+
+** Recommended Development Flow
 
 Firn is a Clojure code base that reaches out to a library compiled with Rust.
-You won't necessarily need to compile any rust code as the rust artifacts have
-been vendored into the clojure/resources folders.
-
-*** Clojure setup / Emacs use.
+*Note:* /While you don't have to install Rust, as we vendor the Rust binaries in
+=clojure/resources=, these may not always be up to date./
 
 This is my personal workflow for developing, it may or may not be useful.
 
 - I open ~core.clj~ and boot up a Cider REPL in Emacs.
-- I eval the CLI functions (new, serve, build) in ~core.clj~ under the ~(comment ..)~
-  block at the end of the file.
+- I eval the CLI functions (new, serve, build) in ~core.clj~ under the ~(comment ..)~ block at the end of the file.
 - When building a feature, I write the code, evaluate it, and then eval the CLI
-  commands again in ~core.clj~. I use ~cider-eval-region~ to both stop mount (if the server is running) and to re-run the CLI command.
+  commands again in ~core.clj~. I use ~cider-eval-region~ to both stop =mount= (if the
+  server is running) and to re-run the CLI command.
 - I usually run the tests on the docs folder that is bundled in the repo:
   + ~(mount/stop) (-main "serve" "-d" "<path_to_repo>/firn/docs")~
-- In emacs, I use ~m-x setenv~ and at the prompt enter ~DEV~ > ~TRUE~
+- In emacs, I use ~m-x setenv~ and at the prompt enter ~DEV~ for name and it's value to ~TRUE~
   - this prevents CLI exit codes from ending the REPL process.
-- *Note*: some of the functions from the =me.raynes.fs= namespace have been
-  duplicated in the ~util.clj~ namespace; largely, the functions that have issues
-  with reflection.
-
-*** Rust Parser
-- In development, we have a binary version of the Rust parser functionality that the Clojure code shells out to.
-- To package up a new version of the rust binary for development (a binary we
-  can shell out to) run the script =bin/build-dev-parser=.
+- While developing, any org-parsing happens by having Clojure code shells out to
+  the dev-parser specific to your systems architecture..
+- If you need to make changes to the rust dev-parser, you can re-build the
+  binary by running =make dev-parser= in the repo root..
 * Thank-you's
 
+- PoiScript's org-mode [[https://github.com/PoiScript/orgize][parser]].
 - Thank you to [[https://github.com/borkdude][@borkdude]] for building some awesome libraries ([[https://github.com/borkdude/sci][sci]] is used in
   firn to evaluate layouts) and for answering questions about compiling with
   GraalVM /and/ for figuring out how to compile [[https://github.com/borkdude/clojure-rust-graalvm][rust and clojure together]].
-- PoiScript's org-mode [[https://github.com/PoiScript/orgize][parser]].
-- [[https://andybrewer.github.io/mvp/][mvp.css]] for base layer styles.
