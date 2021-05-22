@@ -38,10 +38,6 @@ pub extern "system" fn Java_iceshelf_clojure_rust_ClojureRust_parseOrgRust(
         .expect("Couldn't get keywords string from java")
         .into();
 
-    println!("keywords are {:?}", keywords);
-
-
-    // let keywords = &args[1];
     let kws: Vec<String> = keywords.split_whitespace().map(|s| s.to_string()).collect();
 
     let org = Org::parse_custom(
@@ -55,7 +51,6 @@ pub extern "system" fn Java_iceshelf_clojure_rust_ClojureRust_parseOrgRust(
 
     // Then we have to create a new Java string to return. Again, more info
     // in the `strings` module.
-    // let org = Org::parse(&unit[..]);
     let org_string = to_string(&org).unwrap();
     let output = env
         .new_string(format!("{}", org_string))
