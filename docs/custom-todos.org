@@ -4,11 +4,8 @@
 #+DATE_CREATED: <2021-05-21 Fri>
 #+DATE_UPDATED: <2021-05-23 14:14>
 
-
-
 *Purpose:* This document details how to configure Firn to recognize different org
 todo types, similar to ~org-todo-keywords~.
-
 
 * Overview
 
@@ -29,6 +26,7 @@ In your [[file:configuration.org][config.edn file]] you can set your custom todo
 
 Now, whenever Firn encounters a headline with one of these keywords, it will
 apply *two* css classes to it. For example, the headline below:
+
 
 =* TASK Finish application=
 
@@ -65,3 +63,4 @@ prints all your todos across your site could look like this:
         [:span {:style "color: lightcoral"} (todo :keyword) " "]
         [:span (todo :from-headline)]]])]])
 #+end_src
+
