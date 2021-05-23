@@ -280,7 +280,7 @@
        (sort-by :start-ts #(> %1 %2)))))
 
 (defn extract-metadata-helper
-  "There are lots of things we want to extract when iterating over the AST.
+  "There are lots of things we want to extract when iterating over the org tree.
   Rather than filter/loop/map over it several times, it all happens here.
   Collects:
   - Logbooks
@@ -293,6 +293,7 @@
                         :logbook-total      nil
                         :links              []
                         :tags               []
+                        :todos              []
                         :toc                []
                         :attachments        []
                         :__last-no-export__ nil}
@@ -333,14 +334,18 @@
                 tags           (filter #(not= % "noexport") (x :tags)) ;; remove "noexport", all other tags are eligible.
                 tags-with-meta (map #(merge headline-meta file-metadata {:tag-value %}) tags)
                 add-tags       #(vec (concat % tags-with-meta))
-                out            (update out :tags add-tags)]
+                add-todos      #(conj % (merge headline-meta {:keyword (x :keyword)}))
+                out            (update out :tags add-tags)
+                out            (if (x :keyword) #p (update out :todos add-todos) out)]
             (recur xs out last-headline))
+
 
           "clock" ; if clock, merge headline-data into it, and push/recurse into out
           (let [headline-meta {:from-headline (-> last-headline :children first :raw)}
                 new-log-item  (merge headline-meta file-metadata x)
                 out           (update out :logbook conj new-log-item)]
             (recur xs out last-headline))
+
 
           "link" ; if link, also merge file metadata and push into new-links and recurse.
           (let [
