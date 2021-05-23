@@ -336,7 +336,7 @@
                 add-tags       #(vec (concat % tags-with-meta))
                 add-todos      #(conj % (merge headline-meta {:keyword (x :keyword)}))
                 out            (update out :tags add-tags)
-                out            (if (x :keyword) #p (update out :todos add-todos) out)]
+                out            (if (x :keyword) (update out :todos add-todos) out)]
             (recur xs out last-headline))
 
 
