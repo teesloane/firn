@@ -1,6 +1,6 @@
 #+TITLE: Layouts and Partials
 #+DATE_CREATED: <2020-03-24 Tue>
-#+DATE_UPDATED: <2020-11-04 20:12>
+#+DATE_UPDATED: <2021-05-23 14:09>
 #+FIRN_UNDER: Content
 #+FIRN_ORDER: 1
 #+FIRN_FOLD: {2 true}
@@ -74,7 +74,7 @@ Using partials requires the following:
           (head build-url)            ; => Renders the `head` partial
           ; ....
    #+END_SRC
-* The user layout map                                            :advanced:
+* TODO The user layout map                                       :advanced:
 
 The following is a description of the map that gets passed to all user layouts. As such, all of these keys may be destructured as mentioned above. Some values may be removed / added.
 

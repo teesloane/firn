@@ -151,6 +151,12 @@
         (t/is (= "File Logbook" (first-entries :from-file)))
         (t/is (= "tag1" (first-entries :tag-value)))))
 
+    (t/testing "The TODO keyword is recognized in a headline"
+      (let [first-entries (-> file :meta :todos)]
+        (t/is (= first-entries [{:from-headline "A todo thing.",
+                                 :headline-link "/file-metadata#a-todo-thing",
+                                 :keyword "TODO"}]))))
+
     (t/testing "check that logbook gets sorted: most-recent -> least-recent by :start-ts"
       ;; a clever way (I borrowed) to check if vals in a list are sorted.
       (t/is (apply >= start-times)))))

@@ -163,6 +163,7 @@
      :site-map      (config :site-map)
      :site-links    (config :site-links)
      :site-logs     (config :site-logs)
+     :site-todos    (config :site-todos)
      :site-title    (cfg/prop config :site-title)
      :site-author   (cfg/prop config :site-author)
      :site-desc     (cfg/prop config :site-desc)

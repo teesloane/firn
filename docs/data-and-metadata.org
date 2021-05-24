@@ -1,6 +1,6 @@
 #+TITLE: Data and Metadata
 #+DATE_CREATED: <2020-03-25 Wed>
-#+DATE_UPDATED: <2021-02-24 19:05>
+#+DATE_UPDATED: <2021-05-23 13:58>
 #+FIRN_UNDER: Content
 #+FIRN_LAYOUT: docs
 #+FIRN_ORDER: 8
@@ -47,6 +47,7 @@ The following table describes all the data and functions "passed" to a layout ea
 | site-desc     | The site description used for RSS and SEO.            | string    |
 | site-links    | A list of all links across all documents              | vector    |
 | site-logs     | A list of all logbook entries                         | vector    |
+| site-todos    | A list of all todos on a Firn site                    | vector    |
 | site-map      | A map of all files sorted by ~#+FIRN_UNDER~             | map       |
 | site-title    | The site title used for RSS and SEO.                  | string    |
 | site-url      | The site URL used to build link in templates.         | string    |
