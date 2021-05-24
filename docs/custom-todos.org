@@ -2,12 +2,10 @@
 #+FIRN_UNDER: Content
 #+FIRN_ORDER: 11
 #+DATE_CREATED: <2021-05-21 Fri>
-#+DATE_UPDATED: <2021-05-21 08:46>
+#+DATE_UPDATED: <2021-05-23 14:14>
 
-
-
-*Purpose:* This document details how to configure Firn to recognize different org todo types, similar to ~org-todo-keywords~.
-
+*Purpose:* This document details how to configure Firn to recognize different org
+todo types, similar to ~org-todo-keywords~.
 
 * Overview
 
@@ -26,7 +24,9 @@ In your [[file:configuration.org][config.edn file]] you can set your custom todo
  ;...
 #+end_src
 
-Now, whenever Firn encounters a headline with one of these keywords, it will apply *two* css classes to it. For example, the headline below:
+Now, whenever Firn encounters a headline with one of these keywords, it will
+apply *two* css classes to it. For example, the headline below:
+
 
 =* TASK Finish application=
 
@@ -34,4 +34,33 @@ Will have these two css classes applied to it:
 
 =firn-headline-keyword firn-headline-keyword__TASK=
 
-This way, /all/ todo types can be generically styled with the =firn-headline-keyword= and each individual keywords can be styled with =firn-headline-keyword__${keyword}=
+This way, /all/ todo types can be generically styled with the =firn-headline-keyword= and each individual keywords can be styled with =firn-headline-keyword__${keyword}=.
+
+
+* Accessing all todos on your site.
+
+Similar to [[file:logbooks.org][logbooks]] and [[file:org_tags.org][tags]], Firn will collect all todo keywords (custom or
+default) when it processes your files. These are stored in a list called =:site-todos= and each list item looks (roughly) like so:
+
+#+begin_src clojure
+[{:from-headline "A todo thing."
+  :headline-link "/file-metadata#a-todo-thing"
+  :keyword "TODO"}
+ ;....]
+#+end_src
+
+You can access the entire list of todos in your layouts. An simplified example layout that
+prints all your todos across your site could look like this:
+
+#+begin_src clojure
+(defn default
+  [{:keys [site-todos] :as data}]
+  [:html
+   [:body
+    (for [todo site-todos]
+      [:div
+       [:a {:href (todo :headline-link)}
+        [:span {:style "color: lightcoral"} (todo :keyword) " "]
+        [:span (todo :from-headline)]]])]])
+#+end_src
+

@@ -1,4 +1,20 @@
-## [](https://github.com/theiceshelf/firn/compare/v0.0.13...v) (2021-02-24)
+## [](https://github.com/theiceshelf/firn/compare/v0.0.14...v) (2021-05-26)
+
+### [0.0.14](https://github.com/theiceshelf/firn/compare/ec3b6243509f7ad63f72d25e9f5ffa53436beba8...v0.0.14) (2021-05-24)
+
+#### ⚠ BREAKING CHANGES
+
+* Using a sub-part of the generated HTML as the RSS description (#90)
+  * see https://firn.theiceshelf.com/rss
+  * now, user's can specify what part of their content shows up in their RSS.
+* render fns should return nil if no content.
+  * previously, some render functions returned empty lists if no content was found to render.
+  * we should rather return nil for better user experience with rendering layouts.
+
+#### Features
+
+- Add fixed width renderer ([1933082a](https://github.com/theiceshelf/firn/commit/1933082afce607991d7bcaf1539ce84f1cf99a54)))
+- Enable users to define custom todos for their site ([102](https://github.com/theiceshelf/firn/pull/102))
 
 ### [0.0.13](https://github.com/theiceshelf/firn/compare/v0.0.12...v0.0.13) (2021-02-24)
 

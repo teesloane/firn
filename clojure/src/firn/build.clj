@@ -133,6 +133,7 @@
                     :org-tags           [] ;; org-headline tags
                     :firn-tags          {} ;; file-specific tags (#+ROAM-TAGS or #+FIRN-TAGS)
                     :site-links         [] ; useful for backlinks / link graphs
+                    :site-todos         [] ; all org-todos
                     :site-links-private [] ; path-web links for files that are private (for removing backlinks to private files)
                     :site-attachments   []}
          output    {}]
@@ -156,12 +157,12 @@
         final)
 
       ;; Otherwise continue...
-      (let [next-file                                          (first org-files)
-            processed-file                                     (org/make-file config next-file)
-            is-private                                         (org/is-private? config processed-file)
-            in-sitemap?                                        (org/in-site-map? processed-file)
-            org-files                                          (rest org-files)
-            {:keys [links logbook tags attachments firn-tags]} (-> processed-file :meta)]
+      (let [next-file            (first org-files)
+            processed-file       (org/make-file config next-file)
+            is-private           (org/is-private? config processed-file)
+            in-sitemap?          (org/in-site-map? processed-file)
+            org-files            (rest org-files)
+            {:keys [links logbook tags attachments firn-tags todos]} (-> processed-file :meta)]
         (if is-private
           (let [updated-site-vals (update site-vals :site-links-private conj (processed-file :path-web))]
             (recur org-files updated-site-vals output))
@@ -171,6 +172,7 @@
                                     true        (update :site-logs concat logbook)
                                     true        (update :site-attachments concat attachments)
                                     true        (update :org-tags concat tags)
+                                    true        (update :site-todos concat todos)
                                     true        (update :firn-tags concat firn-tags)
                                     in-sitemap? (update :site-map conj (org/make-site-map-item processed-file (cfg/prop config :site-url) )))]
             (recur org-files updated-site-vals updated-output)))))))
