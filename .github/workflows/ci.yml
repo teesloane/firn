@@ -76,25 +76,25 @@ jobs:
 
     - name: Strip release binary (linux and macos)
       if: matrix.build == 'linux' || matrix.build == 'macos'
-      run: strip "target/release/firn2"
+      run: strip "target/release/firn"
 
     - name: chmod it
-      run: chmod +x target/release/firn2
+      run: chmod +x target/release/firn
 
     - name: Tar it
-      run: tar -zcvf ${{matrix.asset_name}}.tar.gz target/release/firn2
+      run: tar -zcvf ${{matrix.asset_name}}.tar.gz target/release/firn
 
     # - name: Release
     #   uses: softprops/action-gh-release@v1
     #   if: startsWith(github.ref, 'refs/tags/')
     #   with:
     #     files: |
-    #       target/release/firn2
+    #       target/release/firn
 
     - name: Upload binaries to release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: target/release/firn2
+        file: target/release/firn
         asset_name: ${{ matrix.asset_name }}.tar.gz
         tag: ${{ github.ref }}

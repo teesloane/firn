@@ -18,7 +18,7 @@ use clap::{App, AppSettings, Arg};
 fn main() -> Result<()> {
     let matches = App::new("Firn")
         .setting(AppSettings::ArgRequiredElseHelp)
-        .version("0.14")
+        .version("0.15")
         .author("The Ice Shelf")
         .about("Org Mode Static Site Generator")
         .arg(
