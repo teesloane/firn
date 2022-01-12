@@ -21,7 +21,7 @@ pub fn start_server(cfg: &mut Config) {
             .expect("Could not build tokio runtime");
 
         rt.block_on(async {
-            println!("starting server at http://localhost:{}", port);
+            println!("Starting server at http://localhost:{}", port);
             let socket = SocketAddr::new(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)), port);
             warp::serve(warp::fs::dir(dir_out))
                 .run(socket)
@@ -55,7 +55,9 @@ fn watch_stuff(cfg: &mut Config) {
     // Add a path to be watched. All files and directories at that path and
     // below will be monitored for changes.
     for (path, recur_mode) in paths_to_watch {
-        watcher.watch(path, recur_mode).unwrap();
+        if path.exists() {
+            watcher.watch(path, recur_mode).unwrap();
+        }
     }
 
     loop {
