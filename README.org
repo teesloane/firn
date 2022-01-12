@@ -2,121 +2,64 @@
 #+html: <p align="center">A Static Site Generator for Org Mode</p>
 #+html: <p align="center"><a href="https://github.com/theiceshelf/firn/releases"><img alt="GitHub release (latest by date including pre-releases)" src="https://img.shields.io/github/v/release/theiceshelf/firn?color=%2316a085&include_prereleases&style=flat-square"><a/>&nbsp;<img src="https://img.shields.io/badge/Status-Alpha-%23f39c12?style=flat-square">&nbsp;<a href="https://discord.gg/TbgKxYb"><img alt="Discord" src="https://img.shields.io/discord/707754224871669770?color=%233498db&label=Discord%20Chat%20&style=flat-square"></a>&nbsp;<a href="https://github.com/sponsors/teesloane"><img src="https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub"></a></p>
 
-* Overview
 
-Firn generates a static site from org-mode files. It is a bit different from
-other static site generators, in that it intends to be a drop in solution for
-creating sites from already existing folders of org-files. Further, because
-org-mode has great capacity for collecting and displaying different kinds of
-data (links, logbooks, drawers, task keywords, tags) we can make this data
-available when org-content is parsed into a data structure.
+* What's Firn?
+Firn generates a static site from org-mode files. It is a bit different from other static site generators, in that it intends to be a drop in solution for creating sites from already existing folders of org-files. Further, because org-mode has great capacity for collecting and displaying different kinds of data (links, logbooks, drawers, task keywords, tags, etc) we can make this data available when org-content is parsed into a data structure.
 
-Currently, running the =firn= binary on a directory of org files performs the
-following:
+Currently, running the firn binary on a directory of org files performs the following:
 
 - Reads all .org files in the directory recursively.
-- Parses org-files into data structures with [[https://github.com/PoiScript/orgize][Orgize.]]
-- Collects all file links and logbooks across all files.
-- Passes files through a template system with Hiccup, and renders to HTML.
+- Parses org-files into data structures with the lovely [[https://github.com/PoiScript/orgize][Orgize]].
+- Collects all file links, tags and logbooks across all files.
+- Passes files through a template system called [[https://github.com/Keats/tera][Tera]], and renders to HTML.
 
-* Quickstart
+* How do I use it?
 
-1. Download the [[https://github.com/theiceshelf/firn/releases][latest release]] (only Mac and Linux currently supported), or use the below code snippet to install:
-   #+BEGIN_SRC sh
-    curl -s https://raw.githubusercontent.com/theiceshelf/firn/master/install -o install-firn
-    chmod +x install-firn && ./install-firn
-    # you may need to run the install script with sudo and/or run it with the absolute PWD path:
-    # sudo ~/<path-to-script>/install-firn
-   #+END_SRC
-2. Navigate to your directory of org files
-3. Run =firn new=
-4. Run =firn serve=
-5. Run =firn build= when ready to put your site online!
+- Download the latest binary from the Github Releases page.
+- Add the binary to your path, or use the =-d= flag to pass a directory to Firn
 
-* Usage
-
-The Firn documentation is available [[https://firn.theiceshelf.com/][here]] and is mirrored and built from the [[file:docs/index.org][docs/]] folder in this repo.
-
-#+BEGIN_SRC sh
-Firn - A static-site generator for org-mode.
-
-Usage: firn [options] action
-
-Options:
-  -p, --port PORT  4000                            Port number
-  -h, --help
-  -v, --version
-  -r, --repl
-  -d, --dir PATH   /Users/tees/Projects/firn/firn  Absolute path of directory to build/serve
-
-Actions:
-  build    Build a static site in a directory with org files.
-  new      Scaffold files and folders needed to start a new site.
-  serve    Runs a development server for processed org files.
-#+END_SRC
-
-** Docker
-
-Firn can also be used in Docker.
 #+begin_src
-docker run -it --rm -p 4000:4000 -v "$PWD":"$PWD" --workdir "$PWD" theiceshelf/firn --help
+# scaffold out a site:
+firn new
+
+# go explore what was generated:
+ls -la _firn
+
+# start a server and go looking for your files:
+firn serve
+
+# ready to build the output ?
+firn build
 #+end_src
 
-I do not use docker commonly, so please do not rely on this image being always up to date.
 
-* Development
-** Prerequisites:
-- Download [[https://www.graalvm.org/downloads/][GraalVM]] and set =GRAALVM_HOME=.
-- Use =gu= to install the =native-image= executable.
-- Install Clojure +  [[https://github.com/technomancy/leiningen][lein]]
-- Install Rust + [[https://doc.rust-lang.org/cargo/getting-started/installation.html][cargo]] (we use 1.51.0)
+Read the full usage documentation [[https://theiceshelf.com/firn.html][here]].
 
-** Building
+* Development & Contributing
 
-*** Clojure Repl + Local Rust Binary
-1. Run ~make install~
-*** Final Binary
-This creates a single binary called =firn=. (Not recommended for local development).
+- Rust version =1.50.0=
+- see =Makefile= commands.
+- You'll need a folder of Org files to test on.
 
-#+BEGIN_SRC sh
-git clone git@github.com:theiceshelf/firn.git && cd firn
-# compile Rust, Clojure and the GraalVM Native Image.
-bin/compile
-#+END_SRC
+A small roadmap can be found [[https://theiceshelf.com/firn.html#Roadmap][here.]]
 
-*** Container image
+* Limitations
+** Development Server
 
-Firn can be built as a container image, using
-#+begin_src sh
-docker build -t theiceshelf/firn .
+The development server is quite naive. There is no caching or diffing in the replacement of changed assets in the /static or /data folder. Further, live reload changes will not be triggered when you change =.org= files in nested directories beyond the top directory of firn. For the most part, dunnwurryaboutit.
+
+** Footnotes
+Due to how the parser parses footnotes, they must look like so:
+#+begin_src
+[fn:1]
+
+<My footnote>
 #+end_src
 
-*Note*: I personally do not use this method, so I cannot confirm that this works / will always work.
+*Not* like this:
 
-** Recommended Development Flow
+#+begin_src
 
-Firn is a Clojure code base that reaches out to a library compiled with Rust.
-*Note:* /While you don't have to install Rust, as we vendor the Rust binaries in
-=clojure/resources=, these may not always be up to date./
+[fn:1] <My Footnote>
 
-This is my personal workflow for developing, it may or may not be useful.
-
-- I open ~core.clj~ and boot up a Cider REPL in Emacs.
-- I eval the CLI functions (new, serve, build) in ~core.clj~ under the ~(comment ..)~ block at the end of the file.
-- When building a feature, I write the code, evaluate it, and then eval the CLI
-  commands again in ~core.clj~. I use ~cider-eval-region~ to both stop =mount= (if the
-  server is running) and to re-run the CLI command.
-- I usually run the tests on the docs folder that is bundled in the repo:
-  + ~(mount/stop) (-main "serve" "-d" "<path_to_repo>/firn/docs")~
-- In emacs, I use ~m-x setenv~ and at the prompt enter ~DEV~ for name and it's value to ~TRUE~
-  - this prevents CLI exit codes from ending the REPL process.
-- While developing, any org-parsing happens by having Clojure code shells out to
-  the dev-parser specific to your systems architecture..
-- If you need to make changes to the rust dev-parser, you can re-build the
-  binary by running =make dev-parser= in the repo root..
-* Thank-you's
-
-- PoiScript's org-mode [[https://github.com/PoiScript/orgize][parser]].
-- Thank you to [[https://github.com/borkdude][@borkdude]] for building some awesome libraries ([[https://github.com/borkdude/sci][sci]] is used in
-  firn to evaluate layouts) and for answering questions about compiling with
-  GraalVM /and/ for figuring out how to compile [[https://github.com/borkdude/clojure-rust-graalvm][rust and clojure together]].
+#+end_src

@@ -1,5 +1,0 @@
-#+TITLE: File1
-
-* Foo
-
-This is a private file, for which a backlinks should not show up in [[file:../file-small.org][this document.]]
