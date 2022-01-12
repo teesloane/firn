@@ -78,11 +78,14 @@ jobs:
       if: matrix.build == 'linux' || matrix.build == 'macos'
       run: strip "target/release/firn"
 
-    - name: chmod it
-      run: chmod +x target/release/firn
-
     - name: Tar it
-      run: tar -zcvf ${{matrix.asset_name}}.tar.gz target/release/firn
+      shell: bash
+      run: tar cvf ${{matrix.asset_name}}.tar.gz target/release/firn
+
+    - name: Build archive
+      shell: bash
+      run: |
+        tar czf "firn-${{matrix.asset_name}}.tar.gz" target/release/firn
 
     # - name: Release
     #   uses: softprops/action-gh-release@v1
