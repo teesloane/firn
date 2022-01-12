@@ -5,17 +5,24 @@ Everything changes. Firn was re-written. This will break your old version of Fir
 #### ⚠ BREAKING CHANGES
 
 * Most of the old API is completely irrelevant.
+* RSS is removed for now.
 * No longer using Hiccup for templating -> using Tera.
 * Folding of headlines removed
 * Rendering of properties removed
 * #+FIRN_UNDER removed (for now)
 * Tagging is less opinionated but more powerful.
-  
 
 #### Features/Added Things
 
 * Scss/sass compilation is built into the site
 * Compilation times should be faster (or else I did something wrong)
+
+#### Why Re-write?
+
+In short: developer happiness with additional out of the box speed improvements.
+
+- The clojure/rust interop stack, stacked on top of GraalVM wasn't efficient for me.
+- Less dependencies, faster iteration, etc etc.
 
 
 ### [0.0.14](https://github.com/theiceshelf/firn/compare/ec3b6243509f7ad63f72d25e9f5ffa53436beba8...v0.0.14) (2021-05-24)
