@@ -1,4 +1,22 @@
-## [](https://github.com/theiceshelf/firn/compare/v0.0.14...v) (2021-05-26)
+### [0.0.15](https://github.com/theiceshelf/firn/compare/v0.0.14...v0.0.15) (2022-01-11)
+
+Everything changes. Firn was re-written. This will break your old version of Firn and using it will require that you re-setup your site. Sorry!
+
+#### ⚠ BREAKING CHANGES
+
+* Most of the old API is completely irrelevant.
+* No longer using Hiccup for templating -> using Tera.
+* Folding of headlines removed
+* Rendering of properties removed
+* #+FIRN_UNDER removed (for now)
+* Tagging is less opinionated but more powerful.
+  
+
+#### Features/Added Things
+
+* Scss/sass compilation is built into the site
+* Compilation times should be faster (or else I did something wrong)
+
 
 ### [0.0.14](https://github.com/theiceshelf/firn/compare/ec3b6243509f7ad63f72d25e9f5ffa53436beba8...v0.0.14) (2021-05-24)
 
