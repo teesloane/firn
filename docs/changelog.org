@@ -1,9 +1,0 @@
-#+TITLE: Changelog
-#+FIRN_ORDER: 5
-#+FIRN_TOC: {:depth 1}
-#+FIRN_UNDER: Reference
-#+DATE_UPDATED: <2020-10-20 13:30>
-#+DATE_CREATED: <2020-07-05 Wed 17:10>
-
-
-An automated changelog is visible at the Firn repository on [[https://github.com/theiceshelf/firn/blob/master/CHANGELOG.md][GitHub]].

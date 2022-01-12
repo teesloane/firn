@@ -1,6 +1,0 @@
-#+TITLE: File_underscores
-
-
-* A test file with underscores in the name.
-
-For testing io-file-> keyword.
