@@ -29,6 +29,9 @@ build_release:
 	strip target/release/firn
 	ls -la -h target/release
 
+build_release_linux:
+	cross build --target x86_64-unknown-linux-gnu --release
+
 build_time: c clean_site
 	time ./target/debug/firn build -d $(TEST_WIKI)
 
