@@ -19,6 +19,8 @@ Currently, running the firn binary on a directory of org files performs the foll
 - Add the binary to your path, or use the =-d= flag to pass a directory to Firn
 
 #+begin_src
+
+# navigate to a directory that has some org-files in it, then
 # scaffold out a site:
 firn new
 
@@ -26,9 +28,10 @@ firn new
 ls -la _firn
 
 # start a server and go looking for your files:
+# if you have an org file called 'foo.org' it will become 'foo.html' etc.
 firn serve
 
-# ready to build the output ?
+# ready to build the output?
 firn build
 #+end_src
 
@@ -37,7 +40,7 @@ Read the full usage documentation [[https://theiceshelf.com/firn.html][here]].
 
 * Development & Contributing
 
-- Rust version =1.50.0=
+- Rust version =1.58.0=
 - see =Makefile= commands.
 - You'll need a folder of Org files to test on.
 
