@@ -1,5 +1,6 @@
 use crate::{
-    org::{OrgMetadata, OrgTagType},
+    front_matter::FrontMatter,
+    org::{OrgMetadata, OrgTagType, OrgMetadataType},
     util,
 };
 /// The data file is mostly for "serializing" larger internal structs that
@@ -28,13 +29,14 @@ pub struct Tag {
     pub tag_type: String,
     pub title: String,
     pub path: String,
+    pub front_matter: FrontMatter,
 }
 
 impl Tag {
     // I guess this could fail if I didn't pass in org metadata of type tag...
     pub fn new(om: OrgMetadata, baseurl: String) -> Tag {
         match om.entity {
-            crate::org::OrgMetadataType::Tag(_tag_name, tag_type) => match tag_type {
+            OrgMetadataType::Tag(_tag_name, tag_type) => match tag_type {
                 OrgTagType::FirnTag => {
                     let path = format!(
                         "{}/{}",
@@ -45,6 +47,7 @@ impl Tag {
                         tag_type: "firn".to_string(),
                         title: om.originating_file,
                         path,
+                        front_matter: om.front_matter
                     }
                 }
                 OrgTagType::OrgTag => {
@@ -58,6 +61,7 @@ impl Tag {
                             .originating_headline
                             .expect("Internal error: OrgMetadata::FirnTag did not have a headline"),
                         path,
+                        front_matter: om.front_matter
                     }
                 }
             },
