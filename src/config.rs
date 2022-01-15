@@ -2,7 +2,7 @@ use crate::{
     errors::{FirnError, FirnErrorType},
     org,
     org::OrgMetadata,
-    templates::{self, links::SitemapDate},
+    templates::{self},
     templates::{
         data,
         links::{LinkData, LinkMeta},
@@ -300,7 +300,7 @@ impl<'a> Config<'a> {
         let mut out: Vec<LinkData> = Vec::new();
         for (_k, v) in &self.global_sitemap {
             match &v.entity {
-                org::OrgMetadataType::Sitemap(fm) => {
+                org::OrgMetadataType::Sitemap(_fm) => {
                     let sitemap_item_url = format!(
                         "{}/{}",
                         self.user_config.site.url,
@@ -309,10 +309,7 @@ impl<'a> Config<'a> {
                     let x = LinkData::new(
                         sitemap_item_url,
                         v.originating_file.clone(),
-                        LinkMeta::Sitemap(SitemapDate {
-                            date_created: fm.date_created_ts,
-                            date_updated: fm.date_updated_ts,
-                        }),
+                        LinkMeta::Sitemap,
                         Some(v.front_matter.clone())
                     );
                     out.push(x);

@@ -27,17 +27,11 @@ pub fn link_transformer(base_url: String, org_link_path: String) -> String {
 // -- Link data for Tera to loop over --------------------------------------------
 
 #[derive(Debug, PartialEq, Serialize)]
-pub struct SitemapDate {
-    pub date_created: Option<i64>,
-    pub date_updated: Option<i64>,
-}
-
-#[derive(Debug, PartialEq, Serialize)]
 pub enum LinkMeta {
     Backlink,
     RelatedFile,
     Tag { count: usize },
-    Sitemap(SitemapDate),
+    Sitemap,
 }
 
 #[derive(Debug, PartialEq, Serialize)]

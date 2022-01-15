@@ -1,6 +1,24 @@
+
+### [0.0.16](https://github.com/theiceshelf/firn/compare/v0.0.15...v0.0.16) (2022-01-15)
+
+#### ⚠ BREAKING CHANGES
+
+Changes to templates:
+
+- Arrays of links for global data (tags, sitemap, logbooks, etc) have frontmatter attached to them:
+- changed a sub property of the above link objects from "kind" to "meta".
+
+#### Added
+
+- Add: frontmatter to LinkData and tagged_items
+- Add(feat): render fn can now bump title level.
+
+#### Fixed:
+- fix: don't watch folders that don't exist.
+
 ### [0.0.15](https://github.com/theiceshelf/firn/compare/v0.0.14...v0.0.15) (2022-01-11)
 
-Everything changes. Firn was re-written. This will break your old version of Firn and using it will require that you re-setup your site. Sorry!
+Everything has changed! Firn is re-written. This will break your old version of Firn and using it will require that you re-setup your site. Sorry!
 
 #### ⚠ BREAKING CHANGES
 
