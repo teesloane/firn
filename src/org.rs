@@ -39,6 +39,7 @@ pub struct OrgMetadata<'a> {
     pub originating_file_web_path: PathBuf,
     pub originating_headline: Option<String>,
     pub originating_headline_web_path: Option<String>,
+    pub front_matter: FrontMatter
 }
 
 impl<'a> OrgMetadata<'a> {
@@ -73,6 +74,7 @@ impl<'a> OrgMetadata<'a> {
                 originating_file_web_path,
                 originating_headline,
                 originating_headline_web_path,
+                front_matter: front_matter.clone()
             };
         }
         OrgMetadata {
@@ -82,6 +84,7 @@ impl<'a> OrgMetadata<'a> {
             originating_file_web_path,
             originating_headline: None,
             originating_headline_web_path: None,
+            front_matter: front_matter.clone()
         }
     }
 
@@ -350,7 +353,8 @@ impl<'a> OrgFile<'a> {
                                         let new_link = templates::links::LinkData::new(
                                             related_item_url,
                                             g_tag.originating_file.clone(),
-                                            templates::links::LinkDataKind::RelatedFile,
+                                            templates::links::LinkMeta::RelatedFile,
+                                            Some(self.front_matter.clone())
                                         );
                                         if !out.contains(&new_link) {
                                             out.push(new_link);
@@ -390,7 +394,8 @@ impl<'a> OrgFile<'a> {
                         let new_link = templates::links::LinkData::new(
                             backlink_item_url,
                             g_link.originating_file.clone(),
-                            templates::links::LinkDataKind::Backlink
+                            templates::links::LinkMeta::Backlink,
+                            Some(self.front_matter.clone())
                         );
                         if !out.contains(&new_link) {
                             out.push(new_link);

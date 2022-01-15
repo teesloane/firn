@@ -5,7 +5,7 @@ use crate::{
     templates::{self, links::SitemapDate},
     templates::{
         data,
-        links::{LinkData, LinkDataKind},
+        links::{LinkData, LinkMeta},
     },
     user_config::UserConfig,
     util,
@@ -285,7 +285,12 @@ impl<'a> Config<'a> {
                 "{}/{}{}.html",
                 self.user_config.site.url, self.user_config.tags.url, tag_name
             );
-            let x = LinkData::new(tag_url, tag_name.to_string(), LinkDataKind::Tag(v.len()));
+            let x = LinkData::new(
+                tag_url,
+                tag_name.to_string(),
+                LinkMeta::Tag{count: v.len()},
+                None
+            );
             out.push(x);
         }
         out.sort_by_key(|ld| ld.file.clone());
@@ -304,10 +309,11 @@ impl<'a> Config<'a> {
                     let x = LinkData::new(
                         sitemap_item_url,
                         v.originating_file.clone(),
-                        LinkDataKind::Sitemap(SitemapDate {
+                        LinkMeta::Sitemap(SitemapDate {
                             date_created: fm.date_created_ts,
                             date_updated: fm.date_updated_ts,
                         }),
+                        Some(v.front_matter.clone())
                     );
                     out.push(x);
                 }
@@ -388,7 +394,7 @@ impl<'a> Config<'a> {
                     println!("{:?} private files were skipped.", priv_files.len());
                 }
             }
-            None => ()
+            None => (),
         }
     }
 
@@ -460,7 +466,6 @@ impl<'a> Config<'a> {
         self.global_sitemap.clear();
         self.build(print_build_log)
     }
-
 
     pub fn check_site_exists(dir_firn: &PathBuf) {
         if !dir_firn.exists() {
