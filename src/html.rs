@@ -1,9 +1,10 @@
 use orgize::export::{DefaultHtmlHandler, HtmlEscape, HtmlHandler};
-use orgize::Element;
+use orgize::{elements, Element};
 use std::io::{Error as IOError, Write};
 use std::string::FromUtf8Error;
-
+use crate::templates::links;
 use crate::util;
+
 
 // -- HTML Handlers for Orgize -------------------------------------------------
 
@@ -33,6 +34,7 @@ impl From<FromUtf8Error> for MyError {
 #[derive(Default)]
 pub struct MyHtmlHandler(DefaultHtmlHandler);
 
+// this handles the actual writing of html.
 impl HtmlHandler<MyError> for MyHtmlHandler {
     fn start<W: Write>(&mut self, mut w: W, element: &Element) -> Result<(), MyError> {
         match element {
@@ -81,4 +83,49 @@ impl HtmlHandler<MyError> for MyHtmlHandler {
 
         Ok(())
     }
+}
+
+
+// -- HTML Transformers
+//
+// Before we hand off orgize-data structures to the above html handler for writing html
+// we sometimes need to transform the data based on user customization / help etc.
+// most of these need to just transfer the beginning of the html (the start fn needed by the trait.)
+
+pub fn trx_link(
+    link: &elements::Link,
+    handler: &mut MyHtmlHandler,
+    writer: &mut Vec<u8>,
+    base_url: String,
+) {
+    let link_web_path = links::link_transformer(base_url, link.path.to_owned().to_string());
+    let new_link = elements::Link {
+        path: std::borrow::Cow::Borrowed(&link_web_path),
+        desc: link.desc.to_owned(),
+    };
+    let new_link_enum = Element::Link(new_link);
+     handler.start(writer, &new_link_enum).unwrap()
+}
+
+
+pub fn trx_title(
+    title: &elements::Title,
+    handler: &mut MyHtmlHandler,
+    writer: &mut Vec<u8>,
+    update_level: Option<i8>
+) {
+    let update_level = update_level.unwrap_or(0);
+    let mut new_level = title.level as i8 + update_level;
+    if new_level > 6 {
+        new_level = 6
+    } else if new_level < 1 {
+        new_level = 1
+    }
+
+    let new_title_inner = elements::Title {
+        level: new_level as usize,
+        ..title.to_owned()
+    };
+    let new_title = Element::Title(new_title_inner);
+    handler.start(writer, &new_title).unwrap()
 }
