@@ -96,12 +96,6 @@ impl<'a> OrgMetadata<'a> {
 // OrgFile
 //
 
-#[derive(Debug, PartialEq, Eq, Serialize, Clone)]
-pub enum OrgFileType {
-    FirnPage,
-    FirnPost,
-}
-
 // Here we collect everything we need for each file:
 // The parsing of org content, of course,
 // links, logbooks, tags, frontmatter, etc.
@@ -128,7 +122,6 @@ pub struct OrgFile<'a> {
     pub tags: Vec<OrgMetadata<'a>>,
     pub attachments: Vec<String>,
     pub posts: Vec<OrgFile<'a>>,
-    pub file_type: OrgFileType,
 }
 
 impl<'a> OrgFile<'a> {
@@ -162,7 +155,6 @@ impl<'a> OrgFile<'a> {
             OrgFile::collect_data(&parsed, &web_path, &file_path, front_matter.clone());
 
         OrgFile {
-            file_type: front_matter.get_file_type(),
             attachments,
             file_path,
             out_path,

@@ -1,4 +1,4 @@
-use crate::org::{OrgFileType, OrgMetadata, OrgMetadataType, OrgTagType};
+use crate::org::{OrgMetadata, OrgMetadataType, OrgTagType};
 use orgize::elements::PropertiesMap;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -18,7 +18,6 @@ pub struct FrontMatter {
     pub firn_sitemap: bool,
     pub firn_private: bool,
     pub firn_properties: bool,
-    pub file_type: Option<String>,
     pub other: HashMap<String, String>,
 }
 
@@ -34,7 +33,6 @@ impl FrontMatter {
             firn_tags: None,
             firn_type: "page".to_string(),
             layout: None,
-            file_type: None,
             firn_sitemap: true,
             firn_private: false,
             firn_properties: false,
@@ -176,19 +174,6 @@ impl FrontMatter {
         self.firn_private
     }
 
-    pub fn get_file_type(&self) -> OrgFileType {
-        if let Some(file_type) = &self.file_type {
-            if file_type == "post" {
-                OrgFileType::FirnPost
-            } else if file_type == "page" {
-                OrgFileType::FirnPage
-            } else {
-                OrgFileType::FirnPage
-            }
-        } else {
-            OrgFileType::FirnPage
-        }
-    }
 
     pub fn is_post(&self) -> bool {
         &self.firn_type == "post"
