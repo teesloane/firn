@@ -42,8 +42,8 @@ build_release_linux:
 
 build_for_gh_release: build_release build_release_linux
 	mkdir -p target/gh_out
-	zip firn_x86_64-apple-darwin target/release/firn
-	zip firn-x86_64-unknown-linux-gnu target/x86_64-unknown-linux-gnu/release/firn
+	zip -j firn_x86_64-apple-darwin target/release/firn
+	zip -j firn-x86_64-unknown-linux-gnu target/x86_64-unknown-linux-gnu/release/firn
 	mv firn_x86_64-apple-darwin.zip target/gh_out
 	mv firn-x86_64-unknown-linux-gnu.zip target/gh_out
 

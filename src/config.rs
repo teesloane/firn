@@ -243,7 +243,7 @@ impl<'a> Config<'a> {
                 self.global_links.append(&mut f.links.clone());
                 self.global_logbook.append(&mut f.logbook.clone());
                 self.global_tags.append(&mut f.tags.clone());
-                if f.front_matter.firn_sitemap {
+                if f.front_matter.can_be_put_into_sitemap() {
                     self.global_sitemap
                         .insert(f.front_matter.get_title(), f.sitemap_data.clone());
                 }

@@ -39,7 +39,7 @@ pub struct OrgMetadata<'a> {
     pub originating_file_web_path: PathBuf,
     pub originating_headline: Option<String>,
     pub originating_headline_web_path: Option<String>,
-    pub front_matter: FrontMatter
+    pub front_matter: FrontMatter,
 }
 
 impl<'a> OrgMetadata<'a> {
@@ -53,7 +53,7 @@ impl<'a> OrgMetadata<'a> {
         let file_title = front_matter.title.clone();
         let originating_file_web_path = web_path.clone();
         let originating_file_path = file_path.to_path_buf();
-        let originating_file = file_title.unwrap_or("No title".to_string());
+        let originating_file = file_title.unwrap_or(util::path_to_string(&originating_file_path));
         // TODO: write a function that cleans headlines - removes links, etc etc
         // etc - from raw. Headline stuff - not every metadata has an associated
         // headline necessarily (ie, links in an org doc before a headline
@@ -74,7 +74,7 @@ impl<'a> OrgMetadata<'a> {
                 originating_file_web_path,
                 originating_headline,
                 originating_headline_web_path,
-                front_matter: front_matter.clone()
+                front_matter: front_matter.clone(),
             };
         }
         OrgMetadata {
@@ -84,7 +84,7 @@ impl<'a> OrgMetadata<'a> {
             originating_file_web_path,
             originating_headline: None,
             originating_headline_web_path: None,
-            front_matter: front_matter.clone()
+            front_matter: front_matter.clone(),
         }
     }
 
@@ -190,7 +190,6 @@ impl<'a> OrgFile<'a> {
         let mut attachments: Vec<String> = Vec::new();
         let mut most_recent_title: Vec<elements::Title> = Vec::new();
         let make_metadata = |metadata_type, title: Option<&elements::Title>| {
-            
             OrgMetadata::new(metadata_type, title, web_path, file_path, &front_matter)
         };
         if front_matter.is_public() {
@@ -346,7 +345,7 @@ impl<'a> OrgFile<'a> {
                                             related_item_url,
                                             g_tag.originating_file.clone(),
                                             templates::links::LinkMeta::RelatedFile,
-                                            Some(self.front_matter.clone())
+                                            Some(self.front_matter.clone()),
                                         );
                                         if !out.contains(&new_link) {
                                             out.push(new_link);
@@ -387,7 +386,7 @@ impl<'a> OrgFile<'a> {
                             backlink_item_url,
                             g_link.originating_file.clone(),
                             templates::links::LinkMeta::Backlink,
-                            Some(self.front_matter.clone())
+                            Some(self.front_matter.clone()),
                         );
                         if !out.contains(&new_link) {
                             out.push(new_link);
@@ -424,7 +423,6 @@ impl<'a> OrgFile<'a> {
     /// Allowing for the possibility of rendering multiple html files
     /// from a single org file (use case: a blog.)
     fn _render_posts(&self) {
-
         for hl in self.parsed.headlines() {
             match hl.section_node() {
                 Some(node_id) => {
@@ -432,7 +430,7 @@ impl<'a> OrgFile<'a> {
                     println!(">>> {:?}", x);
                     // gself.parsed.index_mut(nodeId);
                 }
-                None => ()
+                None => (),
             }
             // let parsed = hl.children(&self.parsed);
             // let front_matter = FrontMatter::new_from_properties_map(hl.title(parsed).properties);
@@ -481,7 +479,6 @@ impl<'a> OrgFile<'a> {
 
             // &self.posts.push(post_as_orgfile);
         }
-
     }
 
     /// render spits out html to disk.

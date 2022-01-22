@@ -174,6 +174,14 @@ impl FrontMatter {
         self.firn_private
     }
 
+    pub fn can_be_put_into_sitemap(&self) -> bool {
+        if let Some(_title) = &self.title {
+            self.is_public() && self.firn_sitemap
+        } else {
+            false
+        }
+    }
+
 
     pub fn is_post(&self) -> bool {
         &self.firn_type == "post"
