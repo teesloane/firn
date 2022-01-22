@@ -38,11 +38,16 @@ fn watch_stuff(cfg: &mut Config) {
         (cfg.dir_static_src.clone(), RecursiveMode::Recursive),
         (cfg.dir_data_files_src.clone(), RecursiveMode::Recursive),
         (cfg.dir_firn.clone(), RecursiveMode::NonRecursive), // for finding config.yaml
-        // Note! we don't recursively watch the org files, as it will
-        // recursively search EVERYTHING, since firn doens't work with a "content" folder
-        // As such, we just watch the top level dir for now.
-        // If notify-rs enables filtered paths, we could switch to recursive.
-        (cfg.dir_source.clone(), RecursiveMode::NonRecursive),
+        // NOTE:
+        // We may want to switch this to NonRecursive because firn works in a
+        // way that it operates on a folder already full of org files... if it
+        // we watch recursively (say you have blog/foo.org), when that changes
+        // it will recompile the site, and then the watcher will look at every
+        // compiled file in _firn/_site, and try and handle those changes.
+        //
+        // This works, but... it bugs me.
+        // If notify-rs ever enables filtered paths, we could switch to recursive.
+        (cfg.dir_source.clone(), RecursiveMode::Recursive),
     ];
 
     // Create a channel to receive the events.
@@ -103,7 +108,7 @@ fn detect_change_kind(dir_source: &PathBuf, path: PathBuf) -> (PathBuf, ChangeKi
     // detects if it's an org file that has changed
     } else if let Some(parent) = changed_path.parent() {
         if let Some(extension) = changed_path.extension() {
-            if parent == starting_folder && extension == "org" {
+            if  extension == "org" {
                 ChangeKind::OrgFile
             } else {
                 ChangeKind::Unknown
