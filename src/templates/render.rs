@@ -1,5 +1,5 @@
 use crate::{
-    config::Config,
+    config::{BaseUrl, Config},
     errors::{FirnError, FirnErrorType},
     front_matter,
     html::{self, MyHtmlHandler},
@@ -16,7 +16,7 @@ use tera::{Function as TeraFn, Result as TeraResult};
 #[derive(Debug, Clone)]
 pub struct Render {
     original_org: String,
-    base_url: String,
+    base_url: BaseUrl,
     file_path: PathBuf,
     front_matter: front_matter::FrontMatter,
     verbosity: i8,
@@ -35,7 +35,7 @@ impl Render {
             original_org: o.original_org.clone(),
             front_matter: o.front_matter.clone(),
             file_path: o.file_path.clone(),
-            base_url: cfg.clone_baseurl(),
+            base_url: cfg.base_url.clone(),
             verbosity: cfg.verbosity,
             user_config: cfg.user_config.clone(),
         }
@@ -56,11 +56,15 @@ impl Render {
             match event {
                 Event::Start(el) => match el {
                     Element::Title(title) => {
-                        html::trx_title(title, &mut handler, &mut wr, update_level)
+                        html::write_title(title, &mut handler, &mut wr, update_level)
                     }
-                    Element::Link(link) => {
-                        html::trx_link(link, &mut handler, &mut wr, self.base_url.clone())
-                    }
+                    Element::Link(link) => html::write_link(
+                        link,
+                        &mut handler,
+                        &mut wr,
+                        self.base_url.clone(),
+                        self.file_path.clone(),
+                    ),
                     _ => handler.start(&mut wr, el).unwrap(),
                 },
                 Event::End(el) => handler.end(&mut wr, el).unwrap(),
@@ -93,11 +97,15 @@ impl Render {
                     if is_writing {
                         match el {
                             Element::Title(title) => {
-                                html::trx_title(title, &mut handler, &mut wr, update_level)
+                                html::write_title(title, &mut handler, &mut wr, update_level)
                             }
-                            Element::Link(link) => {
-                                html::trx_link(link, &mut handler, &mut wr, self.base_url.clone())
-                            }
+                            Element::Link(link) => html::write_link(
+                                link,
+                                &mut handler,
+                                &mut wr,
+                                self.base_url.clone(),
+                                self.file_path.clone(),
+                            ),
                             _ => handler.start(&mut wr, el).unwrap(),
                         }
                     }

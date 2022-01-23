@@ -21,6 +21,54 @@ use std::process::Command;
 use std::{collections::HashMap, fs::create_dir_all};
 use tera;
 
+// TODO: move this to another file
+#[derive(Debug, Clone)]
+pub struct BaseUrl {
+    pub base_url: String,
+    dir_source: PathBuf,
+    dir_data_name: String,
+}
+
+impl BaseUrl {
+    pub fn new(base_url: String, dir_source: PathBuf, dir_data_files_src: PathBuf) -> BaseUrl {
+        let dir_data_name = dir_data_files_src
+            .file_name()
+            .map(|name| name.to_string_lossy().into_owned())
+            .unwrap_or("".into());
+
+        BaseUrl {
+            base_url,
+            dir_source,
+            dir_data_name,
+        }
+    }
+    // check if a link is linking to our data directory (in which case we don't
+    // want to preface it with a sibling directory parent)
+    pub fn link_starts_with_data_dir(&self, link: String) -> bool {
+        link.starts_with(&self.dir_data_name)
+    }
+
+    fn strip_source_cwd(&self, file_path: PathBuf) -> PathBuf {
+        file_path
+            .strip_prefix(self.dir_source.clone())
+            .unwrap()
+            .parent()
+            .unwrap()
+            .to_path_buf()
+    }
+
+    pub fn build(self, link: String, file_path: PathBuf) -> String {
+        let parent_dirs = self.strip_source_cwd(file_path);
+        let mut link_res = PathBuf::from(self.base_url.clone());
+        if parent_dirs != PathBuf::from("") && !self.link_starts_with_data_dir(link.clone()) {
+            link_res.push(parent_dirs);
+        }
+        link_res.push(link);
+
+        util::path_to_string(&link_res)
+    }
+}
+
 pub struct Config<'a> {
     pub dir_source: PathBuf,
     pub dir_firn: PathBuf,
@@ -50,7 +98,7 @@ pub struct Config<'a> {
     pub tag_page: PathBuf,
     pub tags_map: HashMap<String, Vec<OrgMetadata<'a>>>,
     pub tags_list: Vec<LinkData>,
-    pub base_url: String,
+    pub base_url: BaseUrl,
 }
 
 /// Builds common paths for the config object.
@@ -82,10 +130,14 @@ impl<'a> Config<'a> {
         let tag_page = dir_firn.join("[tags].html");
 
         Ok(Config {
-            dir_source: cwd,
+            dir_source: cwd.clone(),
             global_attachments: Vec::new(),
             tera: templates::tera::load_templates(&dir_templates.clone()),
-            base_url: user_config.site.url.clone(),
+            base_url: BaseUrl::new(
+                user_config.site.url.clone(),
+                cwd.clone(),
+                dir_data_files_src.clone(),
+            ),
             dir_static_src: dir_firn.join("static"),
             dir_static_dest: dir_firn.join("_site/static"),
             dir_sass: dir_firn.join("sass"),
@@ -288,8 +340,8 @@ impl<'a> Config<'a> {
             let x = LinkData::new(
                 tag_url,
                 tag_name.to_string(),
-                LinkMeta::Tag{count: v.len()},
-                None
+                LinkMeta::Tag { count: v.len() },
+                None,
             );
             out.push(x);
         }
@@ -310,7 +362,7 @@ impl<'a> Config<'a> {
                         sitemap_item_url,
                         v.originating_file.clone(),
                         LinkMeta::Sitemap,
-                        Some(v.front_matter.clone())
+                        Some(v.front_matter.clone()),
                     );
                     out.push(x);
                 }
@@ -401,6 +453,7 @@ impl<'a> Config<'a> {
             .expect("Failed to parse port to an integer");
         self.serve_port = port_int;
         self.user_config.site.url = format!("http://localhost:{}", port);
+        self.base_url.base_url = format!("http://localhost:{}", port);
     }
 
     fn clean_up_attachments(&self) {
