@@ -26,13 +26,11 @@ use tera;
 pub struct BaseUrl {
     pub base_url: String,
     dir_source: PathBuf,
-    dir_data_files_src: PathBuf,
     dir_data_name: String,
 }
 
 impl BaseUrl {
     pub fn new(base_url: String, dir_source: PathBuf, dir_data_files_src: PathBuf) -> BaseUrl {
-        // let dir_data_name = dir_data_files_src.file_name().unwrap();
         let dir_data_name = dir_data_files_src
             .file_name()
             .map(|name| name.to_string_lossy().into_owned())
@@ -42,7 +40,6 @@ impl BaseUrl {
             base_url,
             dir_source,
             dir_data_name,
-            dir_data_files_src,
         }
     }
     // check if a link is linking to our data directory (in which case we don't
@@ -63,7 +60,6 @@ impl BaseUrl {
     pub fn build(self, link: String, file_path: PathBuf) -> String {
         let parent_dirs = self.strip_source_cwd(file_path);
         let mut link_res = PathBuf::from(self.base_url.clone());
-        println!("{:?}", parent_dirs);
         if parent_dirs != PathBuf::from("") && !self.link_starts_with_data_dir(link.clone()) {
             link_res.push(parent_dirs);
         }

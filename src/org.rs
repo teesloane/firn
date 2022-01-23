@@ -373,8 +373,6 @@ impl<'a> OrgFile<'a> {
                 OrgMetadataType::Link(link) => {
                     let new_link_path = link.path.to_owned().to_string();
                     let web_link =
-                        // util::org_file_link_to_html_link(cfg.clone_baseurl(), new_link_path, self.file_path);
-                        // TODO: find out if this stuff works still
                         util::transform_org_link_to_html(cfg.base_url.clone(), new_link_path, self.file_path.clone());
 
                     let backlink_item_url = format!(
