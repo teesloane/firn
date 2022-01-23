@@ -54,30 +54,6 @@ pub fn make_site_url(base_url: String, link: String) -> String {
     format!("{}/{}", base_url, link)
 }
 
-/// This converts a orgize link (struct) to an html link
-pub fn orgize_link_to_html_link(
-    link: &elements::Link,
-    handler: &mut MyHtmlHandler,
-    writer: &mut Vec<u8>,
-    el: &Element,
-    base_url: String,
-) {
-    let link_path = link.path.to_owned();
-    if is_local_org_file(&link_path) {
-        let link_path = link.path.to_string();
-        let result = org_file_link_to_html_link(base_url, link_path);
-        let new_link = elements::Link {
-            path: std::borrow::Cow::Borrowed(&result),
-            desc: link.desc.to_owned(),
-        };
-        let new_link_enum = Element::Link(new_link);
-
-        handler.start(writer, &new_link_enum).unwrap()
-    } else {
-        handler.start(writer, el).unwrap()
-    }
-}
-
 // org link methods
 // (mostly for doing things with links that look like:
 // `file:../`
