@@ -30,28 +30,6 @@ pub fn exit() -> ! {
     ::std::process::exit(1);
 }
 
-// Converts a string: `file:../myorglink.org` to `<site_baseurl>/myorglink.html`
-// pub fn org_file_link_to_html_link(
-//     base_url: String,
-//     org_link_path: String,
-//     file_path: PathBuf,
-// ) -> String {
-//     let mut result = clean_file_link(org_link_path);
-//     result = str::replace(&result, ".org", ".html");
-//     make_site_url(base_url, result)
-// }
-
-// removes preceding ../../ from a file: link.
-// pub fn clean_file_link(org_link_path: String) -> String {
-//     let mut result = String::from("");
-//     for i in org_link_path.split("../") {
-//         if !i.is_empty() || i != "file:" {
-//             result = i.to_string();
-//         }
-//     }
-//     str::replace(&result, "file:", "")
-// }
-
 /// transform_org_link_to_html converts an org link such as:
 /// `file:../myorglink.org` to:
 /// `<site_baseurl>/myorglink.html`
@@ -60,14 +38,12 @@ pub fn exit() -> ! {
 /// - stripping "../../" from links.
 /// - handling links that start with "./" (ie: "sibling lings")
 /// which requires the file path of the oroginating link so we can get the parent.
-/// TODO: update baseurl to be a struct that can hold data like
-/// what is the cwd / root of the wiki, or can build links etc.
+///
 pub fn transform_org_link_to_html(
     base_url: BaseUrl,
     org_link_path: String,
-    _file_path: PathBuf,
+    file_path: PathBuf,
 ) -> String {
-
     let clean_file_link = |lnk: String| -> String {
         // if it's a link up a directory...
         let mut result = String::from("");
@@ -87,12 +63,12 @@ pub fn transform_org_link_to_html(
     if is_local_org_file(&link_path) {
         link_path = clean_file_link(link_path);
         link_path = str::replace(&link_path, ".org", ".html");
-        return make_site_url(base_url, link_path);
+        return base_url.build(link_path, file_path);
 
     // <2> it's a local image
     } else if is_local_img_file(&link_path) {
         link_path = clean_file_link(link_path);
-        return make_site_url(base_url, link_path);
+        return base_url.build(link_path, file_path);
     }
 
     // <3> is a web link (doesn't start with baseurl.)
@@ -103,9 +79,6 @@ pub fn transform_org_link_to_html(
     link_path
 }
 
-pub fn make_site_url(base_url: BaseUrl, link: String) -> String {
-    format!("{}/{}", base_url.base_url, link)
-}
 
 // org link methods
 // (mostly for doing things with links that look like:

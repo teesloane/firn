@@ -139,7 +139,7 @@ impl<'a> OrgFile<'a> {
             .into_os_string()
             .into_string()
             .expect("Failed to convert web_path to string");
-        let full_url = util::make_site_url(cfg.base_url.clone(), web_path_str);
+        let full_url = cfg.base_url.clone().build(web_path_str, file_path.clone());
         let out_path = PathBuf::from(&cfg.dir_site_out).join(&web_path);
         let parsed = Org::parse_string(read_file);
         let front_matter = FrontMatter::new(&parsed);
