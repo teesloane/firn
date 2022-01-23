@@ -106,7 +106,7 @@ fn detect_change_kind(dir_source: &PathBuf, path: PathBuf) -> (PathBuf, ChangeKi
         ChangeKind::Config
     // this should be at the end of the block!
     // detects if it's an org file that has changed
-    } else if let Some(parent) = changed_path.parent() {
+    } else if let Some(_parent) = changed_path.parent() {
         if let Some(extension) = changed_path.extension() {
             if  extension == "org" {
                 ChangeKind::OrgFile

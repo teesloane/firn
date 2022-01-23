@@ -21,6 +21,21 @@ use std::process::Command;
 use std::{collections::HashMap, fs::create_dir_all};
 use tera;
 
+#[derive(Debug, Clone)]
+pub struct BaseUrl {
+    pub base_url: String,
+    dir_source: PathBuf,
+}
+
+impl BaseUrl {
+    pub fn new(base_url: String, dir_source: PathBuf) -> BaseUrl {
+        BaseUrl {
+            base_url,
+            dir_source,
+        }
+    }
+}
+
 pub struct Config<'a> {
     pub dir_source: PathBuf,
     pub dir_firn: PathBuf,
@@ -50,7 +65,7 @@ pub struct Config<'a> {
     pub tag_page: PathBuf,
     pub tags_map: HashMap<String, Vec<OrgMetadata<'a>>>,
     pub tags_list: Vec<LinkData>,
-    pub base_url: String,
+    pub base_url: BaseUrl,
 }
 
 /// Builds common paths for the config object.
@@ -82,10 +97,10 @@ impl<'a> Config<'a> {
         let tag_page = dir_firn.join("[tags].html");
 
         Ok(Config {
-            dir_source: cwd,
+            dir_source: cwd.clone(),
             global_attachments: Vec::new(),
             tera: templates::tera::load_templates(&dir_templates.clone()),
-            base_url: user_config.site.url.clone(),
+            base_url: BaseUrl::new(user_config.site.url.clone(), cwd.clone()),
             dir_static_src: dir_firn.join("static"),
             dir_static_dest: dir_firn.join("_site/static"),
             dir_sass: dir_firn.join("sass"),
@@ -288,8 +303,8 @@ impl<'a> Config<'a> {
             let x = LinkData::new(
                 tag_url,
                 tag_name.to_string(),
-                LinkMeta::Tag{count: v.len()},
-                None
+                LinkMeta::Tag { count: v.len() },
+                None,
             );
             out.push(x);
         }
@@ -310,7 +325,7 @@ impl<'a> Config<'a> {
                         sitemap_item_url,
                         v.originating_file.clone(),
                         LinkMeta::Sitemap,
-                        Some(v.front_matter.clone())
+                        Some(v.front_matter.clone()),
                     );
                     out.push(x);
                 }

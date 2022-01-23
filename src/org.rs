@@ -139,7 +139,7 @@ impl<'a> OrgFile<'a> {
             .into_os_string()
             .into_string()
             .expect("Failed to convert web_path to string");
-        let full_url = util::make_site_url(cfg.clone_baseurl(), web_path_str);
+        let full_url = util::make_site_url(cfg.base_url.clone(), web_path_str);
         let out_path = PathBuf::from(&cfg.dir_site_out).join(&web_path);
         let parsed = Org::parse_string(read_file);
         let front_matter = FrontMatter::new(&parsed);
@@ -373,7 +373,9 @@ impl<'a> OrgFile<'a> {
                 OrgMetadataType::Link(link) => {
                     let new_link_path = link.path.to_owned().to_string();
                     let web_link =
-                        util::org_file_link_to_html_link(cfg.clone_baseurl(), new_link_path);
+                        // util::org_file_link_to_html_link(cfg.clone_baseurl(), new_link_path, self.file_path);
+                        // TODO: find out if this stuff works still
+                        util::transform_org_link_to_html(cfg.base_url.clone(), new_link_path, self.file_path.clone());
 
                     let backlink_item_url = format!(
                         "{}/{}",

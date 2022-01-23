@@ -1,7 +1,5 @@
-use crate::{errors::FirnError, html::MyHtmlHandler};
+use crate::{config::BaseUrl, errors::FirnError};
 use glob::glob;
-use orgize::export::HtmlHandler;
-use orgize::{elements, Element};
 use std::path::{Path, PathBuf};
 use tera::Tera;
 
@@ -33,25 +31,80 @@ pub fn exit() -> ! {
 }
 
 // Converts a string: `file:../myorglink.org` to `<site_baseurl>/myorglink.html`
-pub fn org_file_link_to_html_link(base_url: String, org_link_path: String) -> String {
-    let mut result = clean_file_link(org_link_path);
-    result = str::replace(&result, ".org", ".html");
-    make_site_url(base_url, result)
-}
+// pub fn org_file_link_to_html_link(
+//     base_url: String,
+//     org_link_path: String,
+//     file_path: PathBuf,
+// ) -> String {
+//     let mut result = clean_file_link(org_link_path);
+//     result = str::replace(&result, ".org", ".html");
+//     make_site_url(base_url, result)
+// }
 
 // removes preceding ../../ from a file: link.
-pub fn clean_file_link(org_link_path: String) -> String {
-    let mut result = String::from("");
-    for i in org_link_path.split("../") {
-        if !i.is_empty() || i != "file:" {
-            result = i.to_string();
+// pub fn clean_file_link(org_link_path: String) -> String {
+//     let mut result = String::from("");
+//     for i in org_link_path.split("../") {
+//         if !i.is_empty() || i != "file:" {
+//             result = i.to_string();
+//         }
+//     }
+//     str::replace(&result, "file:", "")
+// }
+
+/// transform_org_link_to_html converts an org link such as:
+/// `file:../myorglink.org` to:
+/// `<site_baseurl>/myorglink.html`
+/// Has to handle:
+/// - prepending the baseurl
+/// - stripping "../../" from links.
+/// - handling links that start with "./" (ie: "sibling lings")
+/// which requires the file path of the oroginating link so we can get the parent.
+/// TODO: update baseurl to be a struct that can hold data like
+/// what is the cwd / root of the wiki, or can build links etc.
+pub fn transform_org_link_to_html(
+    base_url: BaseUrl,
+    org_link_path: String,
+    _file_path: PathBuf,
+) -> String {
+
+    let clean_file_link = |lnk: String| -> String {
+        // if it's a link up a directory...
+        let mut result = String::from("");
+        for i in lnk.split("../") {
+            if !i.is_empty() || i != "file:" {
+                result = i.to_string();
+            }
         }
+        str::replace(&result, "file:", "")
+    };
+
+    let mut link_path = org_link_path;
+
+    // -- handle different types of links.
+
+    // <1> -- It's a local org file.
+    if is_local_org_file(&link_path) {
+        link_path = clean_file_link(link_path);
+        link_path = str::replace(&link_path, ".org", ".html");
+        return make_site_url(base_url, link_path);
+
+    // <2> it's a local image
+    } else if is_local_img_file(&link_path) {
+        link_path = clean_file_link(link_path);
+        return make_site_url(base_url, link_path);
     }
-    str::replace(&result, "file:", "")
+
+    // <3> is a web link (doesn't start with baseurl.)
+    if !is_local_org_file(&link_path) {
+        return link_path;
+    }
+    // <4> We don't know? Just return the link.
+    link_path
 }
 
-pub fn make_site_url(base_url: String, link: String) -> String {
-    format!("{}/{}", base_url, link)
+pub fn make_site_url(base_url: BaseUrl, link: String) -> String {
+    format!("{}/{}", base_url.base_url, link)
 }
 
 // org link methods
@@ -92,10 +145,12 @@ pub fn is_local_img_file(s: &str) -> bool {
 // Returns the name of a template (to later render), provided it's found
 // in the tera instance.
 pub fn get_template(tera: &Tera, template: &str) -> Result<String, FirnError> {
-    
     let template_with_html = format!("{}.html", &template);
     let default_template_name = "default.html".to_string();
-    if tera.get_template_names().any(|x| x == template_with_html.as_str()) {
+    if tera
+        .get_template_names()
+        .any(|x| x == template_with_html.as_str())
+    {
         return Ok(template_with_html);
     }
     Ok(default_template_name)
