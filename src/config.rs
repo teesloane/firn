@@ -89,7 +89,7 @@ pub struct Config<'a> {
     pub global_logbook: Vec<OrgMetadata<'a>>,
     pub global_attachments: Vec<String>,
     pub tera: tera::Tera,
-    pub verbosity: i8,
+    pub verbosity: u8,
     // Data specifically for templates / user interaction:
     pub user_config: UserConfig,
     pub sitemap: Vec<LinkData>,
@@ -111,7 +111,7 @@ fn build_paths(cwd: &PathBuf) -> (PathBuf, PathBuf, PathBuf, PathBuf) {
 }
 
 impl<'a> Config<'a> {
-    pub fn new(cwd: PathBuf, verbosity: i8) -> Result<Config<'a>, anyhow::Error> {
+    pub fn new(cwd: PathBuf, verbosity: u8) -> Result<Config<'a>, anyhow::Error> {
         let (dir_firn, dir_templates, dir_site_out, config_file) = build_paths(&cwd);
         Config::check_site_exists(&dir_firn);
 
@@ -447,11 +447,8 @@ impl<'a> Config<'a> {
         }
     }
 
-    pub fn setup_for_serve(&mut self, port: &str) {
-        let port_int = port
-            .parse::<u16>()
-            .expect("Failed to parse port to an integer");
-        self.serve_port = port_int;
+    pub fn setup_for_serve(&mut self, port: u16) {
+        self.serve_port = port;
         self.user_config.site.url = format!("http://localhost:{}", port);
         self.base_url.base_url = format!("http://localhost:{}", port);
     }

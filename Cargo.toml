@@ -12,7 +12,7 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0.48"
 serde_yaml = "0.8"
 anyhow = "1.0"
-clap =  "3.0.0-rc.11"
+clap =  { version = "3.0", features = ["derive"] }
 glob = "0.3.0"
 rayon = "1.5"
 chrono = "0.4"
