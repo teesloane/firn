@@ -9,6 +9,7 @@ pub mod templates;
 pub mod user_config;
 pub mod util;
 
+use std::env;
 use std::path::PathBuf;
 
 use anyhow::Result;
@@ -30,16 +31,14 @@ struct Cli {
 enum Command {
     /// Scaffold files and folders needed to start a new site
     New {
-        /// The target directory for a new site
-        #[clap(default_value = ".")]
-        path: PathBuf,
+        /// The target directory for a new site, defaults to cwd
+        path: Option<PathBuf>,
     },
 
     /// Build a static site
     Build {
-        /// Directory containing files to be built
-        #[clap(default_value = ".")]
-        path: PathBuf,
+        /// Directory containing files to be built, defaults to cwd
+        path: Option<PathBuf>,
     },
 
     /// Run a development server for processed org files
@@ -48,9 +47,8 @@ enum Command {
         #[clap(short, long, default_value_t = 8080)]
         port: u16,
 
-        /// Directory containing files to be built and served
-        #[clap(default_value = ".")]
-        path: PathBuf,
+        /// Directory containing files to be built and served, defaults to cwd
+        path: Option<PathBuf>,
     },
 }
 
@@ -58,12 +56,17 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Command::New { path } => new_site::init(path),
+        Command::New { path } => {
+            let path = path_or_cwd(path);
+            new_site::init(path);
+        }
         Command::Build { path } => {
+            let path = path_or_cwd(path);
             let mut config = unwrap_config(path, cli.verbose);
             config.build(true)?;
         }
         Command::Serve { port, path } => {
+            let path = path_or_cwd(path);
             let mut config = unwrap_config(path, cli.verbose);
             config.setup_for_serve(port);
             config.build(true)?;
@@ -71,6 +74,10 @@ fn main() -> Result<()> {
         }
     }
     Ok(())
+}
+
+fn path_or_cwd(path: Option<PathBuf>) -> PathBuf {
+    path.unwrap_or_else(|| env::current_dir().expect("Failed to get cwd"))
 }
 
 fn unwrap_config(cwd_as_path: PathBuf, verbosity: u8) -> config::Config<'static> {
