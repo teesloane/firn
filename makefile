@@ -18,13 +18,13 @@ clean_site:
 # Firn commands
 
 new: c clean_all
-	@./target/debug/firn new -d  $(TEST_WIKI)
+	@./target/debug/firn new  $(TEST_WIKI)
 
 build: c clean_site
-	@./target/debug/firn build -d $(TEST_WIKI)
+	@./target/debug/firn build $(TEST_WIKI)
 
 serve: c clean_site
-	./target/debug/firn serve -p 8081 -d $(TEST_WIKI)
+	./target/debug/firn serve -p 8081 $(TEST_WIKI)
 
 # new + build
 nb: new build
