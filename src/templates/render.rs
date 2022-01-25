@@ -19,7 +19,7 @@ pub struct Render {
     base_url: BaseUrl,
     file_path: PathBuf,
     front_matter: front_matter::FrontMatter,
-    verbosity: i8,
+    verbosity: u8,
     user_config: user_config::UserConfig,
 }
 
