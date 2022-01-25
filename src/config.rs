@@ -14,7 +14,6 @@ use crate::{
 use anyhow::{Context, Result};
 use glob::glob;
 use rayon::prelude::*;
-use sass_rs::{compile_file, Options, OutputStyle};
 use std::fs;
 use std::path::PathBuf;
 use std::process::Command;
@@ -233,11 +232,12 @@ impl<'a> Config<'a> {
                     .unwrap_or(true)
             })
             .collect::<Vec<_>>();
-        let options = Options {
-            output_style: OutputStyle::Compressed,
-            ..Default::default()
-        };
+        // let options = Options {
+        //     output_style: OutputStyle::Compressed,
+        //     ..Default::default()
+        // };
         for file in files {
+            let file_path = self.dir_sass.join(&file);
             let out_path = file.strip_prefix(&self.dir_sass)?;
             let css_output_path = self
                 .dir_static_dest
@@ -249,15 +249,17 @@ impl<'a> Config<'a> {
                 create_dir_all(&css_output_path.parent().unwrap())?;
             }
 
-            // NOTE: at the moment we don't panic or abort on failed config
-            match compile_file(self.dir_sass.join(&file), options.clone()) {
+            // read file to string
+            // let scss_string = fs::read_to_string(self.dir_sass.join(&file))?;
+            let scss_file_path = util::path_to_string(&file_path);
+            match grass::from_path(&scss_file_path, &grass::Options::default()) {
                 Ok(res) => {
                     fs::write(css_output_path, &res).context("Failed to write css to file")?;
-                }
+                },
                 Err(s) => {
                     println!("\n{}\n", s);
                 }
-            };
+            }
         }
         Ok(())
     }
