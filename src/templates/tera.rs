@@ -1,5 +1,5 @@
 use crate::{config::Config, org::OrgFile, templates, util};
-use std::path::PathBuf;
+use std::path::Path;
 use tera::Tera;
 
 /// setup_tera
@@ -29,7 +29,7 @@ pub fn setup(cfg: &Config, org_file: &OrgFile) -> Tera {
     tera
 }
 
-pub fn load_templates(dir_templates: &PathBuf) -> Tera {
+pub fn load_templates(dir_templates: &Path) -> Tera {
     let template_path = format!("{}/**/*.html", util::path_to_string(dir_templates));
     let mut tera = match Tera::new(&template_path) {
         Ok(t) => t,

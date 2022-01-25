@@ -172,7 +172,7 @@ impl<'a> TeraFn for Render {
                 Err(_e) => {
                     if self.verbosity == 1 {
                         println!("\n⚠️ Warning: Firn could not find the headline {:?}\nfor file {:?};\nThe layout ({:?}), which is trying to render the headline will be partially empty.",
-                                 headline, self.file_path, self.front_matter.layout.clone().unwrap_or("".to_string())
+                                 headline, self.file_path, self.front_matter.layout.as_deref().unwrap_or("")
                         );
                     }
                     Ok(tera::Value::String("".to_string()))

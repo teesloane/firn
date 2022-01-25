@@ -1,8 +1,9 @@
 use crate::org::{OrgMetadata, OrgMetadataType, OrgTagType};
-use orgize::elements::PropertiesMap;
+use orgize::elements::{PropertiesMap, Timestamp};
+use orgize::Element;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::path::PathBuf;
+use std::path::Path;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct FrontMatter {
@@ -53,12 +54,7 @@ impl FrontMatter {
         let properties: Vec<(String, String)> = properties
             .pairs
             .iter()
-            .map(|p| {
-                (
-                    p.0.to_lowercase().to_string(),
-                    p.1.to_lowercase().to_string(),
-                )
-            })
+            .map(|p| (p.0.to_lowercase(), p.1.to_lowercase()))
             .collect();
         let mut fm = FrontMatter::default();
         for (k, v) in properties {
@@ -66,7 +62,6 @@ impl FrontMatter {
         }
         // run: self.validate_frontmatter - fail if something is missing?
         fm
-
     }
 
     pub fn collect(&mut self, parsed: &orgize::Org) {
@@ -129,24 +124,16 @@ impl FrontMatter {
     /// however, all the keyword *values* are not parsed - they are just raw strings.
     /// so, we have to re-parse their values. This function is responsible for parsing
     /// just values that are supposed to be orgize:DateTimes (#+date_created, #+date_updated)
-    fn get_date_from_field(val: &String) -> Option<chrono::NaiveDateTime> {
+    fn get_date_from_field(val: &str) -> Option<chrono::NaiveDateTime> {
         if !val.is_empty() {
             let parsed_date = orgize::Org::parse(val);
             for p in parsed_date.iter() {
-                if let orgize::Event::Start(el) = p {
-                    if let orgize::Element::Timestamp(t) = el {
-                        match t {
-                            orgize::elements::Timestamp::Active {
-                                start,
-                                repeater: _,
-                                delay: _,
-                            } => {
-                                let res: chrono::NaiveDateTime = start.into();
-                                return Some(res);
-                            }
-                            _ => (),
-                        }
-                    }
+                if let orgize::Event::Start(Element::Timestamp(Timestamp::Active {
+                    start, ..
+                })) = p
+                {
+                    let res: chrono::NaiveDateTime = start.into();
+                    return Some(res);
                 }
             }
         }
@@ -160,10 +147,8 @@ impl FrontMatter {
         "default".to_string()
     }
 
-    pub fn get_title(&self) -> String {
-        self.title
-            .clone()
-            .unwrap_or("< File Has No Title >".to_string())
+    pub fn get_title(&self) -> &str {
+        self.title.as_deref().unwrap_or("< File Has No Title >")
     }
 
     pub fn is_public(&self) -> bool {
@@ -182,7 +167,6 @@ impl FrontMatter {
         }
     }
 
-
     pub fn is_post(&self) -> bool {
         &self.firn_type == "post"
     }
@@ -190,8 +174,8 @@ impl FrontMatter {
     /// Converts firn_tags in front matter to OrgMetadata
     pub fn firn_link_to_org_metadata(
         &self,
-        web_path: &PathBuf,
-        file_path: &PathBuf,
+        web_path: &Path,
+        file_path: &Path,
         tags: &mut Vec<OrgMetadata>,
     ) {
         if let Some(firn_tags) = self.firn_tags.clone() {
