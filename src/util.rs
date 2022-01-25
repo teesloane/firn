@@ -4,17 +4,10 @@ use std::path::{Path, PathBuf};
 use tera::Tera;
 
 pub fn load_files(cwd: &Path, pattern: &str) -> Vec<PathBuf> {
-    let mut output: Vec<PathBuf> = Vec::new();
-    let pattern_path = PathBuf::new().join(&cwd).join(pattern);
-    let pattern_path_str = pattern_path.into_os_string().into_string().unwrap();
+    let pattern_path = cwd.join(pattern);
+    let pattern_path_str = pattern_path.to_str().unwrap();
 
-    for entry in glob(&pattern_path_str).unwrap() {
-        match entry {
-            Ok(path) => output.push(path),
-            Err(_e) => (),
-        }
-    }
-    output
+    glob(pattern_path_str).unwrap().flatten().collect()
 }
 
 /// Turns a space delimited string into a slug, with dashes instead.
@@ -27,7 +20,7 @@ pub fn slugify(s: &str) -> String {
 }
 
 pub fn exit() -> ! {
-    ::std::process::exit(1);
+    std::process::exit(1);
 }
 
 /// transform_org_link_to_html converts an org link such as:
@@ -111,7 +104,7 @@ pub fn is_local_org_file(link_path: &str) -> bool {
 }
 
 pub fn is_local_img_file(s: &str) -> bool {
-    org_str_is_img_link(s.clone()) && is_local_file_link(s.clone())
+    org_str_is_img_link(s) && is_local_file_link(s)
 }
 
 // get_template
@@ -122,13 +115,13 @@ pub fn get_template(tera: &Tera, template: &str) -> Result<String, FirnError> {
     let default_template_name = "default.html".to_string();
     if tera
         .get_template_names()
-        .any(|x| x == template_with_html.as_str())
+        .any(|x| x == template_with_html)
     {
         return Ok(template_with_html);
     }
     Ok(default_template_name)
 }
 
-pub fn path_to_string(p: &PathBuf) -> String {
+pub fn path_to_string(p: &Path) -> String {
     p.display().to_string()
 }

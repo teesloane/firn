@@ -1,6 +1,7 @@
 use notify::DebouncedEvent::*;
 use notify::{watcher, RecursiveMode, Watcher};
 use std::net::{IpAddr, SocketAddr, Ipv4Addr};
+use std::path::Path;
 use std::{io, path::PathBuf, thread};
 // use std::io;
 use std::sync::mpsc::channel;
@@ -12,7 +13,7 @@ use crate::config::Config;
 // https://github.com/seanmonstar/warp/blob/master/examples/autoreload.rs
 pub fn start_server(cfg: &mut Config) {
     let dir_out = cfg.dir_site_out.clone();
-    let port = cfg.serve_port.clone();
+    let port = cfg.serve_port;
 
     thread::spawn(move || {
         let rt = tokio::runtime::Builder::new_current_thread()
@@ -90,7 +91,7 @@ pub enum ChangeKind {
     Unknown,
 }
 
-fn detect_change_kind(dir_source: &PathBuf, path: PathBuf) -> (PathBuf, ChangeKind) {
+fn detect_change_kind(dir_source: &Path, path: PathBuf) -> (PathBuf, ChangeKind) {
     let starting_folder = dir_source.file_stem().unwrap();
     let mut changed_path = PathBuf::from(starting_folder);
     changed_path.push(path.strip_prefix(dir_source).unwrap_or(&path));
@@ -128,7 +129,7 @@ fn detect_change_kind(dir_source: &PathBuf, path: PathBuf) -> (PathBuf, ChangeKi
 /// NOTE: it might not be worth it to improve things here until reload becomes unbearable
 /// as so much depends on global values being collecting everytime Firn runs.
 fn handle_change_kind((_partial_path, change): (PathBuf, ChangeKind), cfg: &mut Config) {
-    let flush = || io::stdout().flush().ok().expect("Could not flush stdout");
+    let flush = || io::stdout().flush().expect("Could not flush stdout");
     let mut rebuild = |thing: &str| {
         print!("Rebuilding {}...", thing);
         flush();

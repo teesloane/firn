@@ -9,7 +9,7 @@ use orgize::{elements, Element, Event, Org};
 use serde::Serialize;
 use slugify::slugify;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{PathBuf, Path};
 use tera::Context;
 
 #[derive(Debug, PartialEq, Eq, Serialize, Clone)]
@@ -46,14 +46,14 @@ impl<'a> OrgMetadata<'a> {
     pub fn new(
         entity: OrgMetadataType<'a>,
         title: Option<&elements::Title>,
-        web_path: &PathBuf,
-        file_path: &PathBuf,
+        web_path: &Path,
+        file_path: &Path,
         front_matter: &front_matter::FrontMatter,
     ) -> OrgMetadata<'a> {
         let file_title = front_matter.title.clone();
-        let originating_file_web_path = web_path.clone();
+        let originating_file_web_path = web_path.to_path_buf();
         let originating_file_path = file_path.to_path_buf();
-        let originating_file = file_title.unwrap_or(util::path_to_string(&originating_file_path));
+        let originating_file = file_title.unwrap_or_else(|| util::path_to_string(&originating_file_path));
         // TODO: write a function that cleans headlines - removes links, etc etc
         // etc - from raw. Headline stuff - not every metadata has an associated
         // headline necessarily (ie, links in an org doc before a headline
@@ -63,7 +63,7 @@ impl<'a> OrgMetadata<'a> {
             let originating_headline = Some(title.raw.clone().to_string());
             let originating_headline_web_path = Some(format!(
                 "{:}#{:}",
-                &originating_file_web_path.as_os_str().to_str().unwrap(),
+                &originating_file_web_path.to_str().unwrap(),
                 slugged_headline
             ));
 
@@ -175,8 +175,8 @@ impl<'a> OrgFile<'a> {
     /// and links, to be pulled into the full config
     pub fn collect_data(
         parsed_org: &Org<'a>,
-        web_path: &PathBuf,
-        file_path: &PathBuf,
+        web_path: &Path,
+        file_path: &Path,
         front_matter: front_matter::FrontMatter,
     ) -> (
         Vec<OrgMetadata<'a>>,
@@ -228,9 +228,7 @@ impl<'a> OrgFile<'a> {
                                 most_recent_title.get(0),
                             ));
                         }
-                        _ => {
-                            ();
-                        }
+                        _ => {}
                     },
                     Event::End(_element) => {}
                 }
@@ -239,7 +237,7 @@ impl<'a> OrgFile<'a> {
         (links, clocks, tags, attachments)
     }
 
-    pub fn is_in_private_folder(&self, ignored_dirs: &Vec<String>, dir_source: &PathBuf) -> bool {
+    pub fn is_in_private_folder(&self, ignored_dirs: &[String], dir_source: &Path) -> bool {
         let dir_source = util::path_to_string(dir_source);
         let ignored_dirs: Vec<String> = ignored_dirs
             .iter()
@@ -249,19 +247,19 @@ impl<'a> OrgFile<'a> {
         ancestors.any(|f| ignored_dirs.contains(&f.display().to_string()))
     }
 
-    pub fn is_private(&self, ignored_dirs: &Vec<String>, dir_source: &PathBuf) -> bool {
+    pub fn is_private(&self, ignored_dirs: &[String], dir_source: &Path) -> bool {
         self.is_in_private_folder(ignored_dirs, dir_source) || self.front_matter.firn_private
     }
 
     /// [stub] validate_file runs various checks to make sure that the file can be rendered.
     /// - does it have the requisite front matter (title...)
     pub fn valid_for_rendering(&self) -> Result<bool, FirnError> {
-        if let None = &self.front_matter.title {
+        if self.front_matter.title.is_none() {
             return Err(FirnError::new(
                 &format!(
                     "{} {}",
-                    "No title found for: ".to_string(),
-                    self.file_path.display().to_string()
+                    "No title found for: ",
+                    self.file_path.display()
                 ),
                 FirnErrorType::FrontMatterNoTitle,
             ));
@@ -271,8 +269,8 @@ impl<'a> OrgFile<'a> {
             return Err(FirnError::new(
                 &format!(
                     "{} {}",
-                    "Private file: ".to_string(),
-                    self.file_path.display().to_string()
+                    "Private file: ",
+                    self.file_path.display()
                 ),
                 FirnErrorType::IsPrivateFile,
             ));
@@ -284,32 +282,29 @@ impl<'a> OrgFile<'a> {
     fn get_logbook_sum(&self) -> chrono::Duration {
         let mut accumulator = Duration::zero();
         for log in &self.logbook {
-            match &log.entity {
-                OrgMetadataType::Clock(clock) => {
-                    match clock {
-                        Clock::Closed {
-                            start,
-                            end,
-                            repeater: _,
-                            delay: _,
-                            duration: _,
-                            post_blank: _,
-                        } => {
-                            let start: NaiveTime = start.into();
-                            let end: NaiveTime = end.into();
-                            let diff = end - start;
-                            accumulator = accumulator + diff;
-                        }
-                        // we don't handle clocks running
-                        Clock::Running {
-                            start: _,
-                            repeater: _,
-                            delay: _,
-                            post_blank: _,
-                        } => (),
+            if let OrgMetadataType::Clock(clock) = &log.entity {
+                match clock {
+                    Clock::Closed {
+                        start,
+                        end,
+                        repeater: _,
+                        delay: _,
+                        duration: _,
+                        post_blank: _,
+                    } => {
+                        let start: NaiveTime = start.into();
+                        let end: NaiveTime = end.into();
+                        let diff = end - start;
+                        accumulator = accumulator + diff;
                     }
+                    // we don't handle clocks running
+                    Clock::Running {
+                        start: _,
+                        repeater: _,
+                        delay: _,
+                        post_blank: _,
+                    } => (),
                 }
-                _ => (),
             }
         }
         accumulator
@@ -325,39 +320,33 @@ impl<'a> OrgFile<'a> {
 
         for g_tag in &cfg.global_tags {
             // if any global tags match any of the tags of this file, include 'em.
-            match &g_tag.entity {
-                OrgMetadataType::Tag(global_tag, _) => {
-                    for local_tag in &self.tags {
-                        match &local_tag.entity {
-                            OrgMetadataType::Tag(local_tag_name, local_tag_type) => {
-                                let related_item_url = format!(
-                                    "{}/{}",
-                                    cfg.user_config.site.url,
-                                    util::path_to_string(&g_tag.originating_file_web_path)
-                                );
+            if let OrgMetadataType::Tag(global_tag, _) = &g_tag.entity {
+                for local_tag in &self.tags {
+                    if let OrgMetadataType::Tag(local_tag_name, local_tag_type) = &local_tag.entity {
+                        let related_item_url = format!(
+                            "{}/{}",
+                            cfg.user_config.site.url,
+                            util::path_to_string(&g_tag.originating_file_web_path)
+                        );
 
-                                if let OrgTagType::FirnTag = local_tag_type {
-                                    if local_tag_name == global_tag
-                                        && local_tag.originating_file_path
-                                            != g_tag.originating_file_path
-                                    {
-                                        let new_link = templates::links::LinkData::new(
-                                            related_item_url,
-                                            g_tag.originating_file.clone(),
-                                            templates::links::LinkMeta::RelatedFile,
-                                            Some(self.front_matter.clone()),
-                                        );
-                                        if !out.contains(&new_link) {
-                                            out.push(new_link);
-                                        }
-                                    }
+                        if let OrgTagType::FirnTag = local_tag_type {
+                            if local_tag_name == global_tag
+                                && local_tag.originating_file_path
+                                    != g_tag.originating_file_path
+                            {
+                                let new_link = templates::links::LinkData::new(
+                                    related_item_url,
+                                    g_tag.originating_file.clone(),
+                                    templates::links::LinkMeta::RelatedFile,
+                                    Some(self.front_matter.clone()),
+                                );
+                                if !out.contains(&new_link) {
+                                    out.push(new_link);
                                 }
                             }
-                            _ => (),
                         }
                     }
                 }
-                _ => (),
             }
         }
         out
@@ -369,31 +358,28 @@ impl<'a> OrgFile<'a> {
         let mut out: Vec<_> = Vec::new();
         for g_link in &cfg.global_links {
             // if the weblink matches self's web_path it's a match.
-            match &g_link.entity {
-                OrgMetadataType::Link(link) => {
-                    let new_link_path = link.path.to_owned().to_string();
-                    let web_link =
-                        util::transform_org_link_to_html(cfg.base_url.clone(), new_link_path, self.file_path.clone());
+            if let OrgMetadataType::Link(link) = &g_link.entity {
+                let new_link_path = link.path.to_owned().to_string();
+                let web_link =
+                    util::transform_org_link_to_html(cfg.base_url.clone(), new_link_path, self.file_path.clone());
 
-                    let backlink_item_url = format!(
-                        "{}/{}",
-                        cfg.user_config.site.url,
-                        util::path_to_string(&g_link.originating_file_web_path)
+                let backlink_item_url = format!(
+                    "{}/{}",
+                    cfg.user_config.site.url,
+                    util::path_to_string(&g_link.originating_file_web_path)
+                );
+
+                if web_link == self.full_url {
+                    let new_link = templates::links::LinkData::new(
+                        backlink_item_url,
+                        g_link.originating_file.clone(),
+                        templates::links::LinkMeta::Backlink,
+                        Some(self.front_matter.clone()),
                     );
-
-                    if web_link == self.full_url {
-                        let new_link = templates::links::LinkData::new(
-                            backlink_item_url,
-                            g_link.originating_file.clone(),
-                            templates::links::LinkMeta::Backlink,
-                            Some(self.front_matter.clone()),
-                        );
-                        if !out.contains(&new_link) {
-                            out.push(new_link);
-                        }
+                    if !out.contains(&new_link) {
+                        out.push(new_link);
                     }
                 }
-                _ => (),
             }
         }
         out

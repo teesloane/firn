@@ -15,7 +15,7 @@ use anyhow::{Context, Result};
 use glob::glob;
 use rayon::prelude::*;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::{collections::HashMap, fs::create_dir_all};
 use tera;
@@ -33,7 +33,7 @@ impl BaseUrl {
         let dir_data_name = dir_data_files_src
             .file_name()
             .map(|name| name.to_string_lossy().into_owned())
-            .unwrap_or("".into());
+            .unwrap_or_else(|| "".into());
 
         BaseUrl {
             base_url,
@@ -101,8 +101,8 @@ pub struct Config<'a> {
 }
 
 /// Builds common paths for the config object.
-fn build_paths(cwd: &PathBuf) -> (PathBuf, PathBuf, PathBuf, PathBuf) {
-    let dir_firn = PathBuf::new().join(&cwd).join("_firn");
+fn build_paths(cwd: &Path) -> (PathBuf, PathBuf, PathBuf, PathBuf) {
+    let dir_firn = cwd.join("_firn");
     let dir_templates = dir_firn.join("layouts");
     let dir_site_out = dir_firn.join("_site");
     let config_file = dir_firn.join("config.yaml");
@@ -134,7 +134,7 @@ impl<'a> Config<'a> {
             tera: templates::tera::load_templates(&dir_templates.clone()),
             base_url: BaseUrl::new(
                 user_config.site.url.clone(),
-                cwd.clone(),
+                cwd,
                 dir_data_files_src.clone(),
             ),
             dir_static_src: dir_firn.join("static"),
@@ -225,7 +225,6 @@ impl<'a> Config<'a> {
             .filter_map(|e| e.ok())
             .filter(|entry| {
                 !entry
-                    .as_path()
                     .iter()
                     .last()
                     .map(|c| c.to_string_lossy().starts_with('_'))
@@ -255,7 +254,7 @@ impl<'a> Config<'a> {
             match grass::from_path(&scss_file_path, &grass::Options::default()) {
                 Ok(res) => {
                     fs::write(css_output_path, &res).context("Failed to write css to file")?;
-                },
+                }
                 Err(s) => {
                     println!("\n{}\n", s);
                 }
@@ -298,8 +297,10 @@ impl<'a> Config<'a> {
                 self.global_logbook.append(&mut f.logbook.clone());
                 self.global_tags.append(&mut f.tags.clone());
                 if f.front_matter.can_be_put_into_sitemap() {
-                    self.global_sitemap
-                        .insert(f.front_matter.get_title(), f.sitemap_data.clone());
+                    self.global_sitemap.insert(
+                        f.front_matter.get_title().to_owned(),
+                        f.sitemap_data.clone(),
+                    );
                 }
             }
         }
@@ -309,8 +310,8 @@ impl<'a> Config<'a> {
         // Collecting tagged files into a map:
         let mut x: HashMap<String, Vec<OrgMetadata<'a>>> = HashMap::new();
         for tag in &self.global_tags {
-            match &tag.entity {
-                org::OrgMetadataType::Tag(tag_name, tag_type) => match tag_type {
+            if let org::OrgMetadataType::Tag(tag_name, tag_type) = &tag.entity {
+                match tag_type {
                     org::OrgTagType::FirnTag => {
                         if self.user_config.tags.firn {
                             x.entry(tag_name.to_string().to_lowercase())
@@ -325,8 +326,7 @@ impl<'a> Config<'a> {
                                 .or_insert_with(|| vec![tag.to_owned()]);
                         }
                     }
-                },
-                _ => (),
+                }
             }
         }
         self.tags_map = x;
@@ -352,23 +352,20 @@ impl<'a> Config<'a> {
 
         // -- Sitemap --
         let mut out: Vec<LinkData> = Vec::new();
-        for (_k, v) in &self.global_sitemap {
-            match &v.entity {
-                org::OrgMetadataType::Sitemap(_fm) => {
-                    let sitemap_item_url = format!(
-                        "{}/{}",
-                        self.user_config.site.url,
-                        util::path_to_string(&v.originating_file_web_path)
-                    );
-                    let x = LinkData::new(
-                        sitemap_item_url,
-                        v.originating_file.clone(),
-                        LinkMeta::Sitemap,
-                        Some(v.front_matter.clone()),
-                    );
-                    out.push(x);
-                }
-                _ => (),
+        for v in self.global_sitemap.values() {
+            if let org::OrgMetadataType::Sitemap(_fm) = &v.entity {
+                let sitemap_item_url = format!(
+                    "{}/{}",
+                    self.user_config.site.url,
+                    util::path_to_string(&v.originating_file_web_path)
+                );
+                let x = LinkData::new(
+                    sitemap_item_url,
+                    v.originating_file.clone(),
+                    LinkMeta::Sitemap,
+                    Some(v.front_matter.clone()),
+                );
+                out.push(x);
             }
         }
         out.sort_by_key(|ld| ld.file.clone());
@@ -435,17 +432,14 @@ impl<'a> Config<'a> {
     fn print_build_message(&self, failed_renders: Vec<FirnError>) {
         let mut report: HashMap<FirnErrorType, Vec<FirnError>> = HashMap::new();
         for err in failed_renders {
-            let entry = report.entry(err.kind.clone()).or_insert(Vec::new());
+            let entry = report.entry(err.kind.clone()).or_default();
             entry.push(err);
         }
 
-        match report.get(&FirnErrorType::IsPrivateFile) {
-            Some(priv_files) => {
-                if priv_files.len() > 0 {
-                    println!("{:?} private files were skipped.", priv_files.len());
-                }
+        if let Some(priv_files) = report.get(&FirnErrorType::IsPrivateFile) {
+            if !priv_files.is_empty() {
+                println!("{:?} private files were skipped.", priv_files.len());
             }
-            None => (),
         }
     }
 
@@ -516,7 +510,7 @@ impl<'a> Config<'a> {
         self.build(print_build_log)
     }
 
-    pub fn check_site_exists(dir_firn: &PathBuf) {
+    pub fn check_site_exists(dir_firn: &Path) {
         if !dir_firn.exists() {
             println!("\nError: A '_firn' directory does not exists. Have you run `firn new`?");
             util::exit();

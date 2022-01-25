@@ -47,7 +47,7 @@ impl Toc {
         let mut prev_headline_level = 0;
         let mut at_headline_root = false;
         let mut headline_root_lvl = 0;
-        let list_type = list_type.unwrap_or("ol".to_string());
+        let list_type = list_type.as_deref().unwrap_or("ol");
         let exclude_root = exclude_root.unwrap_or(false);
         for headline in parsed.headlines() {
             let title = headline.title(&parsed);
@@ -58,8 +58,6 @@ impl Toc {
             let mut write_headline = || {
                 // if the current hl_lvl we are iterating on is less than the depth..
                 if hl_lvl <= user_preferred_depth {
-
-
                     // and it's more than the prev headline...
                     if hl_lvl > prev_headline_level {
                         // let's open a new ul/ol tag for it.
@@ -73,7 +71,6 @@ impl Toc {
                         for _ in 0..gap_between_headlines {
                             write!(writer, "</{0}>", list_type)
                                 .expect("Failed to use writer in toc function.");
-
                         }
                     }
 
@@ -92,7 +89,7 @@ impl Toc {
                         &title.raw, headline_html_str
                     )
                     .expect("Failed to write table of contents");
-                prev_headline_level = hl_lvl;
+                    prev_headline_level = hl_lvl;
                 // ?????
                 } else {
                     prev_headline_level = hl_lvl;

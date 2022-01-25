@@ -185,8 +185,8 @@ img { max-width: 600px; }
 "#;
 
 pub fn init(cwd: PathBuf) {
-    let dir_firn = PathBuf::new().join(&cwd).join("_firn");
-    if fs::metadata(dir_firn.clone()).is_ok() {
+    let dir_firn = cwd.join("_firn");
+    if fs::metadata(&dir_firn).is_ok() {
         println!("A '_firn' site already exists at this directory.")
     } else {
         let dirs = vec!["layouts/", "layouts/partials", "sass", "static/css", "static/js", "_site"];
@@ -202,7 +202,7 @@ pub fn init(cwd: PathBuf) {
         files.insert(String::from("config.yaml"), CONFIG_YAML);
 
         // Map over the above strings, turn them into paths, and create them.
-        for dir in dirs.iter() {
+        for &dir in &dirs {
             let joined_dir = dir_firn.join(dir);
             fs::create_dir_all(joined_dir).expect("Couldn't create a new firn, directory");
         }
