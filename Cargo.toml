@@ -17,7 +17,7 @@ glob = "0.3.0"
 rayon = "1.5"
 chrono = "0.4"
 slugify = "0.1.0"
-grass = "0.10.8"
+grass = { version = "0.10.8", default-features = false, features = ["random"] }
 # for server (borrowed from zola)
 tokio = { version = "1.0.1", default-features = false, features = ["rt", "fs", "full"] }
 warp = "0.3"
