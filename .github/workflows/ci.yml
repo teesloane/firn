@@ -25,18 +25,13 @@ jobs:
       RUST_BACKTRACE: 1
     strategy:
       matrix:
-        build: [linux, linux-arm, macos]
+        build: [linux, macos]
         include:
         - build: linux
           os: ubuntu-18.04
           rust: nightly
           asset_name: firn-linux-x86_64
-          target: x86_64-unknown-linux-musl
-        - build: linux-arm
-          os: ubuntu-18.04
-          rust: nightly
-          target: arm-unknown-linux-gnueabihf
-          asset_name: firn-linux-arm
+          target: x86_64-unknown-linux-gnu
         - build: macos
           os: macos-latest
           rust: nightly
