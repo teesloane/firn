@@ -3,6 +3,7 @@ use orgize::elements::{PropertiesMap, Timestamp};
 use orgize::Element;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+ use chrono::Datelike;
 use std::path::Path;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -10,6 +11,7 @@ pub struct FrontMatter {
     pub title: Option<String>,
     pub date_created: Option<String>,
     pub date_created_ts: Option<i64>,
+    pub date_created_year: Option<i32>,
     pub date_updated: Option<String>,
     pub date_updated_ts: Option<i64>,
     pub firn_under: Option<Vec<String>>,
@@ -28,6 +30,7 @@ impl FrontMatter {
             title: None,
             date_created: None,
             date_created_ts: None,
+            date_created_year: None,
             date_updated: None,
             date_updated_ts: None,
             firn_under: None,
@@ -85,6 +88,7 @@ impl FrontMatter {
                 if !v.is_empty() {
                     if let Some(dc) = FrontMatter::get_date_from_field(&v) {
                         self.date_created_ts = Some(dc.timestamp());
+                        self.date_created_year = Some(dc.year());
                         self.date_created = Some(dc.format("%Y-%m-%d").to_string());
                     }
                 }
