@@ -72,7 +72,6 @@ pub fn transform_org_link_to_html(
     link_path
 }
 
-
 // org link methods
 // (mostly for doing things with links that look like:
 // `file:../`
@@ -113,10 +112,7 @@ pub fn is_local_img_file(s: &str) -> bool {
 pub fn get_template(tera: &Tera, template: &str) -> Result<String, FirnError> {
     let template_with_html = format!("{}.html", &template);
     let default_template_name = "default.html".to_string();
-    if tera
-        .get_template_names()
-        .any(|x| x == template_with_html)
-    {
+    if tera.get_template_names().any(|x| x == template_with_html) {
         return Ok(template_with_html);
     }
     Ok(default_template_name)
@@ -124,4 +120,51 @@ pub fn get_template(tera: &Tera, template: &str) -> Result<String, FirnError> {
 
 pub fn path_to_string(p: &Path) -> String {
     p.display().to_string()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_is_local_file_link() {
+        assert_eq!(true, is_local_file_link("file:assimil.org"));
+        assert_eq!(false, is_local_file_link("https://theiceshelf.com"));
+    }
+
+    #[test]
+    fn test_transform_org_link_to_html() {
+        let base_url = BaseUrl::new(
+            "https://mysite.com".to_string(),
+            PathBuf::from("/Users/pi/firnsite"),
+            PathBuf::from("/Users/pi/firnsite/wiki/_firn/_site/data"),
+        );
+
+        assert_eq!(
+            "https://mysite.com/sibling_file.html",
+            transform_org_link_to_html(
+                base_url.clone(),
+                "file:sibling_file.org".to_string(),
+                "/Users/pi/firnsite/myfile.org".into()
+            )
+        );
+
+        // TODO: fix this test.
+        // assert_eq!(
+        //     "https://mysite.com/parent_file.html",
+        //     transform_org_link_to_html(
+        //         base_url.clone(),
+        //         "file:../parent_file.org".to_string(),
+        //         "/Users/pi/firnsite/nested/myfile.org".into()
+        //     )
+        // );
+
+        assert_eq!(
+            "https://mysite.com/blog/nested_sibling_file.html",
+            transform_org_link_to_html(
+                base_url.clone(),
+                "file:nested_sibling_file.org".to_string(),
+                "/Users/pi/firnsite/blog/myfile.org".into()
+            )
+        )
+    }
 }
