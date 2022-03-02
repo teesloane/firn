@@ -25,7 +25,7 @@ pub enum OrgTagType {
 /// This information gets used later when we access global tags, logs, etc.
 #[derive(Debug, Serialize, Clone)]
 pub enum OrgMetadataType<'a> {
-    Clock(elements::Clock<'a>),
+    Clock(elements::Clock<'a>), // TODO: add a "duration" as int not string?
     Link(elements::Link<'a>),
     Tag(String, OrgTagType),
     Sitemap(FrontMatter),
@@ -392,7 +392,8 @@ impl<'a> OrgFile<'a> {
         ctx.insert("title", &self.front_matter.get_title());
         ctx.insert("frontmatter", &self.front_matter);
         ctx.insert("related", &self.get_related_files(cfg));
-        ctx.insert("logbook", &logbook_sum.num_hours());
+        ctx.insert("logbook_sum", &logbook_sum.num_hours());
+        // ctx.insert("logbook", &self.logbook);
         ctx.insert("sitemap", &cfg.sitemap);
         ctx.insert("config", &cfg.user_config);
         ctx.insert("tags", &cfg.tags_list);

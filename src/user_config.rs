@@ -26,11 +26,20 @@ pub struct FileConfig {
     pub todo_keywords: Vec<String>,
 }
 
+// Similar to the [tag] concept, we also have a [time] file that
+// is passed data specific to logbooks ("config.global_logbook").
+// Passing it to every single layout would make the build time quite long.
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct LogConfig {
+    pub layouts: Vec<String>
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct UserConfig {
     pub site: SiteConfig,
     pub file: FileConfig,
     pub tags: TagConfig,
+    pub logbooks: LogConfig
 }
 
 impl UserConfig {

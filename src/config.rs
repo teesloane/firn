@@ -427,7 +427,28 @@ impl<'a> Config<'a> {
         }
     }
 
-    // --TAGS: End--------------------------------------------------------------
+    // -- TAGS: End--------------------------------------------------------------
+
+    // -- Logbook Page: Start ------------------------------------------------------
+
+    fn logbooks_build_pages(&self) {
+        for logbook_layout in &self.user_config.logbooks.layouts {
+            let mut ctx = tera::Context::new();
+            ctx.insert("sitemap", &self.sitemap);
+            ctx.insert("global_logbook", &self.global_logbook);
+            ctx.insert("title", "Time");
+            ctx.insert("config", &self.user_config);
+
+            // let logbook_layout_file_name = format!("{}.html", logbook_layout);
+            // let tag_file_name = format!("{}.html", logbook_layout);
+            let out_path = self.dir_site_out.join(logbook_layout);
+            let output = self.tera.render(logbook_layout, &ctx).unwrap();
+            fs::write(&out_path, output).expect("failed to write tag file.")
+        }
+    }
+
+
+    // -- Logbook Page: End --------------------------------------------------------
 
     fn print_build_message(&self, failed_renders: Vec<FirnError>) {
         let mut report: HashMap<FirnErrorType, Vec<FirnError>> = HashMap::new();
@@ -449,6 +470,7 @@ impl<'a> Config<'a> {
         self.base_url.base_url = format!("http://localhost:{}", port);
     }
 
+    // TODO: write a test for this.
     fn clean_up_attachments(&self) {
         let mut deleted_files = 0;
         let mut trx_attachments: Vec<String> = Vec::new();
@@ -487,9 +509,10 @@ impl<'a> Config<'a> {
             self.load_firn_files();
             self.parse_files();
             self.collect_global_data();
-            self.cp_data();
-            self.cp_static();
+            // self.cp_data();
+            // self.cp_static();
             self.tags_build_pages();
+            self.logbooks_build_pages();
             self.render(print_build_log);
             if self.user_config.site.clean_attachments {
                 self.clean_up_attachments();

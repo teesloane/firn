@@ -23,6 +23,9 @@ new: c clean_all
 build: c clean_site
 	@./target/debug/firn build $(TEST_WIKI)
 
+firn_build:
+	@./target/debug/firn build $(TEST_WIKI)
+
 serve: c clean_site
 	./target/debug/firn serve -p 8081 $(TEST_WIKI)
 

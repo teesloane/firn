@@ -43,6 +43,18 @@ tags:
 
   # Set `firn` to true if you want to create a [tag].html page for every *firn_tag* front matter.
   firn: true
+
+# Logbooks ---
+
+# Logbook data can be made available to various templates, but firn needs to
+# know beforehand which layouts you wish to inject time data into.
+# This is because logbook data can grow quite large, and
+# automatically inserting it into *every* layout would cause rendering time to grow.
+
+logbooks:
+  # List templates you wish to inject logbook data into.
+  # This file(s) must be in the _firn/layouts/ directory.
+  layouts: []
 "#;
 
 const TAG_TEMPLATE: &str = r#"{% import "macros.html" as macros %}
