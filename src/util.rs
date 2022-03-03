@@ -1,6 +1,6 @@
 use crate::{config::BaseUrl, errors::FirnError};
 use glob::glob;
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 use tera::Tera;
 
 pub fn load_files(cwd: &Path, pattern: &str) -> Vec<PathBuf> {
@@ -37,15 +37,38 @@ pub fn transform_org_link_to_html(
     org_link_path: String,
     file_path: PathBuf,
 ) -> String {
-    let clean_file_link = |lnk: String| -> String {
-        // if it's a link up a directory...
-        let mut result = String::from("");
-        for i in lnk.split("../") {
-            if !i.is_empty() || i != "file:" {
-                result = i.to_string();
+    let mut num_parents = 0;
+    // this closure is a bit of a mess
+    // but basically, we want to count how many ".." are in the file link,
+    // so we can pass it to the Baseurl::build method.
+    let mut clean_file_link = |lnk: String| -> String {
+        // first, remove the `file:` prefix.
+        let stripped_lnk = str::replace(&lnk, "file:", "");
+        // now, let's turn it into a path so we can break it up.
+        let link_as_path = PathBuf::from(stripped_lnk.clone());
+        // now just get the directory parents of the original file_path
+        let mut file_path_without_file = file_path.parent().unwrap().to_path_buf();
+        let mut final_res: Vec<String> = Vec::new();
+        let mut result: String = stripped_lnk.clone();
+
+        // now for each ParentDir (".."), we push the file_name (last item in the link path)
+        // to a temporary holding place, which we will then reverse
+        // and join into a url.
+        for comp in link_as_path.components() {
+            match comp {
+                Component::ParentDir => {
+                    let file_name_as_str = file_path_without_file.file_name().and_then(|s| s.to_str()).unwrap();
+                    final_res.insert(0, file_name_as_str.to_string());
+                    file_path_without_file.pop();
+                    num_parents += 1;
+                }
+                Component::Normal(f) => {
+                    result = f.to_str().unwrap().to_string();
+                }
+                _ => ()
             }
         }
-        str::replace(&result, "file:", "")
+        result
     };
 
     let mut link_path = org_link_path;
@@ -56,12 +79,13 @@ pub fn transform_org_link_to_html(
     if is_local_org_file(&link_path) {
         link_path = clean_file_link(link_path);
         link_path = str::replace(&link_path, ".org", ".html");
-        return base_url.build(link_path, file_path);
+        let x = base_url.build(link_path, file_path, num_parents);
+        return x
 
     // <2> it's a local image
     } else if is_local_img_file(&link_path) {
         link_path = clean_file_link(link_path);
-        return base_url.build(link_path, file_path);
+        return base_url.build(link_path, file_path, num_parents);
     }
 
     // <3> is a web link (doesn't start with baseurl.)
@@ -149,14 +173,14 @@ mod tests {
         );
 
         // TODO: fix this test.
-        // assert_eq!(
-        //     "https://mysite.com/parent_file.html",
-        //     transform_org_link_to_html(
-        //         base_url.clone(),
-        //         "file:../parent_file.org".to_string(),
-        //         "/Users/pi/firnsite/nested/myfile.org".into()
-        //     )
-        // );
+        assert_eq!(
+            "https://mysite.com/parent_file.html",
+            transform_org_link_to_html(
+                base_url.clone(),
+                "file:../../parent_file.org".to_string(),
+                "/Users/pi/firnsite/nested/deeper/myfile.org".into()
+            )
+        );
 
         assert_eq!(
             "https://mysite.com/blog/nested_sibling_file.html",

@@ -56,9 +56,13 @@ impl BaseUrl {
             .to_path_buf()
     }
 
-    pub fn build(self, link: String, file_path: PathBuf) -> String {
-        let parent_dirs = self.strip_source_cwd(file_path);
+    pub fn build(self, link: String, file_path: PathBuf, parents_to_drop: i32) -> String {
+        let mut parent_dirs = self.strip_source_cwd(file_path);
         let mut link_res = PathBuf::from(self.base_url.clone());
+        for _n in 0..parents_to_drop {
+            parent_dirs.pop();
+        }
+
         if parent_dirs != PathBuf::from("") && !self.link_starts_with_data_dir(link.clone()) {
             link_res.push(parent_dirs);
         }
