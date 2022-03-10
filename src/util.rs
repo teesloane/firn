@@ -84,8 +84,14 @@ pub fn transform_org_link_to_html(
 
     // <2> it's a local image
     } else if is_local_img_file(&link_path) {
-        link_path = clean_file_link(link_path);
-        return base_url.build(link_path, file_path, num_parents);
+        let mut result = String::from("");
+        for i in link_path.split("../") {
+            if !i.is_empty() || i != "file:" {
+                result = i.to_string();
+            }
+        }
+        let new_link_path = str::replace(&result, "file:", "");
+        return base_url.build(new_link_path, file_path, 0);
     }
 
     // <3> is a web link (doesn't start with baseurl.)
@@ -172,7 +178,6 @@ mod tests {
             )
         );
 
-        // TODO: fix this test.
         assert_eq!(
             "https://mysite.com/parent_file.html",
             transform_org_link_to_html(
