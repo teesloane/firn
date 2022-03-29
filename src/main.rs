@@ -17,7 +17,7 @@ use clap::{Parser, Subcommand};
 
 /// Org Mode static site generator
 #[derive(Parser)]
-#[clap(name = "Firn", version = "0.15", author = "The Ice Shelf")]
+#[clap(name = "Firn", version = "0.21", author = "The Ice Shelf")]
 struct Cli {
     /// Set the level of verbosity, e.g. -v => verbose, -vv => very verbose
     #[clap(short, long, global = true, parse(from_occurrences))]

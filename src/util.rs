@@ -30,8 +30,6 @@ pub fn transform_org_link_to_html(
     org_link_path: String,
     file_path: PathBuf,
 ) -> String {
-    let num_parents = 0;
-
     let mut link_path = org_link_path;
 
     // -- handle different types of links.
@@ -41,13 +39,13 @@ pub fn transform_org_link_to_html(
         // link_path = clean_file_link(link_path);
         link_path = str::replace(&link_path, ".org", ".html");
         link_path = str::replace(&link_path, "file:", "");
-        let x = base_url.build(link_path, file_path, num_parents);
+        let x = base_url.build(link_path, file_path);
         return x
 
     // <2> it's a local image
     } else if is_local_img_file(&link_path) {
         link_path = str::replace(&link_path, "file:", "");
-        return base_url.build(link_path, file_path, num_parents);
+        return base_url.build(link_path, file_path);
     }
 
     // <3> is a web link (doesn't start with baseurl.)
