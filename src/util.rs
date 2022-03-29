@@ -1,6 +1,6 @@
 use crate::{config::BaseUrl, errors::FirnError};
 use glob::glob;
-use std::path::{Component, Path, PathBuf};
+use std::path::{Path, PathBuf};
 use tera::Tera;
 
 pub fn load_files(cwd: &Path, pattern: &str) -> Vec<PathBuf> {
@@ -23,53 +23,14 @@ pub fn exit() -> ! {
     std::process::exit(1);
 }
 
-/// transform_org_link_to_html converts an org link such as:
-/// `file:../myorglink.org` to:
-/// `<site_baseurl>/myorglink.html`
-/// Has to handle:
-/// - prepending the baseurl
-/// - stripping "../../" from links.
-/// - handling links that start with "./" (ie: "sibling lings")
-/// which requires the file path of the oroginating link so we can get the parent.
-///
+
+
 pub fn transform_org_link_to_html(
     base_url: BaseUrl,
     org_link_path: String,
     file_path: PathBuf,
 ) -> String {
-    let mut num_parents = 0;
-    // this closure is a bit of a mess
-    // but basically, we want to count how many ".." are in the file link,
-    // so we can pass it to the Baseurl::build method.
-    let mut clean_file_link = |lnk: String| -> String {
-        // first, remove the `file:` prefix.
-        let stripped_lnk = str::replace(&lnk, "file:", "");
-        // now, let's turn it into a path so we can break it up.
-        let link_as_path = PathBuf::from(stripped_lnk.clone());
-        // now just get the directory parents of the original file_path
-        let mut file_path_without_file = file_path.parent().unwrap().to_path_buf();
-        let mut final_res: Vec<String> = Vec::new();
-        let mut result: String = stripped_lnk.clone();
-
-        // now for each ParentDir (".."), we push the file_name (last item in the link path)
-        // to a temporary holding place, which we will then reverse
-        // and join into a url.
-        for comp in link_as_path.components() {
-            match comp {
-                Component::ParentDir => {
-                    let file_name_as_str = file_path_without_file.file_name().and_then(|s| s.to_str()).unwrap();
-                    final_res.insert(0, file_name_as_str.to_string());
-                    file_path_without_file.pop();
-                    num_parents += 1;
-                }
-                Component::Normal(f) => {
-                    result = f.to_str().unwrap().to_string();
-                }
-                _ => ()
-            }
-        }
-        result
-    };
+    let num_parents = 0;
 
     let mut link_path = org_link_path;
 
@@ -77,21 +38,16 @@ pub fn transform_org_link_to_html(
 
     // <1> -- It's a local org file.
     if is_local_org_file(&link_path) {
-        link_path = clean_file_link(link_path);
+        // link_path = clean_file_link(link_path);
         link_path = str::replace(&link_path, ".org", ".html");
+        link_path = str::replace(&link_path, "file:", "");
         let x = base_url.build(link_path, file_path, num_parents);
         return x
 
     // <2> it's a local image
     } else if is_local_img_file(&link_path) {
-        let mut result = String::from("");
-        for i in link_path.split("../") {
-            if !i.is_empty() || i != "file:" {
-                result = i.to_string();
-            }
-        }
-        let new_link_path = str::replace(&result, "file:", "");
-        return base_url.build(new_link_path, file_path, 0);
+        link_path = str::replace(&link_path, "file:", "");
+        return base_url.build(link_path, file_path, num_parents);
     }
 
     // <3> is a web link (doesn't start with baseurl.)
@@ -177,12 +133,38 @@ mod tests {
                 "/Users/pi/firnsite/myfile.org".into()
             )
         );
+        assert_eq!(
+            "https://mysite.com/blog/child_file.html",
+            transform_org_link_to_html(
+                base_url.clone(),
+                "file:blog/child_file.org".to_string(),
+                "/Users/pi/firnsite/myfile.org".into()
+            )
+        );
+
+        assert_eq!(
+            "https://mysite.com/data/files/blog/2022/visitor_3.gif",
+            transform_org_link_to_html(
+                base_url.clone(),
+                "file:../data/files/blog/2022/visitor_3.gif".to_string(),
+                "/Users/pi/firnsite/blog/visitor3.org".into()
+            )
+        );
 
         assert_eq!(
             "https://mysite.com/parent_file.html",
             transform_org_link_to_html(
                 base_url.clone(),
                 "file:../../parent_file.org".to_string(),
+                "/Users/pi/firnsite/nested/deeper/myfile.org".into()
+            )
+        );
+
+        assert_eq!(
+            "https://mysite.com/nested/parent_file.html",
+            transform_org_link_to_html(
+                base_url.clone(),
+                "file:../parent_file.org".to_string(),
                 "/Users/pi/firnsite/nested/deeper/myfile.org".into()
             )
         );

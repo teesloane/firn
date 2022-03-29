@@ -1,7 +1,6 @@
 use crate::{
     errors::{FirnError, FirnErrorType},
-    org,
-    org::OrgMetadata,
+    org::{self, OrgMetadata},
     templates::{self},
     templates::{
         data,
@@ -15,7 +14,7 @@ use anyhow::{Context, Result};
 use glob::glob;
 use rayon::prelude::*;
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 use std::process::Command;
 use std::{collections::HashMap, fs::create_dir_all};
 use tera;
@@ -56,18 +55,27 @@ impl BaseUrl {
             .to_path_buf()
     }
 
-    pub fn build(self, link: String, file_path: PathBuf, parents_to_drop: i32) -> String {
-        let mut parent_dirs = self.strip_source_cwd(file_path);
+    pub fn build(self, link: String, file_path: PathBuf, _parents_to_drop: i32) -> String {
+        let mut parent_dirs = self.strip_source_cwd(file_path.clone());
+        // start with just the baseurl.
         let mut link_res = PathBuf::from(self.base_url.clone());
-        for _n in 0..parents_to_drop {
-            parent_dirs.pop();
-        }
+        // all things after "../" in links
+        let mut link_tail = PathBuf::from("");
 
-        if parent_dirs != PathBuf::from("") && !self.link_starts_with_data_dir(link.clone()) {
-            link_res.push(parent_dirs);
+        let link_as_path = PathBuf::from(link.clone());
+        for comp in link_as_path.components() {
+            match comp {
+                Component::ParentDir => {
+                    parent_dirs.pop();
+                }
+                Component::Normal(f) => {
+                    link_tail.push(f);
+                }
+                _ => ()
+            }
         }
-        link_res.push(link);
-
+        link_res.push(parent_dirs);
+        link_res.push(link_tail);
         util::path_to_string(&link_res)
     }
 }
