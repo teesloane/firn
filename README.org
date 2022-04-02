@@ -49,8 +49,7 @@ A small roadmap can be found [[https://theiceshelf.com/firn.html#Roadmap][here.]
 * Limitations
 ** Development Server
 
-The development server is quite naive. There is no caching or diffing in the replacement of changed assets in the /static or /data folder. Further, live reload changes will not be triggered when you change =.org= files in nested directories beyond the top directory of firn. For the most part, dunnwurryaboutit.
-
+The development server is quite naive. There is no caching or diffing in the replacement of changed assets in the /static or /data folder.
 ** Footnotes
 Due to how the parser parses footnotes, they must look like so:
 #+begin_src
