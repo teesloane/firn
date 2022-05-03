@@ -6,7 +6,7 @@ use crate::{
     org::OrgFile,
     user_config,
 };
-use orgize::export::HtmlHandler;
+use orgize::export::{HtmlHandler, SyntectHtmlHandler};
 use orgize::{Element, Event, Org, ParseConfig};
 use serde_json::value::{from_value, to_value, Value};
 use std::collections::HashMap;
@@ -49,7 +49,7 @@ impl Render {
             },
         );
         let mut wr = Vec::new();
-        let mut handler = MyHtmlHandler::default();
+        let mut handler = SyntectHtmlHandler::new(MyHtmlHandler::default());
 
         // here we manually write out html *only when we are in the headlines we want*.
         for event in parsed.iter() {
@@ -85,7 +85,8 @@ impl Render {
             },
         );
         let mut wr = Vec::new();
-        let mut handler = MyHtmlHandler::default();
+        // let mut handler = MyHtmlHandler::default();
+        let mut handler = SyntectHtmlHandler::new(MyHtmlHandler::default());
         let mut is_writing = false;
         let mut headline_found = false;
         let mut is_writing_level = 0;

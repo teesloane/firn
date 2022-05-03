@@ -1,6 +1,6 @@
 use crate::config::BaseUrl;
 use crate::util;
-use orgize::export::{DefaultHtmlHandler, HtmlEscape, HtmlHandler};
+use orgize::export::{DefaultHtmlHandler, HtmlEscape, HtmlHandler, SyntectHtmlHandler};
 use orgize::{elements, Element};
 use std::io::{Error as IOError, Write};
 use std::path::PathBuf;
@@ -104,7 +104,7 @@ impl HtmlHandler<MyError> for MyHtmlHandler {
 /// linking when encountering a `./` or `../` type of link.
 pub fn write_link(
     link: &elements::Link,
-    handler: &mut MyHtmlHandler,
+    handler: &mut SyntectHtmlHandler<MyError, MyHtmlHandler>,
     writer: &mut Vec<u8>,
     base_url: BaseUrl,
     file_path: PathBuf,
@@ -121,7 +121,7 @@ pub fn write_link(
 
 pub fn write_title(
     title: &elements::Title,
-    handler: &mut MyHtmlHandler,
+    handler: &mut SyntectHtmlHandler<MyError, MyHtmlHandler>,
     writer: &mut Vec<u8>,
     update_level: Option<i8>,
 ) {
