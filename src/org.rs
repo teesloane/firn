@@ -9,7 +9,7 @@ use orgize::{elements, Element, Event, Org};
 use serde::Serialize;
 use slugify::slugify;
 use std::fs;
-use std::path::{PathBuf, Path};
+use std::path::{Path, PathBuf};
 use tera::Context;
 
 #[derive(Debug, PartialEq, Eq, Serialize, Clone)]
@@ -53,7 +53,8 @@ impl<'a> OrgMetadata<'a> {
         let file_title = front_matter.title.clone();
         let originating_file_web_path = web_path.to_path_buf();
         let originating_file_path = file_path.to_path_buf();
-        let originating_file = file_title.unwrap_or_else(|| util::path_to_string(&originating_file_path));
+        let originating_file =
+            file_title.unwrap_or_else(|| util::path_to_string(&originating_file_path));
         // TODO: write a function that cleans headlines - removes links, etc etc
         // etc - from raw. Headline stuff - not every metadata has an associated
         // headline necessarily (ie, links in an org doc before a headline
@@ -256,22 +257,14 @@ impl<'a> OrgFile<'a> {
     pub fn valid_for_rendering(&self) -> Result<bool, FirnError> {
         if self.front_matter.title.is_none() {
             return Err(FirnError::new(
-                &format!(
-                    "{} {}",
-                    "No title found for: ",
-                    self.file_path.display()
-                ),
+                &format!("{} {}", "No title found for: ", self.file_path.display()),
                 FirnErrorType::FrontMatterNoTitle,
             ));
         }
 
         if self.front_matter.is_private() {
             return Err(FirnError::new(
-                &format!(
-                    "{} {}",
-                    "Private file: ",
-                    self.file_path.display()
-                ),
+                &format!("{} {}", "Private file: ", self.file_path.display()),
                 FirnErrorType::IsPrivateFile,
             ));
         }
@@ -322,7 +315,8 @@ impl<'a> OrgFile<'a> {
             // if any global tags match any of the tags of this file, include 'em.
             if let OrgMetadataType::Tag(global_tag, _) = &g_tag.entity {
                 for local_tag in &self.tags {
-                    if let OrgMetadataType::Tag(local_tag_name, local_tag_type) = &local_tag.entity {
+                    if let OrgMetadataType::Tag(local_tag_name, local_tag_type) = &local_tag.entity
+                    {
                         let related_item_url = format!(
                             "{}/{}",
                             cfg.user_config.site.url,
@@ -331,8 +325,7 @@ impl<'a> OrgFile<'a> {
 
                         if let OrgTagType::FirnTag = local_tag_type {
                             if local_tag_name == global_tag
-                                && local_tag.originating_file_path
-                                    != g_tag.originating_file_path
+                                && local_tag.originating_file_path != g_tag.originating_file_path
                             {
                                 let new_link = templates::links::LinkData::new(
                                     related_item_url,
@@ -360,8 +353,11 @@ impl<'a> OrgFile<'a> {
             // if the weblink matches self's web_path it's a match.
             if let OrgMetadataType::Link(link) = &g_link.entity {
                 let new_link_path = link.path.to_owned().to_string();
-                let web_link =
-                    util::transform_org_link_to_html(cfg.base_url.clone(), new_link_path, self.file_path.clone());
+                let web_link = util::transform_org_link_to_html(
+                    cfg.base_url.clone(),
+                    new_link_path,
+                    self.file_path.clone(),
+                );
 
                 let backlink_item_url = format!(
                     "{}/{}",
@@ -394,8 +390,10 @@ impl<'a> OrgFile<'a> {
         ctx.insert("related", &self.get_related_files(cfg));
         ctx.insert("logbook", &logbook_sum.num_hours());
         ctx.insert("sitemap", &cfg.sitemap);
+        ctx.insert("sitemap_layout", &cfg.user_config.sitemap.layout);
         ctx.insert("config", &cfg.user_config);
         ctx.insert("tags", &cfg.tags_list);
+        ctx.insert("nodes", &cfg.sitemap_tree.nodes);
     }
 
     /// render spits out html to disk.

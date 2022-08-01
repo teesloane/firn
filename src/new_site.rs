@@ -43,6 +43,12 @@ tags:
 
   # Set `firn` to true if you want to create a [tag].html page for every *firn_tag* front matter.
   firn: true
+
+sitemap:
+  # The layout of the sitemap. Use "tree" if you would like the directories
+  # where the org files are to be shown on the sitemap.
+  # Currently, any values other than "tree" render the original "flat" layout.
+  layout: "flat"
 "#;
 
 const TAG_TEMPLATE: &str = r#"{% import "macros.html" as macros %}
@@ -124,6 +130,32 @@ their #+date_created and #+date_updated frontmatter. #}
 {% endif %}
 "#;
 
+const PARTIAL_SITEMAP_TREE: &str = r#" {# This partial is used to render the sitemap #}
+{% macro sitemap_tree(u, nodes) %}
+{% if nodes[u] %}
+    {% if nodes[u].first_child %}
+      <details open>
+        {% if u != 0 %}
+          <summary>{{ nodes[u].path_comp }}</summary>
+        {% else %}
+          <summary>Sitemap</summary>
+        {% endif %}
+        <ul>
+          <li>{{ self::sitemap_tree(u=nodes[u].first_child, nodes=nodes) }}</li>
+       </ul>
+      </details>
+    {% elif nodes[u].data %}
+      <a href={{ nodes[u].data.path }}>{{ nodes[u].data.file }}
+        {% if nodes[u].data.kind.Tag %} ({{nodes[u].data.kind.Tag}}) {% endif %}
+      </a>
+    {% endif %}
+   {% if nodes[u].next_sibling %}
+    <li>{{ self::sitemap_tree(u=nodes[u].next_sibling, nodes=nodes) }}</li>
+   {% endif %}
+{% endif %}
+{% endmacro sitemap_tree %}
+"#;
+
 const MACROS: &str = r#" {# the link_list macro is used to render a generic list of links (backlinks, sitemap, tags etc.) #}
 {% macro link_list(title, list_items) %}
   {% if list_items | length > 0 %}
@@ -143,22 +175,25 @@ const MACROS: &str = r#" {# the link_list macro is used to render a generic list
     </section>
   {% endif %}
 {% endmacro input %}
-
 "#;
 
 const DEFAULT_HTML: &str = r#"{% import "macros.html" as macros %}
+{% import "sitemap_tree.html" as sitemap_tree %}
 <html>
   {% include "partials/head.html" %}
   <body style="display: flex;">
     <main style="width: 600px; margin: 0 auto; padding: 32px;">
       {{render()}}
     </main>
-
     <aside style="padding: 32px; width: 300px;">
      <section>{{toc()}}</section>
+      {% if sitemap_layout == "tree" %}
+        <section>{{sitemap_tree::sitemap_tree(u=0, nodes=nodes)}}</section>
+      {% else %}
+        {{macros::link_list(title="Sitemap", list_items=sitemap)}}
+      {% endif %}
       {{macros::link_list(title="Backlinks", list_items=backlinks)}}
       {{macros::link_list(title="Related", list_items=related)}}
-      {{macros::link_list(title="Sitemap", list_items=sitemap)}}
       {{macros::link_list(title="Tags", list_items=tags)}}
     </aside>
   </body>
@@ -189,11 +224,22 @@ pub fn init(cwd: PathBuf) {
     if fs::metadata(&dir_firn).is_ok() {
         println!("A '_firn' site already exists at this directory.")
     } else {
-        let dirs = vec!["layouts/", "layouts/partials", "sass", "static/css", "static/js", "_site"];
+        let dirs = vec![
+            "layouts/",
+            "layouts/partials",
+            "sass",
+            "static/css",
+            "static/js",
+            "_site",
+        ];
 
         let mut files = HashMap::new();
         files.insert(String::from("layouts/partials/head.html"), PARTIAL_HEAD);
         files.insert(String::from("layouts/macros.html"), MACROS);
+        files.insert(
+            String::from("layouts/sitemap_tree.html"),
+            PARTIAL_SITEMAP_TREE,
+        );
         files.insert(String::from("layouts/partials/recent.html"), PARTIAL_RECENT);
         files.insert(String::from("static/js/main.js"), DEFAULT_JS);
         files.insert(String::from("sass/main.scss"), DEFAULT_SCSS);

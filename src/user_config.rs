@@ -27,10 +27,16 @@ pub struct FileConfig {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct SitemapConfig {
+    pub layout: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct UserConfig {
     pub site: SiteConfig,
     pub file: FileConfig,
     pub tags: TagConfig,
+    pub sitemap: SitemapConfig,
 }
 
 impl UserConfig {

@@ -8,6 +8,7 @@ pub mod serve;
 pub mod templates;
 pub mod user_config;
 pub mod util;
+pub mod sitemap;
 
 use std::env;
 use std::path::PathBuf;

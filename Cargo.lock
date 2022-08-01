@@ -370,6 +370,7 @@ dependencies = [
  "grass",
  "notify",
  "orgize",
+ "percent-encoding",
  "rayon",
  "serde",
  "serde_json",

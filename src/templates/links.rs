@@ -3,7 +3,7 @@ use serde::Serialize;
 
 // -- Link data for Tera to loop over --------------------------------------------
 
-#[derive(Debug, PartialEq, Serialize)]
+#[derive(Debug, PartialEq, Serialize, Clone)]
 pub enum LinkMeta {
     Backlink,
     RelatedFile,
@@ -11,7 +11,7 @@ pub enum LinkMeta {
     Sitemap,
 }
 
-#[derive(Debug, PartialEq, Serialize)]
+#[derive(Debug, PartialEq, Serialize, Clone)]
 pub struct LinkData {
     pub path: String,
     pub file: String,
