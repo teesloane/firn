@@ -13,7 +13,6 @@ use crate::{
 
 use anyhow::{Context, Result};
 use glob::glob;
-use percent_encoding::{utf8_percent_encode, AsciiSet, CONTROLS};
 use rayon::prelude::*;
 use std::fs;
 use std::path::{Component, Path, PathBuf};
@@ -21,17 +20,6 @@ use std::process::Command;
 use std::{collections::HashMap, fs::create_dir_all};
 use tera;
 
-const PATH_PERCENT_ENCODE_SET: &AsciiSet = &CONTROLS
-    .add(b' ')
-    .add(b'"')
-    .add(b'<')
-    .add(b'>')
-    .add(b'#')
-    .add(b'\'')
-    .add(b'?')
-    .add(b'`')
-    .add(b'{')
-    .add(b'}');
 // TODO: move this to another file
 #[derive(Debug, Clone)]
 pub struct BaseUrl {
@@ -386,7 +374,7 @@ impl<'a> Config<'a> {
                 let sitemap_item_url = format!(
                     "{}/{}",
                     self.user_config.site.url,
-                    utf8_percent_encode(&web_path, PATH_PERCENT_ENCODE_SET)
+                    util::percent_encode(&web_path)
                 );
                 let x = LinkData::new(
                     sitemap_item_url,
@@ -415,7 +403,7 @@ impl<'a> Config<'a> {
             let sitemap_item_url = format!(
                 "{}/{}",
                 self.user_config.site.url,
-                utf8_percent_encode(&web_path, PATH_PERCENT_ENCODE_SET)
+                util::percent_encode(&web_path)
             );
             let x = LinkData::new(
                 sitemap_item_url,

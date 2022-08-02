@@ -320,7 +320,9 @@ impl<'a> OrgFile<'a> {
                         let related_item_url = format!(
                             "{}/{}",
                             cfg.user_config.site.url,
-                            util::path_to_string(&g_tag.originating_file_web_path)
+                            util::percent_encode(&util::path_to_string(
+                                &g_tag.originating_file_web_path
+                            ))
                         );
 
                         if let OrgTagType::FirnTag = local_tag_type {
@@ -362,7 +364,7 @@ impl<'a> OrgFile<'a> {
                 let backlink_item_url = format!(
                     "{}/{}",
                     cfg.user_config.site.url,
-                    util::path_to_string(&g_link.originating_file_web_path)
+                    util::percent_encode(&util::path_to_string(&g_link.originating_file_web_path))
                 );
 
                 if web_link == self.full_url {
