@@ -1,5 +1,6 @@
 use crate::{config::BaseUrl, errors::FirnError};
 use glob::glob;
+use percent_encoding::{utf8_percent_encode, AsciiSet, CONTROLS};
 use std::path::{Path, PathBuf};
 use tera::Tera;
 
@@ -23,8 +24,6 @@ pub fn exit() -> ! {
     std::process::exit(1);
 }
 
-
-
 pub fn transform_org_link_to_html(
     base_url: BaseUrl,
     org_link_path: String,
@@ -40,7 +39,7 @@ pub fn transform_org_link_to_html(
         link_path = str::replace(&link_path, ".org", ".html");
         link_path = str::replace(&link_path, "file:", "");
         let x = base_url.build(link_path, file_path);
-        return x
+        return x;
 
     // <2> it's a local image
     } else if is_local_img_file(&link_path) {
@@ -104,6 +103,22 @@ pub fn get_template(tera: &Tera, template: &str) -> Result<String, FirnError> {
 
 pub fn path_to_string(p: &Path) -> String {
     p.display().to_string()
+}
+
+const PATH_PERCENT_ENCODE_SET: &AsciiSet = &CONTROLS
+    .add(b' ')
+    .add(b'"')
+    .add(b'<')
+    .add(b'>')
+    .add(b'#')
+    .add(b'\'')
+    .add(b'?')
+    .add(b'`')
+    .add(b'{')
+    .add(b'}');
+
+pub fn percent_encode(p: &String) -> String {
+    utf8_percent_encode(p, PATH_PERCENT_ENCODE_SET).to_string()
 }
 
 #[cfg(test)]

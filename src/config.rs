@@ -1,6 +1,7 @@
 use crate::{
     errors::{FirnError, FirnErrorType},
     org::{self, OrgMetadata},
+    sitemap::SitemapTree,
     templates::{self},
     templates::{
         data,
@@ -71,7 +72,7 @@ impl BaseUrl {
                 Component::Normal(f) => {
                     link_tail.push(f);
                 }
-                _ => ()
+                _ => (),
             }
         }
         link_res.push(parent_dirs);
@@ -104,6 +105,7 @@ pub struct Config<'a> {
     // Data specifically for templates / user interaction:
     pub user_config: UserConfig,
     pub sitemap: Vec<LinkData>,
+    pub sitemap_tree: SitemapTree,
     pub sitemap_mru: Vec<LinkData>,
     pub sitemap_mrp: Vec<LinkData>,
     pub tag_page: PathBuf,
@@ -163,6 +165,7 @@ impl<'a> Config<'a> {
             tags_map: HashMap::new(),
             serve_port: 8080,
             sitemap: Vec::new(),
+            sitemap_tree: SitemapTree::new(),
             sitemap_mru: Vec::new(),
             sitemap_mrp: Vec::new(),
             paths_org_files: Vec::new(),
@@ -366,10 +369,12 @@ impl<'a> Config<'a> {
         let mut out: Vec<LinkData> = Vec::new();
         for v in self.global_sitemap.values() {
             if let org::OrgMetadataType::Sitemap(_fm) = &v.entity {
+                let web_path = util::path_to_string(&v.originating_file_web_path);
+                // https://url.spec.whatwg.org/#path-percent-encode-set
                 let sitemap_item_url = format!(
                     "{}/{}",
                     self.user_config.site.url,
-                    util::path_to_string(&v.originating_file_web_path)
+                    util::percent_encode(&web_path)
                 );
                 let x = LinkData::new(
                     sitemap_item_url,
@@ -382,6 +387,33 @@ impl<'a> Config<'a> {
         }
         out.sort_by_key(|ld| ld.file.clone());
         self.sitemap = out;
+
+        let mut values: Vec<&OrgMetadata> = self
+            .global_sitemap
+            .values()
+            .filter_map(|v| match &v.entity {
+                org::OrgMetadataType::Sitemap(_fm) => Some(v),
+                _ => None,
+            })
+            .collect();
+        values.sort_by_key(|v| v.originating_file_web_path.clone());
+        for v in values {
+            let web_path = util::path_to_string(&v.originating_file_web_path);
+            // https://url.spec.whatwg.org/#path-percent-encode-set
+            let sitemap_item_url = format!(
+                "{}/{}",
+                self.user_config.site.url,
+                util::percent_encode(&web_path)
+            );
+            let x = LinkData::new(
+                sitemap_item_url,
+                v.originating_file.clone(),
+                LinkMeta::Sitemap,
+                Some(v.front_matter.clone()),
+            );
+            self.sitemap_tree
+                .insert(v.originating_file_web_path.clone(), x);
+        }
     }
 
     /// render - iterates over all org files and call their render function.
@@ -430,6 +462,7 @@ impl<'a> Config<'a> {
             ctx.insert("title", &tag_name);
             ctx.insert("tags", &self.tags_list);
             ctx.insert("sitemap", &self.sitemap);
+            ctx.insert("nodes", &self.sitemap_tree.nodes);
             ctx.insert("config", &self.user_config);
 
             let tag_file_name = format!("{}.html", tag_name);
